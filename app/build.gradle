@@ -20,8 +20,20 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    flavorDimensions("main")
+
     dataBinding {
         enabled = true
+    }
+    productFlavors {
+        admin {
+            dimension "main"
+            applicationIdSuffix ".admin"
+        }
+        usuario {
+            dimension "main"
+        }
     }
 }
 

@@ -1,16 +1,46 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <!-- Barra Topo -->
+        <!--<item name="android:windowContentOverlay">@null</item>-->
+        <!--<item name="windowActionBarOverlay">true</item>-->
+        <!--<item name="actionBarStyle">@style/Transparent</item>-->
+        <!-- Fim Barra Topo -->
+    </style>
+
+    <style name="Transparent">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:textColor">@color/azul</item>
+    </style>
+
+    <style name="topo">
+        <item name="android:background">@color/ciano</item>
     </style>
 
     <style name="botao" parent="@android:style/Widget.Button">
         <item name="android:background">@drawable/rounded_corner_button</item>
         <item name="android:bottomLeftRadius">10dp</item>
+        <item name="android:textColor">@color/branco</item>
+    </style>
+
+    <style name="botao_branco" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/rounded_corner_button_branco</item>
+        <item name="android:bottomLeftRadius">10dp</item>
+        <item name="android:textColor">@color/azul</item>
+    </style>
+
+    <style name="botao_transparente" parent="@android:style/Widget.Button">
+        <item name="android:background">@color/transparente</item>
+        <item name="android:textColor">@color/branco</item>
+    </style>
+
+    <style name="texto_branco" parent="@android:style/TextAppearance.Widget.TextView">
         <item name="android:textColor">@color/branco</item>
     </style>
 

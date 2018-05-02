@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+    <!--<item android:id="@+id/icon_sobre"
+        android:icon="@drawable/ic_menu_info_details"
+        android:title="@string/action_sobre"
+        app:showAsAction="always" />
+
+    <item android:id="@+id/icon_config"
+        android:icon="@drawable/ic_config"
+        android:title="@string/action_config"
+        app:showAsAction="always" />-->
+
+    <item android:id="@+id/icon_msg"
+        android:title="Mensagens"
+        app:actionLayout="@layout/toolbar_msg_icon"
+        app:showAsAction="always" />
+
+</menu>

@@ -1,24 +1,54 @@
 package br.com.vostre.circular.view;
 
 import android.databinding.DataBindingUtil;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import br.com.vostre.circular.R;
+import br.com.vostre.circular.databinding.ActivityMenuBinding;
 
-public class MenuActivity extends BaseActivity {
+public class MenuActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     DrawerLayout drawer;
-//    ActivityMenuBinding binding;
+    NavigationView navView;
+    ActivityMenuBinding binding;
+    ActionBarDrawerToggle drawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_menu);
-       // binding = DataBindingUtil.setContentView(this, R.layout.layout_main);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_menu);
         super.onCreate(savedInstanceState);
+        binding.setView(this);
+
+        drawer = binding.container;
+        navView = binding.nav;
+
+        navView.setNavigationItemSelectedListener(this);
+
+        drawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, 0, 0){
+
+            public void onDrawerClosed(View view){
+                super.onDrawerClosed(view);
+                drawerToggle.syncState();
+            }
+
+            public void onDrawerOpened(View view){
+                super.onDrawerOpened(view);
+                drawerToggle.syncState();
+            }
+
+        };
+
+        drawer.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
+
     }
 
     public void onClickBtnPaises(View v){
@@ -61,4 +91,8 @@ public class MenuActivity extends BaseActivity {
         Toast.makeText(getApplicationContext(), "Clicou botão Usuarios", Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        return false;
+    }
 }

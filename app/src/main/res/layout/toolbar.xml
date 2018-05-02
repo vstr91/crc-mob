@@ -11,11 +11,9 @@
         android:id="@+id/toolbar"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:minHeight="?attr/actionBarSize"
         android:background="@color/transparente"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:navigationIcon="?attr/homeAsUpIndicator"
     />
 
 <!--</LinearLayout>-->

@@ -5,9 +5,10 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/azul</item>
 
         <item name="android:statusBarColor">@color/ciano</item>
+        <item name="android:colorControlActivated">@color/ciano</item>
 
         <!-- Barra Topo -->
         <!--<item name="android:windowContentOverlay">@null</item>-->
@@ -51,7 +52,7 @@
     </style>
 
     <style name="botao_principal" parent="@android:style/Widget.Button">
-        <item name="android:background">@color/cinzaClaro</item>
+        <item name="android:background">@drawable/rounded_corner_button_principal</item>
         <item name="android:textColor">@color/azul</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">16sp</item>
@@ -59,6 +60,10 @@
 
     <style name="texto_branco" parent="@android:style/TextAppearance.Widget.TextView">
         <item name="android:textColor">@color/branco</item>
+    </style>
+
+    <style name="texto_azul" parent="@android:style/TextAppearance.Widget.TextView">
+        <item name="android:textColor">@color/azul</item>
     </style>
 
     <style name="badge">

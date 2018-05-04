@@ -1,5 +1,6 @@
 package br.com.vostre.circular.view;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -22,7 +23,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setContentView(R.layout.activity_menu);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_menu);
         super.onCreate(savedInstanceState);
         binding.setView(this);
@@ -52,7 +52,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnPaises(View v){
-        Toast.makeText(getApplicationContext(), "Clicou botão Paises", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(getApplicationContext(), PaisesActivity.class);
+        startActivity(i);
     }
 
     public void onClickBtnEstados(View v){

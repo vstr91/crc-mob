@@ -49,6 +49,9 @@ public class ToolbarUtils {
 
     public static void onMenuItemClick(View v, Activity activity){
         switch(v.getId()){
+            case android.R.id.home:
+                activity.onBackPressed();
+                break;
             case R.id.imageButtonMsg:
             case R.id.msg:
             case R.id.icon_msg:

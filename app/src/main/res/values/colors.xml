@@ -7,4 +7,6 @@
     <color name="branco">#FFFFFF</color>
     <color name="ciano">#00EEE2</color>
     <color name="azul">#334BFF</color>
+    <color name="cinzaEscuro">#333333</color>
+    <color name="cinzaClaro">#EEEEEE</color>
 </resources>

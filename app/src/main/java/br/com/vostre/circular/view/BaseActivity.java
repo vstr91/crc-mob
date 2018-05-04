@@ -51,6 +51,9 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
         int id = item.getItemId();
 
         switch (id){
+            case android.R.id.home:
+                onBackPressed();
+                break;
             /*case R.id.icon_config:
                 intent = new Intent(this, Parametros.class);
                 startActivity(intent);

@@ -3,7 +3,6 @@ package br.com.vostre.circular.view.form;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,20 +11,15 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeFormatterBuilder;
-import org.joda.time.format.DateTimeParser;
-
 import java.text.DateFormat;
 import java.util.Calendar;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.databinding.FormPaisBinding;
+import br.com.vostre.circular.databinding.FormEstadoBinding;
 
-public class FormPais extends FormBase {
+public class FormEstado extends FormBase {
 
-    FormPaisBinding binding;
+    FormEstadoBinding binding;
     Calendar data;
 
     TextView textViewProgramado;
@@ -42,7 +36,7 @@ public class FormPais extends FormBase {
 //        return view;
 
         binding = DataBindingUtil.inflate(
-                inflater, R.layout.form_pais, container, false);
+                inflater, R.layout.form_estado, container, false);
         super.onCreate(savedInstanceState);
         binding.setView(this);
 

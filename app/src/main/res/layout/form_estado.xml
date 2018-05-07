@@ -4,14 +4,14 @@
     <data>
         <variable
             name="view"
-            type="br.com.vostre.circular.view.form.FormPais" />
+            type="br.com.vostre.circular.view.form.FormEstado" />
     </data>
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:minWidth="200dp"
-        tools:context="br.com.vostre.circular.view.form.FormPais">
+        tools:context="br.com.vostre.circular.view.form.FormEstado">
 
 
         <android.support.design.widget.TextInputLayout
@@ -69,7 +69,6 @@
 
         <Switch
             android:id="@+id/switchProgramado"
-            android:onCheckedChanged="@{view::onSwitchProgramadoChange}"
             style="@style/texto_azul"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -78,12 +77,12 @@
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:onCheckedChanged="@{view::onSwitchProgramadoChange}"
             android:text="Programado"
             app:layout_constraintBottom_toTopOf="@+id/btnTrocar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout4" />
+            app:layout_constraintTop_toBottomOf="@+id/spinnerPais" />
 
         <Switch
             android:id="@+id/switchAtivo"
@@ -158,6 +157,20 @@
             app:layout_constraintBottom_toTopOf="@+id/switchAtivo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/switchProgramado" />
+
+        <Spinner
+            android:id="@+id/spinnerPais"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:entries="@android:array/phoneTypes"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout4" />
     </android.support.constraint.ConstraintLayout>
 
 </layout>

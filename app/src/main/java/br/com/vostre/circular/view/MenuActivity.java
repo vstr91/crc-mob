@@ -57,7 +57,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnEstados(View v){
-        Toast.makeText(getApplicationContext(), "Clicou botão Estados", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(getApplicationContext(), EstadosActivity.class);
+        startActivity(i);
     }
 
     public void onClickBtnCidades(View v){

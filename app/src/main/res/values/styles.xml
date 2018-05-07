@@ -51,6 +51,14 @@
         <!--<item name="android:borderlessButtonStyle">true</item>-->
     </style>
 
+    <style name="botao_fechar_branco" parent="@android:style/Widget.Button">
+        <item name="android:background">@color/transparente</item>
+        <item name="android:textColor">@color/branco</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+        <!--<item name="android:borderlessButtonStyle">true</item>-->
+    </style>
+
     <style name="botao_principal" parent="@android:style/Widget.Button">
         <item name="android:background">@drawable/rounded_corner_button_principal</item>
         <item name="android:textColor">@color/azul</item>
@@ -72,6 +80,19 @@
 
     <style name="texto_lista">
         <item name="android:textColor">@color/cinzaEscuro</item>
+    </style>
+
+    <style name="calendario" parent="android:TextAppearance.DeviceDefault.Small">
+        <item name="android:textColor">@color/branco</item>
+        <item name="android:dateTextAppearance">@style/texto_branco</item>
+        <item name="android:yearListItemTextAppearance">@style/texto_branco</item>
+        <item name="android:headerYearTextAppearance">@style/texto_branco</item>
+        <item name="android:headerMonthTextAppearance">@style/texto_branco</item>
+    </style>
+
+    <style name="tabhost">
+        <item name="android:textColorPrimary">@color/branco</item>
+        <item name="android:textColorSecondary">@color/cinzaClaro</item>
     </style>
 
 </resources>

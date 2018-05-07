@@ -82,6 +82,10 @@
         <item name="android:textColor">@color/cinzaEscuro</item>
     </style>
 
+    <style name="texto_lista_menor">
+        <item name="android:textColor">@color/cinzaMedio</item>
+    </style>
+
     <style name="calendario" parent="android:TextAppearance.DeviceDefault.Small">
         <item name="android:textColor">@color/branco</item>
         <item name="android:dateTextAppearance">@style/texto_branco</item>

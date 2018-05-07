@@ -62,11 +62,13 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnCidades(View v){
-        Toast.makeText(getApplicationContext(), "Clicou botão Cidades", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(getApplicationContext(), CidadesActivity.class);
+        startActivity(i);
     }
 
     public void onClickBtnBairros(View v){
-        Toast.makeText(getApplicationContext(), "Clicou botão Bairros", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(getApplicationContext(), BairrosActivity.class);
+        startActivity(i);
     }
 
     public void onClickBtnParadas(View v){

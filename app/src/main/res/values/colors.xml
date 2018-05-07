@@ -9,4 +9,5 @@
     <color name="azul">#334BFF</color>
     <color name="cinzaEscuro">#333333</color>
     <color name="cinzaClaro">#EEEEEE</color>
+    <color name="cinzaMedio">#AAAAAA</color>
 </resources>

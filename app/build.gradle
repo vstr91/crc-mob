@@ -41,6 +41,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
     implementation 'org.osmdroid:osmdroid-android:6.0.1'
+    implementation 'com.karumi:dexter:4.2.0'
 
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:recyclerview-v7:26.1.0'

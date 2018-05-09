@@ -15,12 +15,16 @@ import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsList
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.Marker;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityParadasBinding;
+import br.com.vostre.circular.view.form.FormPais;
 import br.com.vostre.circular.view.form.FormParada;
 
 public class ParadasActivity extends BaseActivity {
@@ -81,6 +85,44 @@ public class ParadasActivity extends BaseActivity {
             mapController.setZoom(19);
             GeoPoint startPoint = new GeoPoint(-22.470804460339885, -43.82463455200195);
             mapController.setCenter(startPoint);
+
+            map.setMaxZoomLevel(19d);
+            map.setMinZoomLevel(15d);
+
+            Marker m = new Marker(map);
+            m.setPosition(new GeoPoint(-22.469786775061603, -43.82366895675659));
+            m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            m.setTitle("Viaduto");
+            map.getOverlays().add(m);
+
+            MapEventsReceiver receiver = new MapEventsReceiver() {
+                @Override
+                public boolean singleTapConfirmedHelper(GeoPoint p) {
+                    Toast.makeText(getBaseContext(),p.getLatitude() + " - "
+                            +p.getLongitude(),Toast.LENGTH_LONG).show();
+
+                    FormParada formParada = new FormParada();
+                    formParada.setLatitude(p.getLatitude());
+                    formParada.setLongitude(p.getLongitude());
+                    formParada.show(getSupportFragmentManager(), "formParada");
+
+//                    Marker m = new Marker(map);
+//                    m.setPosition(new GeoPoint(p.getLatitude(), p.getLongitude()));
+//                    m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+//                    map.getOverlays().add(m);
+
+                    return false;
+                }
+
+                @Override
+                public boolean longPressHelper(GeoPoint p) {
+                    return false;
+                }
+            };
+
+            MapEventsOverlay OverlayEvents = new MapEventsOverlay(getBaseContext(), receiver);
+            map.getOverlays().add(OverlayEvents);
+
         }
 
 
@@ -92,4 +134,19 @@ public class ParadasActivity extends BaseActivity {
         formParada.show(getSupportFragmentManager(), "formParada");
     }
 
+    public void onFabLocationClick(View v){
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        map.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        map.onPause();
+    }
 }

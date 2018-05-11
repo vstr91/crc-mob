@@ -39,7 +39,7 @@ public class FormItinerario extends FormBase {
         binding = DataBindingUtil.inflate(
                 inflater, R.layout.form_itinerario, container, false);
         super.onCreate(savedInstanceState);
-        //binding.setView(this);
+        binding.setView(this);
 
         textViewProgramado = binding.textViewProgramado;
         btnTrocar = binding.btnTrocar;

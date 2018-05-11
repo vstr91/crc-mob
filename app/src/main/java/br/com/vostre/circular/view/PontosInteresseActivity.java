@@ -22,15 +22,12 @@ import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.databinding.ActivityItinerariosBinding;
-import br.com.vostre.circular.databinding.ActivityParadasBinding;
-import br.com.vostre.circular.view.BaseActivity;
-import br.com.vostre.circular.view.form.FormItinerario;
-import br.com.vostre.circular.view.form.FormParada;
+import br.com.vostre.circular.databinding.ActivityPontosInteresseBinding;
+import br.com.vostre.circular.view.form.FormPontoInteresse;
 
-public class ItinerariosActivity extends BaseActivity {
+public class PontosInteresseActivity extends BaseActivity {
 
-    ActivityItinerariosBinding binding;
+    ActivityPontosInteresseBinding binding;
     MapView map;
 
     int permissionGPS;
@@ -40,7 +37,7 @@ public class ItinerariosActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_itinerarios);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_pontos_interesse);
         super.onCreate(savedInstanceState);
 
         MultiplePermissionsListener listener = DialogOnAnyDeniedMultiplePermissionsListener.Builder
@@ -74,7 +71,7 @@ public class ItinerariosActivity extends BaseActivity {
 
         } else{
             binding.setView(this);
-            setTitle("Itinerários");
+            setTitle("Pontos de Interesse");
             getSupportActionBar().setDisplayShowTitleEnabled(true);
 
             map = binding.map;
@@ -96,18 +93,16 @@ public class ItinerariosActivity extends BaseActivity {
             m.setTitle("Viaduto");
             map.getOverlays().add(m);
 
-            /*
-
             MapEventsReceiver receiver = new MapEventsReceiver() {
                 @Override
                 public boolean singleTapConfirmedHelper(GeoPoint p) {
                     Toast.makeText(getBaseContext(),p.getLatitude() + " - "
                             +p.getLongitude(),Toast.LENGTH_LONG).show();
 
-                    FormParada formParada = new FormParada();
-                    formParada.setLatitude(p.getLatitude());
-                    formParada.setLongitude(p.getLongitude());
-                    formParada.show(getSupportFragmentManager(), "formParada");
+                    FormPontoInteresse formPontoInteresse = new FormPontoInteresse();
+                    formPontoInteresse.setLatitude(p.getLatitude());
+                    formPontoInteresse.setLongitude(p.getLongitude());
+                    formPontoInteresse.show(getSupportFragmentManager(), "formPontoInteresse");
 
 //                    Marker m = new Marker(map);
 //                    m.setPosition(new GeoPoint(p.getLatitude(), p.getLongitude()));
@@ -126,16 +121,19 @@ public class ItinerariosActivity extends BaseActivity {
             MapEventsOverlay OverlayEvents = new MapEventsOverlay(getBaseContext(), receiver);
             map.getOverlays().add(OverlayEvents);
 
-            */
         }
 
 
 
     }
 
-    public void onClickSalvar(View v){
-        FormItinerario formItinerario = new FormItinerario();
-        formItinerario.show(getSupportFragmentManager(), "formItinerario");
+    public void onFabClick(View v){
+        FormPontoInteresse formPontoInteresse = new FormPontoInteresse();
+        formPontoInteresse.show(getSupportFragmentManager(), "formPontoInteresse");
+    }
+
+    public void onFabLocationClick(View v){
+
     }
 
     @Override

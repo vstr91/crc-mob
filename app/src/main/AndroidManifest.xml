@@ -28,7 +28,8 @@
         <activity android:name=".view.CidadesActivity" />
         <activity android:name=".view.BairrosActivity" />
         <activity android:name=".view.ParadasActivity" />
-        <activity android:name=".view.ItinerariosActivity"></activity>
+        <activity android:name=".view.ItinerariosActivity" />
+        <activity android:name=".view.PontosInteresseActivity"></activity>
     </application>
 
 </manifest>

@@ -82,7 +82,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnPontosInteresse(View v){
-        Toast.makeText(getApplicationContext(), "Clicou botão Pontos de Interesse", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(getApplicationContext(), PontosInteresseActivity.class);
+        startActivity(i);
     }
 
     public void onClickBtnEmpresas(View v){

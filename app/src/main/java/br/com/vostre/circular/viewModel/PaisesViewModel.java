@@ -19,6 +19,7 @@ import br.com.vostre.circular.utils.StringUtils;
 
 public class PaisesViewModel extends AndroidViewModel {
 
+    private AppDatabase appDatabase;
     PaisDAO paisDAO;
 
     public LiveData<List<Pais>> paises;
@@ -42,14 +43,15 @@ public class PaisesViewModel extends AndroidViewModel {
 
     public PaisesViewModel(Application app){
         super(app);
+        appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         pais = new Pais();
-        paises = new MutableLiveData<>();
+        paises = appDatabase.paisDAO().listarTodos();
     }
 
     public void salvarPais(){
 
         if(pais.valida(pais)){
-            adicionarPais();
+            add(pais);
             System.out.println(pais.getNome()+" | "+pais.getSigla()+" | "+pais.getAtivo());
         } else{
             System.out.println("Faltou algo a ser digitado!");
@@ -57,39 +59,34 @@ public class PaisesViewModel extends AndroidViewModel {
 
     }
 
-    private void adicionarPais(){
-        new AsyncTask<Void, Void, Void>(){
+    // adicionar
 
-            @Override
-            protected Void doInBackground(Void... voids) {
+    public void add(final Pais pais) {
 
-                pais.setDataCadastro(new DateTime());
-                pais.setUltimaAlteracao(new DateTime());
-                pais.setEnviado(false);
-                pais.setSlug(StringUtils.toSlug(pais.getNome()));
+        pais.setDataCadastro(new DateTime());
+        pais.setUltimaAlteracao(new DateTime());
+        pais.setEnviado(false);
+        pais.setSlug(StringUtils.toSlug(pais.getNome()));
 
-                paisDAO = AppDatabase.getAppDatabase(getApplication()).paisDAO();
-                paisDAO.inserir(pais);
-                return null;
-            }
-
-        }.execute();
+        new addAsyncTask(appDatabase).execute(pais);
     }
 
-    public LiveData<List<Pais>> carregarPaises(){
-        new AsyncTask<Void, Void, LiveData<List<Pais>>>(){
+    private static class addAsyncTask extends AsyncTask<Pais, Void, Void> {
 
-            @Override
-            protected LiveData<List<Pais>> doInBackground(Void... voids) {
-                paisDAO = AppDatabase.getAppDatabase(getApplication()).paisDAO();
-                paises = paisDAO.listarTodos();
-                return paises;
-            }
+        private AppDatabase db;
 
-        }.execute();
+        addAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
 
-        return paises;
+        @Override
+        protected Void doInBackground(final Pais... params) {
+            db.paisDAO().inserir((params[0]));
+            return null;
+        }
 
     }
+
+    // fim adicionar
 
 }

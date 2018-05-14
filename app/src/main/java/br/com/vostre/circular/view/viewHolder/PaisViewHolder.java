@@ -17,7 +17,13 @@ public class PaisViewHolder extends RecyclerView.ViewHolder {
 
     public void bind(Pais pais) {
         binding.setPais(pais);
+
+        if(pais.getProgramadoPara() != null && pais.getProgramadoPara().isAfterNow()){
+            binding.btnProgramado.setVisibility(View.VISIBLE);
+        } else{
+            binding.btnProgramado.setVisibility(View.GONE);
+        }
+
         binding.executePendingBindings();
     }
-
 }

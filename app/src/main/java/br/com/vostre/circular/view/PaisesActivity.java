@@ -35,7 +35,7 @@ public class PaisesActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         viewModel = ViewModelProviders.of(this).get(PaisesViewModel.class);
-        viewModel.carregarPaises().observe(this, paisesObserver);
+        viewModel.paises.observe(this, paisesObserver);
 
         binding.setView(this);
         //binding.setViewModel(viewModel);

@@ -3,7 +3,7 @@
     <data>
         <variable
             name="view"
-            type="br.com.vostre.circular.view.PaisesActivity" />
+            type="br.com.vostre.circular.view.ParametrosActivity" />
     </data>
 
     <android.support.v4.widget.DrawerLayout
@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/gradiente"
-            tools:context="br.com.vostre.circular.view.PaisesActivity">
+            tools:context="br.com.vostre.circular.view.ParametrosActivity">
 
             <include
                 layout="@layout/toolbar"
@@ -26,8 +26,7 @@
                 app:layout_constraintTop_toTopOf="parent"></include>
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/listPaises"
-                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                android:id="@+id/listParametros"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginBottom="8dp"
@@ -40,7 +39,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:listitem="@layout/linha_paises" />
+                tools:listitem="@layout/linha_parametros" />
 
             <android.support.design.widget.FloatingActionButton
                 android:layout_width="wrap_content"

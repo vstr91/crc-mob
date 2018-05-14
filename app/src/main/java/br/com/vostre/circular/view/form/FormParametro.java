@@ -1,43 +1,33 @@
 package br.com.vostre.circular.view.form;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeFormatterBuilder;
-import org.joda.time.format.DateTimeParser;
-
 import java.text.DateFormat;
-import java.time.ZoneId;
 import java.util.Calendar;
-import java.util.TimeZone;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.databinding.FormPaisBinding;
-import br.com.vostre.circular.viewModel.PaisesViewModel;
+import br.com.vostre.circular.databinding.FormEmpresaBinding;
+import br.com.vostre.circular.databinding.FormParametroBinding;
 
-public class FormPais extends FormBase {
+public class FormParametro extends FormBase {
 
-    FormPaisBinding binding;
+    FormParametroBinding binding;
     Calendar data;
 
     TextView textViewProgramado;
     Button btnTrocar;
 
-    PaisesViewModel viewModel;
+    ImageView imageViewBrasao;
+    Button btnTrocarBrasao;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -50,30 +40,22 @@ public class FormPais extends FormBase {
 //        return view;
 
         binding = DataBindingUtil.inflate(
-                inflater, R.layout.form_pais, container, false);
+                inflater, R.layout.form_parametro, container, false);
         super.onCreate(savedInstanceState);
-
-        viewModel = ViewModelProviders.of(this).get(PaisesViewModel.class);
-
         binding.setView(this);
-        binding.setViewModel(viewModel);
 
         textViewProgramado = binding.textViewProgramado;
         btnTrocar = binding.btnTrocar;
 
-        if(viewModel.pais.getProgramadoPara() == null){
-            textViewProgramado.setVisibility(View.GONE);
-            btnTrocar.setVisibility(View.GONE);
-        } else{
-            exibeDataEscolhida();
-        }
+        textViewProgramado.setVisibility(View.GONE);
+        btnTrocar.setVisibility(View.GONE);
 
         return binding.getRoot();
 
     }
 
     public void onClickSalvar(View v){
-        viewModel.salvarPais();
+
     }
 
     public void onClickFechar(View v){
@@ -83,7 +65,7 @@ public class FormPais extends FormBase {
     public void onClickTrocar(View v){
         FormCalendario formCalendario = new FormCalendario();
         formCalendario.setParent(this);
-        formCalendario.setDataAnterior(viewModel.pais.getProgramadoPara().toCalendar(null));
+        formCalendario.setDataAnterior(data);
         formCalendario.show(getActivity().getSupportFragmentManager(), "formCalendario");
     }
 
@@ -92,11 +74,7 @@ public class FormPais extends FormBase {
         if(ativo){
             FormCalendario formCalendario = new FormCalendario();
             formCalendario.setParent(this);
-
-            if(viewModel.pais.getProgramadoPara() != null){
-                formCalendario.setDataAnterior(viewModel.pais.getProgramadoPara().toCalendar(null));
-            }
-
+            formCalendario.setDataAnterior(data);
             formCalendario.show(getActivity().getSupportFragmentManager(), "formCalendario");
         } else{
             ocultaDataEscolhida();
@@ -106,10 +84,9 @@ public class FormPais extends FormBase {
 
     @Override
     public void setData(Calendar umaData) {
-        viewModel.pais.setProgramadoPara(new DateTime(umaData,
-                DateTimeZone.forTimeZone(TimeZone.getTimeZone("America/Sao_Paulo"))));
+        this.data = umaData;
 
-        if(viewModel.pais.getProgramadoPara() == null){
+        if(data == null){
             ocultaDataEscolhida();
         } else{
             exibeDataEscolhida();
@@ -120,15 +97,13 @@ public class FormPais extends FormBase {
     private void ocultaDataEscolhida(){
         binding.switchProgramado.setChecked(false);
         textViewProgramado.setVisibility(View.GONE);
-        textViewProgramado.setText("");
         btnTrocar.setVisibility(View.GONE);
-        viewModel.pais.setProgramadoPara(null);
+        data = null;
     }
 
     private void exibeDataEscolhida(){
 
-        textViewProgramado.setText(DateTimeFormat
-                .forPattern("dd/MM/yy HH:mm").print(viewModel.pais.getProgramadoPara()));
+        textViewProgramado.setText(DateFormat.getDateTimeInstance().format(data.getTime()));
 
         textViewProgramado.setVisibility(View.VISIBLE);
         btnTrocar.setVisibility(View.VISIBLE);

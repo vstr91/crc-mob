@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormCalendarioBinding;
@@ -120,7 +121,7 @@ public class FormCalendario extends DialogFragment {
     private void setDataEscolhida(Integer dia, Integer mes, Integer ano){
 
         if(data == null){
-            data = Calendar.getInstance();
+            data = Calendar.getInstance(Locale.getDefault());
         }
 
         data.set(Calendar.DAY_OF_MONTH, dia);

@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "br.com.vostre.circular"
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -42,6 +42,7 @@ dependencies {
 
     implementation 'org.osmdroid:osmdroid-android:6.0.1'
     implementation 'com.karumi:dexter:4.2.0'
+    implementation 'com.github.imangazalievm:slugify:1.0.0'
 
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:recyclerview-v7:26.1.0'

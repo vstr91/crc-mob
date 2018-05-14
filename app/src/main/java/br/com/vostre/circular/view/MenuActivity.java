@@ -11,6 +11,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityMenuBinding;
 
@@ -48,6 +50,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         drawer.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
+
+        JodaTimeAndroid.init(this);
 
     }
 
@@ -87,15 +91,18 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnEmpresas(View v){
-        Toast.makeText(getApplicationContext(), "Clicou botão Empresas", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(getApplicationContext(), EmpresasActivity.class);
+        startActivity(i);
     }
 
     public void onClickBtnParametros(View v){
-        Toast.makeText(getApplicationContext(), "Clicou botão Parametros", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(getApplicationContext(), ParametrosActivity.class);
+        startActivity(i);
     }
 
     public void onClickBtnUsuarios(View v){
-        Toast.makeText(getApplicationContext(), "Clicou botão Usuarios", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(getApplicationContext(), UsuariosActivity.class);
+        startActivity(i);
     }
 
     @Override

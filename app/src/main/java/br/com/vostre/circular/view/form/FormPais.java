@@ -27,6 +27,7 @@ import java.util.TimeZone;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormPaisBinding;
+import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.viewModel.PaisesViewModel;
 
 public class FormPais extends FormBase {
@@ -38,6 +39,17 @@ public class FormPais extends FormBase {
     Button btnTrocar;
 
     PaisesViewModel viewModel;
+
+    Pais pais;
+    Boolean flagInicioEdicao;
+
+    public Pais getPais() {
+        return pais;
+    }
+
+    public void setPais(Pais pais) {
+        this.pais = pais;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -58,6 +70,11 @@ public class FormPais extends FormBase {
         binding.setView(this);
         binding.setViewModel(viewModel);
 
+        if(pais != null){
+            viewModel.pais = pais;
+            flagInicioEdicao = true;
+        }
+
         textViewProgramado = binding.textViewProgramado;
         btnTrocar = binding.btnTrocar;
 
@@ -73,7 +90,14 @@ public class FormPais extends FormBase {
     }
 
     public void onClickSalvar(View v){
-        viewModel.salvarPais();
+
+        if(pais != null){
+            viewModel.editarPais();
+        } else{
+            viewModel.salvarPais();
+        }
+
+        dismiss();
     }
 
     public void onClickFechar(View v){
@@ -88,6 +112,11 @@ public class FormPais extends FormBase {
     }
 
     public void onSwitchProgramadoChange(CompoundButton btn, boolean ativo){
+
+        if(flagInicioEdicao){
+            flagInicioEdicao = false;
+            return;
+        }
 
         if(ativo){
             FormCalendario formCalendario = new FormCalendario();

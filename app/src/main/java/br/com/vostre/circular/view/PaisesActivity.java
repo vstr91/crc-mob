@@ -3,20 +3,16 @@ package br.com.vostre.circular.view;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
-import android.databinding.Observable;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityPaisesBinding;
 import br.com.vostre.circular.model.Pais;
+import br.com.vostre.circular.view.adapter.PaisAdapter;
 import br.com.vostre.circular.view.form.FormPais;
 import br.com.vostre.circular.viewModel.PaisesViewModel;
 
@@ -44,7 +40,7 @@ public class PaisesActivity extends BaseActivity {
 
         listPaises = binding.listPaises;
 
-        adapter = new PaisAdapter(paises);
+        adapter = new PaisAdapter(paises, this);
 
         listPaises.setAdapter(adapter);
 

@@ -74,6 +74,7 @@
 
         <Switch
             android:id="@+id/switchProgramado"
+            android:checked="@{viewModel.pais.programadoPara != null ? true : false}"
             android:onCheckedChanged="@{view::onSwitchProgramadoChange}"
             style="@style/texto_azul"
             android:layout_width="0dp"

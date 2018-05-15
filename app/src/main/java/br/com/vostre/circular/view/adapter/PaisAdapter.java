@@ -1,5 +1,6 @@
-package br.com.vostre.circular.view;
+package br.com.vostre.circular.view.adapter;
 
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -12,10 +13,12 @@ import br.com.vostre.circular.view.viewHolder.PaisViewHolder;
 
 public class PaisAdapter extends RecyclerView.Adapter<PaisViewHolder> {
 
-    List<Pais> paises;
+    public List<Pais> paises;
+    AppCompatActivity ctx;
 
-    public PaisAdapter(List<Pais> paises){
+    public PaisAdapter(List<Pais> paises, AppCompatActivity context){
         this.paises = paises;
+        ctx = context;
     }
 
     @Override
@@ -24,7 +27,7 @@ public class PaisAdapter extends RecyclerView.Adapter<PaisViewHolder> {
                 LayoutInflater.from(parent.getContext());
         LinhaPaisesBinding itemBinding =
                 LinhaPaisesBinding.inflate(layoutInflater, parent, false);
-        return new PaisViewHolder(itemBinding);
+        return new PaisViewHolder(itemBinding, ctx);
     }
 
     @Override

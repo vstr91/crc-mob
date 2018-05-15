@@ -59,6 +59,16 @@ public class PaisesViewModel extends AndroidViewModel {
 
     }
 
+    public void editarPais(){
+
+        if(pais.valida(pais)){
+            edit(pais);
+        } else{
+            System.out.println("Faltou algo a ser digitado!");
+        }
+
+    }
+
     // adicionar
 
     public void add(final Pais pais) {
@@ -88,5 +98,34 @@ public class PaisesViewModel extends AndroidViewModel {
     }
 
     // fim adicionar
+
+    // editar
+
+    public void edit(final Pais pais) {
+
+        pais.setUltimaAlteracao(new DateTime());
+        pais.setEnviado(false);
+        pais.setSlug(StringUtils.toSlug(pais.getNome()));
+
+        new editAsyncTask(appDatabase).execute(pais);
+    }
+
+    private static class editAsyncTask extends AsyncTask<Pais, Void, Void> {
+
+        private AppDatabase db;
+
+        editAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final Pais... params) {
+            db.paisDAO().editar((params[0]));
+            return null;
+        }
+
+    }
+
+    // fim editar
 
 }

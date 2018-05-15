@@ -6,16 +6,18 @@ import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
+import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.utils.Converters;
 
-@Database(entities = {Pais.class}, version = 1)
+@Database(entities = {Pais.class, Estado.class}, version = 1)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase INSTANCE;
 
     public abstract PaisDAO paisDAO();
+    public abstract EstadoDAO estadoDAO();
 
     public static AppDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {

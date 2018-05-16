@@ -7,6 +7,7 @@ import android.databinding.BindingAdapter;
 import android.os.AsyncTask;
 import android.support.v7.widget.AppCompatSpinner;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 
 import org.joda.time.DateTime;
 
@@ -19,6 +20,7 @@ import br.com.vostre.circular.model.dao.EstadoDAO;
 import br.com.vostre.circular.model.dao.PaisDAO;
 import br.com.vostre.circular.utils.StringUtils;
 import br.com.vostre.circular.view.adapter.PaisAdapter;
+import br.com.vostre.circular.view.adapter.PaisAdapterSpinner;
 
 public class EstadosViewModel extends AndroidViewModel {
 
@@ -76,8 +78,8 @@ public class EstadosViewModel extends AndroidViewModel {
 
     }
 
-    @BindingAdapter({"bind:items"})
-    public static void entries(Spinner spinner, PaisAdapter adapter) {
+    @BindingAdapter({"bind:adapter"})
+    public static void entries(Spinner spinner, PaisAdapterSpinner adapter) {
         spinner.setAdapter(adapter);
     }
 

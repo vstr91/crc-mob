@@ -28,6 +28,7 @@ import br.com.vostre.circular.databinding.FormEstadoBinding;
 import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.view.adapter.PaisAdapter;
+import br.com.vostre.circular.view.adapter.PaisAdapterSpinner;
 import br.com.vostre.circular.viewModel.EstadosViewModel;
 
 public class FormEstado extends FormBase {
@@ -50,6 +51,14 @@ public class FormEstado extends FormBase {
 
     public void setEstado(Estado estado) {
         this.estado = estado;
+    }
+
+    public PaisAdapter getAdapter() {
+        return adapter;
+    }
+
+    public void setAdapter(PaisAdapter adapter) {
+        this.adapter = adapter;
     }
 
     @Override
@@ -86,7 +95,7 @@ public class FormEstado extends FormBase {
             exibeDataEscolhida();
         }
 
-        adapter = new PaisAdapter(viewModel.paises.getValue(), (AppCompatActivity) this.getActivity().getParent());
+        adapter = new PaisAdapterSpinner(getContext(), );
         binding.setAdapter(adapter);
 
         binding.spinnerPais.setAdapter(adapter);

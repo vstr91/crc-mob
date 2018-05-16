@@ -1,6 +1,11 @@
 package br.com.vostre.circular.view.form;
 
+import android.app.Application;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.databinding.BindingAdapter;
+import android.databinding.BindingMethod;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,10 +14,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -43,7 +50,17 @@ public class FormEstado extends FormBase {
 
     Estado estado;
     Boolean flagInicioEdicao;
-    PaisAdapter adapter;
+    PaisAdapterSpinner adapter;
+
+    static Application ctx;
+
+    public Application getCtx() {
+        return ctx;
+    }
+
+    public void setCtx(Application ctx) {
+        this.ctx = ctx;
+    }
 
     public Estado getEstado() {
         return estado;
@@ -53,11 +70,11 @@ public class FormEstado extends FormBase {
         this.estado = estado;
     }
 
-    public PaisAdapter getAdapter() {
+    public PaisAdapterSpinner getAdapter() {
         return adapter;
     }
 
-    public void setAdapter(PaisAdapter adapter) {
+    public void setAdapter(PaisAdapterSpinner adapter) {
         this.adapter = adapter;
     }
 
@@ -95,10 +112,7 @@ public class FormEstado extends FormBase {
             exibeDataEscolhida();
         }
 
-        adapter = new PaisAdapterSpinner(getContext(), );
-        binding.setAdapter(adapter);
-
-        binding.spinnerPais.setAdapter(adapter);
+        viewModel.paises.observe(this, paisesObserver);
 
         return binding.getRoot();
 
@@ -177,5 +191,38 @@ public class FormEstado extends FormBase {
         textViewProgramado.setVisibility(View.VISIBLE);
         btnTrocar.setVisibility(View.VISIBLE);
     }
+
+    @BindingAdapter("entries")
+    public static void setSpinnerEntries(Spinner spinner, LiveData<List<Pais>> paises){
+
+        if(paises.getValue() != null){
+            PaisAdapterSpinner adapter = new PaisAdapterSpinner(ctx, R.layout.linha_paises_spinner, R.id.textViewNome, paises.getValue());
+            spinner.setAdapter(adapter);
+        }
+
+    }
+
+    public void setSpinnerEntries(Spinner spinner, List<Pais> paises){
+
+        if(paises != null){
+            PaisAdapterSpinner adapter = new PaisAdapterSpinner(ctx, R.layout.linha_paises_spinner, R.id.textViewNome, paises);
+            spinner.setAdapter(adapter);
+        }
+
+    }
+
+    public void onItemSelectedSpinnerPais(AdapterView<?> adapterView, View view, int i, long l){
+        viewModel.pais = viewModel.paises.getValue().get(i);
+    }
+
+    Observer<List<Pais>> paisesObserver = new Observer<List<Pais>>() {
+        @Override
+        public void onChanged(List<Pais> paises) {
+            setSpinnerEntries(binding.spinnerPais, paises);
+
+            System.out.println("PAISES >>>>>>>>>>>> "+paises.size());
+            System.out.println("ITENS >>>>>>>>>>>> "+binding.spinnerPais.getAdapter().getCount());
+        }
+    };
 
 }

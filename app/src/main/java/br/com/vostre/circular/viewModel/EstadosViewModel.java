@@ -3,6 +3,7 @@ package br.com.vostre.circular.viewModel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.databinding.BindingAdapter;
 import android.os.AsyncTask;
 import android.support.v7.widget.AppCompatSpinner;
@@ -31,6 +32,7 @@ public class EstadosViewModel extends AndroidViewModel {
     public Estado estado;
 
     public LiveData<List<Pais>> paises;
+    public Pais pais;
 
     int paisEscolhido;
 
@@ -55,10 +57,14 @@ public class EstadosViewModel extends AndroidViewModel {
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         estado = new Estado();
         estados = appDatabase.estadoDAO().listarTodos();
+
+        paises = new MutableLiveData<>();
         paises = appDatabase.paisDAO().listarTodos();
     }
 
     public void salvarEstado(){
+
+        estado.setPais(pais.getId());
 
         if(estado.valida(estado)){
             add(estado);
@@ -78,11 +84,6 @@ public class EstadosViewModel extends AndroidViewModel {
 
     }
 
-    @BindingAdapter({"bind:adapter"})
-    public static void entries(Spinner spinner, PaisAdapterSpinner adapter) {
-        spinner.setAdapter(adapter);
-    }
-
     // adicionar
 
     public void add(final Estado estado) {
@@ -91,6 +92,13 @@ public class EstadosViewModel extends AndroidViewModel {
         estado.setUltimaAlteracao(new DateTime());
         estado.setEnviado(false);
         estado.setSlug(StringUtils.toSlug(estado.getNome()));
+
+        // se pais relacionado estiver programado para data apos a programacao do estado, altera a data de programacao do estado para ficar igual e evitar erros de registro nao encontrado
+        if(pais.getProgramadoPara() != null && estado.getProgramadoPara() != null && pais.getProgramadoPara().isAfter(estado.getProgramadoPara())){
+            estado.setProgramadoPara(pais.getProgramadoPara());
+        }
+
+        estado.setPais(pais.getId());
 
         new addAsyncTask(appDatabase).execute(estado);
     }

@@ -1,5 +1,6 @@
 package br.com.vostre.circular.view.adapter;
 
+import android.app.Application;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,17 +11,17 @@ import android.widget.SpinnerAdapter;
 
 import java.util.List;
 
-import br.com.vostre.circular.databinding.LinhaPaisesBinding;
+import br.com.vostre.circular.databinding.LinhaPaisesSpinnerBinding;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.view.viewHolder.PaisViewHolder;
 
 public class PaisAdapterSpinner extends ArrayAdapter<Pais> {
 
     public List<Pais> paises;
-    AppCompatActivity ctx;
+    Application ctx;
 
-    public PaisAdapterSpinner(AppCompatActivity context, int resouceId, int textviewId, List<Pais> paises){
-        super(context, resouceId, textviewId);
+    public PaisAdapterSpinner(Application context, int resouceId, int viewId, List<Pais> paises){
+        super(context, resouceId, viewId, paises);
         this.paises = paises;
         ctx = context;
     }
@@ -28,9 +29,21 @@ public class PaisAdapterSpinner extends ArrayAdapter<Pais> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater layoutInflater =
-                LayoutInflater.from(parent.getContext());
-        LinhaPaisesBinding itemBinding =
-                LinhaPaisesBinding.inflate(layoutInflater, parent, false);
+                LayoutInflater.from(ctx);
+        LinhaPaisesSpinnerBinding itemBinding =
+                LinhaPaisesSpinnerBinding.inflate(layoutInflater, parent, false);
+        itemBinding.setPais(paises.get(position));
+        return itemBinding.getRoot();
+    }
+
+    @Override
+    public View getDropDownView(int position, View convertView, ViewGroup parent)
+    {
+        LayoutInflater layoutInflater =
+                LayoutInflater.from(ctx);
+        LinhaPaisesSpinnerBinding itemBinding =
+                LinhaPaisesSpinnerBinding.inflate(layoutInflater, parent, false);
+        itemBinding.setPais(paises.get(position));
         return itemBinding.getRoot();
     }
 

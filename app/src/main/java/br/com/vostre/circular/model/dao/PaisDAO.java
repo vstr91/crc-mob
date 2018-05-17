@@ -24,6 +24,9 @@ public interface PaisDAO {
     @Query("SELECT * FROM pais WHERE id IN (:ids)")
     List<Pais> carregarTodosPorIds(int[] ids);
 
+    @Query("SELECT * FROM pais WHERE id = :id")
+    LiveData<Pais> carregarPorId(String id);
+
     @Query("SELECT * FROM pais WHERE nome LIKE :nome LIMIT 1")
     Pais encontrarPorNome(String nome);
 

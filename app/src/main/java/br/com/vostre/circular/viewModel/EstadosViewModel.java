@@ -26,15 +26,12 @@ import br.com.vostre.circular.view.adapter.PaisAdapterSpinner;
 public class EstadosViewModel extends AndroidViewModel {
 
     private AppDatabase appDatabase;
-    EstadoDAO estadoDAO;
 
     public LiveData<List<Estado>> estados;
     public Estado estado;
 
     public LiveData<List<Pais>> paises;
     public Pais pais;
-
-    int paisEscolhido;
 
     public LiveData<List<Estado>> getEstados() {
         return estados;
@@ -60,6 +57,7 @@ public class EstadosViewModel extends AndroidViewModel {
 
         paises = new MutableLiveData<>();
         paises = appDatabase.paisDAO().listarTodos();
+
     }
 
     public void salvarEstado(){
@@ -67,6 +65,7 @@ public class EstadosViewModel extends AndroidViewModel {
         estado.setPais(pais.getId());
 
         if(estado.valida(estado)){
+            estado.setSigla(estado.getSigla().toUpperCase());
             add(estado);
         } else{
             System.out.println("Faltou algo a ser digitado!");
@@ -76,7 +75,10 @@ public class EstadosViewModel extends AndroidViewModel {
 
     public void editarEstado(){
 
+        estado.setPais(pais.getId());
+
         if(estado.valida(estado)){
+            estado.setSigla(estado.getSigla().toUpperCase());
             edit(estado);
         } else{
             System.out.println("Faltou algo a ser digitado!");

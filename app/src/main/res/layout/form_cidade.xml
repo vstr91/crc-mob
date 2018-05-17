@@ -5,6 +5,9 @@
         <variable
             name="view"
             type="br.com.vostre.circular.view.form.FormCidade" />
+        <variable
+            name="viewModel"
+            type="br.com.vostre.circular.viewModel.CidadesViewModel" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -33,6 +36,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Nome"
+                android:text="@={viewModel.cidade.nome}"
                 android:inputType="textPersonName"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -42,6 +46,7 @@
 
         <Switch
             android:id="@+id/switchProgramado"
+            android:checked="@{viewModel.estado.programadoPara != null ? true : false}"
             style="@style/texto_azul"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -67,7 +72,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:checked="true"
+            android:checked="@={viewModel.estado.ativo}"
             android:text="Ativo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -136,16 +141,18 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:entries="@android:array/phoneTypes"
+            android:onItemSelected="@{view::onItemSelectedSpinnerEstado}"
+            app:entries="@{viewModel.estados}"
             app:layout_constraintBottom_toTopOf="@+id/switchProgramado"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView" />
+            app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
         <ImageView
             android:id="@+id/imageView"
@@ -156,7 +163,7 @@
             android:layout_marginTop="8dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btnBrasao"
-            app:srcCompat="@mipmap/ic_onibus_azul" />
+            app:srcCompat="@{viewModel.brasao}" />
 
         <Button
             android:id="@+id/btnBrasao"
@@ -166,6 +173,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:onClick="@{view::onClickBtnBrasao}"
             android:text="Selecionar Brasão"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
@@ -178,9 +186,25 @@
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
+            android:onClick="@{view::onClickBtnBrasao}"
             android:text="Trocar"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView"
             app:layout_constraintStart_toEndOf="@+id/imageView"
-            app:layout_constraintTop_toBottomOf="@+id/btnBrasao" />
+            app:layout_constraintTop_toTopOf="@+id/imageView" />
+
+        <TextView
+            android:id="@+id/textView8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Escolha o Estado"
+            android:textAppearance="@style/texto_azul"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
     </android.support.constraint.ConstraintLayout>
 
 </layout>

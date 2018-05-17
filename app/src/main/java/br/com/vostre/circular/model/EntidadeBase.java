@@ -118,7 +118,18 @@ public class EntidadeBase {
 
     }
 
-//    @InverseMethod(value = "setProgramadoParaString")
+    @Override
+    public boolean equals(Object o) {
+
+        if(!(o instanceof EntidadeBase)){
+            return false;
+        }
+
+        EntidadeBase entidadeBase = (EntidadeBase) o;
+        return entidadeBase.getId().equals(this.getId());
+    }
+
+    //    @InverseMethod(value = "setProgramadoParaString")
 //    public String getProgramadoParaString(){
 //
 //        if(this.getProgramadoPara() != null){

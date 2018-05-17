@@ -207,8 +207,14 @@ public class FormEstado extends FormBase {
         if(paises != null){
             PaisAdapterSpinner adapter = new PaisAdapterSpinner(ctx, R.layout.linha_paises_spinner, R.id.textViewNome, paises);
             spinner.setAdapter(adapter);
-            //viewModel.carregaPais(estado);
-            //spinner.setSelection(viewModel.paises.getValue().indexOf(viewModel.pais));
+
+            if(estado != null){
+                Pais pais = new Pais();
+                pais.setId(estado.getPais());
+                int i = viewModel.paises.getValue().indexOf(pais);
+                binding.spinnerPais.setSelection(i);
+            }
+
         }
 
     }

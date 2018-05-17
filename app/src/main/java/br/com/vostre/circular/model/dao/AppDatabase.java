@@ -6,11 +6,12 @@ import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
+import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.utils.Converters;
 
-@Database(entities = {Pais.class, Estado.class}, version = 1)
+@Database(entities = {Pais.class, Estado.class, Cidade.class}, version = 1)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -18,6 +19,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract PaisDAO paisDAO();
     public abstract EstadoDAO estadoDAO();
+    public abstract CidadeDAO cidadeDAO();
 
     public static AppDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {
@@ -25,7 +27,7 @@ public abstract class AppDatabase extends RoomDatabase {
                     Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, "circular")
                             // allow queries on the main thread.
                             // Don't do this on a real app! See PersistenceBasicSample for an example.
-                            .allowMainThreadQueries()
+                            //.allowMainThreadQueries()
                             .build();
         }
         return INSTANCE;

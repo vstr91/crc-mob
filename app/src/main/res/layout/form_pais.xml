@@ -63,7 +63,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Sigla"
-                android:inputType="textPersonName"
+                android:inputType="textCapCharacters"
                 android:maxLength="3"
                 android:textAllCaps="true"
                 app:layout_constraintEnd_toEndOf="parent"

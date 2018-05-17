@@ -51,6 +51,7 @@ public class PaisesViewModel extends AndroidViewModel {
     public void salvarPais(){
 
         if(pais.valida(pais)){
+            pais.setSigla(pais.getSigla().toUpperCase());
             add(pais);
             System.out.println(pais.getNome()+" | "+pais.getSigla()+" | "+pais.getAtivo());
         } else{
@@ -62,6 +63,7 @@ public class PaisesViewModel extends AndroidViewModel {
     public void editarPais(){
 
         if(pais.valida(pais)){
+            pais.setSigla(pais.getSigla().toUpperCase());
             edit(pais);
         } else{
             System.out.println("Faltou algo a ser digitado!");

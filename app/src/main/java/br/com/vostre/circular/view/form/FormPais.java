@@ -41,7 +41,7 @@ public class FormPais extends FormBase {
     PaisesViewModel viewModel;
 
     Pais pais;
-    Boolean flagInicioEdicao;
+    public Boolean flagInicioEdicao;
 
     public Pais getPais() {
         return pais;
@@ -113,7 +113,7 @@ public class FormPais extends FormBase {
 
     public void onSwitchProgramadoChange(CompoundButton btn, boolean ativo){
 
-        if(flagInicioEdicao){
+        if(flagInicioEdicao && pais.getProgramadoPara() != null){
             flagInicioEdicao = false;
             return;
         }

@@ -48,6 +48,7 @@ public class PaisesActivity extends BaseActivity {
 
     public void onFabClick(View v){
         FormPais formPais = new FormPais();
+        formPais.flagInicioEdicao = false;
         formPais.show(getSupportFragmentManager(), "formPais");
     }
 

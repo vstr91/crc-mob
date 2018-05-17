@@ -46,6 +46,7 @@ public class PaisViewHolder extends RecyclerView.ViewHolder {
             public boolean onLongClick(View v) {
                 FormPais formPais = new FormPais();
                 formPais.setPais(pais);
+                formPais.flagInicioEdicao = true;
                 formPais.show(ctx.getSupportFragmentManager(), "formPais");
                 return false;
             }

@@ -45,6 +45,7 @@ public class EstadoViewHolder extends RecyclerView.ViewHolder {
             public boolean onLongClick(View v) {
                 FormEstado formEstado = new FormEstado();
                 formEstado.setEstado(estado);
+                formEstado.setCtx(ctx.getApplication());
                 formEstado.show(ctx.getSupportFragmentManager(), "formEstado");
                 return false;
             }

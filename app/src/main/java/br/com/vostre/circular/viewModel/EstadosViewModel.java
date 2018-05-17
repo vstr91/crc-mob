@@ -93,8 +93,11 @@ public class EstadosViewModel extends AndroidViewModel {
         estado.setEnviado(false);
         estado.setSlug(StringUtils.toSlug(estado.getNome()));
 
-        // se pais relacionado estiver programado para data apos a programacao do estado, altera a data de programacao do estado para ficar igual e evitar erros de registro nao encontrado
-        if(pais.getProgramadoPara() != null && estado.getProgramadoPara() != null && pais.getProgramadoPara().isAfter(estado.getProgramadoPara())){
+        // se pais relacionado estiver programado para data apos a programacao do estado,
+        // altera a data de programacao do estado para ficar igual e evitar erros de
+        // registro nao encontrado
+        if((pais.getProgramadoPara() != null && estado.getProgramadoPara() == null) ||
+                (pais.getProgramadoPara() != null && estado.getProgramadoPara() != null && pais.getProgramadoPara().isAfter(estado.getProgramadoPara()))){
             estado.setProgramadoPara(pais.getProgramadoPara());
         }
 
@@ -128,6 +131,14 @@ public class EstadosViewModel extends AndroidViewModel {
         estado.setUltimaAlteracao(new DateTime());
         estado.setEnviado(false);
         estado.setSlug(StringUtils.toSlug(estado.getNome()));
+
+        // se pais relacionado estiver programado para data apos a programacao do estado,
+        // altera a data de programacao do estado para ficar igual e evitar erros de
+        // registro nao encontrado
+        if((pais.getProgramadoPara() != null && estado.getProgramadoPara() == null) ||
+                (pais.getProgramadoPara() != null && estado.getProgramadoPara() != null && pais.getProgramadoPara().isAfter(estado.getProgramadoPara()))){
+            estado.setProgramadoPara(pais.getProgramadoPara());
+        }
 
         new editAsyncTask(appDatabase).execute(estado);
     }

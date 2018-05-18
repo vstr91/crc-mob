@@ -6,12 +6,13 @@ import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
+import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.utils.Converters;
 
-@Database(entities = {Pais.class, Estado.class, Cidade.class}, version = 1)
+@Database(entities = {Pais.class, Estado.class, Cidade.class, Bairro.class}, version = 1)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -20,6 +21,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract PaisDAO paisDAO();
     public abstract EstadoDAO estadoDAO();
     public abstract CidadeDAO cidadeDAO();
+    public abstract BairroDAO bairroDAO();
 
     public static AppDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {

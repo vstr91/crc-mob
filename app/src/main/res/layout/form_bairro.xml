@@ -5,6 +5,9 @@
         <variable
             name="view"
             type="br.com.vostre.circular.view.form.FormBairro" />
+        <variable
+            name="viewModel"
+            type="br.com.vostre.circular.viewModel.BairrosViewModel" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -33,6 +36,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Nome"
+                android:text="@={viewModel.bairro.bairro.nome}"
                 android:inputType="textPersonName"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -42,6 +46,7 @@
 
         <Switch
             android:id="@+id/switchProgramado"
+            android:checked="@{viewModel.bairro.bairro.programadoPara != null ? true : false}"
             style="@style/texto_azul"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -67,7 +72,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:checked="true"
+            android:checked="@={viewModel.bairro.bairro.ativo}"
             android:text="Ativo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -140,7 +145,8 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:entries="@android:array/phoneTypes"
+            android:onItemSelected="@{view::onItemSelectedSpinnerCidade}"
+            app:entries="@{viewModel.cidades}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />

@@ -146,7 +146,6 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:entries="@android:array/phoneTypes"
             android:onItemSelected="@{view::onItemSelectedSpinnerEstado}"
             app:entries="@{viewModel.estados}"
             app:layout_constraintBottom_toTopOf="@+id/switchProgramado"

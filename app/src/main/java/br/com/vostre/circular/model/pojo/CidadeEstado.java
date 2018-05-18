@@ -44,4 +44,15 @@ public class CidadeEstado {
     public void setNomeEstado(String nomeEstado) {
         this.nomeEstado = nomeEstado;
     }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if(!(o instanceof CidadeEstado)){
+            return false;
+        }
+
+        CidadeEstado cidade = (CidadeEstado) o;
+        return cidade.getCidade().getId().equals(this.getCidade().getId());
+    }
 }

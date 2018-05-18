@@ -101,10 +101,12 @@ public class CidadesViewModel extends AndroidViewModel {
                 if (fos != null) {
                     fos.close();
 
-                    File brasaoAntigo = new File(getApplication().getFilesDir(), cidade.getCidade().getBrasao());
+                    if(cidade.getCidade().getBrasao() != null && !cidade.getCidade().getBrasao().isEmpty()){
+                        File brasaoAntigo = new File(getApplication().getFilesDir(), cidade.getCidade().getBrasao());
 
-                    if(brasaoAntigo.exists() && brasaoAntigo.canWrite() && brasaoAntigo.getName() != file.getName()){
-                        brasaoAntigo.delete();
+                        if(brasaoAntigo.exists() && brasaoAntigo.canWrite() && brasaoAntigo.getName() != file.getName()){
+                            brasaoAntigo.delete();
+                        }
                     }
 
                     cidade.getCidade().setBrasao(file.getName());

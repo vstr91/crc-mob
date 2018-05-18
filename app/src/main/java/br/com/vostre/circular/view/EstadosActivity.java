@@ -59,7 +59,6 @@ public class EstadosActivity extends BaseActivity {
     Observer<List<Estado>> estadosObserver = new Observer<List<Estado>>() {
         @Override
         public void onChanged(List<Estado> estados) {
-            System.out.println(estados.size());
             adapter.estados = estados;
             adapter.notifyDataSetChanged();
         }

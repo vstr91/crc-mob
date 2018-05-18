@@ -55,7 +55,6 @@ public class PaisesActivity extends BaseActivity {
     Observer<List<Pais>> paisesObserver = new Observer<List<Pais>>() {
         @Override
         public void onChanged(List<Pais> paises) {
-            System.out.println(paises.size());
             adapter.paises = paises;
             adapter.notifyDataSetChanged();
         }

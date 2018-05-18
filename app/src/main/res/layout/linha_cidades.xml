@@ -4,7 +4,7 @@
     <data>
         <variable
             name="cidade"
-            type="br.com.vostre.circular.model.Cidade" />
+            type="br.com.vostre.circular.model.pojo.CidadeEstado" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -32,9 +32,10 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="5"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/textViewNome"
@@ -44,18 +45,18 @@
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
                         android:paddingTop="10dp"
-                        android:text="Nome" />
+                        android:text="@{cidade.cidade.nome}" />
 
                     <TextView
                         android:id="@+id/textViewEstado"
                         style="@style/texto_lista_menor"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:paddingBottom="10dp"
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
-                        android:paddingBottom="10dp"
                         android:paddingTop="0dp"
-                        android:text="Estado"
+                        android:text="@{cidade.nomeEstado}"
                         android:textSize="12sp" />
 
                 </LinearLayout>

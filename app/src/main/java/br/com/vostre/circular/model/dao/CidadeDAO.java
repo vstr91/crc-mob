@@ -11,6 +11,8 @@ import android.arch.persistence.room.Update;
 import java.util.List;
 
 import br.com.vostre.circular.model.Cidade;
+import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.pojo.CidadeEstado;
 
 @Dao
 public interface CidadeDAO {
@@ -20,6 +22,9 @@ public interface CidadeDAO {
 
     @Query("SELECT * FROM cidade WHERE ativo = 1")
     List<Cidade> listarTodosAtivos();
+
+    @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado FROM cidade c INNER JOIN estado e ON e.id = c.estado")
+    LiveData<List<CidadeEstado>> listarTodosComEstado();
 
     @Query("SELECT * FROM cidade WHERE id IN (:ids)")
     List<Cidade> carregarTodosPorIds(int[] ids);

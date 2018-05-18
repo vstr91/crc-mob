@@ -52,6 +52,7 @@ public class EstadosActivity extends BaseActivity {
     public void onFabClick(View v){
         FormEstado formEstado = new FormEstado();
         formEstado.setCtx(getApplication());
+        formEstado.flagInicioEdicao = false;
         formEstado.show(getSupportFragmentManager(), "formEstado");
     }
 

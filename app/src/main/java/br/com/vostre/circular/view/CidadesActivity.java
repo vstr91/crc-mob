@@ -14,6 +14,7 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityCidadesBinding;
 import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.view.adapter.CidadeAdapter;
 import br.com.vostre.circular.view.adapter.EstadoAdapter;
 import br.com.vostre.circular.view.form.FormCidade;
@@ -26,7 +27,7 @@ public class CidadesActivity extends BaseActivity {
     CidadesViewModel viewModel;
 
     RecyclerView listCidades;
-    List<Cidade> cidades;
+    List<CidadeEstado> cidades;
     CidadeAdapter adapter;
 
     @Override
@@ -51,12 +52,13 @@ public class CidadesActivity extends BaseActivity {
     public void onFabClick(View v){
         FormCidade formCidade = new FormCidade();
         formCidade.setCtx(getApplication());
+        formCidade.flagInicioEdicao = false;
         formCidade.show(getSupportFragmentManager(), "formCidade");
     }
 
-    Observer<List<Cidade>> cidadesObserver = new Observer<List<Cidade>>() {
+    Observer<List<CidadeEstado>> cidadesObserver = new Observer<List<CidadeEstado>>() {
         @Override
-        public void onChanged(List<Cidade> cidades) {
+        public void onChanged(List<CidadeEstado> cidades) {
             adapter.cidades = cidades;
             adapter.notifyDataSetChanged();
         }

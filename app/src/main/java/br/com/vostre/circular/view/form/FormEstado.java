@@ -49,7 +49,7 @@ public class FormEstado extends FormBase {
     EstadosViewModel viewModel;
 
     Estado estado;
-    Boolean flagInicioEdicao;
+    public Boolean flagInicioEdicao;
     PaisAdapterSpinner adapter;
 
     static Application ctx;
@@ -142,7 +142,7 @@ public class FormEstado extends FormBase {
 
     public void onSwitchProgramadoChange(CompoundButton btn, boolean ativo){
 
-        if(flagInicioEdicao){
+        if(flagInicioEdicao && estado.getProgramadoPara() != null){
             flagInicioEdicao = false;
             return;
         }

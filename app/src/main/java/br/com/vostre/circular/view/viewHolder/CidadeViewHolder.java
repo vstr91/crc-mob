@@ -11,6 +11,7 @@ import br.com.vostre.circular.databinding.LinhaCidadesBinding;
 import br.com.vostre.circular.databinding.LinhaEstadosBinding;
 import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.view.form.FormCidade;
 import br.com.vostre.circular.view.form.FormEstado;
 
@@ -25,16 +26,16 @@ public class CidadeViewHolder extends RecyclerView.ViewHolder {
         this.ctx = context;
     }
 
-    public void bind(final Cidade cidade) {
+    public void bind(final CidadeEstado cidade) {
         binding.setCidade(cidade);
 
-        if(cidade.getProgramadoPara() != null && cidade.getProgramadoPara().isAfterNow()){
+        if(cidade.getCidade().getProgramadoPara() != null && cidade.getCidade().getProgramadoPara().isAfterNow()){
             binding.btnProgramado.setVisibility(View.VISIBLE);
             binding.btnProgramado.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(v.getContext(), DateTimeFormat.forPattern("dd/MM/yyyy HH:mm")
-                            .print(cidade.getProgramadoPara()), Toast.LENGTH_SHORT).show();
+                            .print(cidade.getCidade().getProgramadoPara()), Toast.LENGTH_SHORT).show();
                 }
             });
         } else{
@@ -47,6 +48,7 @@ public class CidadeViewHolder extends RecyclerView.ViewHolder {
                 FormCidade formCidade = new FormCidade();
                 formCidade.setCidade(cidade);
                 formCidade.setCtx(ctx.getApplication());
+                formCidade.flagInicioEdicao = true;
                 formCidade.show(ctx.getSupportFragmentManager(), "formCidade");
                 return false;
             }

@@ -11,15 +11,16 @@ import br.com.vostre.circular.databinding.LinhaCidadesBinding;
 import br.com.vostre.circular.databinding.LinhaEstadosBinding;
 import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.view.viewHolder.CidadeViewHolder;
 import br.com.vostre.circular.view.viewHolder.EstadoViewHolder;
 
 public class CidadeAdapter extends RecyclerView.Adapter<CidadeViewHolder> {
 
-    public List<Cidade> cidades;
+    public List<CidadeEstado> cidades;
     AppCompatActivity ctx;
 
-    public CidadeAdapter(List<Cidade> cidades, AppCompatActivity context){
+    public CidadeAdapter(List<CidadeEstado> cidades, AppCompatActivity context){
         this.cidades = cidades;
         ctx = context;
     }
@@ -35,7 +36,7 @@ public class CidadeAdapter extends RecyclerView.Adapter<CidadeViewHolder> {
 
     @Override
     public void onBindViewHolder(CidadeViewHolder holder, int position) {
-        Cidade cidade = cidades.get(position);
+        CidadeEstado cidade = cidades.get(position);
         holder.bind(cidade);
     }
 

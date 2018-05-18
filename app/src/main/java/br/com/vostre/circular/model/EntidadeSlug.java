@@ -10,6 +10,10 @@ public class EntidadeSlug extends EntidadeBase {
     @NonNull
     private String slug;
 
+    public EntidadeSlug(){
+        this.setAtivo(true);
+    }
+
     public String getNome() {
         return nome;
     }

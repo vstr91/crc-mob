@@ -26,6 +26,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.DateFormat;
@@ -39,6 +40,7 @@ import br.com.vostre.circular.databinding.FormEstadoBinding;
 import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.Pais;
+import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.view.adapter.EstadoAdapterSpinner;
 import br.com.vostre.circular.view.adapter.PaisAdapterSpinner;
 import br.com.vostre.circular.viewModel.CidadesViewModel;
@@ -57,19 +59,19 @@ public class FormCidade extends FormBase {
 
     CidadesViewModel viewModel;
 
-    Cidade cidade;
-    Boolean flagInicioEdicao;
+    CidadeEstado cidade;
+    public Boolean flagInicioEdicao;
     EstadoAdapterSpinner adapter;
 
     static Application ctx;
 
     private static final int PICK_IMAGE = 300;
 
-    public Cidade getCidade() {
+    public CidadeEstado getCidade() {
         return cidade;
     }
 
-    public void setCidade(Cidade cidade) {
+    public void setCidade(CidadeEstado cidade) {
         this.cidade = cidade;
     }
 
@@ -115,13 +117,24 @@ public class FormCidade extends FormBase {
 
         if(cidade != null){
             viewModel.cidade = cidade;
+
+            File brasao = new File(ctx.getFilesDir(), cidade.getCidade().getBrasao());
+
+            if(brasao.exists() && brasao.canRead()){
+                Bitmap bmp = BitmapFactory.decodeFile(brasao.getAbsolutePath());
+                viewModel.setBrasao(bmp);
+                exibeBrasao();
+            } else{
+                ocultaBrasao();
+            }
+
             flagInicioEdicao = true;
         }
 
         textViewProgramado = binding.textViewProgramado;
         btnTrocar = binding.btnTrocar;
 
-        if(viewModel.cidade.getProgramadoPara() == null){
+        if(viewModel.cidade.getCidade().getProgramadoPara() == null){
             textViewProgramado.setVisibility(View.GONE);
             btnTrocar.setVisibility(View.GONE);
         } else{
@@ -152,13 +165,13 @@ public class FormCidade extends FormBase {
     public void onClickTrocar(View v){
         FormCalendario formCalendario = new FormCalendario();
         formCalendario.setParent(this);
-        formCalendario.setDataAnterior(viewModel.cidade.getProgramadoPara().toCalendar(null));
+        formCalendario.setDataAnterior(viewModel.cidade.getCidade().getProgramadoPara().toCalendar(null));
         formCalendario.show(getActivity().getSupportFragmentManager(), "formCalendario");
     }
 
     public void onSwitchProgramadoChange(CompoundButton btn, boolean ativo){
 
-        if(flagInicioEdicao){
+        if(flagInicioEdicao && cidade.getCidade().getProgramadoPara() != null){
             flagInicioEdicao = false;
             return;
         }
@@ -167,8 +180,8 @@ public class FormCidade extends FormBase {
             FormCalendario formCalendario = new FormCalendario();
             formCalendario.setParent(this);
 
-            if(viewModel.cidade.getProgramadoPara() != null){
-                formCalendario.setDataAnterior(viewModel.cidade.getProgramadoPara().toCalendar(null));
+            if(viewModel.cidade.getCidade().getProgramadoPara() != null){
+                formCalendario.setDataAnterior(viewModel.cidade.getCidade().getProgramadoPara().toCalendar(null));
             }
 
             formCalendario.show(getActivity().getSupportFragmentManager(), "formCalendario");
@@ -180,10 +193,10 @@ public class FormCidade extends FormBase {
 
     @Override
     public void setData(Calendar umaData) {
-        viewModel.cidade.setProgramadoPara(new DateTime(umaData,
+        viewModel.cidade.getCidade().setProgramadoPara(new DateTime(umaData,
                 DateTimeZone.forTimeZone(TimeZone.getTimeZone("America/Sao_Paulo"))));
 
-        if(viewModel.cidade.getProgramadoPara() == null){
+        if(viewModel.cidade.getCidade().getProgramadoPara() == null){
             ocultaDataEscolhida();
         } else{
             exibeDataEscolhida();
@@ -196,13 +209,13 @@ public class FormCidade extends FormBase {
         textViewProgramado.setVisibility(View.GONE);
         textViewProgramado.setText("");
         btnTrocar.setVisibility(View.GONE);
-        viewModel.cidade.setProgramadoPara(null);
+        viewModel.cidade.getCidade().setProgramadoPara(null);
     }
 
     private void exibeDataEscolhida(){
 
         textViewProgramado.setText(DateTimeFormat
-                .forPattern("dd/MM/yy HH:mm").print(viewModel.cidade.getProgramadoPara()));
+                .forPattern("dd/MM/yy HH:mm").print(viewModel.cidade.getCidade().getProgramadoPara()));
 
         textViewProgramado.setVisibility(View.VISIBLE);
         btnTrocar.setVisibility(View.VISIBLE);
@@ -212,11 +225,14 @@ public class FormCidade extends FormBase {
         binding.switchProgramado.setChecked(false);
         imageViewBrasao.setVisibility(View.GONE);
         btnTrocarBrasao.setVisibility(View.GONE);
-        viewModel.cidade.setBrasao(null);
+        viewModel.brasao = null;
+        viewModel.cidade.getCidade().setBrasao(null);
         binding.btnBrasao.setVisibility(View.VISIBLE);
     }
 
     private void exibeBrasao(){
+        imageViewBrasao.setImageBitmap(viewModel.brasao);
+        imageViewBrasao.invalidate();
         imageViewBrasao.setVisibility(View.VISIBLE);
         btnTrocarBrasao.setVisibility(View.VISIBLE);
         binding.btnBrasao.setVisibility(View.GONE);
@@ -240,7 +256,7 @@ public class FormCidade extends FormBase {
 
             if(cidade != null){
                 Estado estado = new Estado();
-                estado.setId(cidade.getEstado());
+                estado.setId(cidade.getCidade().getEstado());
                 int i = viewModel.estados.getValue().indexOf(estado);
                 binding.spinnerEstado.setSelection(i);
             }
@@ -250,7 +266,11 @@ public class FormCidade extends FormBase {
     }
 
     public void onItemSelectedSpinnerEstado(AdapterView<?> adapterView, View view, int i, long l){
-        viewModel.estado = viewModel.estados.getValue().get(i);
+
+        if(viewModel.estados.getValue() != null){
+            viewModel.estado = viewModel.estados.getValue().get(i);
+        }
+
     }
 
     public void onClickBtnBrasao(View v){
@@ -278,9 +298,6 @@ public class FormCidade extends FormBase {
                 try {
                     InputStream inputStream = ctx.getContentResolver().openInputStream(data.getData());
                     viewModel.brasao = BitmapFactory.decodeStream(inputStream);
-                    imageViewBrasao.setImageBitmap(viewModel.brasao);
-                    imageViewBrasao.invalidate();
-
                     exibeBrasao();
 
                 } catch (FileNotFoundException e) {

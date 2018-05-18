@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Nome"
-                android:text="@={viewModel.cidade.nome}"
+                android:text="@={viewModel.cidade.cidade.nome}"
                 android:inputType="textPersonName"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -46,7 +46,7 @@
 
         <Switch
             android:id="@+id/switchProgramado"
-            android:checked="@{viewModel.estado.programadoPara != null ? true : false}"
+            android:checked="@{viewModel.cidade.cidade.programadoPara != null ? true : false}"
             style="@style/texto_azul"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -72,7 +72,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:checked="@={viewModel.estado.ativo}"
+            android:checked="@={viewModel.cidade.cidade.ativo}"
             android:text="Ativo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

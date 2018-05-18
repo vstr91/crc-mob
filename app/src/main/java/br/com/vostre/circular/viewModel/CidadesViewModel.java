@@ -22,14 +22,15 @@ import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.dao.CidadeDAO;
+import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.utils.StringUtils;
 
 public class CidadesViewModel extends AndroidViewModel {
 
     private AppDatabase appDatabase;
 
-    public LiveData<List<Cidade>> cidades;
-    public Cidade cidade;
+    public LiveData<List<CidadeEstado>> cidades;
+    public CidadeEstado cidade;
 
     public LiveData<List<Estado>> estados;
     public Estado estado;
@@ -44,28 +45,28 @@ public class CidadesViewModel extends AndroidViewModel {
         this.brasao = brasao;
     }
 
-    public LiveData<List<Cidade>> getCidades() {
+    public LiveData<List<CidadeEstado>> getCidades() {
         return cidades;
     }
 
-    public void setCidades(LiveData<List<Cidade>> cidades) {
+    public void setCidades(LiveData<List<CidadeEstado>> cidades) {
         this.cidades = cidades;
     }
 
-    public Cidade getCidade() {
+    public CidadeEstado getCidade() {
         return cidade;
     }
 
-    public void setCidade(Cidade cidade) {
+    public void setCidade(CidadeEstado cidade) {
         this.cidade = cidade;
-        brasao = BitmapFactory.decodeFile(cidade.getBrasao());
+        brasao = BitmapFactory.decodeFile(cidade.getCidade().getBrasao());
     }
 
     public CidadesViewModel(Application app){
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
-        cidade = new Cidade();
-        cidades = appDatabase.cidadeDAO().listarTodos();
+        cidade = new CidadeEstado();
+        cidades = appDatabase.cidadeDAO().listarTodosComEstado();
 
         estados = new MutableLiveData<>();
         estados = appDatabase.estadoDAO().listarTodos();
@@ -74,8 +75,19 @@ public class CidadesViewModel extends AndroidViewModel {
 
     public void salvarCidade(){
 
-        cidade.setEstado(estado.getId());
+        cidade.getCidade().setEstado(estado.getId());
 
+        salvarBrasao();
+
+        if(cidade.getCidade().valida(cidade.getCidade())){
+            add(cidade);
+        } else{
+            System.out.println("Faltou algo a ser digitado!");
+        }
+
+    }
+
+    private void salvarBrasao() {
         FileOutputStream fos = null;
         File file = new File(getApplication().getFilesDir(),  UUID.randomUUID().toString()+".png");
 
@@ -88,30 +100,28 @@ public class CidadesViewModel extends AndroidViewModel {
             try {
                 if (fos != null) {
                     fos.close();
-                    cidade.setBrasao(file.getName());
+
+                    File brasaoAntigo = new File(getApplication().getFilesDir(), cidade.getCidade().getBrasao());
+
+                    if(brasaoAntigo.exists() && brasaoAntigo.canWrite() && brasaoAntigo.getName() != file.getName()){
+                        brasaoAntigo.delete();
+                    }
+
+                    cidade.getCidade().setBrasao(file.getName());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
-
-
-
-
-        if(cidade.valida(cidade)){
-            add(cidade);
-        } else{
-            System.out.println("Faltou algo a ser digitado!");
-        }
-
     }
 
     public void editarCidade(){
 
-        cidade.setEstado(estado.getId());
+        cidade.getCidade().setEstado(estado.getId());
 
-        if(cidade.valida(cidade)){
+        salvarBrasao();
+
+        if(cidade.getCidade().valida(cidade.getCidade())){
             edit(cidade);
         } else{
             System.out.println("Faltou algo a ser digitado!");
@@ -121,27 +131,28 @@ public class CidadesViewModel extends AndroidViewModel {
 
     // adicionar
 
-    public void add(final Cidade cidade) {
+    public void add(final CidadeEstado cidade) {
 
-        cidade.setDataCadastro(new DateTime());
-        cidade.setUltimaAlteracao(new DateTime());
-        cidade.setEnviado(false);
-        cidade.setSlug(StringUtils.toSlug(cidade.getNome()));
+        cidade.getCidade().setDataCadastro(new DateTime());
+        cidade.getCidade().setUltimaAlteracao(new DateTime());
+        cidade.getCidade().setEnviado(false);
+        cidade.getCidade().setSlug(StringUtils.toSlug(cidade.getCidade().getNome()));
 
         // se estado relacionado estiver programado para data apos a programacao do cidade,
         // altera a data de programacao do cidade para ficar igual e evitar erros de
         // registro nao encontrado
-        if((estado.getProgramadoPara() != null && cidade.getProgramadoPara() == null) ||
-                (estado.getProgramadoPara() != null && cidade.getProgramadoPara() != null && estado.getProgramadoPara().isAfter(cidade.getProgramadoPara()))){
-            cidade.setProgramadoPara(estado.getProgramadoPara());
+        if((estado.getProgramadoPara() != null && cidade.getCidade().getProgramadoPara() == null) ||
+                (estado.getProgramadoPara() != null && cidade.getCidade().getProgramadoPara() != null &&
+                        estado.getProgramadoPara().isAfter(cidade.getCidade().getProgramadoPara()))){
+            cidade.getCidade().setProgramadoPara(estado.getProgramadoPara());
         }
 
-        cidade.setEstado(estado.getId());
+        cidade.getCidade().setEstado(estado.getId());
 
         new addAsyncTask(appDatabase).execute(cidade);
     }
 
-    private static class addAsyncTask extends AsyncTask<Cidade, Void, Void> {
+    private static class addAsyncTask extends AsyncTask<CidadeEstado, Void, Void> {
 
         private AppDatabase db;
 
@@ -150,8 +161,8 @@ public class CidadesViewModel extends AndroidViewModel {
         }
 
         @Override
-        protected Void doInBackground(final Cidade... params) {
-            db.cidadeDAO().inserir((params[0]));
+        protected Void doInBackground(final CidadeEstado... params) {
+            db.cidadeDAO().inserir((params[0].getCidade()));
             return null;
         }
 
@@ -161,24 +172,25 @@ public class CidadesViewModel extends AndroidViewModel {
 
     // editar
 
-    public void edit(final Cidade cidade) {
+    public void edit(final CidadeEstado cidade) {
 
-        cidade.setUltimaAlteracao(new DateTime());
-        cidade.setEnviado(false);
-        cidade.setSlug(StringUtils.toSlug(cidade.getNome()));
+        cidade.getCidade().setUltimaAlteracao(new DateTime());
+        cidade.getCidade().setEnviado(false);
+        cidade.getCidade().setSlug(StringUtils.toSlug(cidade.getCidade().getNome()));
 
         // se estado relacionado estiver programado para data apos a programacao do cidade,
         // altera a data de programacao do cidade para ficar igual e evitar erros de
         // registro nao encontrado
-        if((estado.getProgramadoPara() != null && cidade.getProgramadoPara() == null) ||
-                (estado.getProgramadoPara() != null && cidade.getProgramadoPara() != null && estado.getProgramadoPara().isAfter(cidade.getProgramadoPara()))){
-            cidade.setProgramadoPara(estado.getProgramadoPara());
+        if((estado.getProgramadoPara() != null && cidade.getCidade().getProgramadoPara() == null) ||
+                (estado.getProgramadoPara() != null && cidade.getCidade().getProgramadoPara() != null &&
+                        estado.getProgramadoPara().isAfter(cidade.getCidade().getProgramadoPara()))){
+            cidade.getCidade().setProgramadoPara(estado.getProgramadoPara());
         }
 
         new editAsyncTask(appDatabase).execute(cidade);
     }
 
-    private static class editAsyncTask extends AsyncTask<Cidade, Void, Void> {
+    private static class editAsyncTask extends AsyncTask<CidadeEstado, Void, Void> {
 
         private AppDatabase db;
 
@@ -187,8 +199,8 @@ public class CidadesViewModel extends AndroidViewModel {
         }
 
         @Override
-        protected Void doInBackground(final Cidade... params) {
-            db.cidadeDAO().editar((params[0]));
+        protected Void doInBackground(final CidadeEstado... params) {
+            db.cidadeDAO().editar((params[0].getCidade()));
             return null;
         }
 

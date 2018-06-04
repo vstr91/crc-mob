@@ -3,10 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
         <variable
             name="view"
             type="br.com.vostre.circular.view.PontosInteresseActivity" />
+        <variable
+            name="viewModel"
+            type="br.com.vostre.circular.viewModel.PontosInteresseViewModel" />
     </data>
 
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -34,6 +36,7 @@
 
             <org.osmdroid.views.MapView
                 android:id="@+id/map"
+                app:center="@{viewModel.centroMapa}"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 

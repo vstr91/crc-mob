@@ -92,6 +92,24 @@ public class FormCalendarioPOI extends FormCalendario {
 
         binding.timePicker.setIs24HourView(true);
 
+        if(qual == 0 && dataInicioAnterior != null){
+            binding.timePicker.setCurrentHour(dataInicioAnterior.get(Calendar.HOUR_OF_DAY));
+            binding.timePicker.setCurrentMinute(dataInicioAnterior.get(Calendar.MINUTE));
+
+            binding.calendarView.setDate(dataInicioAnterior.getTimeInMillis());
+            setDataEscolhida(dataInicioAnterior.get(Calendar.DAY_OF_MONTH),
+                    dataInicioAnterior.get(Calendar.MONTH), dataInicioAnterior.get(Calendar.YEAR));
+        }
+
+        if(qual == 1 && dataFimAnterior != null){
+            binding.timePicker.setCurrentHour(dataFimAnterior.get(Calendar.HOUR_OF_DAY));
+            binding.timePicker.setCurrentMinute(dataFimAnterior.get(Calendar.MINUTE));
+
+            binding.calendarView.setDate(dataFimAnterior.getTimeInMillis());
+            setDataEscolhida(dataFimAnterior.get(Calendar.DAY_OF_MONTH),
+                    dataFimAnterior.get(Calendar.MONTH), dataFimAnterior.get(Calendar.YEAR));
+        }
+
         tabHost = binding.tabs;
         tabHost.setup();
 
@@ -138,8 +156,6 @@ public class FormCalendarioPOI extends FormCalendario {
                 dataInicio = Calendar.getInstance();
             }
 
-            System.out.println(binding.timePicker.getCurrentHour());
-
             dataInicio.set(Calendar.HOUR_OF_DAY, binding.timePicker.getCurrentHour());
             dataInicio.set(Calendar.MINUTE, binding.timePicker.getCurrentMinute());
 
@@ -148,8 +164,6 @@ public class FormCalendarioPOI extends FormCalendario {
             if(dataFim == null){
                 dataFim = Calendar.getInstance();
             }
-
-            System.out.println(binding.timePicker.getCurrentHour());
 
             dataFim.set(Calendar.HOUR_OF_DAY, binding.timePicker.getCurrentHour());
             dataFim.set(Calendar.MINUTE, binding.timePicker.getCurrentMinute());

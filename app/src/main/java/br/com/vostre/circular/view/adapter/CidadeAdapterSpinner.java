@@ -9,8 +9,6 @@ import android.widget.ArrayAdapter;
 import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaCidadesSpinnerBinding;
-import br.com.vostre.circular.databinding.LinhaEstadosSpinnerBinding;
-import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
 
 public class CidadeAdapterSpinner extends ArrayAdapter<CidadeEstado> {

@@ -12,14 +12,10 @@ import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityCidadesBinding;
-import br.com.vostre.circular.model.Cidade;
-import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.view.adapter.CidadeAdapter;
-import br.com.vostre.circular.view.adapter.EstadoAdapter;
 import br.com.vostre.circular.view.form.FormCidade;
 import br.com.vostre.circular.viewModel.CidadesViewModel;
-import br.com.vostre.circular.viewModel.EstadosViewModel;
 
 public class CidadesActivity extends BaseActivity {
 

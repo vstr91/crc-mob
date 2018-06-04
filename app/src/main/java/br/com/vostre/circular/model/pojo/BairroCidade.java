@@ -2,6 +2,7 @@ package br.com.vostre.circular.model.pojo;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Embedded;
+import android.arch.persistence.room.Ignore;
 
 import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Cidade;
@@ -26,6 +27,7 @@ public class BairroCidade {
     @ColumnInfo(name = "siglaEstado")
     String siglaEstado;
 
+    @Ignore
     String nomeCidadeComEstado;
 
     public BairroCidade(){

@@ -11,7 +11,6 @@ import android.arch.persistence.room.Update;
 import java.util.List;
 
 import br.com.vostre.circular.model.Cidade;
-import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
 
 @Dao

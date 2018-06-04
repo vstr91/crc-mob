@@ -1,5 +1,6 @@
 package br.com.vostre.circular.view.form;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,15 +9,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.text.DateFormat;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.databinding.FormEmpresaBinding;
 import br.com.vostre.circular.databinding.FormParametroBinding;
+import br.com.vostre.circular.model.Parametro;
+import br.com.vostre.circular.viewModel.ParametrosViewModel;
 
 public class FormParametro extends FormBase {
 
@@ -26,8 +31,18 @@ public class FormParametro extends FormBase {
     TextView textViewProgramado;
     Button btnTrocar;
 
-    ImageView imageViewBrasao;
-    Button btnTrocarBrasao;
+    ParametrosViewModel viewModel;
+
+    Parametro parametro;
+    public Boolean flagInicioEdicao;
+
+    public Parametro getParametro() {
+        return parametro;
+    }
+
+    public void setParametro(Parametro parametro) {
+        this.parametro = parametro;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -42,13 +57,26 @@ public class FormParametro extends FormBase {
         binding = DataBindingUtil.inflate(
                 inflater, R.layout.form_parametro, container, false);
         super.onCreate(savedInstanceState);
+
+        viewModel = ViewModelProviders.of(this).get(ParametrosViewModel.class);
+
         binding.setView(this);
+        binding.setViewModel(viewModel);
+
+        if(parametro != null){
+            viewModel.parametro = parametro;
+            flagInicioEdicao = true;
+        }
 
         textViewProgramado = binding.textViewProgramado;
         btnTrocar = binding.btnTrocar;
 
-        textViewProgramado.setVisibility(View.GONE);
-        btnTrocar.setVisibility(View.GONE);
+        if(viewModel.parametro.getProgramadoPara() == null){
+            textViewProgramado.setVisibility(View.GONE);
+            btnTrocar.setVisibility(View.GONE);
+        } else{
+            exibeDataEscolhida();
+        }
 
         return binding.getRoot();
 
@@ -56,6 +84,13 @@ public class FormParametro extends FormBase {
 
     public void onClickSalvar(View v){
 
+        if(parametro != null){
+            viewModel.editarParametro();
+        } else{
+            viewModel.salvarParametro();
+        }
+
+        dismiss();
     }
 
     public void onClickFechar(View v){
@@ -65,16 +100,25 @@ public class FormParametro extends FormBase {
     public void onClickTrocar(View v){
         FormCalendario formCalendario = new FormCalendario();
         formCalendario.setParent(this);
-        formCalendario.setDataAnterior(data);
+        formCalendario.setDataAnterior(viewModel.parametro.getProgramadoPara().toCalendar(null));
         formCalendario.show(getActivity().getSupportFragmentManager(), "formCalendario");
     }
 
     public void onSwitchProgramadoChange(CompoundButton btn, boolean ativo){
 
+        if(flagInicioEdicao && parametro.getProgramadoPara() != null){
+            flagInicioEdicao = false;
+            return;
+        }
+
         if(ativo){
             FormCalendario formCalendario = new FormCalendario();
             formCalendario.setParent(this);
-            formCalendario.setDataAnterior(data);
+
+            if(viewModel.parametro.getProgramadoPara() != null){
+                formCalendario.setDataAnterior(viewModel.parametro.getProgramadoPara().toCalendar(null));
+            }
+
             formCalendario.show(getActivity().getSupportFragmentManager(), "formCalendario");
         } else{
             ocultaDataEscolhida();
@@ -84,9 +128,10 @@ public class FormParametro extends FormBase {
 
     @Override
     public void setData(Calendar umaData) {
-        this.data = umaData;
+        viewModel.parametro.setProgramadoPara(new DateTime(umaData,
+                DateTimeZone.forTimeZone(TimeZone.getTimeZone("America/Sao_Paulo"))));
 
-        if(data == null){
+        if(viewModel.parametro.getProgramadoPara() == null){
             ocultaDataEscolhida();
         } else{
             exibeDataEscolhida();
@@ -97,13 +142,15 @@ public class FormParametro extends FormBase {
     private void ocultaDataEscolhida(){
         binding.switchProgramado.setChecked(false);
         textViewProgramado.setVisibility(View.GONE);
+        textViewProgramado.setText("");
         btnTrocar.setVisibility(View.GONE);
-        data = null;
+        viewModel.parametro.setProgramadoPara(null);
     }
 
     private void exibeDataEscolhida(){
 
-        textViewProgramado.setText(DateFormat.getDateTimeInstance().format(data.getTime()));
+        textViewProgramado.setText(DateTimeFormat
+                .forPattern("dd/MM/yy HH:mm").print(viewModel.parametro.getProgramadoPara()));
 
         textViewProgramado.setVisibility(View.VISIBLE);
         btnTrocar.setVisibility(View.VISIBLE);

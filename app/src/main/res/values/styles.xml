@@ -99,4 +99,9 @@
         <item name="android:textColorSecondary">@color/cinzaClaro</item>
     </style>
 
+    <style name="TabWidget" parent="AppTheme">
+        <item name="android:textColorPrimary">@color/branco</item>
+        <item name="android:textColorSecondary">@color/cinzaClaro</item>
+    </style>
+
 </resources>

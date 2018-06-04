@@ -21,6 +21,7 @@
 
             <include
                 layout="@layout/toolbar"
+                android:id="@+id/toolbar"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"></include>
@@ -35,10 +36,11 @@
                 android:layout_marginRight="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
+                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/toolbar"
                 tools:listitem="@layout/linha_empresas" />
 
             <android.support.design.widget.FloatingActionButton

@@ -5,6 +5,9 @@
         <variable
             name="view"
             type="br.com.vostre.circular.view.form.FormUsuario" />
+        <variable
+            name="viewModel"
+            type="br.com.vostre.circular.viewModel.UsuariosViewModel" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -33,6 +36,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Nome"
+                android:text="@={viewModel.usuario.nome}"
                 android:inputType="textPersonName"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -59,12 +63,32 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Email"
+                android:text="@={viewModel.usuario.email}"
                 android:inputType="textEmailAddress"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
         </android.support.design.widget.TextInputLayout>
+
+        <Switch
+            android:id="@+id/switchProgramado"
+            android:checked="@{viewModel.usuario.programadoPara != null ? true : false}"
+            style="@style/texto_azul"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:onCheckedChanged="@{view::onSwitchProgramadoChange}"
+            android:text="Programado"
+            app:layout_constraintBottom_toTopOf="@+id/btnTrocar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout3" />
 
         <Switch
             android:id="@+id/switchAtivo"
@@ -76,15 +100,15 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:checked="true"
+            android:checked="@={viewModel.usuario.ativo}"
             android:text="Ativo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout3"
+            app:layout_constraintTop_toBottomOf="@+id/btnTrocar"
             tools:checked="true" />
 
         <Button
-            android:id="@+id/btnSalvar"
+            android:id="@+id/btnCadastrar"
             style="@style/botao_principal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -112,6 +136,33 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/switchAtivo" />
+
+        <TextView
+            android:id="@+id/textViewProgramado"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:text="05/05/2018 20:00"
+            app:layout_constraintBottom_toTopOf="@+id/switchAtivo"
+            app:layout_constraintEnd_toStartOf="@+id/btnTrocar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/switchProgramado" />
+
+        <Button
+            android:id="@+id/btnTrocar"
+            style="@style/botao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:onClick="@{view::onClickTrocar}"
+            android:text="Trocar"
+            app:layout_constraintBottom_toTopOf="@+id/switchAtivo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/switchProgramado" />
 
     </android.support.constraint.ConstraintLayout>
 

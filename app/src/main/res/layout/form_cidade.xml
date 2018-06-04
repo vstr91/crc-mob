@@ -80,7 +80,7 @@
             tools:checked="true" />
 
         <Button
-            android:id="@+id/btnSalvar"
+            android:id="@+id/btnCadastrar"
             style="@style/botao_principal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -156,13 +156,15 @@
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="45dp"
-            android:layout_height="wrap_content"
+            android:layout_height="45dp"
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
+            android:scaleType="centerInside"
+            app:layout_constraintBottom_toTopOf="@+id/textView8"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btnBrasao"
-            app:srcCompat="@{viewModel.brasao}" />
+            app:srcCompat="@mipmap/ic_onibus_azul" />
 
         <Button
             android:id="@+id/btnBrasao"

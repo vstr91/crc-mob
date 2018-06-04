@@ -77,7 +77,9 @@ public class CidadesViewModel extends AndroidViewModel {
 
         cidade.getCidade().setEstado(estado.getId());
 
-        salvarBrasao();
+        if(brasao != null){
+            salvarBrasao();
+        }
 
         if(cidade.getCidade().valida(cidade.getCidade())){
             add(cidade);
@@ -121,7 +123,9 @@ public class CidadesViewModel extends AndroidViewModel {
 
         cidade.getCidade().setEstado(estado.getId());
 
-        salvarBrasao();
+        if(brasao != null){
+            salvarBrasao();
+        }
 
         if(cidade.getCidade().valida(cidade.getCidade())){
             edit(cidade);

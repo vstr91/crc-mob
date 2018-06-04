@@ -13,7 +13,6 @@ import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaPaisesSpinnerBinding;
 import br.com.vostre.circular.model.Pais;
-import br.com.vostre.circular.view.viewHolder.PaisViewHolder;
 
 public class PaisAdapterSpinner extends ArrayAdapter<Pais> {
 

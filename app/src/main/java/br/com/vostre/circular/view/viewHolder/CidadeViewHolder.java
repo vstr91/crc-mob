@@ -8,12 +8,8 @@ import android.widget.Toast;
 import org.joda.time.format.DateTimeFormat;
 
 import br.com.vostre.circular.databinding.LinhaCidadesBinding;
-import br.com.vostre.circular.databinding.LinhaEstadosBinding;
-import br.com.vostre.circular.model.Cidade;
-import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.view.form.FormCidade;
-import br.com.vostre.circular.view.form.FormEstado;
 
 public class CidadeViewHolder extends RecyclerView.ViewHolder {
 

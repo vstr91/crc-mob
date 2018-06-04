@@ -8,18 +8,16 @@ import android.support.annotation.NonNull;
         unique = true)})
 public class Cidade extends EntidadeSlug {
 
-    @NonNull
     private String brasao;
 
     @NonNull
     private String estado;
 
-    @NonNull
     public String getBrasao() {
         return brasao;
     }
 
-    public void setBrasao(@NonNull String brasao) {
+    public void setBrasao(String brasao) {
         this.brasao = brasao;
     }
 
@@ -34,7 +32,7 @@ public class Cidade extends EntidadeSlug {
 
     public boolean valida(Cidade cidade) {
 
-        if(super.valida(cidade) && cidade.getBrasao() != null && cidade.getEstado() != null){
+        if(super.valida(cidade) && cidade.getEstado() != null){
             return true;
         } else{
             return false;

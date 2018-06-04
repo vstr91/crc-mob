@@ -7,7 +7,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 26
         versionCode 1
-        versionName "1.0"
+        versionName "2.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -43,6 +43,8 @@ dependencies {
     implementation 'org.osmdroid:osmdroid-android:6.0.1'
     implementation 'com.karumi:dexter:4.2.0'
     implementation 'com.github.imangazalievm:slugify:1.0.0'
+
+    implementation 'com.google.android.gms:play-services-location:15.0.1'
 
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:recyclerview-v7:26.1.0'

@@ -19,7 +19,6 @@ import java.util.Locale;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormCalendarioBinding;
-import br.com.vostre.circular.databinding.FormPaisBinding;
 
 public class FormCalendario extends DialogFragment {
 
@@ -61,6 +60,15 @@ public class FormCalendario extends DialogFragment {
         binding.setView(this);
 
         binding.timePicker.setIs24HourView(true);
+
+        if(dataAnterior != null){
+            binding.timePicker.setCurrentHour(dataAnterior.get(Calendar.HOUR_OF_DAY));
+            binding.timePicker.setCurrentMinute(dataAnterior.get(Calendar.MINUTE));
+
+            binding.calendarView.setDate(dataAnterior.getTimeInMillis());
+            setDataEscolhida(dataAnterior.get(Calendar.DAY_OF_MONTH),
+                    dataAnterior.get(Calendar.MONTH), dataAnterior.get(Calendar.YEAR));
+        }
 
         tabHost = binding.tabs;
         tabHost.setup();

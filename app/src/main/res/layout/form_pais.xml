@@ -109,7 +109,7 @@
             tools:checked="true" />
 
         <Button
-            android:id="@+id/btnSalvar"
+            android:id="@+id/btnCadastrar"
             style="@style/botao_principal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -1,6 +1,7 @@
 package br.com.vostre.circular.utils;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v4.view.MenuItemCompat;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -9,6 +10,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import br.com.vostre.circular.R;
+import br.com.vostre.circular.view.MensagensActivity;
 
 /**
  * Created by Almir on 16/12/2015.
@@ -55,9 +57,8 @@ public class ToolbarUtils {
             case R.id.imageButtonMsg:
             case R.id.msg:
             case R.id.icon_msg:
-//                Intent intent = new Intent(activity, Mensagens.class);
-//                activity.startActivity(intent);
-                System.out.println("CLICOU MENSAGEM");
+                Intent intent = new Intent(activity, MensagensActivity.class);
+                activity.startActivity(intent);
                 break;
         }
     }

@@ -8,11 +8,27 @@ import android.content.Context;
 
 import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Cidade;
+import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.Horario;
+import br.com.vostre.circular.model.HorarioItinerario;
+import br.com.vostre.circular.model.Itinerario;
+import br.com.vostre.circular.model.Mensagem;
+import br.com.vostre.circular.model.MensagemResposta;
+import br.com.vostre.circular.model.Onibus;
 import br.com.vostre.circular.model.Pais;
+import br.com.vostre.circular.model.Parada;
+import br.com.vostre.circular.model.ParadaItinerario;
+import br.com.vostre.circular.model.Parametro;
+import br.com.vostre.circular.model.PontoInteresse;
+import br.com.vostre.circular.model.SecaoItinerario;
+import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.utils.Converters;
 
-@Database(entities = {Pais.class, Estado.class, Cidade.class, Bairro.class}, version = 1)
+@Database(entities = {Pais.class, Estado.class, Cidade.class, Bairro.class,
+        Empresa.class, Parametro.class, Usuario.class, Mensagem.class, MensagemResposta.class,
+        Parada.class, PontoInteresse.class, Itinerario.class, ParadaItinerario.class,
+        Horario.class, HorarioItinerario.class, SecaoItinerario.class, Onibus.class}, version = 1)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -22,6 +38,19 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract EstadoDAO estadoDAO();
     public abstract CidadeDAO cidadeDAO();
     public abstract BairroDAO bairroDAO();
+    public abstract EmpresaDAO empresaDAO();
+    public abstract ParametroDAO parametroDAO();
+    public abstract UsuarioDAO usuarioDAO();
+    public abstract MensagemDAO mensagemDAO();
+    public abstract MensagemRespostaDAO mensagemRespostaDAO();
+    public abstract ParadaDAO paradaDAO();
+    public abstract PontoInteresseDAO pontoInteresseDAO();
+    public abstract ItinerarioDAO itinerarioDAO();
+    public abstract ParadaItinerarioDAO paradaItinerarioDAO();
+    public abstract HorarioDAO horarioDAO();
+    public abstract HorarioItinerarioDAO horarioItinerarioDAO();
+    public abstract SecaoItinerarioDAO secaoItinerarioDAO();
+    public abstract OnibusDAO onibusDAO();
 
     public static AppDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {

@@ -8,11 +8,8 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaBairrosBinding;
-import br.com.vostre.circular.databinding.LinhaEstadosBinding;
-import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.view.viewHolder.BairroViewHolder;
-import br.com.vostre.circular.view.viewHolder.EstadoViewHolder;
 
 public class BairroAdapter extends RecyclerView.Adapter<BairroViewHolder> {
 

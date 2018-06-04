@@ -9,9 +9,7 @@ import android.widget.ArrayAdapter;
 import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaEstadosSpinnerBinding;
-import br.com.vostre.circular.databinding.LinhaPaisesSpinnerBinding;
 import br.com.vostre.circular.model.Estado;
-import br.com.vostre.circular.model.Pais;
 
 public class EstadoAdapterSpinner extends ArrayAdapter<Estado> {
 

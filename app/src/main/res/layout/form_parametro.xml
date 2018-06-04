@@ -5,6 +5,9 @@
         <variable
             name="view"
             type="br.com.vostre.circular.view.form.FormParametro" />
+        <variable
+            name="viewModel"
+            type="br.com.vostre.circular.viewModel.ParametrosViewModel" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -33,6 +36,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Nome"
+                android:text="@={viewModel.parametro.nome}"
                 android:inputType="textPersonName"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -59,7 +63,8 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Valor"
-                android:inputType="textEmailAddress"
+                android:text="@={viewModel.parametro.valor}"
+                android:inputType="textPersonName"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -68,6 +73,7 @@
 
         <Switch
             android:id="@+id/switchProgramado"
+            android:checked="@{viewModel.parametro.programadoPara != null ? true : false}"
             style="@style/texto_azul"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -94,7 +100,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:checked="true"
+            android:checked="@={viewModel.parametro.ativo}"
             android:text="Ativo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -102,7 +108,7 @@
             tools:checked="true" />
 
         <Button
-            android:id="@+id/btnSalvar"
+            android:id="@+id/btnCadastrar"
             style="@style/botao_principal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

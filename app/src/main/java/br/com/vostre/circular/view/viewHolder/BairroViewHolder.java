@@ -8,12 +8,8 @@ import android.widget.Toast;
 import org.joda.time.format.DateTimeFormat;
 
 import br.com.vostre.circular.databinding.LinhaBairrosBinding;
-import br.com.vostre.circular.databinding.LinhaEstadosBinding;
-import br.com.vostre.circular.model.Bairro;
-import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.view.form.FormBairro;
-import br.com.vostre.circular.view.form.FormEstado;
 
 public class BairroViewHolder extends RecyclerView.ViewHolder {
 

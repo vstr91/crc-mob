@@ -36,15 +36,10 @@ import java.util.TimeZone;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormCidadeBinding;
-import br.com.vostre.circular.databinding.FormEstadoBinding;
-import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Estado;
-import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.view.adapter.EstadoAdapterSpinner;
-import br.com.vostre.circular.view.adapter.PaisAdapterSpinner;
 import br.com.vostre.circular.viewModel.CidadesViewModel;
-import br.com.vostre.circular.viewModel.EstadosViewModel;
 
 public class FormCidade extends FormBase {
 
@@ -118,14 +113,16 @@ public class FormCidade extends FormBase {
         if(cidade != null){
             viewModel.cidade = cidade;
 
-            File brasao = new File(ctx.getFilesDir(), cidade.getCidade().getBrasao());
+            if(cidade.getCidade().getBrasao() != null){
+                File brasao = new File(ctx.getFilesDir(), cidade.getCidade().getBrasao());
 
-            if(brasao.exists() && brasao.canRead()){
-                Bitmap bmp = BitmapFactory.decodeFile(brasao.getAbsolutePath());
-                viewModel.setBrasao(bmp);
-                exibeBrasao();
-            } else{
-                ocultaBrasao();
+                if(brasao.exists() && brasao.canRead()){
+                    Bitmap bmp = BitmapFactory.decodeFile(brasao.getAbsolutePath());
+                    viewModel.setBrasao(bmp);
+                    exibeBrasao();
+                } else{
+                    ocultaBrasao();
+                }
             }
 
             flagInicioEdicao = true;
@@ -222,7 +219,6 @@ public class FormCidade extends FormBase {
     }
 
     private void ocultaBrasao(){
-        binding.switchProgramado.setChecked(false);
         imageViewBrasao.setVisibility(View.GONE);
         btnTrocarBrasao.setVisibility(View.GONE);
         viewModel.brasao = null;

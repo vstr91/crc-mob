@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
@@ -46,6 +47,7 @@ import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 import br.com.vostre.circular.view.adapter.ParadaItinerarioAdapter;
+import br.com.vostre.circular.view.form.FormItinerario;
 import br.com.vostre.circular.view.utils.SortListItemHelper;
 import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
 import br.com.vostre.circular.databinding.ActivityDetalhesItinerarioBinding;
@@ -191,28 +193,31 @@ public class DetalhesItinerarioActivity extends BaseActivity {
     }
 
     public void onClickBtnSalvar(View v){
-
-//        if(viewModel.localAtual != null){
-//            FormParada formParada = new FormParada();
-//            formParada.setLatitude(viewModel.localAtual.getValue().getLatitude());
-//            formParada.setLongitude(viewModel.localAtual.getValue().getLongitude());
-//            formParada.setCtx(getApplication());
-//            formParada.show(getSupportFragmentManager(), "formParada");
-//        }
-
+        if(viewModel.paradasItinerario.getValue().size() > 1){
+            viewModel.salvarParadas();
+        } else{
+            Toast.makeText(getApplicationContext(), "Ao menos duas paradas devem ser selecionadas!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void onClickBtnEditar(View v){
 
-        Toast.makeText(getApplicationContext(), viewModel.itinerario.getValue().getItinerario().getId(), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), viewModel.itinerario.getValue().getItinerario().getId(), Toast.LENGTH_SHORT).show();
 
-//        if(viewModel.localAtual != null){
-//            FormParada formParada = new FormParada();
-//            formParada.setLatitude(viewModel.localAtual.getValue().getLatitude());
-//            formParada.setLongitude(viewModel.localAtual.getValue().getLongitude());
-//            formParada.setCtx(getApplication());
-//            formParada.show(getSupportFragmentManager(), "formParada");
-//        }
+        FormItinerario formItinerario = new FormItinerario();
+        formItinerario.setItinerario(viewModel.itinerario.getValue().getItinerario());
+        formItinerario.setCtx(ctx.getApplication());
+        formItinerario.show(getSupportFragmentManager(), "formItinerario");
+
+    }
+
+    public void onClickBtnSecoes(View v){
+        Intent i = new Intent(ctx, SecoesItinerarioActivity.class);
+        i.putExtra("itinerario", viewModel.getItinerario().getValue().getItinerario().getId());
+        ctx.startActivity(i);
+    }
+
+    public void onClickBtnHorarios(View v){
 
     }
 
@@ -311,6 +316,7 @@ public class DetalhesItinerarioActivity extends BaseActivity {
                         paradaItinerario.setDestaque(false);
                         paradaItinerario.setValorAnterior(null);
                         paradaItinerario.setValorSeguinte(null);
+                        paradaItinerario.setAtivo(true);
 
                         ParadaItinerarioBairro pib = new ParadaItinerarioBairro();
                         pib.setParadaItinerario(paradaItinerario);

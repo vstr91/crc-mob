@@ -257,7 +257,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 }
                 for (Location location : locationResult.getLocations()) {
 
-                    if(location.getAccuracy() <= 10){
+                    if(location.getAccuracy() <= 20){
                         localAtual.setValue(location);
 
                         if(localAtual.getValue() != null){

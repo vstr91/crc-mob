@@ -59,6 +59,14 @@ public class FormItinerario extends FormBase {
         FormItinerario.ctx = ctx;
     }
 
+    public Itinerario getItinerario() {
+        return itinerario;
+    }
+
+    public void setItinerario(Itinerario itinerario) {
+        this.itinerario = itinerario;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 //        View view = inflater.inflate(R.layout.form_pais, container, false);
@@ -100,8 +108,6 @@ public class FormItinerario extends FormBase {
         } else{
             exibeDataEscolhida();
         }
-
-        //System.out.println("DATAAAAAA >>>>>>>>>>>>> "+viewModel.itinerario.getTempo());
 
         viewModel.empresas.observe(this, empresasObserver);
 

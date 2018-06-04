@@ -103,7 +103,7 @@ public class FormParadaDetalheItinerario extends FormBase {
         if(parada != null){
             viewModel.editarParada();
         } else{
-            viewModel.salvarParada();
+            viewModel.salvarParadas();
         }
 
         dismiss();

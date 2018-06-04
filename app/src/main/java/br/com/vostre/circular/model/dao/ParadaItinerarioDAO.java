@@ -28,12 +28,18 @@ public interface ParadaItinerarioDAO {
     @Query("SELECT pi.*, p.id AS idParada, p.nome AS nomeParada, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade " +
             "FROM parada_itinerario pi " +
             "INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade " +
-            "WHERE p.ativo = 1 AND pi.itinerario = :itinerario")
+            "WHERE pi.ativo = 1 AND pi.itinerario = :itinerario ORDER BY pi.ordem")
     LiveData<List<ParadaItinerarioBairro>> listarTodosAtivosPorItinerarioComBairro(String itinerario);
 
     @Query("SELECT i.* FROM parada_itinerario pi INNER JOIN itinerario i ON i.id = pi.itinerario " +
             "WHERE pi.parada = :parada AND pi.ativo = 1 AND i.ativo = 1")
     List<Itinerario> listarTodosAtivosPorParada(String parada);
+
+    @Query("SELECT pi.* FROM parada_itinerario pi WHERE pi.parada = :parada AND pi.itinerario = :itinerario")
+    ParadaItinerario checaDuplicidade(String parada, String itinerario);
+
+    @Query("UPDATE parada_itinerario SET ativo = 0 WHERE itinerario = :itinerario")
+    void invalidaTodosPorItinerario(String itinerario);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
     void inserirTodos(ParadaItinerario... paradasItinerarios);

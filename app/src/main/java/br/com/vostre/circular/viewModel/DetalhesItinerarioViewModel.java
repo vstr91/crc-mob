@@ -144,8 +144,8 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
     }
 
-    public void salvarParada(){
-
+    public void salvarParadas(){
+        addParadas(this.paradasItinerario.getValue());
     }
 
     public void editarParada(){
@@ -163,9 +163,12 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
         int cont = 1;
 
+        new invalidaParadasAsyncTask(appDatabase).execute(itinerario.getValue().getItinerario());
+
         for(ParadaItinerarioBairro pib : pibs){
             pib.getParadaItinerario().setItinerario(itinerario.getValue().getItinerario().getId());
             pib.getParadaItinerario().setOrdem(cont);
+            pib.getParadaItinerario().setAtivo(true);
 
             pib.getParadaItinerario().setDataCadastro(new DateTime());
             pib.getParadaItinerario().setUltimaAlteracao(new DateTime());
@@ -176,7 +179,25 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
             cont++;
         }
 
+        paradasItinerario.postValue(appDatabase.paradaItinerarioDAO().listarTodosAtivosPorItinerarioComBairro(itinerario.getValue().getItinerario().getId()).getValue());
 
+    }
+
+    private static class invalidaParadasAsyncTask extends AsyncTask<Itinerario, Void, Void> {
+
+        private AppDatabase db;
+
+        invalidaParadasAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final Itinerario... params) {
+
+            db.paradaItinerarioDAO().invalidaTodosPorItinerario(params[0].getId());
+
+            return null;
+        }
 
     }
 
@@ -190,7 +211,24 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
         @Override
         protected Void doInBackground(final ParadaItinerario... params) {
-            db.paradaItinerarioDAO().inserir(params[0]);
+
+            ParadaItinerario paradaItinerario = db.paradaItinerarioDAO().checaDuplicidade(params[0].getParada(), params[0].getItinerario());
+
+            if(paradaItinerario != null){
+                ParadaItinerario pi = params[0];
+
+                paradaItinerario.setAtivo(true);
+                paradaItinerario.setOrdem(pi.getOrdem());
+                paradaItinerario.setDestaque(pi.getDestaque());
+                paradaItinerario.setValorAnterior(pi.getValorAnterior());
+                paradaItinerario.setValorSeguinte(pi.getValorSeguinte());
+
+                db.paradaItinerarioDAO().editar(paradaItinerario);
+            } else{
+                db.paradaItinerarioDAO().inserir(params[0]);
+            }
+
+
             return null;
         }
 
@@ -268,7 +306,7 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
                 }
                 for (Location location : locationResult.getLocations()) {
 
-                    if(location.getAccuracy() <= 10){
+                    if(location.getAccuracy() <= 20){
                         localAtual.setValue(location);
 
                         if(localAtual.getValue() != null){

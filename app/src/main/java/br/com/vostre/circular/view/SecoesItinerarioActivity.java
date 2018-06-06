@@ -33,11 +33,12 @@ public class SecoesItinerarioActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         viewModel = ViewModelProviders.of(this).get(SecoesItinerarioViewModel.class);
-        viewModel.secoes.observe(this, secoesObserver);
 
         Itinerario itinerario = new Itinerario();
         itinerario.setId(getIntent().getStringExtra("itinerario"));
         viewModel.setItinerario(itinerario);
+
+        viewModel.secoes.observe(this, secoesObserver);
 
         binding.setView(this);
         //binding.setViewModel(viewModel);

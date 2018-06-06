@@ -1,14 +1,20 @@
 package br.com.vostre.circular.view.form;
 
+import android.app.Application;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.joda.time.DateTime;
@@ -16,35 +22,48 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.TimeZone;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.databinding.FormPaisBinding;
-import br.com.vostre.circular.databinding.FormSecaoBinding;
+import br.com.vostre.circular.databinding.FormEstadoBinding;
+import br.com.vostre.circular.databinding.FormHorarioItinerarioBinding;
+import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.Pais;
-import br.com.vostre.circular.model.SecaoItinerario;
-import br.com.vostre.circular.viewModel.PaisesViewModel;
-import br.com.vostre.circular.viewModel.SecoesItinerarioViewModel;
+import br.com.vostre.circular.view.adapter.PaisAdapterSpinner;
+import br.com.vostre.circular.viewModel.EstadosViewModel;
+import br.com.vostre.circular.viewModel.HorariosItinerarioViewModel;
 
-public class FormSecao extends FormBase {
+public class FormHorarioItinerario extends FormBase {
 
-    FormSecaoBinding binding;
+    FormHorarioItinerarioBinding binding;
     Calendar data;
 
     TextView textViewProgramado;
     Button btnTrocar;
 
-    SecoesItinerarioViewModel viewModel;
+    HorariosItinerarioViewModel viewModel;
 
-    SecaoItinerario secao;
+    HorarioItinerario horario;
     public Boolean flagInicioEdicao;
 
-    public SecaoItinerario getSecao() {
-        return secao;
+    static Application ctx;
+
+    public Application getCtx() {
+        return ctx;
     }
 
-    public void setSecao(SecaoItinerario secao) {
-        this.secao = secao;
+    public void setCtx(Application ctx) {
+        this.ctx = ctx;
+    }
+
+    public HorarioItinerario getHorario() {
+        return horario;
+    }
+
+    public void setHorario(HorarioItinerario horario) {
+        this.horario = horario;
     }
 
     @Override
@@ -58,23 +77,23 @@ public class FormSecao extends FormBase {
 //        return view;
 
         binding = DataBindingUtil.inflate(
-                inflater, R.layout.form_secao, container, false);
+                inflater, R.layout.form_horario_itinerario, container, false);
         super.onCreate(savedInstanceState);
 
-        viewModel = ViewModelProviders.of(this.getActivity()).get(SecoesItinerarioViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(HorariosItinerarioViewModel.class);
 
         binding.setView(this);
         binding.setViewModel(viewModel);
 
-        if(secao != null){
-            viewModel.secao = secao;
+        if(horario != null){
+            viewModel.horario = horario;
             flagInicioEdicao = true;
         }
 
         textViewProgramado = binding.textViewProgramado;
         btnTrocar = binding.btnTrocar;
 
-        if(viewModel.secao.getProgramadoPara() == null){
+        if(viewModel.horario.getProgramadoPara() == null){
             textViewProgramado.setVisibility(View.GONE);
             btnTrocar.setVisibility(View.GONE);
         } else{
@@ -87,10 +106,10 @@ public class FormSecao extends FormBase {
 
     public void onClickSalvar(View v){
 
-        if(secao != null){
-            viewModel.editarSecao();
+        if(horario != null){
+            viewModel.editarHorario();
         } else{
-            viewModel.salvarSecao();
+            viewModel.salvarHorario();
         }
 
         dismiss();
@@ -103,13 +122,13 @@ public class FormSecao extends FormBase {
     public void onClickTrocar(View v){
         FormCalendario formCalendario = new FormCalendario();
         formCalendario.setParent(this);
-        formCalendario.setDataAnterior(viewModel.secao.getProgramadoPara().toCalendar(null));
+        formCalendario.setDataAnterior(viewModel.horario.getProgramadoPara().toCalendar(null));
         formCalendario.show(getActivity().getSupportFragmentManager(), "formCalendario");
     }
 
     public void onSwitchProgramadoChange(CompoundButton btn, boolean ativo){
 
-        if(flagInicioEdicao && secao.getProgramadoPara() != null){
+        if(flagInicioEdicao && horario.getProgramadoPara() != null){
             flagInicioEdicao = false;
             return;
         }
@@ -118,8 +137,8 @@ public class FormSecao extends FormBase {
             FormCalendario formCalendario = new FormCalendario();
             formCalendario.setParent(this);
 
-            if(viewModel.secao.getProgramadoPara() != null){
-                formCalendario.setDataAnterior(viewModel.secao.getProgramadoPara().toCalendar(null));
+            if(viewModel.horario.getProgramadoPara() != null){
+                formCalendario.setDataAnterior(viewModel.horario.getProgramadoPara().toCalendar(null));
             }
 
             formCalendario.show(getActivity().getSupportFragmentManager(), "formCalendario");
@@ -131,10 +150,10 @@ public class FormSecao extends FormBase {
 
     @Override
     public void setData(Calendar umaData) {
-        viewModel.secao.setProgramadoPara(new DateTime(umaData,
+        viewModel.horario.setProgramadoPara(new DateTime(umaData,
                 DateTimeZone.forTimeZone(TimeZone.getTimeZone("America/Sao_Paulo"))));
 
-        if(viewModel.secao.getProgramadoPara() == null){
+        if(viewModel.horario.getProgramadoPara() == null){
             ocultaDataEscolhida();
         } else{
             exibeDataEscolhida();
@@ -147,13 +166,13 @@ public class FormSecao extends FormBase {
         textViewProgramado.setVisibility(View.GONE);
         textViewProgramado.setText("");
         btnTrocar.setVisibility(View.GONE);
-        viewModel.secao.setProgramadoPara(null);
+        viewModel.horario.setProgramadoPara(null);
     }
 
     private void exibeDataEscolhida(){
 
         textViewProgramado.setText(DateTimeFormat
-                .forPattern("dd/MM/yy HH:mm").print(viewModel.secao.getProgramadoPara()));
+                .forPattern("dd/MM/yy HH:mm").print(viewModel.horario.getProgramadoPara()));
 
         textViewProgramado.setVisibility(View.VISIBLE);
         btnTrocar.setVisibility(View.VISIBLE);

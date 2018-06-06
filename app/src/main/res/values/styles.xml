@@ -15,6 +15,7 @@
         <!--<item name="windowActionBarOverlay">true</item>-->
         <!--<item name="actionBarStyle">@style/Transparent</item>-->
         <!-- Fim Barra Topo -->
+
     </style>
 
     <style name="Transparent">

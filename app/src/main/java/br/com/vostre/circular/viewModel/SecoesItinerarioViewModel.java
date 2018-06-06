@@ -49,13 +49,14 @@ public class SecoesItinerarioViewModel extends AndroidViewModel {
 
     public void setItinerario(Itinerario itinerario) {
         this.itinerario = itinerario;
+        secoes = appDatabase.secaoItinerarioDAO().listarTodosPorItinerario(itinerario.getId());
     }
 
     public SecoesItinerarioViewModel(Application app){
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         secao = new SecaoItinerario();
-        secoes = appDatabase.secaoItinerarioDAO().listarTodos();
+        secoes = appDatabase.secaoItinerarioDAO().listarTodosPorItinerario("");
     }
 
     public void salvarSecao(){

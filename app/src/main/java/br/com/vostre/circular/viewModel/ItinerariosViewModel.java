@@ -15,11 +15,13 @@ import com.google.android.gms.location.LocationServices;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.model.Empresa;
+import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
@@ -106,6 +108,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
         retorno = new MutableLiveData<>();
         retorno.setValue(-1);
+
     }
 
     public void salvarItinerario(){

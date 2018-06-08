@@ -43,7 +43,7 @@
                         android:layout_weight="2"
                         android:gravity="center_vertical"
                         android:padding="10dp"
-                        android:text="@{horario.nome}"
+                        android:text="@{horario.horario}"
                         android:textStyle="bold" />
 
                     <LinearLayout
@@ -251,7 +251,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@{horario.observacoes}"
+                    android:text="@{horario.observacao}"
                     android:textAppearance="@style/texto_azul"
                     android:textStyle="bold" />
             </LinearLayout>

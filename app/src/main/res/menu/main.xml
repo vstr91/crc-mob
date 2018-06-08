@@ -11,6 +11,11 @@
         android:title="@string/action_config"
         app:showAsAction="always" />-->
 
+    <item android:id="@+id/icon_horarios"
+        android:title="Horários"
+        app:actionLayout="@layout/toolbar_horarios_icon"
+        app:showAsAction="always" />
+
     <item android:id="@+id/icon_msg"
         android:title="Mensagens"
         app:actionLayout="@layout/toolbar_msg_icon"

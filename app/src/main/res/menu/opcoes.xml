@@ -8,6 +8,11 @@
         android:title="@string/action_sobre"
         app:showAsAction="always" />-->
 
+    <item android:id="@+id/icon_horarios"
+        android:title="Horários"
+        android:icon="@drawable/ic_access_time_white_24dp"
+        app:showAsAction="always" />
+
     <item android:id="@+id/icon_msg"
         android:title="Mensagens"
         android:icon="@drawable/ic_mail_outline_24dp"

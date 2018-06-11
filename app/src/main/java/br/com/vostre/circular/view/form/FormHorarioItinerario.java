@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -31,6 +32,7 @@ import br.com.vostre.circular.databinding.FormHorarioItinerarioBinding;
 import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.Pais;
+import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.view.adapter.PaisAdapterSpinner;
 import br.com.vostre.circular.viewModel.EstadosViewModel;
 import br.com.vostre.circular.viewModel.HorariosItinerarioViewModel;
@@ -45,7 +47,7 @@ public class FormHorarioItinerario extends FormBase {
 
     HorariosItinerarioViewModel viewModel;
 
-    HorarioItinerario horario;
+    HorarioItinerarioNome horario;
     public Boolean flagInicioEdicao;
 
     static Application ctx;
@@ -58,11 +60,11 @@ public class FormHorarioItinerario extends FormBase {
         this.ctx = ctx;
     }
 
-    public HorarioItinerario getHorario() {
+    public HorarioItinerarioNome getHorario() {
         return horario;
     }
 
-    public void setHorario(HorarioItinerario horario) {
+    public void setHorario(HorarioItinerarioNome horario) {
         this.horario = horario;
     }
 
@@ -80,7 +82,7 @@ public class FormHorarioItinerario extends FormBase {
                 inflater, R.layout.form_horario_itinerario, container, false);
         super.onCreate(savedInstanceState);
 
-        viewModel = ViewModelProviders.of(this).get(HorariosItinerarioViewModel.class);
+        viewModel = ViewModelProviders.of(this.getActivity()).get(HorariosItinerarioViewModel.class);
 
         binding.setView(this);
         binding.setViewModel(viewModel);
@@ -93,7 +95,8 @@ public class FormHorarioItinerario extends FormBase {
         textViewProgramado = binding.textViewProgramado;
         btnTrocar = binding.btnTrocar;
 
-        if(viewModel.horario.getProgramadoPara() == null){
+        if(viewModel.horario.getHorarioItinerario() == null ||
+                viewModel.horario.getHorarioItinerario().getProgramadoPara() == null){
             textViewProgramado.setVisibility(View.GONE);
             btnTrocar.setVisibility(View.GONE);
         } else{
@@ -106,13 +109,19 @@ public class FormHorarioItinerario extends FormBase {
 
     public void onClickSalvar(View v){
 
-        if(horario != null){
+        HorarioItinerario hi = horario.getHorarioItinerario();
+
+        if(hi.getDomingo() || hi.getSegunda() || hi.getTerca() || hi.getQuarta() ||
+                hi.getQuinta() || hi.getSexta() || hi.getSabado()){
+            horario.getHorarioItinerario().setItinerario(viewModel.iti.get().getItinerario().getId());
+            horario.getHorarioItinerario().setHorario(horario.getIdHorario());
+
             viewModel.editarHorario();
+            dismiss();
         } else{
-            viewModel.salvarHorario();
+            Toast.makeText(ctx, "Ao menos um dia deve ser selecionado!", Toast.LENGTH_SHORT).show();
         }
 
-        dismiss();
     }
 
     public void onClickFechar(View v){
@@ -122,13 +131,14 @@ public class FormHorarioItinerario extends FormBase {
     public void onClickTrocar(View v){
         FormCalendario formCalendario = new FormCalendario();
         formCalendario.setParent(this);
-        formCalendario.setDataAnterior(viewModel.horario.getProgramadoPara().toCalendar(null));
+        formCalendario.setDataAnterior(viewModel.horario.getHorarioItinerario().getProgramadoPara().toCalendar(null));
         formCalendario.show(getActivity().getSupportFragmentManager(), "formCalendario");
     }
 
     public void onSwitchProgramadoChange(CompoundButton btn, boolean ativo){
 
-        if(flagInicioEdicao && horario.getProgramadoPara() != null){
+        if(flagInicioEdicao && horario.getHorarioItinerario() != null
+                && horario.getHorarioItinerario().getProgramadoPara() != null){
             flagInicioEdicao = false;
             return;
         }
@@ -137,8 +147,10 @@ public class FormHorarioItinerario extends FormBase {
             FormCalendario formCalendario = new FormCalendario();
             formCalendario.setParent(this);
 
-            if(viewModel.horario.getProgramadoPara() != null){
-                formCalendario.setDataAnterior(viewModel.horario.getProgramadoPara().toCalendar(null));
+            if(viewModel.horario.getHorarioItinerario() != null
+                    && viewModel.horario.getHorarioItinerario().getProgramadoPara() != null){
+                formCalendario.setDataAnterior(viewModel.horario.getHorarioItinerario()
+                        .getProgramadoPara().toCalendar(null));
             }
 
             formCalendario.show(getActivity().getSupportFragmentManager(), "formCalendario");
@@ -150,10 +162,15 @@ public class FormHorarioItinerario extends FormBase {
 
     @Override
     public void setData(Calendar umaData) {
-        viewModel.horario.setProgramadoPara(new DateTime(umaData,
+
+        if(viewModel.horario.getHorarioItinerario() == null){
+            viewModel.horario.setHorarioItinerario(new HorarioItinerario());
+        }
+
+        viewModel.horario.getHorarioItinerario().setProgramadoPara(new DateTime(umaData,
                 DateTimeZone.forTimeZone(TimeZone.getTimeZone("America/Sao_Paulo"))));
 
-        if(viewModel.horario.getProgramadoPara() == null){
+        if(viewModel.horario.getHorarioItinerario().getProgramadoPara() == null){
             ocultaDataEscolhida();
         } else{
             exibeDataEscolhida();
@@ -166,16 +183,19 @@ public class FormHorarioItinerario extends FormBase {
         textViewProgramado.setVisibility(View.GONE);
         textViewProgramado.setText("");
         btnTrocar.setVisibility(View.GONE);
-        viewModel.horario.setProgramadoPara(null);
+        viewModel.horario.getHorarioItinerario().setProgramadoPara(null);
     }
 
     private void exibeDataEscolhida(){
 
-        textViewProgramado.setText(DateTimeFormat
-                .forPattern("dd/MM/yy HH:mm").print(viewModel.horario.getProgramadoPara()));
+        if(viewModel.horario.getHorarioItinerario() != null){
+            textViewProgramado.setText(DateTimeFormat
+                    .forPattern("dd/MM/yy HH:mm").print(viewModel.horario.getHorarioItinerario().getProgramadoPara()));
 
-        textViewProgramado.setVisibility(View.VISIBLE);
-        btnTrocar.setVisibility(View.VISIBLE);
+            textViewProgramado.setVisibility(View.VISIBLE);
+            btnTrocar.setVisibility(View.VISIBLE);
+        }
+
     }
 
 }

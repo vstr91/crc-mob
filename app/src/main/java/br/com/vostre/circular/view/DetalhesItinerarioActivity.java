@@ -218,7 +218,9 @@ public class DetalhesItinerarioActivity extends BaseActivity {
     }
 
     public void onClickBtnHorarios(View v){
-
+        Intent i = new Intent(ctx, HorariosItinerarioActivity.class);
+        i.putExtra("itinerario", viewModel.getItinerario().getValue().getItinerario().getId());
+        ctx.startActivity(i);
     }
 
     @Override

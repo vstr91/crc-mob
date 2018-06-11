@@ -37,6 +37,16 @@ public class HorarioItinerario extends EntidadeBase {
 
     private String observacao;
 
+    public HorarioItinerario(){
+        this.setDomingo(false);
+        this.setSegunda(false);
+        this.setTerca(false);
+        this.setQuarta(false);
+        this.setQuinta(false);
+        this.setSexta(false);
+        this.setSabado(false);
+    }
+
     @NonNull
     public String getHorario() {
         return horario;

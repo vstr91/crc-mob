@@ -3,6 +3,7 @@ package br.com.vostre.circular.viewModel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.databinding.ObservableField;
 import android.os.AsyncTask;
 
 import org.joda.time.DateTime;
@@ -11,55 +12,71 @@ import java.util.List;
 
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
+import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.dao.PaisDAO;
+import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
+import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.utils.StringUtils;
 
 public class HorariosItinerarioViewModel extends AndroidViewModel {
 
     private AppDatabase appDatabase;
 
-    public LiveData<List<HorarioItinerario>> horarios;
-    public HorarioItinerario horario;
+    public LiveData<List<HorarioItinerarioNome>> horarios;
+    public HorarioItinerarioNome horario;
 
-    public LiveData<List<HorarioItinerario>> getHorarios() {
+    public LiveData<ItinerarioPartidaDestino> itinerario;
+    public ObservableField<ItinerarioPartidaDestino> iti;
+
+    public LiveData<List<HorarioItinerarioNome>> getHorarios() {
         return horarios;
     }
 
-    public void setHorarios(LiveData<List<HorarioItinerario>> horarios) {
+    public void setHorarios(LiveData<List<HorarioItinerarioNome>> horarios) {
         this.horarios = horarios;
     }
 
-    public HorarioItinerario getHorario() {
+    public void setItinerario(String itinerario) {
+        this.itinerario = appDatabase.itinerarioDAO().carregar(itinerario);
+        horarios = appDatabase.horarioItinerarioDAO()
+                .listarTodosAtivosPorItinerario(itinerario);
+    }
+
+    public HorarioItinerarioNome getHorario() {
         return horario;
     }
 
-    public void setHorario(HorarioItinerario horario) {
+    public void setHorario(HorarioItinerarioNome horario) {
         this.horario = horario;
+
+        if(horario.getHorarioItinerario() == null){
+            this.horario.setHorarioItinerario(new HorarioItinerario());
+        }
+
+    }
+
+    public ObservableField<ItinerarioPartidaDestino> getIti() {
+        return iti;
+    }
+
+    public void setIti(ObservableField<ItinerarioPartidaDestino> iti) {
+        this.iti = iti;
     }
 
     public HorariosItinerarioViewModel(Application app){
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
-        horario = new HorarioItinerario();
-        horarios = appDatabase.horarioItinerarioDAO().listarTodos();
-    }
-
-    public void salvarHorario(){
-
-        if(horario.valida(horario)){
-            add(horario);
-        } else{
-            System.out.println("Faltou algo a ser digitado!");
-        }
-
+        horario = new HorarioItinerarioNome();
+        horarios = appDatabase.horarioItinerarioDAO().listarTodosAtivosPorItinerario("");
+        iti = new ObservableField<>(new ItinerarioPartidaDestino());
     }
 
     public void editarHorario(){
 
-        if(horario.valida(horario)){
-            edit(horario);
+        if(horario.getHorarioItinerario().valida(horario.getHorarioItinerario())){
+            edit(horario.getHorarioItinerario());
         } else{
             System.out.println("Faltou algo a ser digitado!");
         }
@@ -68,41 +85,36 @@ public class HorariosItinerarioViewModel extends AndroidViewModel {
 
     // adicionar
 
-    public void add(final HorarioItinerario horario) {
+    public void edit(final HorarioItinerario horario) {
 
-        horario.setDataCadastro(new DateTime());
+        if(horario.getDataCadastro() == null){
+            horario.setDataCadastro(new DateTime());
+        }
+
         horario.setUltimaAlteracao(new DateTime());
         horario.setEnviado(false);
 
-        new addAsyncTask(appDatabase).execute(horario);
+        //new invalidaHorariosAsyncTask(appDatabase).execute(itinerario.getValue().getItinerario());
+
+        new editAsyncTask(appDatabase).execute(horario);
     }
 
-    private static class addAsyncTask extends AsyncTask<HorarioItinerario, Void, Void> {
+    private static class invalidaHorariosAsyncTask extends AsyncTask<Itinerario, Void, Void> {
 
         private AppDatabase db;
 
-        addAsyncTask(AppDatabase appDatabase) {
+        invalidaHorariosAsyncTask(AppDatabase appDatabase) {
             db = appDatabase;
         }
 
         @Override
-        protected Void doInBackground(final HorarioItinerario... params) {
-            db.horarioItinerarioDAO().inserir((params[0]));
+        protected Void doInBackground(final Itinerario... params) {
+
+            db.horarioItinerarioDAO().invalidaTodosPorItinerario(params[0].getId());
+
             return null;
         }
 
-    }
-
-    // fim adicionar
-
-    // editar
-
-    public void edit(final HorarioItinerario horario) {
-
-        horario.setUltimaAlteracao(new DateTime());
-        horario.setEnviado(false);
-
-        new editAsyncTask(appDatabase).execute(horario);
     }
 
     private static class editAsyncTask extends AsyncTask<HorarioItinerario, Void, Void> {
@@ -115,7 +127,30 @@ public class HorariosItinerarioViewModel extends AndroidViewModel {
 
         @Override
         protected Void doInBackground(final HorarioItinerario... params) {
-            db.horarioItinerarioDAO().editar((params[0]));
+
+            HorarioItinerario horarioItinerario = db.horarioItinerarioDAO()
+                    .checaDuplicidade(params[0].getHorario(), params[0].getItinerario());
+
+            if(horarioItinerario != null){
+                HorarioItinerario hi = params[0];
+
+                horarioItinerario.setAtivo(true);
+                horarioItinerario.setDomingo(hi.getDomingo());
+                horarioItinerario.setSegunda(hi.getSegunda());
+                horarioItinerario.setTerca(hi.getTerca());
+                horarioItinerario.setQuarta(hi.getQuarta());
+                horarioItinerario.setQuinta(hi.getQuinta());
+                horarioItinerario.setSexta(hi.getSexta());
+                horarioItinerario.setSabado(hi.getSabado());
+                horarioItinerario.setObservacao(hi.getObservacao());
+                horarioItinerario.setUltimaAlteracao(new DateTime());
+                horarioItinerario.setProgramadoPara(hi.getProgramadoPara());
+
+                db.horarioItinerarioDAO().editar(horarioItinerario);
+            } else{
+                db.horarioItinerarioDAO().inserir(params[0]);
+            }
+
             return null;
         }
 

@@ -20,7 +20,6 @@ import br.com.vostre.circular.utils.StringUtils;
 public class SecoesItinerarioViewModel extends AndroidViewModel {
 
     private AppDatabase appDatabase;
-    SecaoItinerarioDAO secaoItinerarioDAO;
 
     public LiveData<List<SecaoItinerario>> secoes;
     public SecaoItinerario secao;

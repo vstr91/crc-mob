@@ -39,8 +39,9 @@
         <activity android:name=".view.DetalhesEmpresaActivity" />
         <activity android:name=".view.DetalhesOnibusActivity" />
         <activity android:name=".view.DetalhesItinerarioActivity" />
-        <activity android:name=".view.SecoesItinerarioActivity"></activity>
+        <activity android:name=".view.SecoesItinerarioActivity" />
         <activity android:name=".view.HorariosActivity" />
+        <activity android:name=".view.HorariosItinerarioActivity"></activity>
     </application>
 
 </manifest>

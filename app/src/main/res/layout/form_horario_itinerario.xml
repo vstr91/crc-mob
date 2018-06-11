@@ -62,7 +62,7 @@
                     android:layout_height="28dp"
                     android:layout_gravity="center"
                     android:background="@drawable/radio_dia"
-                    android:checked="@={viewModel.horario.domingo}"
+                    android:checked="@={viewModel.horario.horarioItinerario.domingo}"
                     android:textOff=" "
                     android:textOn=" " />
             </LinearLayout>
@@ -88,7 +88,7 @@
                     android:layout_height="28dp"
                     android:layout_gravity="center"
                     android:background="@drawable/radio_dia"
-                    android:checked="@={viewModel.horario.segunda}"
+                    android:checked="@={viewModel.horario.horarioItinerario.segunda}"
                     android:textOff=" "
                     android:textOn=" " />
             </LinearLayout>
@@ -114,7 +114,7 @@
                     android:layout_height="28dp"
                     android:layout_gravity="center"
                     android:background="@drawable/radio_dia"
-                    android:checked="@={viewModel.horario.terca}"
+                    android:checked="@={viewModel.horario.horarioItinerario.terca}"
                     android:textOff=" "
                     android:textOn=" " />
             </LinearLayout>
@@ -140,7 +140,7 @@
                     android:layout_height="28dp"
                     android:layout_gravity="center"
                     android:background="@drawable/radio_dia"
-                    android:checked="@={viewModel.horario.quarta}"
+                    android:checked="@={viewModel.horario.horarioItinerario.quarta}"
                     android:textOff=" "
                     android:textOn=" " />
             </LinearLayout>
@@ -166,7 +166,7 @@
                     android:layout_height="28dp"
                     android:layout_gravity="center"
                     android:background="@drawable/radio_dia"
-                    android:checked="@={viewModel.horario.quinta}"
+                    android:checked="@={viewModel.horario.horarioItinerario.quinta}"
                     android:textOff=" "
                     android:textOn=" " />
             </LinearLayout>
@@ -192,7 +192,7 @@
                     android:layout_height="28dp"
                     android:layout_gravity="center"
                     android:background="@drawable/radio_dia"
-                    android:checked="@={viewModel.horario.sexta}"
+                    android:checked="@={viewModel.horario.horarioItinerario.sexta}"
                     android:textOff=" "
                     android:textOn=" " />
             </LinearLayout>
@@ -218,7 +218,7 @@
                     android:layout_height="28dp"
                     android:layout_gravity="center"
                     android:background="@drawable/radio_dia"
-                    android:checked="@={viewModel.horario.sabado}"
+                    android:checked="@={viewModel.horario.horarioItinerario.sabado}"
                     android:textOff=" "
                     android:textOn=" " />
             </LinearLayout>
@@ -247,7 +247,7 @@
                 android:inputType="text"
                 android:lines="5"
                 android:singleLine="false"
-                android:text="@={viewModel.horario.observacao}"
+                android:text="@={viewModel.horario.horarioItinerario.observacao}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -256,7 +256,7 @@
 
         <Switch
             android:id="@+id/switchProgramado"
-            android:checked="@{viewModel.horario.programadoPara != null ? true : false}"
+            android:checked="@{viewModel.horario.horarioItinerario.programadoPara != null ? true : false}"
             android:onCheckedChanged="@{view::onSwitchProgramadoChange}"
             style="@style/texto_azul"
             android:layout_width="0dp"
@@ -283,7 +283,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:checked="@={viewModel.horario.ativo}"
+            android:checked="@={viewModel.horario.horarioItinerario.ativo}"
             android:text="Ativo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

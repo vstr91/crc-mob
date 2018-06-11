@@ -21,6 +21,9 @@ public interface PaisDAO {
     @Query("SELECT * FROM pais WHERE ativo = 1")
     List<Pais> listarTodosAtivos();
 
+    @Query("SELECT * FROM pais WHERE enviado = 0")
+    List<Pais> listarTodosAEnviar();
+
     @Query("SELECT * FROM pais WHERE id IN (:ids)")
     List<Pais> carregarTodosPorIds(int[] ids);
 

@@ -85,15 +85,11 @@ public class ToolbarUtils {
                 // Constants
                 // Content provider authority
                 final String AUTHORITY =
-                        "com.example.android.datasync.provider";
+                        "br.com.vostre.circular";
                 // Account type
-                final String ACCOUNT_TYPE = "com.example.android.datasync";
+                final String ACCOUNT_TYPE = "br.com.vostre.circular";
                 // Account
                 final String ACCOUNT = "default_account";
-                // Instance fields
-                Account mAccount;
-
-                mAccount = MenuActivity.CreateSyncAccount(activity);
 
                 // Pass the settings flags by inserting them in a bundle
                 Bundle settingsBundle = new Bundle();
@@ -105,7 +101,7 @@ public class ToolbarUtils {
                  * Request the sync for the default account, authority, and
                  * manual sync settings
                  */
-                ContentResolver.requestSync(mAccount, AUTHORITY, settingsBundle);
+                ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
 
                 Pais pais = new Pais();
                 pais.setId(UUID.randomUUID().toString());

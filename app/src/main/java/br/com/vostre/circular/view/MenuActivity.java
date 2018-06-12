@@ -38,9 +38,9 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
     // Constants
     // The authority for the sync adapter's content provider
-    public static final String AUTHORITY = "com.example.android.datasync.provider";
+    public static final String AUTHORITY = "br.com.vostre.circular.datasync.provider";
     // An account type, in the form of a domain name
-    public static final String ACCOUNT_TYPE = "example.com";
+    public static final String ACCOUNT_TYPE = "br.com.vostre.circular";
     // The account name
     public static final String ACCOUNT = "dummyaccount";
     // Instance fields
@@ -71,7 +71,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
          * Turn on periodic syncing
          */
         ContentResolver.addPeriodicSync(
-                ACCOUNT,
+                new Account(ACCOUNT, ACCOUNT_TYPE),
                 AUTHORITY,
                 Bundle.EMPTY,
                 SYNC_INTERVAL);

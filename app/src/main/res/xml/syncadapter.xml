@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sync-adapter
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:contentAuthority="br.com.vostre.circular"
+    android:contentAuthority="br.com.vostre.circular.datasync.provider"
     android:accountType="br.com.vostre.circular"
     android:userVisible="false"
-    android:supportsUploading="false"
-    android:allowParallelSyncs="false"
+    android:supportsUploading="true"
+    android:allowParallelSyncs="true"
     android:isAlwaysSyncable="true"/>

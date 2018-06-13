@@ -22,6 +22,9 @@ public interface CidadeDAO {
     @Query("SELECT * FROM cidade WHERE ativo = 1")
     List<Cidade> listarTodosAtivos();
 
+    @Query("SELECT * FROM cidade WHERE enviado = 0")
+    List<Cidade> listarTodosAEnviar();
+
     @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado FROM cidade c INNER JOIN estado e ON e.id = c.estado")
     LiveData<List<CidadeEstado>> listarTodosComEstado();
 

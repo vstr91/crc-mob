@@ -11,6 +11,7 @@ import android.arch.persistence.room.Update;
 import java.util.List;
 
 import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 
@@ -19,6 +20,9 @@ public interface ParadaDAO {
 
     @Query("SELECT * FROM parada")
     LiveData<List<Parada>> listarTodos();
+
+    @Query("SELECT * FROM parada WHERE enviado = 0")
+    List<Parada> listarTodosAEnviar();
 
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada p " +

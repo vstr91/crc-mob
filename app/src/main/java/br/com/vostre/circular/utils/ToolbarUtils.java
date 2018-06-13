@@ -1,6 +1,7 @@
 package br.com.vostre.circular.utils;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -22,6 +23,8 @@ import br.com.vostre.circular.view.HorariosActivity;
 import br.com.vostre.circular.view.MensagensActivity;
 import br.com.vostre.circular.view.MenuActivity;
 
+import static android.content.Context.ACCOUNT_SERVICE;
+
 /**
  * Created by Almir on 16/12/2015.
  */
@@ -33,6 +36,13 @@ public class ToolbarUtils {
     static ImageButton imageButtonSync;
     static View.OnClickListener mListener;
     public static int NOVAS_MENSAGENS = 0;
+
+    // The authority for the sync adapter's content provider
+    public static final String AUTHORITY = "br.com.vostre.circular.datasync.provider";
+    // An account type, in the form of a domain name
+    public static final String ACCOUNT_TYPE = "br.com.vostre.circular";
+    // The account name
+    public static final String ACCOUNT = "dummyaccount";
 
     public static void preparaMenu(Menu menu, Activity activity, View.OnClickListener listener){
 
@@ -82,15 +92,6 @@ public class ToolbarUtils {
             case R.id.icon_sync:
             case R.id.sync:
 
-                // Constants
-                // Content provider authority
-                final String AUTHORITY =
-                        "br.com.vostre.circular";
-                // Account type
-                final String ACCOUNT_TYPE = "br.com.vostre.circular";
-                // Account
-                final String ACCOUNT = "default_account";
-
                 // Pass the settings flags by inserting them in a bundle
                 Bundle settingsBundle = new Bundle();
                 settingsBundle.putBoolean(
@@ -113,7 +114,7 @@ public class ToolbarUtils {
                 pais.setEnviado(false);
                 pais.setSlug(StringUtils.toSlug(pais.getNome()));
 
-                System.out.println("PAIS: "+pais.toJson());
+                //System.out.println("PAIS: "+pais.toJson());
 
                 break;
             case R.id.imageButtonHorarios:

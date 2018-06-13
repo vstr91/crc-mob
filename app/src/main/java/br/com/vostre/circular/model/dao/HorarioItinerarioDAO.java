@@ -22,6 +22,9 @@ public interface HorarioItinerarioDAO {
     @Query("SELECT * FROM horario_itinerario WHERE ativo = 1")
     List<HorarioItinerario> listarTodosAtivos();
 
+    @Query("SELECT * FROM horario_itinerario WHERE enviado = 0")
+    List<HorarioItinerario> listarTodosAEnviar();
+
     @Query("SELECT hi.*, h.id AS idHorario, h.nome AS nomeHorario " +
             "FROM horario h LEFT JOIN horario_itinerario hi ON hi.horario = h.id " +
             "WHERE h.ativo = 1 AND (hi.ativo = 1 OR hi.ativo IS NULL) AND (hi.itinerario = :itinerario OR hi.itinerario IS NULL) ORDER BY h.nome")

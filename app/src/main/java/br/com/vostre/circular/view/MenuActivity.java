@@ -48,7 +48,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
     // Sync interval constants
     public static final long SECONDS_PER_MINUTE = 60L;
-    public static final long SYNC_INTERVAL_IN_MINUTES = 60L;
+    public static final long SYNC_INTERVAL_IN_MINUTES = 1L;
     public static final long SYNC_INTERVAL =
             SYNC_INTERVAL_IN_MINUTES *
                     SECONDS_PER_MINUTE;
@@ -97,8 +97,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         drawer.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
-
-        JodaTimeAndroid.init(this);
 
     }
 
@@ -181,11 +179,13 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
              * then call context.setIsSyncable(account, AUTHORITY, 1)
              * here.
              */
+            System.out.println("AQUI!!!!");
         } else {
             /*
              * The account exists or some other error occurred. Log this, report it,
              * or handle it internally.
              */
+            System.out.println("EXISTE!!!!");
         }
 
         return null;

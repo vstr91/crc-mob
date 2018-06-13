@@ -24,6 +24,9 @@ public interface SecaoItinerarioDAO {
     @Query("SELECT * FROM secao_itinerario WHERE ativo = 1")
     List<SecaoItinerario> listarTodosAtivos();
 
+    @Query("SELECT * FROM secao_itinerario WHERE enviado = 0")
+    List<SecaoItinerario> listarTodosAEnviar();
+
     @Query("SELECT * FROM secao_itinerario WHERE id IN (:ids)")
     List<SecaoItinerario> carregarTodosPorIds(int[] ids);
 

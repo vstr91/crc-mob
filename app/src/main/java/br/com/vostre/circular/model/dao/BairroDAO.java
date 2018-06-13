@@ -24,6 +24,9 @@ public interface BairroDAO {
     @Query("SELECT * FROM bairro WHERE ativo = 1")
     List<Bairro> listarTodosAtivos();
 
+    @Query("SELECT * FROM bairro WHERE enviado = 0")
+    List<Bairro> listarTodosAEnviar();
+
     @Query("SELECT b.*, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado FROM bairro b " +
             "INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado")
     LiveData<List<BairroCidade>> listarTodosComCidade();

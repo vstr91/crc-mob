@@ -21,6 +21,9 @@ public interface UsuarioDAO {
     @Query("SELECT * FROM usuario WHERE ativo = 1")
     List<Usuario> listarTodosAtivos();
 
+    @Query("SELECT * FROM usuario WHERE enviado = 0")
+    List<Usuario> listarTodosAEnviar();
+
     @Query("SELECT * FROM usuario WHERE id IN (:ids)")
     List<Usuario> carregarTodosPorIds(int[] ids);
 

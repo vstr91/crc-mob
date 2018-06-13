@@ -186,7 +186,11 @@ public class FormPontoInteresse extends FormPOIBase {
     public void onClickTrocarInicio(View v){
         FormCalendarioPOI formCalendario = new FormCalendarioPOI();
         formCalendario.setParent(this);
-        formCalendario.setDataInicioAnterior(viewModel.pontoInteresse.getDataInicial().toCalendar(null));
+
+        if(viewModel.pontoInteresse.getDataInicial() != null){
+            formCalendario.setDataInicioAnterior(viewModel.pontoInteresse.getDataInicial().toCalendar(null));
+        }
+
         formCalendario.setQual(0);
         formCalendario.show(getActivity().getSupportFragmentManager(), "formCalendario");
     }
@@ -194,7 +198,11 @@ public class FormPontoInteresse extends FormPOIBase {
     public void onClickTrocarFim(View v){
         FormCalendarioPOI formCalendario = new FormCalendarioPOI();
         formCalendario.setParent(this);
-        formCalendario.setDataFimAnterior(viewModel.pontoInteresse.getDataFinal().toCalendar(null));
+
+        if(viewModel.pontoInteresse.getDataFinal() != null){
+            formCalendario.setDataFimAnterior(viewModel.pontoInteresse.getDataFinal().toCalendar(null));
+        }
+
         formCalendario.setQual(1);
         formCalendario.show(getActivity().getSupportFragmentManager(), "formCalendario");
     }

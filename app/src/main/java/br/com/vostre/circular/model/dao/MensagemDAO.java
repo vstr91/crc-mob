@@ -22,6 +22,9 @@ public interface MensagemDAO {
     @Query("SELECT * FROM mensagem WHERE ativo = 1")
     List<Mensagem> listarTodosAtivos();
 
+    @Query("SELECT * FROM mensagem WHERE enviado = 0")
+    List<Mensagem> listarTodosAEnviar();
+
     @Query("SELECT * FROM mensagem WHERE id IN (:ids)")
     List<Mensagem> carregarTodosPorIds(int[] ids);
 

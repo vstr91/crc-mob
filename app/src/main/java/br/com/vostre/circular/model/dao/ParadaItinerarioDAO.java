@@ -35,6 +35,9 @@ public interface ParadaItinerarioDAO {
             "WHERE pi.parada = :parada AND pi.ativo = 1 AND i.ativo = 1")
     List<Itinerario> listarTodosAtivosPorParada(String parada);
 
+    @Query("SELECT * FROM parada_itinerario WHERE enviado = 0")
+    List<ParadaItinerario> listarTodosAEnviar();
+
     @Query("SELECT pi.* FROM parada_itinerario pi WHERE pi.parada = :parada AND pi.itinerario = :itinerario")
     ParadaItinerario checaDuplicidade(String parada, String itinerario);
 

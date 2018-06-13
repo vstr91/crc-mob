@@ -21,6 +21,9 @@ public interface OnibusDAO {
     @Query("SELECT * FROM onibus WHERE ativo = 1")
     LiveData<List<Onibus>> listarTodosAtivos();
 
+    @Query("SELECT * FROM onibus WHERE enviado = 0")
+    List<Onibus> listarTodosAEnviar();
+
     @Query("SELECT * FROM onibus WHERE ativo = 1 AND empresa = :empresa")
     LiveData<List<Onibus>> listarTodosAtivosPorEmpresa(String empresa);
 

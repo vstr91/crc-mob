@@ -21,6 +21,9 @@ public interface HorarioDAO {
     @Query("SELECT * FROM horario WHERE ativo = 1")
     List<Horario> listarTodosAtivos();
 
+    @Query("SELECT * FROM horario WHERE enviado = 0")
+    List<Horario> listarTodosAEnviar();
+
     @Query("SELECT * FROM horario WHERE id IN (:ids)")
     List<Horario> carregarTodosPorIds(int[] ids);
 

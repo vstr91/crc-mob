@@ -22,6 +22,9 @@ public interface MensagemRespostaDAO {
     @Query("SELECT * FROM mensagem_resposta WHERE ativo = 1")
     List<MensagemResposta> listarTodosAtivos();
 
+    @Query("SELECT * FROM mensagem_resposta WHERE enviado = 0")
+    List<MensagemResposta> listarTodosAEnviar();
+
     @Query("SELECT * FROM mensagem_resposta WHERE mensagem = :id")
     LiveData<List<MensagemResposta>> carregarTodosPorIdMensagem(String id);
 

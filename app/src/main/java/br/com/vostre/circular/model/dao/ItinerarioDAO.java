@@ -44,6 +44,9 @@ public interface ItinerarioDAO {
             "WHERE i.ativo = 1")
     LiveData<List<ItinerarioPartidaDestino>> listarTodosAtivos();
 
+    @Query("SELECT * FROM itinerario WHERE enviado = 0")
+    List<Itinerario> listarTodosAEnviar();
+
     @Query("SELECT DISTINCT i.*, " +
             "(SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
             "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id)) AS 'nomePartida', " +

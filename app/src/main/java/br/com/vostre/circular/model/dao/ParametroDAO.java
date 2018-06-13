@@ -22,6 +22,9 @@ public interface ParametroDAO {
     @Query("SELECT * FROM parametro WHERE ativo = 1")
     List<Parametro> listarTodosAtivos();
 
+    @Query("SELECT * FROM parametro WHERE enviado = 0")
+    List<Parametro> listarTodosAEnviar();
+
     @Query("SELECT * FROM parametro WHERE id IN (:ids)")
     List<Parametro> carregarTodosPorIds(int[] ids);
 

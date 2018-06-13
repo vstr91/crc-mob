@@ -43,15 +43,4 @@ public class Pais extends EntidadeSlug {
 
     }
 
-    public String toJson(){
-
-        List<Pais> paises = new ArrayList<>();
-
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(DateTime.class, JsonUtils.serDateTime)
-                .registerTypeAdapter(DateTime.class, JsonUtils.deserDateTime)
-                .create();
-        return gson.toJson(paises);
-    }
-
 }

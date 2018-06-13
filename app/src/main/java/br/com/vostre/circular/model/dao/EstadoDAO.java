@@ -21,6 +21,9 @@ public interface EstadoDAO {
     @Query("SELECT * FROM estado WHERE ativo = 1")
     List<Estado> listarTodosAtivos();
 
+    @Query("SELECT * FROM estado WHERE enviado = 0")
+    List<Estado> listarTodosAEnviar();
+
     @Query("SELECT * FROM estado WHERE id IN (:ids)")
     List<Estado> carregarTodosPorIds(int[] ids);
 

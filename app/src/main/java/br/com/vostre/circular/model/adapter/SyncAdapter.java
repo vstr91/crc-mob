@@ -130,11 +130,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
 //        String json = "{"+strHorarios+"}";
 
-        System.out.println(json);
+        //System.out.println(json);
 
         File caminho = Environment.getExternalStorageDirectory();
 
-        System.out.println("caminho: "+caminho);
+        //System.out.println("caminho: "+caminho);
 
         File arquivo = new File(caminho, "data.txt");
 

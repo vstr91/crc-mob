@@ -11,6 +11,11 @@
         android:title="@string/action_config"
         app:showAsAction="always" />-->
 
+    <item android:id="@+id/icon_import"
+        android:title="Importar"
+        app:actionLayout="@layout/toolbar_import_icon"
+        app:showAsAction="always" />
+
     <item android:id="@+id/icon_sync"
         android:title="Sincronizar"
         app:actionLayout="@layout/toolbar_sync_icon"

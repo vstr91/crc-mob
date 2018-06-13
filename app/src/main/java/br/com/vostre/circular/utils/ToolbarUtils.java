@@ -34,8 +34,11 @@ public class ToolbarUtils {
     static ImageButton imageButtonMsg;
     static ImageButton imageButtonHorarios;
     static ImageButton imageButtonSync;
+    static ImageButton imageButtonImportar;
     static View.OnClickListener mListener;
     public static int NOVAS_MENSAGENS = 0;
+
+    public static final Integer PICK_FILE = 310;
 
     // The authority for the sync adapter's content provider
     public static final String AUTHORITY = "br.com.vostre.circular.datasync.provider";
@@ -57,6 +60,9 @@ public class ToolbarUtils {
         MenuItem itemSync = menu.findItem(R.id.icon_sync);
         MenuItemCompat.getActionView(itemSync).setOnClickListener(listener);
 
+        MenuItem itemImport = menu.findItem(R.id.icon_import);
+        MenuItemCompat.getActionView(itemImport).setOnClickListener(listener);
+
         mListener = listener;
 
         NOVAS_MENSAGENS = 0;
@@ -69,6 +75,9 @@ public class ToolbarUtils {
 
         imageButtonSync = MenuItemCompat.getActionView(itemSync).findViewById(R.id.imageButtonSync);
         imageButtonSync.setOnClickListener(mListener);
+
+        imageButtonImportar = MenuItemCompat.getActionView(itemImport).findViewById(R.id.imageButtonImport);
+        imageButtonImportar.setOnClickListener(mListener);
 
         if(NOVAS_MENSAGENS < 1){
             textViewBadgeMsg = MenuItemCompat.getActionView(itemMsg).findViewById(R.id.textViewBadgeMsg);
@@ -87,6 +96,16 @@ public class ToolbarUtils {
         switch(v.getId()){
             case android.R.id.home:
                 activity.onBackPressed();
+                break;
+            case R.id.imageButtonImport:
+            case R.id.icon_import:
+            case R.id.importar:
+
+                Intent intentFile = new Intent();
+                intentFile.setType("text/*");
+                intentFile.setAction(Intent.ACTION_GET_CONTENT);
+                activity.startActivityForResult(Intent.createChooser(intentFile, "Escolha o arquivo de dados"), PICK_FILE);
+
                 break;
             case R.id.imageButtonSync:
             case R.id.icon_sync:

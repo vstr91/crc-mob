@@ -8,6 +8,11 @@
         android:title="@string/action_sobre"
         app:showAsAction="always" />-->
 
+    <item android:id="@+id/icon_import"
+        android:title="Importar"
+        android:icon="@drawable/ic_import_white_24dp"
+        app:showAsAction="always" />
+
     <item android:id="@+id/icon_sync"
         android:title="Sincronização"
         android:icon="@drawable/ic_sync_white_24dp"

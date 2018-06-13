@@ -37,7 +37,7 @@ public interface PaisDAO {
     Pais encontrarPorSigla(String sigla);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
-    void inserirTodos(Pais... paises);
+    void inserirTodos(List<Pais> paises);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
     void inserir(Pais pais);
@@ -47,5 +47,8 @@ public interface PaisDAO {
 
     @Delete
     void deletar(Pais pais);
+
+    @Query("DELETE FROM pais")
+    void deletarTodos();
 
 }

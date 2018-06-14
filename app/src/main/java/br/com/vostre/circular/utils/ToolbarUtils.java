@@ -123,18 +123,6 @@ public class ToolbarUtils {
                  */
                 ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
 
-                Pais pais = new Pais();
-                pais.setId(UUID.randomUUID().toString());
-                pais.setNome("Brasil");
-                pais.setSigla("BRA");
-                pais.setAtivo(true);
-                pais.setDataCadastro(new DateTime());
-                pais.setUltimaAlteracao(new DateTime());
-                pais.setEnviado(false);
-                pais.setSlug(StringUtils.toSlug(pais.getNome()));
-
-                //System.out.println("PAIS: "+pais.toJson());
-
                 break;
             case R.id.imageButtonHorarios:
             case R.id.icon_horarios:

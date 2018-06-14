@@ -27,7 +27,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.R;
+import br.com.vostre.circular.model.Bairro;
+import br.com.vostre.circular.model.Cidade;
+import br.com.vostre.circular.model.Empresa;
+import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.Horario;
+import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Pais;
+import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.utils.ToolbarUtils;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
@@ -140,6 +147,8 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
                     DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy HH:mm");
 
+                    // PAISES
+
                     if(paises.length() > 0){
 
                         int total = paises.length();
@@ -167,6 +176,240 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
                         }
 
                         viewModel.add(lstPaises, "pais");
+
+                    }
+
+                    // ESTADOS
+
+                    if(estados.length() > 0){
+
+                        int total = estados.length();
+                        List<Estado> lstEstados = new ArrayList<>();
+
+                        for(int i = 0; i < total; i++){
+                            Estado estado = new Estado();
+                            JSONObject obj = estados.getJSONObject(i);
+
+                            estado.setId(obj.getString("id"));
+                            estado.setNome(obj.getString("nome"));
+                            estado.setSigla(obj.getString("sigla"));
+                            estado.setPais(obj.getString("pais"));
+                            estado.setSlug(obj.getString("slug"));
+                            estado.setEnviado(obj.getBoolean("enviado"));
+                            estado.setAtivo(obj.getBoolean("ativo"));
+                            estado.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
+                            estado.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+
+                            if(!obj.optString("programadoPara", "").isEmpty()){
+                                estado.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
+                            }
+
+                            lstEstados.add(estado);
+
+                        }
+
+                        viewModel.add(lstEstados, "estado");
+
+                    }
+
+                    // CIDADES
+
+                    if(cidades.length() > 0){
+
+                        int total = cidades.length();
+                        List<Cidade> lstCidades = new ArrayList<>();
+
+                        for(int i = 0; i < total; i++){
+                            Cidade cidade = new Cidade();
+                            JSONObject obj = cidades.getJSONObject(i);
+
+                            cidade.setId(obj.getString("id"));
+                            cidade.setNome(obj.getString("nome"));
+                            cidade.setBrasao(obj.getString("brasao"));
+                            cidade.setEstado(obj.getString("estado"));
+                            cidade.setSlug(obj.getString("slug"));
+                            cidade.setEnviado(obj.getBoolean("enviado"));
+                            cidade.setAtivo(obj.getBoolean("ativo"));
+                            cidade.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
+                            cidade.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+
+                            if(!obj.optString("programadoPara", "").isEmpty()){
+                                cidade.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
+                            }
+
+                            lstCidades.add(cidade);
+
+                        }
+
+                        viewModel.add(lstCidades, "cidade");
+
+                    }
+
+                    // BAIRROS
+
+                    if(bairros.length() > 0){
+
+                        int total = bairros.length();
+                        List<Bairro> lstBairros = new ArrayList<>();
+
+                        for(int i = 0; i < total; i++){
+                            Bairro bairro = new Bairro();
+                            JSONObject obj = bairros.getJSONObject(i);
+
+                            bairro.setId(obj.getString("id"));
+                            bairro.setNome(obj.getString("nome"));
+                            bairro.setCidade(obj.getString("cidade"));
+                            bairro.setSlug(obj.getString("slug"));
+                            bairro.setEnviado(obj.getBoolean("enviado"));
+                            bairro.setAtivo(obj.getBoolean("ativo"));
+                            bairro.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
+                            bairro.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+
+                            if(!obj.optString("programadoPara", "").isEmpty()){
+                                bairro.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
+                            }
+
+                            lstBairros.add(bairro);
+
+                        }
+
+                        viewModel.add(lstBairros, "bairro");
+
+                    }
+
+                    // PARADAS
+
+                    if(paradas.length() > 0){
+
+                        int total = paradas.length();
+                        List<Parada> lstParadas = new ArrayList<>();
+
+                        for(int i = 0; i < total; i++){
+                            Parada parada = new Parada();
+                            JSONObject obj = paradas.getJSONObject(i);
+
+                            parada.setId(obj.getString("id"));
+                            parada.setNome(obj.getString("nome"));
+                            parada.setLatitude(obj.getDouble("latitude"));
+                            parada.setLongitude(obj.getDouble("longitude"));
+                            parada.setTaxaDeEmbarque(obj.optDouble("taxaDeEmbarque", 0));
+                            parada.setImagem(obj.optString("imagem", null));
+                            parada.setBairro(obj.getString("bairro"));
+                            parada.setSlug(obj.getString("slug"));
+                            parada.setEnviado(obj.getBoolean("enviado"));
+                            parada.setAtivo(obj.getBoolean("ativo"));
+                            parada.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
+                            parada.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+
+                            if(!obj.optString("programadoPara", "").isEmpty()){
+                                parada.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
+                            }
+
+                            lstParadas.add(parada);
+
+                        }
+
+                        viewModel.add(lstParadas, "parada");
+
+                    }
+
+                    // EMPRESAS
+
+                    if(empresas.length() > 0){
+
+                        int total = empresas.length();
+                        List<Empresa> lstEmpresas = new ArrayList<>();
+
+                        for(int i = 0; i < total; i++){
+                            Empresa empresa = new Empresa();
+                            JSONObject obj = empresas.getJSONObject(i);
+
+                            empresa.setId(obj.getString("id"));
+                            empresa.setNome(obj.getString("nome"));
+                            empresa.setEmail(obj.optString("email", ""));
+                            empresa.setTelefone(obj.optString("telefone", ""));
+                            empresa.setLogo(obj.optString("logo", ""));
+                            empresa.setSlug(obj.getString("slug"));
+                            empresa.setEnviado(obj.getBoolean("enviado"));
+                            empresa.setAtivo(obj.getBoolean("ativo"));
+                            empresa.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
+                            empresa.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+
+                            if(!obj.optString("programadoPara", "").isEmpty()){
+                                empresa.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
+                            }
+
+                            lstEmpresas.add(empresa);
+
+                        }
+
+                        viewModel.add(lstEmpresas, "empresa");
+
+                    }
+
+                    // ITINERARIOS
+
+                    if(itinerarios.length() > 0){
+
+                        int total = itinerarios.length();
+                        List<Itinerario> lstItinerarios = new ArrayList<>();
+
+                        for(int i = 0; i < total; i++){
+                            Itinerario itinerario = new Itinerario();
+                            JSONObject obj = empresas.getJSONObject(i);
+
+                            itinerario.setId(obj.getString("id"));
+                            itinerario.setAcessivel(obj.getBoolean("acessivel"));
+                            itinerario.setTarifa(obj.getDouble("tarifa"));
+                            itinerario.setTempo(dtf.parseDateTime(obj.getString("tempo")));
+                            itinerario.setDistancia(obj.optDouble("distancia", 0));
+                            itinerario.setObservacao(obj.optString("observacao", ""));
+                            itinerario.setSigla(obj.optString("sigla", ""));
+                            itinerario.setEmpresa(obj.getString("empresa"));
+                            itinerario.setEnviado(obj.getBoolean("enviado"));
+                            itinerario.setAtivo(obj.getBoolean("ativo"));
+                            itinerario.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
+                            itinerario.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+
+                            if(!obj.optString("programadoPara", "").isEmpty()){
+                                itinerario.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
+                            }
+
+                            lstItinerarios.add(itinerario);
+
+                        }
+
+                        viewModel.add(lstItinerarios, "itinerario");
+
+                    }
+
+                    // HORARIOS
+
+                    if(horarios.length() > 0){
+
+                        int total = horarios.length();
+                        List<Horario> lstHorarios = new ArrayList<>();
+
+                        for(int i = 0; i < total; i++){
+                            Horario horario = new Horario();
+                            JSONObject obj = horarios.getJSONObject(i);
+
+                            horario.setId(obj.getString("id"));
+                            horario.setNome(dtf.parseDateTime(obj.getString("nome")));
+                            horario.setEnviado(obj.getBoolean("enviado"));
+                            horario.setAtivo(obj.getBoolean("ativo"));
+                            horario.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
+                            horario.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+
+                            if(!obj.optString("programadoPara", "").isEmpty()){
+                                horario.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
+                            }
+
+                            lstHorarios.add(horario);
+
+                        }
+
+                        viewModel.add(lstHorarios, "horario");
 
                     }
 

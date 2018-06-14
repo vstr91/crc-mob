@@ -9,6 +9,11 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.Environment;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import org.joda.time.DateTime;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,14 +36,21 @@ import br.com.vostre.circular.model.Parametro;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Usuario;
+import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
+import br.com.vostre.circular.utils.Constants;
 import br.com.vostre.circular.utils.JsonUtils;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Handle the transfer of data between a server and an
  * app, using the Android sync adapter framework.
  */
-public class SyncAdapter extends AbstractThreadedSyncAdapter {
+public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback<String> {
 
     // Global variables
     // Define a variable to contain a content resolver instance
@@ -128,13 +140,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
                 +strPontosInteresse+","+strUsuarios+"}";
 
-//        String json = "{"+strHorarios+"}";
-
-        //System.out.println(json);
-
         File caminho = Environment.getExternalStorageDirectory();
-
-        //System.out.println("caminho: "+caminho);
 
         File arquivo = new File(caminho, "data.txt");
 
@@ -147,6 +153,30 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(DateTime.class, JsonUtils.serDateTime)
+                .registerTypeAdapter(DateTime.class, JsonUtils.deserDateTime)
+                .create();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Constants.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+
+        CircularAPI api = retrofit.create(CircularAPI.class);
+        Call<String> call = api.enviaDados(json);
+        call.enqueue(this);
+
+    }
+
+    @Override
+    public void onResponse(Call<String> call, Response<String> response) {
+        System.out.println("RESPONSE: "+response.message()+" | "+call.request().toString()+" | "+response.body());
+    }
+
+    @Override
+    public void onFailure(Call<String> call, Throwable t) {
 
     }
 }

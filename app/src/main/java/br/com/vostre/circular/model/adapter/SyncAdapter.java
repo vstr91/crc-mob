@@ -140,6 +140,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
                 +strPontosInteresse+","+strUsuarios+"}";
 
+        // EXPORTA ARQUIVO DE DADOS
+        /*
         File caminho = Environment.getExternalStorageDirectory();
 
         File arquivo = new File(caminho, "data.txt");
@@ -153,6 +155,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         } catch (IOException e) {
             e.printStackTrace();
         }
+        */
 
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(DateTime.class, JsonUtils.serDateTime)
@@ -177,6 +180,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
     @Override
     public void onFailure(Call<String> call, Throwable t) {
-
+        System.out.println("RESPONSE ERROR: "+t.getMessage()+" | "+call.request().toString());
     }
 }

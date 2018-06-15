@@ -18,6 +18,7 @@ import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Mensagem;
+import br.com.vostre.circular.model.Onibus;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
@@ -70,6 +71,10 @@ public class BaseViewModel extends AndroidViewModel {
                 case "empresa":
                     db.empresaDAO().deletarTodos();
                     db.empresaDAO().inserirTodos((List<Empresa>) params[0]);
+                    break;
+                case "onibus":
+                    db.onibusDAO().deletarTodos();
+                    db.onibusDAO().inserirTodos((List<Onibus>) params[0]);
                     break;
                 case "estado":
                     db.estadoDAO().deletarTodos();

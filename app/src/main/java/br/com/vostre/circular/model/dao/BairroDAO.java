@@ -38,7 +38,7 @@ public interface BairroDAO {
     Bairro encontrarPorNome(String nome);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
-    void inserirTodos(Bairro... bairros);
+    void inserirTodos(List<Bairro> bairros);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
     void inserir(Bairro bairro);
@@ -48,5 +48,8 @@ public interface BairroDAO {
 
     @Delete
     void deletar(Bairro bairro);
+
+    @Query("DELETE FROM bairro")
+    void deletarTodos();
 
 }

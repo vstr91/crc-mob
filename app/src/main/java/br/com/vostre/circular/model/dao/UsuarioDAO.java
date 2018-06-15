@@ -37,7 +37,7 @@ public interface UsuarioDAO {
     Usuario encontrarPorEmail(String email);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
-    void inserirTodos(Usuario... usuarios);
+    void inserirTodos(List<Usuario> usuarios);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
     void inserir(Usuario usuario);
@@ -47,5 +47,8 @@ public interface UsuarioDAO {
 
     @Delete
     void deletar(Usuario usuario);
+
+    @Query("DELETE FROM usuario")
+    void deletarTodos();
 
 }

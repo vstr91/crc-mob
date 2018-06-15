@@ -43,7 +43,7 @@ public interface HorarioItinerarioDAO {
     LiveData<HorarioItinerario> carregarPorId(String id);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
-    void inserirTodos(HorarioItinerario... horarioItinerarioes);
+    void inserirTodos(List<HorarioItinerario> horarioItinerarios);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
     void inserir(HorarioItinerario horarioItinerario);
@@ -53,5 +53,8 @@ public interface HorarioItinerarioDAO {
 
     @Delete
     void deletar(HorarioItinerario horarioItinerario);
+
+    @Query("DELETE FROM horario_itinerario")
+    void deletarTodos();
 
 }

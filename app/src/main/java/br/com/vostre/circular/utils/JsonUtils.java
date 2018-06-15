@@ -32,6 +32,13 @@ public class JsonUtils {
         @Override
         public DateTime deserialize(JsonElement json, Type typeOfT,
                                 JsonDeserializationContext context) throws JsonParseException {
+
+            try{
+                Long.parseLong(json.getAsString());
+            } catch (NumberFormatException e){
+                return DateTimeFormat.forPattern("dd-MM-yyyy HH:mm").parseDateTime(json.getAsString());
+            }
+
             return json == null ? null : new DateTime(json.getAsLong());
         }
     };
@@ -52,6 +59,15 @@ public class JsonUtils {
                 .registerTypeAdapter(DateTime.class, JsonUtils.deserDateTime)
                 .create();
         return gson.toJson(dados);
+    }
+
+    public static EntidadeBase fromJson(String json, Type baseClass){
+
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(DateTime.class, JsonUtils.serDateTime)
+                .registerTypeAdapter(DateTime.class, JsonUtils.deserDateTime)
+                .create();
+        return gson.fromJson(json, baseClass);
     }
 
 }

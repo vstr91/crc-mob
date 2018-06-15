@@ -99,7 +99,7 @@ public interface ItinerarioDAO {
     LiveData<ItinerarioPartidaDestino> carregar(String itinerario);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
-    void inserirTodos(Itinerario... itinerarios);
+    void inserirTodos(List<Itinerario> itinerarios);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
     void inserir(Itinerario itinerario);
@@ -109,5 +109,8 @@ public interface ItinerarioDAO {
 
     @Delete
     void deletar(Itinerario itinerario);
+
+    @Query("DELETE FROM itinerario")
+    void deletarTodos();
 
 }

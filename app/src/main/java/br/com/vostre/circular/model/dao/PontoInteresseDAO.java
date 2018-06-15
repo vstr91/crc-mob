@@ -34,7 +34,7 @@ public interface PontoInteresseDAO {
     PontoInteresse encontrarPorSlug(String slug);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
-    void inserirTodos(PontoInteresse... pontosInteresse);
+    void inserirTodos(List<PontoInteresse> pontosInteresse);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
     void inserir(PontoInteresse pontoInteresse);
@@ -44,5 +44,8 @@ public interface PontoInteresseDAO {
 
     @Delete
     void deletar(PontoInteresse pontoInteresse);
+
+    @Query("DELETE FROM ponto_interesse")
+    void deletarTodos();
 
 }

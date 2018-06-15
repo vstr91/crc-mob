@@ -34,7 +34,7 @@ public interface HorarioDAO {
     Horario encontrarPorNome(String nome);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
-    void inserirTodos(Horario... horarioes);
+    void inserirTodos(List<Horario> horarios);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
     void inserir(Horario horario);
@@ -44,5 +44,8 @@ public interface HorarioDAO {
 
     @Delete
     void deletar(Horario horario);
+
+    @Query("DELETE FROM horario")
+    void deletarTodos();
 
 }

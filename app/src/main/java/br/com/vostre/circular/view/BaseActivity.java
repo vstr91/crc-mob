@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.common.util.JsonUtils;
 
@@ -35,6 +36,7 @@ import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.Parada;
+import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.utils.ToolbarUtils;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
@@ -158,24 +160,30 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
                             Pais pais = new Pais();
                             JSONObject obj = paises.getJSONObject(i);
 
-                            pais.setId(obj.getString("id"));
-                            pais.setNome(obj.getString("nome"));
-                            pais.setSigla(obj.getString("sigla"));
-                            pais.setSlug(obj.getString("slug"));
-                            pais.setEnviado(obj.getBoolean("enviado"));
-                            pais.setAtivo(obj.getBoolean("ativo"));
-                            pais.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
-                            pais.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+                            System.out.println("TESTE:::: "+obj.toString());
+                            pais = (Pais) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Pais.class);
 
-                            if(!obj.optString("programadoPara", "").isEmpty()){
-                                pais.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
-                            }
+//                            pais.setId(obj.getString("id"));
+//                            pais.setNome(obj.getString("nome"));
+//                            pais.setSigla(obj.getString("sigla"));
+//                            pais.setSlug(obj.getString("slug"));
+//                            pais.setEnviado(obj.getBoolean("enviado"));
+//                            pais.setAtivo(obj.getBoolean("ativo"));
+//                            pais.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
+//                            pais.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+//
+//                            if(!obj.optString("programadoPara", "").isEmpty()){
+//                                pais.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
+//                            }
 
                             lstPaises.add(pais);
 
                         }
 
+                        System.out.println("PAISES::: "+lstPaises.get(0).getNome());
+
                         viewModel.add(lstPaises, "pais");
+                        System.out.println("PAISES::: "+lstPaises.get(0).getNome());
 
                     }
 
@@ -187,22 +195,24 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
                         List<Estado> lstEstados = new ArrayList<>();
 
                         for(int i = 0; i < total; i++){
-                            Estado estado = new Estado();
+                            Estado estado;
                             JSONObject obj = estados.getJSONObject(i);
 
-                            estado.setId(obj.getString("id"));
-                            estado.setNome(obj.getString("nome"));
-                            estado.setSigla(obj.getString("sigla"));
-                            estado.setPais(obj.getString("pais"));
-                            estado.setSlug(obj.getString("slug"));
-                            estado.setEnviado(obj.getBoolean("enviado"));
-                            estado.setAtivo(obj.getBoolean("ativo"));
-                            estado.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
-                            estado.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+                            estado = (Estado) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Estado.class);
 
-                            if(!obj.optString("programadoPara", "").isEmpty()){
-                                estado.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
-                            }
+//                            estado.setId(obj.getString("id"));
+//                            estado.setNome(obj.getString("nome"));
+//                            estado.setSigla(obj.getString("sigla"));
+//                            estado.setPais(obj.getString("pais"));
+//                            estado.setSlug(obj.getString("slug"));
+//                            estado.setEnviado(obj.getBoolean("enviado"));
+//                            estado.setAtivo(obj.getBoolean("ativo"));
+//                            estado.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
+//                            estado.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+//
+//                            if(!obj.optString("programadoPara", "").isEmpty()){
+//                                estado.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
+//                            }
 
                             lstEstados.add(estado);
 
@@ -223,19 +233,21 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
                             Cidade cidade = new Cidade();
                             JSONObject obj = cidades.getJSONObject(i);
 
-                            cidade.setId(obj.getString("id"));
-                            cidade.setNome(obj.getString("nome"));
-                            cidade.setBrasao(obj.getString("brasao"));
-                            cidade.setEstado(obj.getString("estado"));
-                            cidade.setSlug(obj.getString("slug"));
-                            cidade.setEnviado(obj.getBoolean("enviado"));
-                            cidade.setAtivo(obj.getBoolean("ativo"));
-                            cidade.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
-                            cidade.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+                            cidade = (Cidade) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Cidade.class);
 
-                            if(!obj.optString("programadoPara", "").isEmpty()){
-                                cidade.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
-                            }
+//                            cidade.setId(obj.getString("id"));
+//                            cidade.setNome(obj.getString("nome"));
+//                            cidade.setBrasao(obj.getString("brasao"));
+//                            cidade.setEstado(obj.getString("estado"));
+//                            cidade.setSlug(obj.getString("slug"));
+//                            cidade.setEnviado(obj.getBoolean("enviado"));
+//                            cidade.setAtivo(obj.getBoolean("ativo"));
+//                            cidade.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
+//                            cidade.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+//
+//                            if(!obj.optString("programadoPara", "").isEmpty()){
+//                                cidade.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
+//                            }
 
                             lstCidades.add(cidade);
 
@@ -256,18 +268,20 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
                             Bairro bairro = new Bairro();
                             JSONObject obj = bairros.getJSONObject(i);
 
-                            bairro.setId(obj.getString("id"));
-                            bairro.setNome(obj.getString("nome"));
-                            bairro.setCidade(obj.getString("cidade"));
-                            bairro.setSlug(obj.getString("slug"));
-                            bairro.setEnviado(obj.getBoolean("enviado"));
-                            bairro.setAtivo(obj.getBoolean("ativo"));
-                            bairro.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
-                            bairro.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+                            bairro = (Bairro) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Bairro.class);
 
-                            if(!obj.optString("programadoPara", "").isEmpty()){
-                                bairro.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
-                            }
+//                            bairro.setId(obj.getString("id"));
+//                            bairro.setNome(obj.getString("nome"));
+//                            bairro.setCidade(obj.getString("cidade"));
+//                            bairro.setSlug(obj.getString("slug"));
+//                            bairro.setEnviado(obj.getBoolean("enviado"));
+//                            bairro.setAtivo(obj.getBoolean("ativo"));
+//                            bairro.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
+//                            bairro.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+//
+//                            if(!obj.optString("programadoPara", "").isEmpty()){
+//                                bairro.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
+//                            }
 
                             lstBairros.add(bairro);
 
@@ -288,22 +302,24 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
                             Parada parada = new Parada();
                             JSONObject obj = paradas.getJSONObject(i);
 
-                            parada.setId(obj.getString("id"));
-                            parada.setNome(obj.getString("nome"));
-                            parada.setLatitude(obj.getDouble("latitude"));
-                            parada.setLongitude(obj.getDouble("longitude"));
-                            parada.setTaxaDeEmbarque(obj.optDouble("taxaDeEmbarque", 0));
-                            parada.setImagem(obj.optString("imagem", null));
-                            parada.setBairro(obj.getString("bairro"));
-                            parada.setSlug(obj.getString("slug"));
-                            parada.setEnviado(obj.getBoolean("enviado"));
-                            parada.setAtivo(obj.getBoolean("ativo"));
-                            parada.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
-                            parada.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+                            parada = (Parada) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Parada.class);
 
-                            if(!obj.optString("programadoPara", "").isEmpty()){
-                                parada.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
-                            }
+//                            parada.setId(obj.getString("id"));
+//                            parada.setNome(obj.getString("nome"));
+//                            parada.setLatitude(obj.getDouble("latitude"));
+//                            parada.setLongitude(obj.getDouble("longitude"));
+//                            parada.setTaxaDeEmbarque(obj.optDouble("taxaDeEmbarque", 0));
+//                            parada.setImagem(obj.optString("imagem", null));
+//                            parada.setBairro(obj.getString("bairro"));
+//                            parada.setSlug(obj.getString("slug"));
+//                            parada.setEnviado(obj.getBoolean("enviado"));
+//                            parada.setAtivo(obj.getBoolean("ativo"));
+//                            parada.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
+//                            parada.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+//
+//                            if(!obj.optString("programadoPara", "").isEmpty()){
+//                                parada.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
+//                            }
 
                             lstParadas.add(parada);
 
@@ -324,20 +340,22 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
                             Empresa empresa = new Empresa();
                             JSONObject obj = empresas.getJSONObject(i);
 
-                            empresa.setId(obj.getString("id"));
-                            empresa.setNome(obj.getString("nome"));
-                            empresa.setEmail(obj.optString("email", ""));
-                            empresa.setTelefone(obj.optString("telefone", ""));
-                            empresa.setLogo(obj.optString("logo", ""));
-                            empresa.setSlug(obj.getString("slug"));
-                            empresa.setEnviado(obj.getBoolean("enviado"));
-                            empresa.setAtivo(obj.getBoolean("ativo"));
-                            empresa.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
-                            empresa.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+                            empresa = (Empresa) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Empresa.class);
 
-                            if(!obj.optString("programadoPara", "").isEmpty()){
-                                empresa.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
-                            }
+//                            empresa.setId(obj.getString("id"));
+//                            empresa.setNome(obj.getString("nome"));
+//                            empresa.setEmail(obj.optString("email", ""));
+//                            empresa.setTelefone(obj.optString("telefone", ""));
+//                            empresa.setLogo(obj.optString("logo", ""));
+//                            empresa.setSlug(obj.getString("slug"));
+//                            empresa.setEnviado(obj.getBoolean("enviado"));
+//                            empresa.setAtivo(obj.getBoolean("ativo"));
+//                            empresa.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
+//                            empresa.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+//
+//                            if(!obj.optString("programadoPara", "").isEmpty()){
+//                                empresa.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
+//                            }
 
                             lstEmpresas.add(empresa);
 
@@ -356,24 +374,26 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
                         for(int i = 0; i < total; i++){
                             Itinerario itinerario = new Itinerario();
-                            JSONObject obj = empresas.getJSONObject(i);
+                            JSONObject obj = itinerarios.getJSONObject(i);
 
-                            itinerario.setId(obj.getString("id"));
-                            itinerario.setAcessivel(obj.getBoolean("acessivel"));
-                            itinerario.setTarifa(obj.getDouble("tarifa"));
-                            itinerario.setTempo(dtf.parseDateTime(obj.getString("tempo")));
-                            itinerario.setDistancia(obj.optDouble("distancia", 0));
-                            itinerario.setObservacao(obj.optString("observacao", ""));
-                            itinerario.setSigla(obj.optString("sigla", ""));
-                            itinerario.setEmpresa(obj.getString("empresa"));
-                            itinerario.setEnviado(obj.getBoolean("enviado"));
-                            itinerario.setAtivo(obj.getBoolean("ativo"));
-                            itinerario.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
-                            itinerario.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+                            itinerario = (Itinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Itinerario.class);
 
-                            if(!obj.optString("programadoPara", "").isEmpty()){
-                                itinerario.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
-                            }
+//                            itinerario.setId(obj.getString("id"));
+//                            itinerario.setAcessivel(obj.getBoolean("acessivel"));
+//                            itinerario.setTarifa(obj.getDouble("tarifa"));
+//                            itinerario.setTempo(dtf.parseDateTime(obj.getString("tempo")));
+//                            itinerario.setDistancia(obj.optDouble("distancia", 0));
+//                            itinerario.setObservacao(obj.optString("observacao", ""));
+//                            itinerario.setSigla(obj.optString("sigla", ""));
+//                            itinerario.setEmpresa(obj.getString("empresa"));
+//                            itinerario.setEnviado(obj.getBoolean("enviado"));
+//                            itinerario.setAtivo(obj.getBoolean("ativo"));
+//                            itinerario.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
+//                            itinerario.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+//
+//                            if(!obj.optString("programadoPara", "").isEmpty()){
+//                                itinerario.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
+//                            }
 
                             lstItinerarios.add(itinerario);
 
@@ -394,16 +414,18 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
                             Horario horario = new Horario();
                             JSONObject obj = horarios.getJSONObject(i);
 
-                            horario.setId(obj.getString("id"));
-                            horario.setNome(dtf.parseDateTime(obj.getString("nome")));
-                            horario.setEnviado(obj.getBoolean("enviado"));
-                            horario.setAtivo(obj.getBoolean("ativo"));
-                            horario.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
-                            horario.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+                            horario = (Horario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Horario.class);
 
-                            if(!obj.optString("programadoPara", "").isEmpty()){
-                                horario.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
-                            }
+//                            horario.setId(obj.getString("id"));
+//                            horario.setNome(dtf.parseDateTime(obj.getString("nome")));
+//                            horario.setEnviado(obj.getBoolean("enviado"));
+//                            horario.setAtivo(obj.getBoolean("ativo"));
+//                            horario.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
+//                            horario.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+//
+//                            if(!obj.optString("programadoPara", "").isEmpty()){
+//                                horario.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
+//                            }
 
                             lstHorarios.add(horario);
 
@@ -412,6 +434,40 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
                         viewModel.add(lstHorarios, "horario");
 
                     }
+
+                    // PARADAS ITINERARIOS
+
+//                    if(paradasItinerarios.length() > 0){
+//
+//                        int total = paradasItinerarios.length();
+//                        List<ParadaItinerario> lstParadasItinerarios = new ArrayList<>();
+//
+//                        for(int i = 0; i < total; i++){
+//                            ParadaItinerario parada = new ParadaItinerario();
+//                            JSONObject obj = horarios.getJSONObject(i);
+//
+//                            br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Parada.class);
+//
+//                            horario.setId(obj.getString("id"));
+//                            horario.setNome(dtf.parseDateTime(obj.getString("nome")));
+//                            horario.setEnviado(obj.getBoolean("enviado"));
+//                            horario.setAtivo(obj.getBoolean("ativo"));
+//                            horario.setDataCadastro(dtf.parseDateTime(obj.getString("dataCadastro")));
+//                            horario.setUltimaAlteracao(dtf.parseDateTime(obj.getString("ultimaAlteracao")));
+//
+//                            if(!obj.optString("programadoPara", "").isEmpty()){
+//                                horario.setProgramadoPara(dtf.parseDateTime(obj.getString("programadoPara")));
+//                            }
+//
+//                            lstParadasItinerarios.add(horario);
+//
+//                        }
+//
+//                        viewModel.add(lstParadasItinerarios, "horario");
+//
+//                    }
+
+                    Toast.makeText(getApplicationContext(), "Finalizou!", Toast.LENGTH_SHORT).show();
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();

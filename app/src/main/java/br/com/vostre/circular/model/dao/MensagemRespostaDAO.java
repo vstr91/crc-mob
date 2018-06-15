@@ -32,7 +32,7 @@ public interface MensagemRespostaDAO {
     LiveData<MensagemResposta> carregarPorId(String id);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
-    void inserirTodos(MensagemResposta... mensagensRespostas);
+    void inserirTodos(List<MensagemResposta> mensagensRespostas);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
     void inserir(MensagemResposta mensagemResposta);
@@ -42,5 +42,8 @@ public interface MensagemRespostaDAO {
 
     @Delete
     void deletar(MensagemResposta mensagemResposta);
+
+    @Query("DELETE FROM mensagem_resposta")
+    void deletarTodos();
 
 }

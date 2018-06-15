@@ -34,7 +34,7 @@ public interface OnibusDAO {
     LiveData<Onibus> carregar(String id);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
-    void inserirTodos(Onibus... onibus);
+    void inserirTodos(List<Onibus> onibus);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
     void inserir(Onibus onibus);
@@ -44,5 +44,8 @@ public interface OnibusDAO {
 
     @Delete
     void deletar(Onibus onibus);
+
+    @Query("DELETE FROM onibus")
+    void deletarTodos();
 
 }

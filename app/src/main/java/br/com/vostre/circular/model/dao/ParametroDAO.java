@@ -35,7 +35,7 @@ public interface ParametroDAO {
     Parametro encontrarPorNome(String nome);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
-    void inserirTodos(Parametro... parametros);
+    void inserirTodos(List<Parametro> parametros);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
     void inserir(Parametro parametro);
@@ -45,5 +45,8 @@ public interface ParametroDAO {
 
     @Delete
     void deletar(Parametro parametro);
+
+    @Query("DELETE FROM parametro")
+    void deletarTodos();
 
 }

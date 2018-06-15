@@ -37,7 +37,7 @@ public interface EmpresaDAO {
     Empresa encontrarPorNome(String nome);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
-    void inserirTodos(Empresa... empresas);
+    void inserirTodos(List<Empresa> empresas);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
     void inserir(Empresa empresa);
@@ -47,5 +47,8 @@ public interface EmpresaDAO {
 
     @Delete
     void deletar(Empresa empresa);
+
+    @Query("DELETE FROM empresa")
+    void deletarTodos();
 
 }

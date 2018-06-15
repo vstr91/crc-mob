@@ -45,7 +45,7 @@ public interface ParadaItinerarioDAO {
     void invalidaTodosPorItinerario(String itinerario);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
-    void inserirTodos(ParadaItinerario... paradasItinerarios);
+    void inserirTodos(List<ParadaItinerario> paradasItinerarios);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
     void inserir(ParadaItinerario paradaItinerario);
@@ -55,5 +55,8 @@ public interface ParadaItinerarioDAO {
 
     @Delete
     void deletar(ParadaItinerario paradaItinerario);
+
+    @Query("DELETE FROM parada_itinerario")
+    void deletarTodos();
 
 }

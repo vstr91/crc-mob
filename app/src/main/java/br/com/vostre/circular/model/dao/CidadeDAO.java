@@ -35,7 +35,7 @@ public interface CidadeDAO {
     Cidade encontrarPorNome(String nome);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
-    void inserirTodos(Cidade... cidadees);
+    void inserirTodos(List<Cidade> cidadees);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
     void inserir(Cidade cidade);
@@ -45,5 +45,8 @@ public interface CidadeDAO {
 
     @Delete
     void deletar(Cidade cidade);
+
+    @Query("DELETE FROM cidade")
+    void deletarTodos();
 
 }

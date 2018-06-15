@@ -34,7 +34,7 @@ public interface SecaoItinerarioDAO {
     LiveData<SecaoItinerario> carregarPorId(String id);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
-    void inserirTodos(SecaoItinerario... secaoItinerarioes);
+    void inserirTodos(List<SecaoItinerario> secaoItinerarioes);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
     void inserir(SecaoItinerario secaoItinerario);
@@ -44,5 +44,8 @@ public interface SecaoItinerarioDAO {
 
     @Delete
     void deletar(SecaoItinerario secaoItinerario);
+
+    @Query("DELETE FROM secao_itinerario")
+    void deletarTodos();
 
 }

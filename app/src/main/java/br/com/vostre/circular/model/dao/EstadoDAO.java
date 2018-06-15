@@ -34,7 +34,7 @@ public interface EstadoDAO {
     Estado encontrarPorSigla(String sigla);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
-    void inserirTodos(Estado... estadoes);
+    void inserirTodos(List<Estado> estadoes);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
     void inserir(Estado estado);
@@ -44,5 +44,8 @@ public interface EstadoDAO {
 
     @Delete
     void deletar(Estado estado);
+
+    @Query("DELETE FROM estado")
+    void deletarTodos();
 
 }

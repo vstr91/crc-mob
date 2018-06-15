@@ -49,7 +49,7 @@ public interface ParadaDAO {
     Parada encontrarPorSlug(String slug);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
-    void inserirTodos(Parada... paradas);
+    void inserirTodos(List<Parada> paradas);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)
     void inserir(Parada parada);
@@ -59,5 +59,8 @@ public interface ParadaDAO {
 
     @Delete
     void deletar(Parada parada);
+
+    @Query("DELETE FROM parada")
+    void deletarTodos();
 
 }

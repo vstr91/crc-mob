@@ -13,6 +13,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import org.joda.time.DateTime;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -45,6 +47,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 /**
  * Handle the transfer of data between a server and an
@@ -164,12 +167,21 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.BASE_URL)
+                .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
-        CircularAPI api = retrofit.create(CircularAPI.class);
-        Call<String> call = api.enviaDados(json);
-        call.enqueue(this);
+        JSONObject paramObject = new JSONObject();
+        try {
+            paramObject.put("dados", json);
+            paramObject.put("qtd", paises.size()+estados.size());
+
+            CircularAPI api = retrofit.create(CircularAPI.class);
+            Call<String> call = api.enviaDados(paramObject.toString());
+            call.enqueue(this);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
 

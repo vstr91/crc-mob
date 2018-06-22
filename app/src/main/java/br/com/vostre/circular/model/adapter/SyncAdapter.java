@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.Environment;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -59,6 +60,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     // Define a variable to contain a content resolver instance
     ContentResolver mContentResolver;
 
+    Context ctx;
+
     /**
      * Set up the sync adapter
      */
@@ -69,6 +72,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
          * from the incoming Context
          */
         mContentResolver = context.getContentResolver();
+        ctx = context.getApplicationContext();
     }
 
     /**
@@ -144,7 +148,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 +strPontosInteresse+","+strUsuarios+"}";
 
         // EXPORTA ARQUIVO DE DADOS
-        /*
+        ///*
         File caminho = Environment.getExternalStorageDirectory();
 
         File arquivo = new File(caminho, "data.txt");
@@ -158,7 +162,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         } catch (IOException e) {
             e.printStackTrace();
         }
-        */
+        //*/
 
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(DateTime.class, JsonUtils.serDateTime)
@@ -187,11 +191,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
     @Override
     public void onResponse(Call<String> call, Response<String> response) {
+        Toast.makeText(ctx, "Código de resposta: "+response.code()+" | Mensagem: "+response.message(), Toast.LENGTH_SHORT).show();
         System.out.println("RESPONSE: "+response.message()+" | "+call.request().toString()+" | "+response.body());
     }
 
     @Override
     public void onFailure(Call<String> call, Throwable t) {
+        Toast.makeText(ctx, "Erro ao acessar: "+t.getMessage(), Toast.LENGTH_SHORT).show();
         System.out.println("RESPONSE ERROR: "+t.getMessage()+" | "+call.request().toString());
     }
 }

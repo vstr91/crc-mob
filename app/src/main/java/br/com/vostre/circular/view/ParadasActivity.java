@@ -5,8 +5,10 @@ import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -173,7 +175,7 @@ public class ParadasActivity extends BaseActivity {
 //        mapController.setCenter(startPoint);
 
         map.setMaxZoomLevel(19d);
-        map.setMinZoomLevel(15d);
+        map.setMinZoomLevel(5d);
     }
 
     public void onFabClick(View v){
@@ -191,6 +193,23 @@ public class ParadasActivity extends BaseActivity {
     public void onFabLocationClick(View v){
         mapController.animateTo(new GeoPoint(viewModel.localAtual.getValue().getLatitude(),
                 viewModel.localAtual.getValue().getLongitude()));
+    }
+
+    public boolean onFabLocationLongClick(View v){
+        viewModel.centralizaMapa = !viewModel.centralizaMapa;
+
+        if(viewModel.centralizaMapa){
+            mapController.animateTo(new GeoPoint(viewModel.localAtual.getValue().getLatitude(),
+                    viewModel.localAtual.getValue().getLongitude()));
+            v.setBackgroundTintList(ColorStateList.valueOf(Color.GREEN));
+        } else{
+            v.setBackgroundTintList(ColorStateList.valueOf(Color.DKGRAY));
+        }
+
+        v.invalidate();
+
+        return true;
+
     }
 
     @Override
@@ -263,7 +282,7 @@ public class ParadasActivity extends BaseActivity {
 
             if(viewModel.centralizaMapa && centro.getLatitude() != 0.0 && centro.getLongitude() != 0.0){
                 setMapCenter(map, new GeoPoint(centro.getLatitude(), centro.getLongitude()));
-                viewModel.centralizaMapa = false;
+                //viewModel.centralizaMapa = false;
             }
 
         }

@@ -31,6 +31,9 @@ public interface ParametroDAO {
     @Query("SELECT * FROM parametro WHERE id = :id")
     LiveData<Parametro> carregarPorId(String id);
 
+    @Query("SELECT valor FROM parametro WHERE slug = :slug")
+    String carregarPorSlug(String slug);
+
     @Query("SELECT * FROM parametro WHERE nome LIKE :nome LIMIT 1")
     Parametro encontrarPorNome(String nome);
 

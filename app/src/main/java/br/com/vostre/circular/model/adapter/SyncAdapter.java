@@ -169,8 +169,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 .registerTypeAdapter(DateTime.class, JsonUtils.deserDateTime)
                 .create();
 
+        String baseUrl = appDatabase.parametroDAO().carregarPorSlug("servidor");
+
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Constants.BASE_URL)
+                .baseUrl(baseUrl)
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
@@ -191,13 +193,20 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
     @Override
     public void onResponse(Call<String> call, Response<String> response) {
-        Toast.makeText(ctx, "Código de resposta: "+response.code()+" | Mensagem: "+response.message(), Toast.LENGTH_SHORT).show();
+
+        if(response.code() == 200){
+            Toast.makeText(ctx, "Sincronização efetuada com sucesso!", Toast.LENGTH_SHORT).show();
+        } else{
+            Toast.makeText(ctx, "Código de resposta: "+response.code()+" | Mensagem: "+response.message(),
+                    Toast.LENGTH_SHORT).show();
+        }
+
         System.out.println("RESPONSE: "+response.message()+" | "+call.request().toString()+" | "+response.body());
     }
 
     @Override
     public void onFailure(Call<String> call, Throwable t) {
-        Toast.makeText(ctx, "Erro ao acessar: "+t.getMessage(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(ctx, "Problema ao acessar: "+t.getMessage(), Toast.LENGTH_SHORT).show();
         System.out.println("RESPONSE ERROR: "+t.getMessage()+" | "+call.request().toString());
     }
 }

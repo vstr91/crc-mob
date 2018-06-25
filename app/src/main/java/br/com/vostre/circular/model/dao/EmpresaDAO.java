@@ -36,7 +36,7 @@ public interface EmpresaDAO {
     @Query("SELECT * FROM empresa WHERE nome LIKE :nome LIMIT 1")
     Empresa encontrarPorNome(String nome);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<Empresa> empresas);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)

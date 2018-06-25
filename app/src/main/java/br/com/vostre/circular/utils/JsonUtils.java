@@ -1,5 +1,7 @@
 package br.com.vostre.circular.utils;
 
+import android.support.annotation.Nullable;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -43,6 +45,21 @@ public class JsonUtils {
         }
     };
 
+    public static JsonDeserializer<DateTime> deserDateTimeAPI = new JsonDeserializer<DateTime>() {
+        @Override
+        public DateTime deserialize(JsonElement json, Type typeOfT,
+                                    JsonDeserializationContext context) throws JsonParseException {
+
+            try{
+                Long.parseLong(json.getAsString());
+            } catch (NumberFormatException e){
+                return DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZZ").parseDateTime(json.getAsString());
+            }
+
+            return json == null ? null : new DateTime(json.getAsLong());
+        }
+    };
+
     public static String toJson(EntidadeBase dado){
 
         Gson gson = new GsonBuilder()
@@ -61,12 +78,23 @@ public class JsonUtils {
         return gson.toJson(dados);
     }
 
-    public static EntidadeBase fromJson(String json, Type baseClass){
+    public static EntidadeBase fromJson(String json, Type baseClass, @Nullable int tipo){
 
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(DateTime.class, JsonUtils.serDateTime)
-                .registerTypeAdapter(DateTime.class, JsonUtils.deserDateTime)
-                .create();
+        Gson gson;
+
+        if(tipo == 0){
+            gson = new GsonBuilder()
+                    .registerTypeAdapter(DateTime.class, JsonUtils.serDateTime)
+                    .registerTypeAdapter(DateTime.class, JsonUtils.deserDateTime)
+                    .create();
+        } else{
+            gson = new GsonBuilder()
+                    .registerTypeAdapter(DateTime.class, JsonUtils.serDateTime)
+                    .registerTypeAdapter(DateTime.class, JsonUtils.deserDateTimeAPI)
+                    .create();
+        }
+
+
         return gson.fromJson(json, baseClass);
     }
 

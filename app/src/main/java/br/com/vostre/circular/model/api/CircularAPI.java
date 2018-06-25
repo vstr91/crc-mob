@@ -11,7 +11,7 @@ public interface CircularAPI {
     @POST("api/envia-dados/-/-")
     Call<String> enviaDados(@Body String json);
 
-    @POST("api/recebe-dados/")
+    @POST("api/recebe-dados/-/-")
     Call<String> recebeDados();
 
 }

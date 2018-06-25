@@ -1,11 +1,13 @@
 package br.com.vostre.circular.model.adapter;
 
 import android.accounts.Account;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SyncResult;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.widget.Toast;
@@ -14,12 +16,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import org.joda.time.DateTime;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.model.Bairro;
@@ -43,6 +47,8 @@ import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.utils.Constants;
 import br.com.vostre.circular.utils.JsonUtils;
+import br.com.vostre.circular.view.BaseActivity;
+import br.com.vostre.circular.viewModel.BaseViewModel;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -61,6 +67,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     ContentResolver mContentResolver;
 
     Context ctx;
+    AppDatabase appDatabase;
+    String baseUrl;
 
     /**
      * Set up the sync adapter
@@ -106,7 +114,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             ContentProviderClient provider,
             SyncResult syncResult) {
 
-        AppDatabase appDatabase = AppDatabase.getAppDatabase(this.getContext());
+        appDatabase = AppDatabase.getAppDatabase(this.getContext());
 
         List<? extends EntidadeBase> paises = appDatabase.paisDAO().listarTodosAEnviar();
         List<? extends EntidadeBase> empresas = appDatabase.empresaDAO().listarTodosAEnviar();
@@ -164,30 +172,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         }
         //*/
 
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(DateTime.class, JsonUtils.serDateTime)
-                .registerTypeAdapter(DateTime.class, JsonUtils.deserDateTime)
-                .create();
+        baseUrl = appDatabase.parametroDAO().carregarPorSlug("servidor");
 
-        String baseUrl = appDatabase.parametroDAO().carregarPorSlug("servidor");
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-
-        JSONObject paramObject = new JSONObject();
-        try {
-            paramObject.put("dados", json);
-            paramObject.put("qtd", paises.size()+estados.size());
-
-            CircularAPI api = retrofit.create(CircularAPI.class);
-            Call<String> call = api.enviaDados(paramObject.toString());
-            call.enqueue(this);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        chamaAPI(100, json, 0, baseUrl);
 
     }
 
@@ -195,7 +182,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     public void onResponse(Call<String> call, Response<String> response) {
 
         if(response.code() == 200){
-            Toast.makeText(ctx, "Sincronização efetuada com sucesso!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx, "Envio de dados efetuado com sucesso!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx, "Iniciando recebimento de dados...", Toast.LENGTH_SHORT).show();
+
+            chamaAPI(0, null, 1, baseUrl);
+
         } else{
             Toast.makeText(ctx, "Código de resposta: "+response.code()+" | Mensagem: "+response.message(),
                     Toast.LENGTH_SHORT).show();
@@ -209,4 +200,548 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         Toast.makeText(ctx, "Problema ao acessar: "+t.getMessage(), Toast.LENGTH_SHORT).show();
         System.out.println("RESPONSE ERROR: "+t.getMessage()+" | "+call.request().toString());
     }
+
+    private void chamaAPI(Integer registros, String json, Integer tipo, String baseUrl) {
+
+        Gson gson;
+
+        if(tipo == 0){
+            gson = new GsonBuilder()
+                    .registerTypeAdapter(DateTime.class, JsonUtils.serDateTime)
+                    .registerTypeAdapter(DateTime.class, JsonUtils.deserDateTime)
+                    .create();
+        } else{
+            gson = new GsonBuilder()
+                    .registerTypeAdapter(DateTime.class, JsonUtils.serDateTime)
+                    .registerTypeAdapter(DateTime.class, JsonUtils.deserDateTimeAPI)
+                    .create();
+        }
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+
+        if(tipo == 0){
+            JSONObject paramObject = new JSONObject();
+            try {
+                paramObject.put("dados", json);
+                paramObject.put("qtd", registros);
+
+                CircularAPI api = retrofit.create(CircularAPI.class);
+                Call<String> call = api.enviaDados(paramObject.toString());
+                call.enqueue(this);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else{
+            CircularAPI api = retrofit.create(CircularAPI.class);
+            Call<String> call = api.recebeDados();
+            call.enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    Toast.makeText(ctx, "Recebimento de dados efetuado com sucesso! Iniciando processamento...", Toast.LENGTH_SHORT).show();
+                    System.out.println("RESPONSE RECEBIMENTO: "+response.message()+" | "+call.request().toString()+" | "+response.body());
+
+                    try {
+                        processaJson(response.body());
+                    } catch (JSONException e) {
+                        Toast.makeText(ctx, "Problema ao processar dados: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+                    Toast.makeText(ctx, "Problema ao receber dados: "+t.getMessage(), Toast.LENGTH_SHORT).show();
+                    System.out.println("RESPONSE ERROR RECEBIMENTO: "+t.getMessage()+" | "+call.request().toString());
+                }
+            });
+        }
+
+
+    }
+
+    private void processaJson(String dados) throws JSONException {
+
+        JSONObject arrayObject = new JSONObject(dados);
+
+        System.out.println("RESPONSE JSON >>:>>>>>> "+arrayObject.getString("paises"));
+
+        JSONArray paises = arrayObject.getJSONArray("paises");
+        JSONArray empresas = arrayObject.getJSONArray("empresas");
+        JSONArray onibus = arrayObject.getJSONArray("onibus");
+        JSONArray estados = arrayObject.getJSONArray("estados");
+        JSONArray cidades = arrayObject.getJSONArray("cidades");
+        JSONArray bairros = arrayObject.getJSONArray("bairros");
+        JSONArray paradas = arrayObject.getJSONArray("paradas");
+        JSONArray itinerarios = arrayObject.getJSONArray("itinerarios");
+        JSONArray horarios = arrayObject.getJSONArray("horarios");
+        JSONArray paradasItinerarios = arrayObject.getJSONArray("paradas_itinerarios");
+        JSONArray secoesItinerarios = arrayObject.getJSONArray("secoes_itinerarios");
+        JSONArray horariosItinerarios = arrayObject.getJSONArray("horarios_itinerarios");
+        JSONArray pontosInteresse = arrayObject.getJSONArray("pontos_interesse");
+        JSONArray mensagens = arrayObject.getJSONArray("mensagens");
+        JSONArray parametros = arrayObject.getJSONArray("parametros");
+        JSONArray usuarios = arrayObject.getJSONArray("usuarios");
+
+        // PAISES
+
+        if(paises.length() > 0){
+
+            int total = paises.length();
+            List<Pais> lstPaises = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                Pais pais;
+                JSONObject obj = paises.getJSONObject(i);
+
+                pais = (Pais) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Pais.class, 1);
+                pais.setEnviado(true);
+                System.out.println("RESPONSE pais >>>>>>>> "+pais.getDataCadastro());
+
+                lstPaises.add(pais);
+
+            }
+
+            add(lstPaises, "pais");
+
+        }
+/*
+        // ESTADOS
+
+        if(estados.length() > 0){
+
+            int total = estados.length();
+            List<Estado> lstEstados = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                Estado estado;
+                JSONObject obj = estados.getJSONObject(i);
+
+                estado = (Estado) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Estado.class);
+                estado.setEnviado(true);
+
+                lstEstados.add(estado);
+
+            }
+
+            add(lstEstados, "estado");
+
+        }
+
+        // CIDADES
+
+        if(cidades.length() > 0){
+
+            int total = cidades.length();
+            List<Cidade> lstCidades = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                Cidade cidade;
+                JSONObject obj = cidades.getJSONObject(i);
+
+                cidade = (Cidade) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Cidade.class);
+                cidade.setEnviado(true);
+
+                lstCidades.add(cidade);
+
+            }
+
+            add(lstCidades, "cidade");
+
+        }
+
+        // BAIRROS
+
+        if(bairros.length() > 0){
+
+            int total = bairros.length();
+            List<Bairro> lstBairros = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                Bairro bairro;
+                JSONObject obj = bairros.getJSONObject(i);
+
+                bairro = (Bairro) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Bairro.class);
+                bairro.setEnviado(true);
+
+                lstBairros.add(bairro);
+
+            }
+
+            add(lstBairros, "bairro");
+
+        }
+
+        // PARADAS
+
+        if(paradas.length() > 0){
+
+            int total = paradas.length();
+            List<Parada> lstParadas = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                Parada parada;
+                JSONObject obj = paradas.getJSONObject(i);
+
+                parada = (Parada) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Parada.class);
+                parada.setEnviado(true);
+
+                lstParadas.add(parada);
+
+            }
+
+            add(lstParadas, "parada");
+
+        }
+
+        // EMPRESAS
+
+        if(empresas.length() > 0){
+
+            int total = empresas.length();
+            List<Empresa> lstEmpresas = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                Empresa empresa;
+                JSONObject obj = empresas.getJSONObject(i);
+
+                empresa = (Empresa) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Empresa.class);
+                empresa.setEnviado(true);
+
+                lstEmpresas.add(empresa);
+
+            }
+
+            add(lstEmpresas, "empresa");
+
+        }
+
+        // ONIBUS
+
+        if(onibus.length() > 0){
+
+            int total = onibus.length();
+            List<Onibus> lstOnibus = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                Onibus umOnibus;
+                JSONObject obj = onibus.getJSONObject(i);
+
+                umOnibus = (Onibus) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Onibus.class);
+                umOnibus.setEnviado(true);
+
+                lstOnibus.add(umOnibus);
+
+            }
+
+            add(lstOnibus, "onibus");
+
+        }
+
+        // ITINERARIOS
+
+        if(itinerarios.length() > 0){
+
+            int total = itinerarios.length();
+            List<Itinerario> lstItinerarios = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                Itinerario itinerario;
+                JSONObject obj = itinerarios.getJSONObject(i);
+
+                itinerario = (Itinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Itinerario.class);
+                itinerario.setEnviado(true);
+
+                lstItinerarios.add(itinerario);
+
+            }
+
+            add(lstItinerarios, "itinerario");
+
+        }
+
+        // HORARIOS
+
+        if(horarios.length() > 0){
+
+            int total = horarios.length();
+            List<Horario> lstHorarios = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                Horario horario;
+                JSONObject obj = horarios.getJSONObject(i);
+
+                horario = (Horario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Horario.class);
+                horario.setEnviado(true);
+
+                lstHorarios.add(horario);
+
+            }
+
+            add(lstHorarios, "horario");
+
+        }
+
+        // PARADAS ITINERARIOS
+
+        if(paradasItinerarios.length() > 0){
+
+            int total = paradasItinerarios.length();
+            List<ParadaItinerario> lstParadasItinerarios = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                ParadaItinerario paradaItinerario;
+                JSONObject obj = paradasItinerarios.getJSONObject(i);
+
+                paradaItinerario = (ParadaItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), ParadaItinerario.class);
+                paradaItinerario.setEnviado(true);
+
+                lstParadasItinerarios.add(paradaItinerario);
+
+            }
+
+            add(lstParadasItinerarios, "parada_itinerario");
+
+        }
+
+        // SECOES ITINERARIOS
+
+        if(secoesItinerarios.length() > 0){
+
+            int total = secoesItinerarios.length();
+            List<SecaoItinerario> lstSecoesItinerarios = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                SecaoItinerario secaoItinerario;
+                JSONObject obj = secoesItinerarios.getJSONObject(i);
+
+                secaoItinerario = (SecaoItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), SecaoItinerario.class);
+                secaoItinerario.setEnviado(true);
+
+                lstSecoesItinerarios.add(secaoItinerario);
+
+            }
+
+            add(lstSecoesItinerarios, "secao_itinerario");
+
+        }
+
+        // HORARIOS ITINERARIOS
+
+        if(horariosItinerarios.length() > 0){
+
+            int total = horariosItinerarios.length();
+            List<HorarioItinerario> lstHorariosItinerarios = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                HorarioItinerario horarioItinerario;
+                JSONObject obj = horariosItinerarios.getJSONObject(i);
+
+                horarioItinerario = (HorarioItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), HorarioItinerario.class);
+                horarioItinerario.setEnviado(true);
+
+                lstHorariosItinerarios.add(horarioItinerario);
+
+            }
+
+            add(lstHorariosItinerarios, "horario_itinerario");
+
+        }
+
+        // MENSAGENS
+
+        if(mensagens.length() > 0){
+
+            int total = mensagens.length();
+            List<Mensagem> lstMensagens = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                Mensagem mensagem;
+                JSONObject obj = mensagens.getJSONObject(i);
+
+                mensagem = (Mensagem) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Mensagem.class);
+                mensagem.setEnviado(true);
+
+                lstMensagens.add(mensagem);
+
+            }
+
+            add(lstMensagens, "mensagem");
+
+        }
+
+        // PARAMETROS
+
+        if(parametros.length() > 0){
+
+            int total = parametros.length();
+            List<Parametro> lstParametros = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                Parametro parametro;
+                JSONObject obj = parametros.getJSONObject(i);
+
+                parametro = (Parametro) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Parametro.class);
+                parametro.setEnviado(true);
+
+                lstParametros.add(parametro);
+
+            }
+
+            add(lstParametros, "parametro");
+
+        }
+
+        // PONTOS INTERESSE
+
+        if(pontosInteresse.length() > 0){
+
+            int total = pontosInteresse.length();
+            List<PontoInteresse> lstPontosInteresse = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                PontoInteresse pontoInteresse;
+                JSONObject obj = pontosInteresse.getJSONObject(i);
+
+                pontoInteresse = (PontoInteresse) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), PontoInteresse.class);
+                pontoInteresse.setEnviado(true);
+
+                lstPontosInteresse.add(pontoInteresse);
+
+            }
+
+            add(lstPontosInteresse, "ponto_interesse");
+
+        }
+
+        // USUARIOS
+
+        if(usuarios.length() > 0){
+
+            int total = usuarios.length();
+            List<Usuario> lstUsuarios = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                Usuario usuario;
+                JSONObject obj = usuarios.getJSONObject(i);
+
+                usuario = (Usuario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Usuario.class);
+                usuario.setEnviado(true);
+
+                lstUsuarios.add(usuario);
+
+            }
+
+            add(lstUsuarios, "usuario");
+
+        }
+        */
+    }
+
+    // adicionar
+
+    public void add(final List<? extends EntidadeBase> entidadeBase, String entidade) {
+
+        new addAsyncTask(appDatabase, entidade).execute(entidadeBase);
+    }
+
+    private class addAsyncTask extends AsyncTask<List<? extends EntidadeBase>, Void, Void> {
+
+        private AppDatabase db;
+        private String entidade;
+
+        addAsyncTask(AppDatabase appDatabase, String entidade) {
+            db = appDatabase;
+            this.entidade = entidade;
+        }
+
+        @Override
+        protected Void doInBackground(final List<? extends EntidadeBase>... params) {
+
+            switch(entidade){
+                case "pais":
+                    db.paisDAO().deletarTodos();
+                    db.paisDAO().inserirTodos((List<Pais>) params[0]);
+                    System.out.println("RESPONSE PAIS");
+                    break;
+                case "empresa":
+                    db.empresaDAO().deletarTodos();
+                    db.empresaDAO().inserirTodos((List<Empresa>) params[0]);
+                    break;
+                case "onibus":
+                    db.onibusDAO().deletarTodos();
+                    db.onibusDAO().inserirTodos((List<Onibus>) params[0]);
+                    break;
+                case "estado":
+                    db.estadoDAO().deletarTodos();
+                    db.estadoDAO().inserirTodos((List<Estado>) params[0]);
+                    break;
+                case "cidade":
+                    db.cidadeDAO().deletarTodos();
+                    db.cidadeDAO().inserirTodos((List<Cidade>) params[0]);
+                    break;
+                case "bairro":
+                    db.bairroDAO().deletarTodos();
+                    db.bairroDAO().inserirTodos((List<Bairro>) params[0]);
+                    break;
+                case "parada":
+                    db.paradaDAO().deletarTodos();
+                    db.paradaDAO().inserirTodos((List<Parada>) params[0]);
+                    break;
+                case "itinerario":
+                    db.itinerarioDAO().deletarTodos();
+                    db.itinerarioDAO().inserirTodos((List<Itinerario>) params[0]);
+                    break;
+                case "horario":
+                    db.horarioDAO().deletarTodos();
+                    db.horarioDAO().inserirTodos((List<Horario>) params[0]);
+                    break;
+                case "parada_itinerario":
+                    db.paradaItinerarioDAO().deletarTodos();
+                    db.paradaItinerarioDAO().inserirTodos((List<ParadaItinerario>) params[0]);
+                    break;
+                case "secao_itinerario":
+                    db.secaoItinerarioDAO().deletarTodos();
+                    db.secaoItinerarioDAO().inserirTodos((List<SecaoItinerario>) params[0]);
+                    break;
+                case "horario_itinerario":
+                    db.horarioItinerarioDAO().deletarTodos();
+                    db.horarioItinerarioDAO().inserirTodos((List<HorarioItinerario>) params[0]);
+                    break;
+                case "mensagem":
+                    db.mensagemDAO().deletarTodos();
+                    db.mensagemDAO().inserirTodos((List<Mensagem>) params[0]);
+                    break;
+                case "parametro":
+                    db.parametroDAO().deletarTodos();
+                    db.parametroDAO().inserirTodos((List<Parametro>) params[0]);
+                    break;
+                case "ponto_interesse":
+                    System.out.println("RESPONSE USUARIO");
+                    db.pontoInteresseDAO().deletarTodos();
+                    db.pontoInteresseDAO().inserirTodos((List<PontoInteresse>) params[0]);
+                    break;
+                case "usuario":
+                    db.usuarioDAO().deletarTodos();
+                    System.out.println("RESPONSE USUARIO");
+                    db.usuarioDAO().inserirTodos((List<Usuario>) params[0]);
+                    break;
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            System.out.println("RESPONSE PROCESSAMENTO");
+            Toast.makeText(SyncAdapter.this.ctx, "Processamento finalizado!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // fim adicionar
+
 }

@@ -36,7 +36,7 @@ public interface PaisDAO {
     @Query("SELECT * FROM pais WHERE sigla LIKE :sigla LIMIT 1")
     Pais encontrarPorSigla(String sigla);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<Pais> paises);
 
     @Insert(onConflict = OnConflictStrategy.FAIL)

@@ -86,4 +86,15 @@ public class BairroCidade {
         return nomeCidade+" / "+siglaEstado;
     }
 
+    @Override
+    public boolean equals(Object o) {
+
+        if(!(o instanceof BairroCidade)){
+            return false;
+        }
+
+        BairroCidade bairro = (BairroCidade) o;
+        return bairro.getBairro().getId().equals(this.getBairro().getId());
+    }
+
 }

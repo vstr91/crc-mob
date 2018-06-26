@@ -16,6 +16,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,8 +26,13 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Cidade;
@@ -55,6 +63,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
+import retrofit2.http.Header;
 
 /**
  * Handle the transfer of data between a server and an
@@ -174,7 +183,16 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
         baseUrl = appDatabase.parametroDAO().carregarPorSlug("servidor");
 
-        chamaAPI(100, json, 0, baseUrl);
+        int registros = paises.size()+empresas.size()+onibus.size()+estados.size()+cidades.size()
+                +bairros.size()+paradas.size()+itinerarios.size()+horarios.size()+paradasItinerario.size()
+                +secoesItinerarios.size()+horariosItinerarios.size()+mensagens.size()+parametros.size()+pontosInteresse.size()+usuarios.size();
+
+        if(registros > 0){
+            chamaAPI(registros, json, 0, baseUrl);
+        } else{
+            chamaAPI(0, null, 1, baseUrl);
+        }
+
 
     }
 
@@ -192,13 +210,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     Toast.LENGTH_SHORT).show();
         }
 
-        System.out.println("RESPONSE: "+response.message()+" | "+call.request().toString()+" | "+response.body());
     }
 
     @Override
     public void onFailure(Call<String> call, Throwable t) {
         Toast.makeText(ctx, "Problema ao acessar: "+t.getMessage(), Toast.LENGTH_SHORT).show();
-        System.out.println("RESPONSE ERROR: "+t.getMessage()+" | "+call.request().toString());
     }
 
     private void chamaAPI(Integer registros, String json, Integer tipo, String baseUrl) {
@@ -242,7 +258,22 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
                     Toast.makeText(ctx, "Recebimento de dados efetuado com sucesso! Iniciando processamento...", Toast.LENGTH_SHORT).show();
-                    System.out.println("RESPONSE RECEBIMENTO: "+response.message()+" | "+call.request().toString()+" | "+response.body());
+                    String date = response.headers().get("date");
+
+                    System.out.println("DATE >>>>>>>>>>>>> "+date);
+
+                    Calendar calendar = Calendar.getInstance();
+                    SimpleDateFormat dateFormat = new SimpleDateFormat(
+                            "EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+                    dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+                    try {
+                        calendar.setTime(dateFormat.parse(date));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    System.out.println("DATA >>>>>>>>>>>>> "+DateTimeFormat.forPattern("dd/MM/yyyy HH:mm").print(calendar.getTimeInMillis()));
 
                     try {
                         processaJson(response.body());
@@ -255,7 +286,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 @Override
                 public void onFailure(Call<String> call, Throwable t) {
                     Toast.makeText(ctx, "Problema ao receber dados: "+t.getMessage(), Toast.LENGTH_SHORT).show();
-                    System.out.println("RESPONSE ERROR RECEBIMENTO: "+t.getMessage()+" | "+call.request().toString());
                 }
             });
         }
@@ -266,8 +296,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     private void processaJson(String dados) throws JSONException {
 
         JSONObject arrayObject = new JSONObject(dados);
-
-        System.out.println("RESPONSE JSON >>:>>>>>> "+arrayObject.getString("paises"));
 
         JSONArray paises = arrayObject.getJSONArray("paises");
         JSONArray empresas = arrayObject.getJSONArray("empresas");
@@ -299,7 +327,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 pais = (Pais) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Pais.class, 1);
                 pais.setEnviado(true);
-                System.out.println("RESPONSE pais >>>>>>>> "+pais.getDataCadastro());
 
                 lstPaises.add(pais);
 
@@ -308,7 +335,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             add(lstPaises, "pais");
 
         }
-/*
+
         // ESTADOS
 
         if(estados.length() > 0){
@@ -320,7 +347,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 Estado estado;
                 JSONObject obj = estados.getJSONObject(i);
 
-                estado = (Estado) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Estado.class);
+                estado = (Estado) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Estado.class, 1);
                 estado.setEnviado(true);
 
                 lstEstados.add(estado);
@@ -342,7 +369,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 Cidade cidade;
                 JSONObject obj = cidades.getJSONObject(i);
 
-                cidade = (Cidade) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Cidade.class);
+                cidade = (Cidade) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Cidade.class, 1);
                 cidade.setEnviado(true);
 
                 lstCidades.add(cidade);
@@ -364,7 +391,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 Bairro bairro;
                 JSONObject obj = bairros.getJSONObject(i);
 
-                bairro = (Bairro) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Bairro.class);
+                bairro = (Bairro) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Bairro.class, 1);
                 bairro.setEnviado(true);
 
                 lstBairros.add(bairro);
@@ -386,7 +413,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 Parada parada;
                 JSONObject obj = paradas.getJSONObject(i);
 
-                parada = (Parada) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Parada.class);
+                parada = (Parada) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Parada.class, 1);
                 parada.setEnviado(true);
 
                 lstParadas.add(parada);
@@ -408,7 +435,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 Empresa empresa;
                 JSONObject obj = empresas.getJSONObject(i);
 
-                empresa = (Empresa) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Empresa.class);
+                empresa = (Empresa) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Empresa.class, 1);
                 empresa.setEnviado(true);
 
                 lstEmpresas.add(empresa);
@@ -430,7 +457,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 Onibus umOnibus;
                 JSONObject obj = onibus.getJSONObject(i);
 
-                umOnibus = (Onibus) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Onibus.class);
+                umOnibus = (Onibus) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Onibus.class, 1);
                 umOnibus.setEnviado(true);
 
                 lstOnibus.add(umOnibus);
@@ -452,7 +479,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 Itinerario itinerario;
                 JSONObject obj = itinerarios.getJSONObject(i);
 
-                itinerario = (Itinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Itinerario.class);
+                itinerario = (Itinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Itinerario.class, 1);
                 itinerario.setEnviado(true);
 
                 lstItinerarios.add(itinerario);
@@ -474,7 +501,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 Horario horario;
                 JSONObject obj = horarios.getJSONObject(i);
 
-                horario = (Horario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Horario.class);
+                horario = (Horario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Horario.class, 1);
                 horario.setEnviado(true);
 
                 lstHorarios.add(horario);
@@ -496,7 +523,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 ParadaItinerario paradaItinerario;
                 JSONObject obj = paradasItinerarios.getJSONObject(i);
 
-                paradaItinerario = (ParadaItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), ParadaItinerario.class);
+                paradaItinerario = (ParadaItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), ParadaItinerario.class, 1);
                 paradaItinerario.setEnviado(true);
 
                 lstParadasItinerarios.add(paradaItinerario);
@@ -518,7 +545,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 SecaoItinerario secaoItinerario;
                 JSONObject obj = secoesItinerarios.getJSONObject(i);
 
-                secaoItinerario = (SecaoItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), SecaoItinerario.class);
+                secaoItinerario = (SecaoItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), SecaoItinerario.class, 1);
                 secaoItinerario.setEnviado(true);
 
                 lstSecoesItinerarios.add(secaoItinerario);
@@ -540,7 +567,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 HorarioItinerario horarioItinerario;
                 JSONObject obj = horariosItinerarios.getJSONObject(i);
 
-                horarioItinerario = (HorarioItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), HorarioItinerario.class);
+                horarioItinerario = (HorarioItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), HorarioItinerario.class, 1);
                 horarioItinerario.setEnviado(true);
 
                 lstHorariosItinerarios.add(horarioItinerario);
@@ -562,7 +589,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 Mensagem mensagem;
                 JSONObject obj = mensagens.getJSONObject(i);
 
-                mensagem = (Mensagem) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Mensagem.class);
+                mensagem = (Mensagem) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Mensagem.class, 1);
                 mensagem.setEnviado(true);
 
                 lstMensagens.add(mensagem);
@@ -584,7 +611,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 Parametro parametro;
                 JSONObject obj = parametros.getJSONObject(i);
 
-                parametro = (Parametro) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Parametro.class);
+                parametro = (Parametro) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Parametro.class, 1);
                 parametro.setEnviado(true);
 
                 lstParametros.add(parametro);
@@ -606,7 +633,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 PontoInteresse pontoInteresse;
                 JSONObject obj = pontosInteresse.getJSONObject(i);
 
-                pontoInteresse = (PontoInteresse) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), PontoInteresse.class);
+                pontoInteresse = (PontoInteresse) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), PontoInteresse.class, 1);
                 pontoInteresse.setEnviado(true);
 
                 lstPontosInteresse.add(pontoInteresse);
@@ -628,7 +655,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 Usuario usuario;
                 JSONObject obj = usuarios.getJSONObject(i);
 
-                usuario = (Usuario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Usuario.class);
+                usuario = (Usuario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Usuario.class, 1);
                 usuario.setEnviado(true);
 
                 lstUsuarios.add(usuario);
@@ -638,7 +665,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             add(lstUsuarios, "usuario");
 
         }
-        */
+
     }
 
     // adicionar
@@ -665,7 +692,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 case "pais":
                     db.paisDAO().deletarTodos();
                     db.paisDAO().inserirTodos((List<Pais>) params[0]);
-                    System.out.println("RESPONSE PAIS");
                     break;
                 case "empresa":
                     db.empresaDAO().deletarTodos();
@@ -737,8 +763,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            System.out.println("RESPONSE PROCESSAMENTO");
-            Toast.makeText(SyncAdapter.this.ctx, "Processamento finalizado!", Toast.LENGTH_SHORT).show();
         }
     }
 

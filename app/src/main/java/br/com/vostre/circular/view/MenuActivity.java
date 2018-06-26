@@ -48,7 +48,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
     // Sync interval constants
     public static final long SECONDS_PER_MINUTE = 60L;
-    public static final long SYNC_INTERVAL_IN_MINUTES = 1L;
+    public static final long SYNC_INTERVAL_IN_MINUTES = 60*5L;
     public static final long SYNC_INTERVAL =
             SYNC_INTERVAL_IN_MINUTES *
                     SECONDS_PER_MINUTE;
@@ -67,6 +67,12 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         // Get the content resolver for your app
         mResolver = getContentResolver();
+
+        mAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
+
+        ContentResolver.setIsSyncable(mAccount, AUTHORITY, 1);
+        ContentResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
+
         /*
          * Turn on periodic syncing
          */

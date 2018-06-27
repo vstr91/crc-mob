@@ -23,6 +23,7 @@ import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.Parametro;
+import br.com.vostre.circular.model.ParametroInterno;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Usuario;
@@ -127,6 +128,9 @@ public class BaseViewModel extends AndroidViewModel {
                 case "usuario":
                     db.usuarioDAO().deletarTodos();
                     db.usuarioDAO().inserirTodos((List<Usuario>) params[0]);
+                    break;
+                case "parametro_interno":
+                    db.parametroInternoDAO().inserir((ParametroInterno) params[0].get(0));
                     break;
             }
 

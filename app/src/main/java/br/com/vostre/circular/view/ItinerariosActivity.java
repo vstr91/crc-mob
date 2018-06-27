@@ -184,7 +184,7 @@ public class ItinerariosActivity extends BaseActivity {
 //        mapController.setCenter(startPoint);
 
         map.setMaxZoomLevel(19d);
-        map.setMinZoomLevel(15d);
+        map.setMinZoomLevel(5d);
     }
 
     public void onClickSalvar(View v){

@@ -4,6 +4,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 public interface CircularAPI {
 
@@ -11,7 +12,7 @@ public interface CircularAPI {
     @POST("api/envia-dados/-/-")
     Call<String> enviaDados(@Body String json);
 
-    @POST("api/recebe-dados/-/-")
-    Call<String> recebeDados();
+    @POST("api/recebe-dados/-/{ultimoAcesso}")
+    Call<String> recebeDados(@Path("ultimoAcesso") String ultimoAcesso);
 
 }

@@ -127,9 +127,6 @@ public class ParadasActivity extends BaseActivity {
             MapEventsReceiver receiver = new MapEventsReceiver() {
                 @Override
                 public boolean singleTapConfirmedHelper(GeoPoint p) {
-                    Toast.makeText(getBaseContext(),p.getLatitude() + " - "
-                            +p.getLongitude(),Toast.LENGTH_LONG).show();
-
                     FormParada formParada = new FormParada();
                     formParada.setLatitude(p.getLatitude());
                     formParada.setLongitude(p.getLongitude());

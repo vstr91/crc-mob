@@ -81,7 +81,6 @@ public class DetalhesEmpresaActivity extends BaseActivity {
     }
 
     public void onFabClick(View v){
-        Toast.makeText(getApplicationContext(), "TAB: "+tabHost.getCurrentTab(), Toast.LENGTH_SHORT).show();
 
         if(tabHost.getCurrentTab() == 0){
 

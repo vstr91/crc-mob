@@ -1,6 +1,8 @@
 package br.com.vostre.circular.model.adapter;
 
 import android.accounts.Account;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
@@ -10,6 +12,7 @@ import android.content.SyncResult;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.WorkerThread;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -48,6 +51,7 @@ import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.Parametro;
+import br.com.vostre.circular.model.ParametroInterno;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Usuario;
@@ -55,6 +59,7 @@ import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.utils.Constants;
 import br.com.vostre.circular.utils.JsonUtils;
+import br.com.vostre.circular.utils.Unique;
 import br.com.vostre.circular.view.BaseActivity;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 import retrofit2.Call;
@@ -183,6 +188,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
         baseUrl = appDatabase.parametroDAO().carregarPorSlug("servidor");
 
+        if(baseUrl == null){
+            baseUrl = Constants.BASE_URL;
+        }
+
         int registros = paises.size()+empresas.size()+onibus.size()+estados.size()+cidades.size()
                 +bairros.size()+paradas.size()+itinerarios.size()+horarios.size()+paradasItinerario.size()
                 +secoesItinerarios.size()+horariosItinerarios.size()+mensagens.size()+parametros.size()+pontosInteresse.size()+usuarios.size();
@@ -253,30 +262,23 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             }
         } else{
             CircularAPI api = retrofit.create(CircularAPI.class);
-            Call<String> call = api.recebeDados();
+
+            ParametroInterno parametroInterno = appDatabase.parametroInternoDAO().carregar();
+            String data = "-";
+            System.out.println("IU ::::::: "+parametroInterno.getIdentificadorUnico());
+
+            if(parametroInterno != null){
+                data = DateTimeFormat.forPattern("yyyy-MM-dd-HH-mm-ss").print(parametroInterno.getDataUltimoAcesso());
+            }
+
+            Call<String> call = api.recebeDados(data);
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
                     Toast.makeText(ctx, "Recebimento de dados efetuado com sucesso! Iniciando processamento...", Toast.LENGTH_SHORT).show();
-                    String date = response.headers().get("date");
-
-                    System.out.println("DATE >>>>>>>>>>>>> "+date);
-
-                    Calendar calendar = Calendar.getInstance();
-                    SimpleDateFormat dateFormat = new SimpleDateFormat(
-                            "EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
-                    dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 
                     try {
-                        calendar.setTime(dateFormat.parse(date));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
-                    System.out.println("DATA >>>>>>>>>>>>> "+DateTimeFormat.forPattern("dd/MM/yyyy HH:mm").print(calendar.getTimeInMillis()));
-
-                    try {
-                        processaJson(response.body());
+                        processaJson(response);
                     } catch (JSONException e) {
                         Toast.makeText(ctx, "Problema ao processar dados: "+e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -293,378 +295,410 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
     }
 
-    private void processaJson(String dados) throws JSONException {
+    private void processaJson(Response<String> response) throws JSONException {
 
-        JSONObject arrayObject = new JSONObject(dados);
+        String dados = response.body();
 
-        JSONArray paises = arrayObject.getJSONArray("paises");
-        JSONArray empresas = arrayObject.getJSONArray("empresas");
-        JSONArray onibus = arrayObject.getJSONArray("onibus");
-        JSONArray estados = arrayObject.getJSONArray("estados");
-        JSONArray cidades = arrayObject.getJSONArray("cidades");
-        JSONArray bairros = arrayObject.getJSONArray("bairros");
-        JSONArray paradas = arrayObject.getJSONArray("paradas");
-        JSONArray itinerarios = arrayObject.getJSONArray("itinerarios");
-        JSONArray horarios = arrayObject.getJSONArray("horarios");
-        JSONArray paradasItinerarios = arrayObject.getJSONArray("paradas_itinerarios");
-        JSONArray secoesItinerarios = arrayObject.getJSONArray("secoes_itinerarios");
-        JSONArray horariosItinerarios = arrayObject.getJSONArray("horarios_itinerarios");
-        JSONArray pontosInteresse = arrayObject.getJSONArray("pontos_interesse");
-        JSONArray mensagens = arrayObject.getJSONArray("mensagens");
-        JSONArray parametros = arrayObject.getJSONArray("parametros");
-        JSONArray usuarios = arrayObject.getJSONArray("usuarios");
+        if(dados != null){
 
-        // PAISES
+            JSONObject arrayObject = new JSONObject(dados);
 
-        if(paises.length() > 0){
+            JSONArray paises = arrayObject.getJSONArray("paises");
+            JSONArray empresas = arrayObject.getJSONArray("empresas");
+            JSONArray onibus = arrayObject.getJSONArray("onibus");
+            JSONArray estados = arrayObject.getJSONArray("estados");
+            JSONArray cidades = arrayObject.getJSONArray("cidades");
+            JSONArray bairros = arrayObject.getJSONArray("bairros");
+            JSONArray paradas = arrayObject.getJSONArray("paradas");
+            JSONArray itinerarios = arrayObject.getJSONArray("itinerarios");
+            JSONArray horarios = arrayObject.getJSONArray("horarios");
+            JSONArray paradasItinerarios = arrayObject.getJSONArray("paradas_itinerarios");
+            JSONArray secoesItinerarios = arrayObject.getJSONArray("secoes_itinerarios");
+            JSONArray horariosItinerarios = arrayObject.getJSONArray("horarios_itinerarios");
+            JSONArray pontosInteresse = arrayObject.getJSONArray("pontos_interesse");
+            JSONArray mensagens = arrayObject.getJSONArray("mensagens");
+            JSONArray parametros = arrayObject.getJSONArray("parametros");
+            JSONArray usuarios = arrayObject.getJSONArray("usuarios");
 
-            int total = paises.length();
-            List<Pais> lstPaises = new ArrayList<>();
+            // PAISES
 
-            for(int i = 0; i < total; i++){
-                Pais pais;
-                JSONObject obj = paises.getJSONObject(i);
+            if(paises.length() > 0){
 
-                pais = (Pais) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Pais.class, 1);
-                pais.setEnviado(true);
+                int total = paises.length();
+                List<Pais> lstPaises = new ArrayList<>();
 
-                lstPaises.add(pais);
+                for(int i = 0; i < total; i++){
+                    Pais pais;
+                    JSONObject obj = paises.getJSONObject(i);
 
-            }
+                    pais = (Pais) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Pais.class, 1);
+                    pais.setEnviado(true);
 
-            add(lstPaises, "pais");
+                    lstPaises.add(pais);
 
-        }
+                }
 
-        // ESTADOS
-
-        if(estados.length() > 0){
-
-            int total = estados.length();
-            List<Estado> lstEstados = new ArrayList<>();
-
-            for(int i = 0; i < total; i++){
-                Estado estado;
-                JSONObject obj = estados.getJSONObject(i);
-
-                estado = (Estado) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Estado.class, 1);
-                estado.setEnviado(true);
-
-                lstEstados.add(estado);
+                add(lstPaises, "pais");
 
             }
 
-            add(lstEstados, "estado");
+            // ESTADOS
 
-        }
+            if(estados.length() > 0){
 
-        // CIDADES
+                int total = estados.length();
+                List<Estado> lstEstados = new ArrayList<>();
 
-        if(cidades.length() > 0){
+                for(int i = 0; i < total; i++){
+                    Estado estado;
+                    JSONObject obj = estados.getJSONObject(i);
 
-            int total = cidades.length();
-            List<Cidade> lstCidades = new ArrayList<>();
+                    estado = (Estado) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Estado.class, 1);
+                    estado.setEnviado(true);
 
-            for(int i = 0; i < total; i++){
-                Cidade cidade;
-                JSONObject obj = cidades.getJSONObject(i);
+                    lstEstados.add(estado);
 
-                cidade = (Cidade) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Cidade.class, 1);
-                cidade.setEnviado(true);
+                }
 
-                lstCidades.add(cidade);
-
-            }
-
-            add(lstCidades, "cidade");
-
-        }
-
-        // BAIRROS
-
-        if(bairros.length() > 0){
-
-            int total = bairros.length();
-            List<Bairro> lstBairros = new ArrayList<>();
-
-            for(int i = 0; i < total; i++){
-                Bairro bairro;
-                JSONObject obj = bairros.getJSONObject(i);
-
-                bairro = (Bairro) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Bairro.class, 1);
-                bairro.setEnviado(true);
-
-                lstBairros.add(bairro);
+                add(lstEstados, "estado");
 
             }
 
-            add(lstBairros, "bairro");
+            // CIDADES
 
-        }
+            if(cidades.length() > 0){
 
-        // PARADAS
+                int total = cidades.length();
+                List<Cidade> lstCidades = new ArrayList<>();
 
-        if(paradas.length() > 0){
+                for(int i = 0; i < total; i++){
+                    Cidade cidade;
+                    JSONObject obj = cidades.getJSONObject(i);
 
-            int total = paradas.length();
-            List<Parada> lstParadas = new ArrayList<>();
+                    cidade = (Cidade) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Cidade.class, 1);
+                    cidade.setEnviado(true);
 
-            for(int i = 0; i < total; i++){
-                Parada parada;
-                JSONObject obj = paradas.getJSONObject(i);
+                    lstCidades.add(cidade);
 
-                parada = (Parada) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Parada.class, 1);
-                parada.setEnviado(true);
+                }
 
-                lstParadas.add(parada);
-
-            }
-
-            add(lstParadas, "parada");
-
-        }
-
-        // EMPRESAS
-
-        if(empresas.length() > 0){
-
-            int total = empresas.length();
-            List<Empresa> lstEmpresas = new ArrayList<>();
-
-            for(int i = 0; i < total; i++){
-                Empresa empresa;
-                JSONObject obj = empresas.getJSONObject(i);
-
-                empresa = (Empresa) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Empresa.class, 1);
-                empresa.setEnviado(true);
-
-                lstEmpresas.add(empresa);
+                add(lstCidades, "cidade");
 
             }
 
-            add(lstEmpresas, "empresa");
+            // BAIRROS
 
-        }
+            if(bairros.length() > 0){
 
-        // ONIBUS
+                int total = bairros.length();
+                List<Bairro> lstBairros = new ArrayList<>();
 
-        if(onibus.length() > 0){
+                for(int i = 0; i < total; i++){
+                    Bairro bairro;
+                    JSONObject obj = bairros.getJSONObject(i);
 
-            int total = onibus.length();
-            List<Onibus> lstOnibus = new ArrayList<>();
+                    bairro = (Bairro) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Bairro.class, 1);
+                    bairro.setEnviado(true);
 
-            for(int i = 0; i < total; i++){
-                Onibus umOnibus;
-                JSONObject obj = onibus.getJSONObject(i);
+                    lstBairros.add(bairro);
 
-                umOnibus = (Onibus) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Onibus.class, 1);
-                umOnibus.setEnviado(true);
+                }
 
-                lstOnibus.add(umOnibus);
-
-            }
-
-            add(lstOnibus, "onibus");
-
-        }
-
-        // ITINERARIOS
-
-        if(itinerarios.length() > 0){
-
-            int total = itinerarios.length();
-            List<Itinerario> lstItinerarios = new ArrayList<>();
-
-            for(int i = 0; i < total; i++){
-                Itinerario itinerario;
-                JSONObject obj = itinerarios.getJSONObject(i);
-
-                itinerario = (Itinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Itinerario.class, 1);
-                itinerario.setEnviado(true);
-
-                lstItinerarios.add(itinerario);
+                add(lstBairros, "bairro");
 
             }
 
-            add(lstItinerarios, "itinerario");
+            // PARADAS
 
-        }
+            if(paradas.length() > 0){
 
-        // HORARIOS
+                int total = paradas.length();
+                List<Parada> lstParadas = new ArrayList<>();
 
-        if(horarios.length() > 0){
+                for(int i = 0; i < total; i++){
+                    Parada parada;
+                    JSONObject obj = paradas.getJSONObject(i);
 
-            int total = horarios.length();
-            List<Horario> lstHorarios = new ArrayList<>();
+                    parada = (Parada) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Parada.class, 1);
+                    parada.setEnviado(true);
 
-            for(int i = 0; i < total; i++){
-                Horario horario;
-                JSONObject obj = horarios.getJSONObject(i);
+                    lstParadas.add(parada);
 
-                horario = (Horario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Horario.class, 1);
-                horario.setEnviado(true);
+                }
 
-                lstHorarios.add(horario);
-
-            }
-
-            add(lstHorarios, "horario");
-
-        }
-
-        // PARADAS ITINERARIOS
-
-        if(paradasItinerarios.length() > 0){
-
-            int total = paradasItinerarios.length();
-            List<ParadaItinerario> lstParadasItinerarios = new ArrayList<>();
-
-            for(int i = 0; i < total; i++){
-                ParadaItinerario paradaItinerario;
-                JSONObject obj = paradasItinerarios.getJSONObject(i);
-
-                paradaItinerario = (ParadaItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), ParadaItinerario.class, 1);
-                paradaItinerario.setEnviado(true);
-
-                lstParadasItinerarios.add(paradaItinerario);
+                add(lstParadas, "parada");
 
             }
 
-            add(lstParadasItinerarios, "parada_itinerario");
+            // EMPRESAS
 
-        }
+            if(empresas.length() > 0){
 
-        // SECOES ITINERARIOS
+                int total = empresas.length();
+                List<Empresa> lstEmpresas = new ArrayList<>();
 
-        if(secoesItinerarios.length() > 0){
+                for(int i = 0; i < total; i++){
+                    Empresa empresa;
+                    JSONObject obj = empresas.getJSONObject(i);
 
-            int total = secoesItinerarios.length();
-            List<SecaoItinerario> lstSecoesItinerarios = new ArrayList<>();
+                    empresa = (Empresa) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Empresa.class, 1);
+                    empresa.setEnviado(true);
 
-            for(int i = 0; i < total; i++){
-                SecaoItinerario secaoItinerario;
-                JSONObject obj = secoesItinerarios.getJSONObject(i);
+                    lstEmpresas.add(empresa);
 
-                secaoItinerario = (SecaoItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), SecaoItinerario.class, 1);
-                secaoItinerario.setEnviado(true);
+                }
 
-                lstSecoesItinerarios.add(secaoItinerario);
-
-            }
-
-            add(lstSecoesItinerarios, "secao_itinerario");
-
-        }
-
-        // HORARIOS ITINERARIOS
-
-        if(horariosItinerarios.length() > 0){
-
-            int total = horariosItinerarios.length();
-            List<HorarioItinerario> lstHorariosItinerarios = new ArrayList<>();
-
-            for(int i = 0; i < total; i++){
-                HorarioItinerario horarioItinerario;
-                JSONObject obj = horariosItinerarios.getJSONObject(i);
-
-                horarioItinerario = (HorarioItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), HorarioItinerario.class, 1);
-                horarioItinerario.setEnviado(true);
-
-                lstHorariosItinerarios.add(horarioItinerario);
+                add(lstEmpresas, "empresa");
 
             }
 
-            add(lstHorariosItinerarios, "horario_itinerario");
+            // ONIBUS
 
-        }
+            if(onibus.length() > 0){
 
-        // MENSAGENS
+                int total = onibus.length();
+                List<Onibus> lstOnibus = new ArrayList<>();
 
-        if(mensagens.length() > 0){
+                for(int i = 0; i < total; i++){
+                    Onibus umOnibus;
+                    JSONObject obj = onibus.getJSONObject(i);
 
-            int total = mensagens.length();
-            List<Mensagem> lstMensagens = new ArrayList<>();
+                    umOnibus = (Onibus) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Onibus.class, 1);
+                    umOnibus.setEnviado(true);
 
-            for(int i = 0; i < total; i++){
-                Mensagem mensagem;
-                JSONObject obj = mensagens.getJSONObject(i);
+                    lstOnibus.add(umOnibus);
 
-                mensagem = (Mensagem) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Mensagem.class, 1);
-                mensagem.setEnviado(true);
+                }
 
-                lstMensagens.add(mensagem);
-
-            }
-
-            add(lstMensagens, "mensagem");
-
-        }
-
-        // PARAMETROS
-
-        if(parametros.length() > 0){
-
-            int total = parametros.length();
-            List<Parametro> lstParametros = new ArrayList<>();
-
-            for(int i = 0; i < total; i++){
-                Parametro parametro;
-                JSONObject obj = parametros.getJSONObject(i);
-
-                parametro = (Parametro) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Parametro.class, 1);
-                parametro.setEnviado(true);
-
-                lstParametros.add(parametro);
+                add(lstOnibus, "onibus");
 
             }
 
-            add(lstParametros, "parametro");
+            // ITINERARIOS
 
-        }
+            if(itinerarios.length() > 0){
 
-        // PONTOS INTERESSE
+                int total = itinerarios.length();
+                List<Itinerario> lstItinerarios = new ArrayList<>();
 
-        if(pontosInteresse.length() > 0){
+                for(int i = 0; i < total; i++){
+                    Itinerario itinerario;
+                    JSONObject obj = itinerarios.getJSONObject(i);
 
-            int total = pontosInteresse.length();
-            List<PontoInteresse> lstPontosInteresse = new ArrayList<>();
+                    itinerario = (Itinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Itinerario.class, 1);
+                    itinerario.setEnviado(true);
 
-            for(int i = 0; i < total; i++){
-                PontoInteresse pontoInteresse;
-                JSONObject obj = pontosInteresse.getJSONObject(i);
+                    lstItinerarios.add(itinerario);
 
-                pontoInteresse = (PontoInteresse) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), PontoInteresse.class, 1);
-                pontoInteresse.setEnviado(true);
+                }
 
-                lstPontosInteresse.add(pontoInteresse);
-
-            }
-
-            add(lstPontosInteresse, "ponto_interesse");
-
-        }
-
-        // USUARIOS
-
-        if(usuarios.length() > 0){
-
-            int total = usuarios.length();
-            List<Usuario> lstUsuarios = new ArrayList<>();
-
-            for(int i = 0; i < total; i++){
-                Usuario usuario;
-                JSONObject obj = usuarios.getJSONObject(i);
-
-                usuario = (Usuario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Usuario.class, 1);
-                usuario.setEnviado(true);
-
-                lstUsuarios.add(usuario);
+                add(lstItinerarios, "itinerario");
 
             }
 
-            add(lstUsuarios, "usuario");
+            // HORARIOS
+
+            if(horarios.length() > 0){
+
+                int total = horarios.length();
+                List<Horario> lstHorarios = new ArrayList<>();
+
+                for(int i = 0; i < total; i++){
+                    Horario horario;
+                    JSONObject obj = horarios.getJSONObject(i);
+
+                    horario = (Horario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Horario.class, 1);
+                    horario.setEnviado(true);
+
+                    lstHorarios.add(horario);
+
+                }
+
+                add(lstHorarios, "horario");
+
+            }
+
+            // PARADAS ITINERARIOS
+
+            if(paradasItinerarios.length() > 0){
+
+                int total = paradasItinerarios.length();
+                List<ParadaItinerario> lstParadasItinerarios = new ArrayList<>();
+
+                for(int i = 0; i < total; i++){
+                    ParadaItinerario paradaItinerario;
+                    JSONObject obj = paradasItinerarios.getJSONObject(i);
+
+                    paradaItinerario = (ParadaItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), ParadaItinerario.class, 1);
+                    paradaItinerario.setEnviado(true);
+
+                    lstParadasItinerarios.add(paradaItinerario);
+
+                }
+
+                add(lstParadasItinerarios, "parada_itinerario");
+
+            }
+
+            // SECOES ITINERARIOS
+
+            if(secoesItinerarios.length() > 0){
+
+                int total = secoesItinerarios.length();
+                List<SecaoItinerario> lstSecoesItinerarios = new ArrayList<>();
+
+                for(int i = 0; i < total; i++){
+                    SecaoItinerario secaoItinerario;
+                    JSONObject obj = secoesItinerarios.getJSONObject(i);
+
+                    secaoItinerario = (SecaoItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), SecaoItinerario.class, 1);
+                    secaoItinerario.setEnviado(true);
+
+                    lstSecoesItinerarios.add(secaoItinerario);
+
+                }
+
+                add(lstSecoesItinerarios, "secao_itinerario");
+
+            }
+
+            // HORARIOS ITINERARIOS
+
+            if(horariosItinerarios.length() > 0){
+
+                int total = horariosItinerarios.length();
+                List<HorarioItinerario> lstHorariosItinerarios = new ArrayList<>();
+
+                for(int i = 0; i < total; i++){
+                    HorarioItinerario horarioItinerario;
+                    JSONObject obj = horariosItinerarios.getJSONObject(i);
+
+                    horarioItinerario = (HorarioItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), HorarioItinerario.class, 1);
+                    horarioItinerario.setEnviado(true);
+
+                    lstHorariosItinerarios.add(horarioItinerario);
+
+                }
+
+                add(lstHorariosItinerarios, "horario_itinerario");
+
+            }
+
+            // MENSAGENS
+
+            if(mensagens.length() > 0){
+
+                int total = mensagens.length();
+                List<Mensagem> lstMensagens = new ArrayList<>();
+
+                for(int i = 0; i < total; i++){
+                    Mensagem mensagem;
+                    JSONObject obj = mensagens.getJSONObject(i);
+
+                    mensagem = (Mensagem) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Mensagem.class, 1);
+                    mensagem.setEnviado(true);
+
+                    lstMensagens.add(mensagem);
+
+                }
+
+                add(lstMensagens, "mensagem");
+
+            }
+
+            // PARAMETROS
+
+            if(parametros.length() > 0){
+
+                int total = parametros.length();
+                List<Parametro> lstParametros = new ArrayList<>();
+
+                for(int i = 0; i < total; i++){
+                    Parametro parametro;
+                    JSONObject obj = parametros.getJSONObject(i);
+
+                    parametro = (Parametro) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Parametro.class, 1);
+                    parametro.setEnviado(true);
+
+                    lstParametros.add(parametro);
+
+                }
+
+                add(lstParametros, "parametro");
+
+            }
+
+            // PONTOS INTERESSE
+
+            if(pontosInteresse.length() > 0){
+
+                int total = pontosInteresse.length();
+                List<PontoInteresse> lstPontosInteresse = new ArrayList<>();
+
+                for(int i = 0; i < total; i++){
+                    PontoInteresse pontoInteresse;
+                    JSONObject obj = pontosInteresse.getJSONObject(i);
+
+                    pontoInteresse = (PontoInteresse) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), PontoInteresse.class, 1);
+                    pontoInteresse.setEnviado(true);
+
+                    lstPontosInteresse.add(pontoInteresse);
+
+                }
+
+                add(lstPontosInteresse, "ponto_interesse");
+
+            }
+
+            // USUARIOS
+
+            if(usuarios.length() > 0){
+
+                int total = usuarios.length();
+                List<Usuario> lstUsuarios = new ArrayList<>();
+
+                for(int i = 0; i < total; i++){
+                    Usuario usuario;
+                    JSONObject obj = usuarios.getJSONObject(i);
+
+                    usuario = (Usuario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Usuario.class, 1);
+                    usuario.setEnviado(true);
+
+                    lstUsuarios.add(usuario);
+
+                }
+
+                add(lstUsuarios, "usuario");
+
+            }
 
         }
+
+        if(response.code() == 200){
+            atualizaDataAcesso(response);
+        }
+
+    }
+
+    private void atualizaDataAcesso(Response response){
+
+        String date = response.headers().get("date");
+
+        System.out.println("DATE >>>>>>>>>>>>> "+date);
+
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+        try {
+            calendar.setTime(dateFormat.parse(date));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+//        String dataUltimoAcesso = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm").print(calendar.getTimeInMillis());
+        new addParamAsyncTask(appDatabase, calendar).execute();
 
     }
 
@@ -673,6 +707,47 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     public void add(final List<? extends EntidadeBase> entidadeBase, String entidade) {
 
         new addAsyncTask(appDatabase, entidade).execute(entidadeBase);
+    }
+
+    private class addParamAsyncTask extends AsyncTask<ParametroInterno, Void, Void> {
+
+        private AppDatabase db;
+        private ParametroInterno parametro;
+        private DateTime ultimoAcesso;
+
+        addParamAsyncTask(AppDatabase appDatabase, Calendar ultimoAcesso) {
+            db = appDatabase;
+            this.ultimoAcesso = new DateTime(ultimoAcesso);
+        }
+
+        @Override
+        protected Void doInBackground(final ParametroInterno... params) {
+
+            parametro = appDatabase.parametroInternoDAO().carregar();
+
+            if(parametro == null){
+                parametro = new ParametroInterno();
+                parametro.setId("1");
+                parametro.setDataCadastro(DateTime.now());
+                parametro.setAtivo(true);
+                parametro.setEnviado(true);
+
+                String identificadorUnico = Unique.geraIdentificadorUnico();
+
+                parametro.setIdentificadorUnico(identificadorUnico);
+            }
+
+            parametro.setDataUltimoAcesso(ultimoAcesso);
+            parametro.setUltimaAlteracao(DateTime.now());
+
+            db.parametroInternoDAO().inserir(parametro);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
     }
 
     private class addAsyncTask extends AsyncTask<List<? extends EntidadeBase>, Void, Void> {

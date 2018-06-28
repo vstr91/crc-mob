@@ -3,11 +3,15 @@ package br.com.vostre.circular.viewModel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.databinding.ObservableField;
 import android.os.AsyncTask;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
+import java.util.Calendar;
 import java.util.List;
+import java.util.Observable;
 
 import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Cidade;
@@ -30,14 +34,26 @@ import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.dao.PaisDAO;
 import br.com.vostre.circular.utils.StringUtils;
+import br.com.vostre.circular.utils.Unique;
 
 public class BaseViewModel extends AndroidViewModel {
 
     private AppDatabase appDatabase;
+    ObservableField<String> id;
+
+    public ObservableField<String> getId() {
+        return id;
+    }
+
+    public void setId(ObservableField<String> id) {
+        this.id = id;
+    }
 
     public BaseViewModel(Application app){
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
+        id = new ObservableField<>();
+        new paramAsyncTask(appDatabase).execute();
     }
 
     public void salvar(List<? extends EntidadeBase> dados, String entidade){
@@ -140,5 +156,48 @@ public class BaseViewModel extends AndroidViewModel {
     }
 
     // fim adicionar
+
+    private class paramAsyncTask extends AsyncTask<ParametroInterno, Void, Void> {
+
+        private AppDatabase db;
+        private ParametroInterno parametro;
+
+        paramAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final ParametroInterno... params) {
+
+            parametro = appDatabase.parametroInternoDAO().carregar();
+
+            if(parametro == null){
+                parametro = new ParametroInterno();
+                parametro.setId("1");
+                parametro.setDataCadastro(DateTime.now());
+                parametro.setAtivo(true);
+                parametro.setEnviado(true);
+
+                String identificadorUnico = Unique.geraIdentificadorUnico();
+
+                parametro.setIdentificadorUnico(identificadorUnico);
+
+                parametro.setDataUltimoAcesso(DateTimeFormat.forPattern("dd/mm/yyyy").parseDateTime("01/01/2000"));
+                parametro.setUltimaAlteracao(DateTime.now());
+
+                db.parametroInternoDAO().inserir(parametro);
+
+            }
+
+            id.set(parametro.getIdentificadorUnico());
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+    }
 
 }

@@ -2,6 +2,7 @@ package br.com.vostre.circular.view;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -47,6 +48,8 @@ import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.utils.ToolbarUtils;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
+import br.com.vostre.circular.databinding.DrawerHeaderBinding;
+
 import static br.com.vostre.circular.utils.ToolbarUtils.PICK_FILE;
 
 public class BaseActivity extends AppCompatActivity implements View.OnClickListener {
@@ -65,7 +68,10 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
+        //viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
+
+//        DrawerHeaderBinding binding = DataBindingUtil.setContentView(this, R.layout.drawer_header);
+//        binding.setViewModel(viewModel);
 
     }
 

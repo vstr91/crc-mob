@@ -33,6 +33,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -58,6 +59,7 @@ import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.utils.Constants;
+import br.com.vostre.circular.utils.Crypt;
 import br.com.vostre.circular.utils.JsonUtils;
 import br.com.vostre.circular.utils.Unique;
 import br.com.vostre.circular.view.BaseActivity;
@@ -83,6 +85,28 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     Context ctx;
     AppDatabase appDatabase;
     String baseUrl;
+
+    ParametroInterno parametroInterno;
+    String token;
+
+    List<? extends EntidadeBase> paises;
+    List<? extends EntidadeBase> empresas;
+    List<? extends EntidadeBase> onibus;
+    List<? extends EntidadeBase> estados;
+    List<? extends EntidadeBase> cidades;
+    List<? extends EntidadeBase> bairros;
+    List<? extends EntidadeBase> paradas;
+    List<? extends EntidadeBase> itinerarios;
+    List<? extends EntidadeBase> horarios;
+    List<? extends EntidadeBase> paradasItinerario;
+    List<? extends EntidadeBase> secoesItinerarios;
+    List<? extends EntidadeBase> horariosItinerarios;
+    List<? extends EntidadeBase> mensagens;
+    List<? extends EntidadeBase> parametros;
+    List<? extends EntidadeBase> pontosInteresse;
+    List<? extends EntidadeBase> usuarios;
+
+    Crypt crypt;
 
     /**
      * Set up the sync adapter
@@ -130,78 +154,20 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
         appDatabase = AppDatabase.getAppDatabase(this.getContext());
 
-        List<? extends EntidadeBase> paises = appDatabase.paisDAO().listarTodosAEnviar();
-        List<? extends EntidadeBase> empresas = appDatabase.empresaDAO().listarTodosAEnviar();
-        List<? extends EntidadeBase> onibus = appDatabase.onibusDAO().listarTodosAEnviar();
-        List<? extends EntidadeBase> estados = appDatabase.estadoDAO().listarTodosAEnviar();
-        List<? extends EntidadeBase> cidades = appDatabase.cidadeDAO().listarTodosAEnviar();
-        List<? extends EntidadeBase> bairros = appDatabase.bairroDAO().listarTodosAEnviar();
-        List<? extends EntidadeBase> paradas = appDatabase.paradaDAO().listarTodosAEnviar();
-        List<? extends EntidadeBase> itinerarios = appDatabase.itinerarioDAO().listarTodosAEnviar();
-        List<? extends EntidadeBase> horarios = appDatabase.horarioDAO().listarTodosAEnviar();
-        List<? extends EntidadeBase> paradasItinerario = appDatabase.paradaItinerarioDAO().listarTodosAEnviar();
-        List<? extends EntidadeBase> secoesItinerarios = appDatabase.secaoItinerarioDAO().listarTodosAEnviar();
-        List<? extends EntidadeBase> horariosItinerarios = appDatabase.horarioItinerarioDAO().listarTodosAEnviar();
-        List<? extends EntidadeBase> mensagens = appDatabase.mensagemDAO().listarTodosAEnviar();
-        List<? extends EntidadeBase> parametros = appDatabase.parametroDAO().listarTodosAEnviar();
-        List<? extends EntidadeBase> pontosInteresse = appDatabase.pontoInteresseDAO().listarTodosAEnviar();
-        List<? extends EntidadeBase> usuarios = appDatabase.usuarioDAO().listarTodosAEnviar();
-
-        String strPaises = "\"paises\": "+JsonUtils.toJson((List<EntidadeBase>) paises);
-        String strEmpresas = "\"empresas\": "+JsonUtils.toJson((List<EntidadeBase>) empresas);
-        String strOnibus = "\"onibus\": "+JsonUtils.toJson((List<EntidadeBase>) onibus);
-        String strEstados = "\"estados\": "+JsonUtils.toJson((List<EntidadeBase>) estados);
-        String strCidades = "\"cidades\": "+JsonUtils.toJson((List<EntidadeBase>) cidades);
-        String strBairros = "\"bairros\": "+JsonUtils.toJson((List<EntidadeBase>) bairros);
-        String strParadas = "\"paradas\": "+JsonUtils.toJson((List<EntidadeBase>) paradas);
-        String strItinerarios = "\"itinerarios\": "+JsonUtils.toJson((List<EntidadeBase>) itinerarios);
-        String strHorarios = "\"horarios\": "+JsonUtils.toJson((List<EntidadeBase>) horarios);
-        String strParadasItinerarios = "\"paradas_itinerarios\": "+JsonUtils.toJson((List<EntidadeBase>) paradasItinerario);
-        String strSecoesItinerarios = "\"secoes_itinerarios\": "+JsonUtils.toJson((List<EntidadeBase>) secoesItinerarios);
-        String strHorariosItinerarios = "\"horarios_itinerarios\": "+JsonUtils.toJson((List<EntidadeBase>) horariosItinerarios);
-        String strMensagens = "\"mensagens\": "+JsonUtils.toJson((List<EntidadeBase>) mensagens);
-        String strParametros = "\"parametros\": "+JsonUtils.toJson((List<EntidadeBase>) parametros);
-        String strPontosInteresse = "\"pontos_interesse\": "+JsonUtils.toJson((List<EntidadeBase>) pontosInteresse);
-        String strUsuarios = "\"usuarios\": "+JsonUtils.toJson((List<EntidadeBase>) usuarios);
-
-        String json = "{"+strPaises+","+strEmpresas+","+strOnibus+","+strEstados+","+strCidades+","
-                +strBairros+","+strParadas+","+strItinerarios+","+strHorarios+","+strParadasItinerarios+","
-                +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
-                +strPontosInteresse+","+strUsuarios+"}";
-
-        // EXPORTA ARQUIVO DE DADOS
-        ///*
-        File caminho = Environment.getExternalStorageDirectory();
-
-        File arquivo = new File(caminho, "data.txt");
-
-        FileOutputStream stream = null;
-
-        try {
-            stream = new FileOutputStream(arquivo);
-            stream.write(json.getBytes());
-            stream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //*/
-
         baseUrl = appDatabase.parametroDAO().carregarPorSlug("servidor");
+        crypt = new Crypt();
 
         if(baseUrl == null){
             baseUrl = Constants.BASE_URL;
         }
 
-        int registros = paises.size()+empresas.size()+onibus.size()+estados.size()+cidades.size()
-                +bairros.size()+paradas.size()+itinerarios.size()+horarios.size()+paradasItinerario.size()
-                +secoesItinerarios.size()+horariosItinerarios.size()+mensagens.size()+parametros.size()+pontosInteresse.size()+usuarios.size();
+        parametroInterno = appDatabase.parametroInternoDAO().carregar();
 
-        if(registros > 0){
-            chamaAPI(registros, json, 0, baseUrl);
-        } else{
-            chamaAPI(0, null, 1, baseUrl);
+        try {
+            requisitaToken(parametroInterno.getIdentificadorUnico());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
 
     }
 
@@ -212,7 +178,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             Toast.makeText(ctx, "Envio de dados efetuado com sucesso!", Toast.LENGTH_SHORT).show();
             Toast.makeText(ctx, "Iniciando recebimento de dados...", Toast.LENGTH_SHORT).show();
 
-            chamaAPI(0, null, 1, baseUrl);
+            chamaAPI(0, null, 1, baseUrl, token);
 
         } else{
             Toast.makeText(ctx, "Código de resposta: "+response.code()+" | Mensagem: "+response.message(),
@@ -226,7 +192,51 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         Toast.makeText(ctx, "Problema ao acessar: "+t.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
-    private void chamaAPI(Integer registros, String json, Integer tipo, String baseUrl) {
+    private void requisitaToken(String id) throws Exception{
+        Retrofit retrofit = new Retrofit.Builder()
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .baseUrl(baseUrl)
+                .build();
+
+        CircularAPI api = retrofit.create(CircularAPI.class);
+
+        id = crypt.bytesToHex(crypt.encrypt(id));
+
+        Call<String> call = api.requisitaToken(id);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+
+                System.out.println("RESP CODE >>>>> "+response.code());
+
+                if(response.code() == 200){
+
+                    token = response.body();
+                    System.out.println("TOKEN >>>>> "+token);
+
+                    try {
+                        token = crypt.bytesToHex(crypt.encrypt(token));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    new listaDadosAsyncTask(appDatabase).execute();
+
+                } else{
+                    //erro
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+
+    }
+
+    private void chamaAPI(Integer registros, String json, Integer tipo, String baseUrl, String token) {
 
         Gson gson;
 
@@ -255,7 +265,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 paramObject.put("qtd", registros);
 
                 CircularAPI api = retrofit.create(CircularAPI.class);
-                Call<String> call = api.enviaDados(paramObject.toString());
+                Call<String> call = api.enviaDados(paramObject.toString(), token);
                 call.enqueue(this);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -263,15 +273,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         } else{
             CircularAPI api = retrofit.create(CircularAPI.class);
 
-            ParametroInterno parametroInterno = appDatabase.parametroInternoDAO().carregar();
             String data = "-";
-            System.out.println("IU ::::::: "+parametroInterno.getIdentificadorUnico());
 
             if(parametroInterno != null){
                 data = DateTimeFormat.forPattern("yyyy-MM-dd-HH-mm-ss").print(parametroInterno.getDataUltimoAcesso());
             }
 
-            Call<String> call = api.recebeDados(data);
+            Call<String> call = api.recebeDados(token, data);
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
@@ -702,6 +710,91 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
     }
 
+    private class listaDadosAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        private AppDatabase db;
+
+        listaDadosAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+
+            paises = appDatabase.paisDAO().listarTodosAEnviar();
+            empresas = appDatabase.empresaDAO().listarTodosAEnviar();
+            onibus = appDatabase.onibusDAO().listarTodosAEnviar();
+            estados = appDatabase.estadoDAO().listarTodosAEnviar();
+            cidades = appDatabase.cidadeDAO().listarTodosAEnviar();
+            bairros = appDatabase.bairroDAO().listarTodosAEnviar();
+            paradas = appDatabase.paradaDAO().listarTodosAEnviar();
+            itinerarios = appDatabase.itinerarioDAO().listarTodosAEnviar();
+            horarios = appDatabase.horarioDAO().listarTodosAEnviar();
+            paradasItinerario = appDatabase.paradaItinerarioDAO().listarTodosAEnviar();
+            secoesItinerarios = appDatabase.secaoItinerarioDAO().listarTodosAEnviar();
+            horariosItinerarios = appDatabase.horarioItinerarioDAO().listarTodosAEnviar();
+            mensagens = appDatabase.mensagemDAO().listarTodosAEnviar();
+            parametros = appDatabase.parametroDAO().listarTodosAEnviar();
+            pontosInteresse = appDatabase.pontoInteresseDAO().listarTodosAEnviar();
+            usuarios = appDatabase.usuarioDAO().listarTodosAEnviar();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            String strPaises = "\"paises\": "+JsonUtils.toJson((List<EntidadeBase>) paises);
+            String strEmpresas = "\"empresas\": "+JsonUtils.toJson((List<EntidadeBase>) empresas);
+            String strOnibus = "\"onibus\": "+JsonUtils.toJson((List<EntidadeBase>) onibus);
+            String strEstados = "\"estados\": "+JsonUtils.toJson((List<EntidadeBase>) estados);
+            String strCidades = "\"cidades\": "+JsonUtils.toJson((List<EntidadeBase>) cidades);
+            String strBairros = "\"bairros\": "+JsonUtils.toJson((List<EntidadeBase>) bairros);
+            String strParadas = "\"paradas\": "+JsonUtils.toJson((List<EntidadeBase>) paradas);
+            String strItinerarios = "\"itinerarios\": "+JsonUtils.toJson((List<EntidadeBase>) itinerarios);
+            String strHorarios = "\"horarios\": "+JsonUtils.toJson((List<EntidadeBase>) horarios);
+            String strParadasItinerarios = "\"paradas_itinerarios\": "+JsonUtils.toJson((List<EntidadeBase>) paradasItinerario);
+            String strSecoesItinerarios = "\"secoes_itinerarios\": "+JsonUtils.toJson((List<EntidadeBase>) secoesItinerarios);
+            String strHorariosItinerarios = "\"horarios_itinerarios\": "+JsonUtils.toJson((List<EntidadeBase>) horariosItinerarios);
+            String strMensagens = "\"mensagens\": "+JsonUtils.toJson((List<EntidadeBase>) mensagens);
+            String strParametros = "\"parametros\": "+JsonUtils.toJson((List<EntidadeBase>) parametros);
+            String strPontosInteresse = "\"pontos_interesse\": "+JsonUtils.toJson((List<EntidadeBase>) pontosInteresse);
+            String strUsuarios = "\"usuarios\": "+JsonUtils.toJson((List<EntidadeBase>) usuarios);
+
+            String json = "{"+strPaises+","+strEmpresas+","+strOnibus+","+strEstados+","+strCidades+","
+                    +strBairros+","+strParadas+","+strItinerarios+","+strHorarios+","+strParadasItinerarios+","
+                    +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
+                    +strPontosInteresse+","+strUsuarios+"}";
+
+            // EXPORTA ARQUIVO DE DADOS
+            ///*
+            File caminho = Environment.getExternalStorageDirectory();
+
+            File arquivo = new File(caminho, "data.txt");
+
+            FileOutputStream stream = null;
+
+            try {
+                stream = new FileOutputStream(arquivo);
+                stream.write(json.getBytes());
+                stream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            //*/
+
+            int registros = paises.size()+empresas.size()+onibus.size()+estados.size()+cidades.size()
+                    +bairros.size()+paradas.size()+itinerarios.size()+horarios.size()+paradasItinerario.size()
+                    +secoesItinerarios.size()+horariosItinerarios.size()+mensagens.size()+parametros.size()+pontosInteresse.size()+usuarios.size();
+
+            if(registros > 0){
+                chamaAPI(registros, json, 0, baseUrl, token);
+            } else{
+                chamaAPI(0, null, 1, baseUrl, token);
+            }
+        }
+    }
+
     // adicionar
 
     public void add(final List<? extends EntidadeBase> entidadeBase, String entidade) {
@@ -724,18 +817,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         protected Void doInBackground(final ParametroInterno... params) {
 
             parametro = appDatabase.parametroInternoDAO().carregar();
-
-            if(parametro == null){
-                parametro = new ParametroInterno();
-                parametro.setId("1");
-                parametro.setDataCadastro(DateTime.now());
-                parametro.setAtivo(true);
-                parametro.setEnviado(true);
-
-                String identificadorUnico = Unique.geraIdentificadorUnico();
-
-                parametro.setIdentificadorUnico(identificadorUnico);
-            }
 
             parametro.setDataUltimoAcesso(ultimoAcesso);
             parametro.setUltimaAlteracao(DateTime.now());

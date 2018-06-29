@@ -27,7 +27,7 @@ import br.com.vostre.circular.utils.StringUtils;
 
 public class CidadesViewModel extends AndroidViewModel {
 
-    private AppDatabase appDatabase;
+    private static AppDatabase appDatabase;
 
     public LiveData<List<CidadeEstado>> cidades;
     public CidadeEstado cidade;
@@ -112,6 +112,7 @@ public class CidadesViewModel extends AndroidViewModel {
                     }
 
                     cidade.getCidade().setBrasao(file.getName());
+                    cidade.getCidade().setImagemEnviada(false);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -178,6 +179,11 @@ public class CidadesViewModel extends AndroidViewModel {
 
     // editar
 
+    public static void edit(final Cidade cidade) {
+
+        new editCidadeAsyncTask(appDatabase).execute(cidade);
+    }
+
     public void edit(final CidadeEstado cidade) {
 
         cidade.getCidade().setUltimaAlteracao(new DateTime());
@@ -194,6 +200,22 @@ public class CidadesViewModel extends AndroidViewModel {
         }
 
         new editAsyncTask(appDatabase).execute(cidade);
+    }
+
+    private static class editCidadeAsyncTask extends AsyncTask<Cidade, Void, Void> {
+
+        private AppDatabase db;
+
+        editCidadeAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final Cidade... params) {
+            db.cidadeDAO().editar((params[0]));
+            return null;
+        }
+
     }
 
     private static class editAsyncTask extends AsyncTask<CidadeEstado, Void, Void> {

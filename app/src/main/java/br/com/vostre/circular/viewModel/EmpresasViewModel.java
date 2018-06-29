@@ -23,7 +23,7 @@ import br.com.vostre.circular.utils.StringUtils;
 
 public class EmpresasViewModel extends AndroidViewModel {
 
-    private AppDatabase appDatabase;
+    private static AppDatabase appDatabase;
 
     public LiveData<List<Empresa>> empresas;
     public Empresa empresa;
@@ -150,6 +150,27 @@ public class EmpresasViewModel extends AndroidViewModel {
     // fim adicionar
 
     // editar
+
+    public static void editEmpresa(final Empresa empresa) {
+
+        new editEmpresaAsyncTask(appDatabase).execute(empresa);
+    }
+
+    private static class editEmpresaAsyncTask extends AsyncTask<Empresa, Void, Void> {
+
+        private AppDatabase db;
+
+        editEmpresaAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final Empresa... params) {
+            db.empresaDAO().editar((params[0]));
+            return null;
+        }
+
+    }
 
     public void edit(final Empresa empresa) {
 

@@ -24,6 +24,9 @@ public interface ParadaDAO {
     @Query("SELECT * FROM parada WHERE enviado = 0")
     List<Parada> listarTodosAEnviar();
 
+    @Query("SELECT * FROM parada WHERE imagemEnviada = 0")
+    List<Parada> listarTodosImagemAEnviar();
+
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada p " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +

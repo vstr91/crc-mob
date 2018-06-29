@@ -13,6 +13,18 @@ public class Cidade extends EntidadeSlug {
     @NonNull
     private String estado;
 
+    @NonNull
+    private boolean imagemEnviada = true;
+
+    @NonNull
+    public boolean isImagemEnviada() {
+        return imagemEnviada;
+    }
+
+    public void setImagemEnviada(@NonNull boolean imagemEnviada) {
+        this.imagemEnviada = imagemEnviada;
+    }
+
     public String getBrasao() {
         return brasao;
     }

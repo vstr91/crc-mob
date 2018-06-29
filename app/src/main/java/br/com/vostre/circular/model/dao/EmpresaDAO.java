@@ -27,6 +27,9 @@ public interface EmpresaDAO {
     @Query("SELECT * FROM empresa WHERE enviado = 0")
     List<Empresa> listarTodosAEnviar();
 
+    @Query("SELECT * FROM empresa WHERE imagemEnviada = 0")
+    List<Empresa> listarTodosImagemAEnviar();
+
     @Query("SELECT * FROM empresa WHERE id = :id")
     LiveData<Empresa> carregar(String id);
 

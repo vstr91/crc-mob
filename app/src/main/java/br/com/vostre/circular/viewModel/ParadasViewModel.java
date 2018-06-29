@@ -181,6 +181,7 @@ public class ParadasViewModel extends AndroidViewModel {
                     }
 
                     parada.getParada().setImagem(file.getName());
+                    parada.getParada().setImagemEnviada(false);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

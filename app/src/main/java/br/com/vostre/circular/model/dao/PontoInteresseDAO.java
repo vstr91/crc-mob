@@ -24,6 +24,9 @@ public interface PontoInteresseDAO {
     @Query("SELECT * FROM ponto_interesse WHERE enviado = 0")
     List<PontoInteresse> listarTodosAEnviar();
 
+    @Query("SELECT * FROM ponto_interesse WHERE imagemEnviada = 0")
+    List<PontoInteresse> listarTodosImagemAEnviar();
+
     @Query("SELECT * FROM ponto_interesse WHERE id IN (:ids)")
     List<PontoInteresse> carregarTodosPorIds(int[] ids);
 

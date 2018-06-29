@@ -24,6 +24,18 @@ public class PontoInteresse extends EntidadeSlug {
     private DateTime dataFinal;
 
     @NonNull
+    private boolean imagemEnviada = true;
+
+    @NonNull
+    public boolean isImagemEnviada() {
+        return imagemEnviada;
+    }
+
+    public void setImagemEnviada(@NonNull boolean imagemEnviada) {
+        this.imagemEnviada = imagemEnviada;
+    }
+
+    @NonNull
     public Double getLatitude() {
         return latitude;
     }

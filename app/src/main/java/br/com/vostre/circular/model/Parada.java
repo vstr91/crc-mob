@@ -22,6 +22,9 @@ public class Parada extends EntidadeSlug {
     private String bairro;
 
     @NonNull
+    private boolean imagemEnviada = true;
+
+    @NonNull
     public Double getLatitude() {
         return latitude;
     }
@@ -62,6 +65,15 @@ public class Parada extends EntidadeSlug {
 
     public void setBairro(@NonNull String bairro) {
         this.bairro = bairro;
+    }
+
+    @NonNull
+    public boolean isImagemEnviada() {
+        return imagemEnviada;
+    }
+
+    public void setImagemEnviada(@NonNull boolean imagemEnviada) {
+        this.imagemEnviada = imagemEnviada;
     }
 
     public boolean valida(Parada parada) {

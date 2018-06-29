@@ -64,6 +64,11 @@ import br.com.vostre.circular.utils.JsonUtils;
 import br.com.vostre.circular.utils.Unique;
 import br.com.vostre.circular.view.BaseActivity;
 import br.com.vostre.circular.viewModel.BaseViewModel;
+import br.com.vostre.circular.viewModel.CidadesViewModel;
+import br.com.vostre.circular.viewModel.EmpresasViewModel;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -88,6 +93,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
     ParametroInterno parametroInterno;
     String token;
+    String tokenImagem;
 
     List<? extends EntidadeBase> paises;
     List<? extends EntidadeBase> empresas;
@@ -163,8 +169,29 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
         parametroInterno = appDatabase.parametroInternoDAO().carregar();
 
+        if(parametroInterno == null){
+            parametroInterno = new ParametroInterno();
+            parametroInterno.setId("1");
+            parametroInterno.setDataCadastro(DateTime.now());
+            parametroInterno.setAtivo(true);
+            parametroInterno.setEnviado(true);
+
+            String identificadorUnico = Unique.geraIdentificadorUnico();
+
+            parametroInterno.setIdentificadorUnico(identificadorUnico);
+
+            parametroInterno.setDataUltimoAcesso(DateTimeFormat.forPattern("dd/mm/yyyy").parseDateTime("01/01/2000"));
+            parametroInterno.setUltimaAlteracao(DateTime.now());
+
+            appDatabase.parametroInternoDAO().inserir(parametroInterno);
+
+        }
+
+        System.out.println("PARAM "+parametroInterno.getIdentificadorUnico());
+
         try {
-            requisitaToken(parametroInterno.getIdentificadorUnico());
+            requisitaToken(parametroInterno.getIdentificadorUnico(), 0);
+            requisitaToken(parametroInterno.getIdentificadorUnico(), 1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -192,7 +219,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         Toast.makeText(ctx, "Problema ao acessar: "+t.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
-    private void requisitaToken(String id) throws Exception{
+    private void requisitaToken(String id, int tipo) throws Exception{
         Retrofit retrofit = new Retrofit.Builder()
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .baseUrl(baseUrl)
@@ -202,37 +229,73 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
         id = crypt.bytesToHex(crypt.encrypt(id));
 
-        Call<String> call = api.requisitaToken(id);
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+        if(tipo == 0){
+            Call<String> call = api.requisitaToken(id);
+            call.enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
 
-                System.out.println("RESP CODE >>>>> "+response.code());
+                    System.out.println("RESP CODE >>>>> "+response.code());
 
-                if(response.code() == 200){
+                    if(response.code() == 200){
 
-                    token = response.body();
-                    System.out.println("TOKEN >>>>> "+token);
+                        token = response.body();
+                        System.out.println("TOKEN >>>>> "+token);
 
-                    try {
-                        token = crypt.bytesToHex(crypt.encrypt(token));
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        try {
+                            token = crypt.bytesToHex(crypt.encrypt(token));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        new listaDadosAsyncTask(appDatabase).execute();
+
+                    } else{
+                        //erro
                     }
 
-                    new listaDadosAsyncTask(appDatabase).execute();
-
-                } else{
-                    //erro
                 }
 
-            }
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
 
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
+                }
+            });
+        } else{
+            Call<String> call = api.requisitaToken(id);
+            call.enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
 
-            }
-        });
+                    System.out.println("RESP CODE >>>>> "+response.code());
+
+                    if(response.code() == 200){
+
+                        tokenImagem = response.body();
+                        System.out.println("TOKEN >>>>> "+tokenImagem);
+
+                        try {
+                            tokenImagem = crypt.bytesToHex(crypt.encrypt(tokenImagem));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        new enviaImagemAsyncTask(appDatabase).execute();
+
+                    } else{
+                        //erro
+                    }
+
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+
+                }
+            });
+        }
+
+
 
     }
 
@@ -795,6 +858,92 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         }
     }
 
+    private class enviaImagemAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        private AppDatabase db;
+
+        enviaImagemAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        List<Empresa> empresas;
+        List<Cidade> cidades;
+        List<Parada> paradas;
+        List<PontoInteresse> pontosInteresse;
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+
+            empresas = appDatabase.empresaDAO().listarTodosImagemAEnviar();
+            cidades = appDatabase.cidadeDAO().listarTodosImagemAEnviar();
+            paradas = appDatabase.paradaDAO().listarTodosImagemAEnviar();
+            pontosInteresse = appDatabase.pontoInteresseDAO().listarTodosImagemAEnviar();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(baseUrl)
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .build();
+
+            for(final Cidade cidade : cidades){
+
+                File imagem = new File(getContext().getApplicationContext().getFilesDir(),  cidade.getBrasao());
+
+                RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
+                MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
+                RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
+
+                CircularAPI api = retrofit.create(CircularAPI.class);
+                Call<String> call = api.enviaImagem(body, name, tokenImagem);
+                call.enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        cidade.setImagemEnviada(true);
+                        CidadesViewModel.edit(cidade);
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+
+                    }
+                });
+
+            }
+
+            for(final Empresa empresa : empresas){
+
+                File imagem = new File(getContext().getApplicationContext().getFilesDir(),  empresa.getLogo());
+
+                RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
+                MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
+                RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
+
+                CircularAPI api = retrofit.create(CircularAPI.class);
+                Call<String> call = api.enviaImagem(body, name, tokenImagem);
+                call.enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        empresa.setImagemEnviada(true);
+                        EmpresasViewModel.editEmpresa(empresa);
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+
+                    }
+                });
+
+            }
+
+        }
+    }
+
     // adicionar
 
     public void add(final List<? extends EntidadeBase> entidadeBase, String entidade) {
@@ -902,13 +1051,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     db.parametroDAO().inserirTodos((List<Parametro>) params[0]);
                     break;
                 case "ponto_interesse":
-                    System.out.println("RESPONSE USUARIO");
                     db.pontoInteresseDAO().deletarTodos();
                     db.pontoInteresseDAO().inserirTodos((List<PontoInteresse>) params[0]);
                     break;
                 case "usuario":
                     db.usuarioDAO().deletarTodos();
-                    System.out.println("RESPONSE USUARIO");
                     db.usuarioDAO().inserirTodos((List<Usuario>) params[0]);
                     break;
             }

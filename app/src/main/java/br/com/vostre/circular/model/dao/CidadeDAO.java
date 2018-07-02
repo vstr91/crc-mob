@@ -16,10 +16,10 @@ import br.com.vostre.circular.model.pojo.CidadeEstado;
 @Dao
 public interface CidadeDAO {
 
-    @Query("SELECT * FROM cidade")
+    @Query("SELECT * FROM cidade ORDER BY nome")
     LiveData<List<Cidade>> listarTodos();
 
-    @Query("SELECT * FROM cidade WHERE ativo = 1")
+    @Query("SELECT * FROM cidade WHERE ativo = 1 ORDER BY nome")
     List<Cidade> listarTodosAtivos();
 
     @Query("SELECT * FROM cidade WHERE enviado = 0")
@@ -28,7 +28,7 @@ public interface CidadeDAO {
     @Query("SELECT * FROM cidade WHERE imagemEnviada = 0 AND brasao IS NOT NULL")
     List<Cidade> listarTodosImagemAEnviar();
 
-    @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado FROM cidade c INNER JOIN estado e ON e.id = c.estado")
+    @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado FROM cidade c INNER JOIN estado e ON e.id = c.estado ORDER BY c.nome")
     LiveData<List<CidadeEstado>> listarTodosComEstado();
 
     @Query("SELECT * FROM cidade WHERE id IN (:ids)")

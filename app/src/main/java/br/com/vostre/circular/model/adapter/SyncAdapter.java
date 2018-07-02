@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.squareup.picasso.Picasso;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -458,6 +459,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     cidade.setImagemEnviada(false);
 
                     lstCidades.add(cidade);
+
+                    if(!cidade.getBrasao().isEmpty()){
+                        File brasao = new File(getContext().getApplicationContext().getFilesDir(), cidade.getBrasao());
+
+                        if(!brasao.exists() && !brasao.canWrite()){
+//                            Picasso.get().load("localhost/crc-web/web/app_dev.php/api/recebe-imagem/"+cidade.getBrasao().replace(".png", "")).
+                        }
+                    }
 
                 }
 
@@ -918,7 +927,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                             CidadesViewModel.edit(cidade, getContext().getApplicationContext());
                         } else{
                             Toast.makeText(getContext().getApplicationContext(),
-                                    "Erro ao enviar imagem de "+cidade.getNome()+" para o servidor",
+                                    "Erro "+response.code()+" ("+response.message()+") ao enviar imagem de "+cidade.getNome()+" para o servidor",
                                     Toast.LENGTH_SHORT).show();
                         }
 
@@ -927,7 +936,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
                         Toast.makeText(getContext().getApplicationContext(),
-                                "Erro ao enviar imagem de "+cidade.getNome()+" para o servidor",
+                                "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+cidade.getNome()+" para o servidor",
                                 Toast.LENGTH_SHORT).show();
                     }
                 });

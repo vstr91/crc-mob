@@ -24,6 +24,7 @@ import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.dao.CidadeDAO;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
+import br.com.vostre.circular.utils.ImageUtils;
 import br.com.vostre.circular.utils.StringUtils;
 
 public class CidadesViewModel extends AndroidViewModel {
@@ -96,6 +97,10 @@ public class CidadesViewModel extends AndroidViewModel {
 
         try {
             fos = new FileOutputStream(file);
+
+            int adjustedHeight = 200 * brasao.getHeight() / brasao.getWidth();
+
+            brasao = Bitmap.createScaledBitmap(brasao, 200, adjustedHeight, false);
             brasao.compress(Bitmap.CompressFormat.PNG, 100, fos);
         } catch (FileNotFoundException e) {
             e.printStackTrace();

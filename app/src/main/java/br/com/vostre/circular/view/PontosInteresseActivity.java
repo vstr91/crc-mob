@@ -4,9 +4,13 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.DrawableContainer;
 import android.location.Location;
 import android.support.annotation.NonNull;
@@ -31,6 +35,8 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.List;
 
 import br.com.vostre.circular.R;
@@ -38,6 +44,7 @@ import br.com.vostre.circular.databinding.ActivityPontosInteresseBinding;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.DialogUtils;
 import br.com.vostre.circular.view.form.FormPontoInteresse;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.view.utils.InfoWindowPOI;
@@ -58,6 +65,8 @@ public class PontosInteresseActivity extends BaseActivity {
     AppCompatActivity ctx;
     MyLocationNewOverlay mLocationOverlay;
     MapEventsOverlay overlayEvents;
+
+    FormPontoInteresse formPontoInteresse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +130,7 @@ public class PontosInteresseActivity extends BaseActivity {
 //                    Toast.makeText(getBaseContext(),p.getLatitude() + " - "
 //                            +p.getLongitude(),Toast.LENGTH_LONG).show();
 
-                    FormPontoInteresse formPontoInteresse = new FormPontoInteresse();
+                    formPontoInteresse = new FormPontoInteresse();
                     formPontoInteresse.setLatitude(p.getLatitude());
                     formPontoInteresse.setLongitude(p.getLongitude());
                     formPontoInteresse.setCtx(getApplication());
@@ -172,7 +181,7 @@ public class PontosInteresseActivity extends BaseActivity {
     public void onFabClick(View v){
 
         if(viewModel.localAtual != null){
-            FormPontoInteresse formPontoInteresse = new FormPontoInteresse();
+            formPontoInteresse = new FormPontoInteresse();
             formPontoInteresse.setLatitude(viewModel.localAtual.getValue().getLatitude());
             formPontoInteresse.setLongitude(viewModel.localAtual.getValue().getLongitude());
             formPontoInteresse.setCtx(getApplication());
@@ -184,6 +193,23 @@ public class PontosInteresseActivity extends BaseActivity {
     public void onFabLocationClick(View v){
         mapController.animateTo(new GeoPoint(viewModel.localAtual.getValue().getLatitude(),
                 viewModel.localAtual.getValue().getLongitude()));
+    }
+
+    public boolean onFabLocationLongClick(View v){
+        viewModel.centralizaMapa = !viewModel.centralizaMapa;
+
+        if(viewModel.centralizaMapa){
+            mapController.animateTo(new GeoPoint(viewModel.localAtual.getValue().getLatitude(),
+                    viewModel.localAtual.getValue().getLongitude()));
+            v.setBackgroundTintList(ColorStateList.valueOf(Color.GREEN));
+        } else{
+            v.setBackgroundTintList(ColorStateList.valueOf(Color.DKGRAY));
+        }
+
+        v.invalidate();
+
+        return true;
+
     }
 
     @Override
@@ -266,7 +292,7 @@ public class PontosInteresseActivity extends BaseActivity {
 
             if(viewModel.centralizaMapa && centro.getLatitude() != 0.0 && centro.getLongitude() != 0.0){
                 setMapCenter(map, new GeoPoint(centro.getLatitude(), centro.getLongitude()));
-                viewModel.centralizaMapa = false;
+                //viewModel.centralizaMapa = false;
             }
 
         }
@@ -408,4 +434,28 @@ public class PontosInteresseActivity extends BaseActivity {
         }
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        formPontoInteresse = (FormPontoInteresse) DialogUtils.getOpenedDialog(this);
+
+        if (requestCode == FormPontoInteresse.PICK_IMAGE) {
+
+            if (data != null) {
+                try {
+                    InputStream inputStream = getContentResolver().openInputStream(data.getData());
+                    viewModel.foto = BitmapFactory.decodeStream(inputStream);
+                    formPontoInteresse.exibeImagem();
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+        }
+
+    }
+
 }

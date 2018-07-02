@@ -31,10 +31,10 @@ public interface MensagemDAO {
     @Query("SELECT * FROM mensagem WHERE id = :id")
     LiveData<Mensagem> carregarPorId(String id);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<Mensagem> mensagens);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserir(Mensagem mensagem);
 
     @Update

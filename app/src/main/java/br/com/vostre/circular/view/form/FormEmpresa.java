@@ -52,7 +52,7 @@ public class FormEmpresa extends FormBase {
 
     static Application ctx;
 
-    private static final int PICK_IMAGE = 300;
+    public static final int PICK_IMAGE = 300;
 
     public Empresa getEmpresa() {
         return empresa;
@@ -97,7 +97,7 @@ public class FormEmpresa extends FormBase {
         imageViewLogo.setVisibility(View.GONE);
         btnTrocarLogo.setVisibility(View.GONE);
 
-        viewModel = ViewModelProviders.of(this).get(EmpresasViewModel.class);
+        viewModel = ViewModelProviders.of(getActivity()).get(EmpresasViewModel.class);
 
         binding.setView(this);
         binding.setViewModel(viewModel);
@@ -219,7 +219,7 @@ public class FormEmpresa extends FormBase {
         binding.btnLogo.setVisibility(View.VISIBLE);
     }
 
-    private void exibeLogo(){
+    public void exibeLogo(){
         imageViewLogo.setImageBitmap(viewModel.logo);
         imageViewLogo.invalidate();
         imageViewLogo.setVisibility(View.VISIBLE);
@@ -231,7 +231,7 @@ public class FormEmpresa extends FormBase {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Escolha a imagem da logo"), PICK_IMAGE);
+        getActivity().startActivityForResult(Intent.createChooser(intent, "Escolha a imagem da logo"), PICK_IMAGE);
     }
 
     @BindingAdapter("srcCompat")
@@ -241,26 +241,6 @@ public class FormEmpresa extends FormBase {
             imageView.setImageBitmap(bitmap);
         }
 
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        if (requestCode == PICK_IMAGE) {
-
-            if(data != null){
-                try {
-                    InputStream inputStream = ctx.getContentResolver().openInputStream(data.getData());
-                    viewModel.logo = BitmapFactory.decodeStream(inputStream);
-                    exibeLogo();
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-
-
-        }
     }
 
 }

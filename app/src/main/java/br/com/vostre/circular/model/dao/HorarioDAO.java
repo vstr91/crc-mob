@@ -33,10 +33,10 @@ public interface HorarioDAO {
     @Query("SELECT * FROM horario WHERE nome LIKE :nome LIMIT 1")
     Horario encontrarPorNome(String nome);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<Horario> horarios);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserir(Horario horario);
 
     @Update

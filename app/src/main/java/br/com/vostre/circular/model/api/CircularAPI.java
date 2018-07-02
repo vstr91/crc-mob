@@ -27,7 +27,7 @@ public interface CircularAPI {
 
     @Headers("Content-Type: application/json")
     @POST("api/envia-dados/{token}")
-    Call<String> enviaDados(@Path("token") String token, @Body String json);
+    Call<String> enviaDados(@Body String json, @Path("token") String token);
 
     @GET("api/recebe-dados/{token}/{ultimoAcesso}")
     Call<String> recebeDados(@Path("token") String token, @Path("ultimoAcesso") String ultimoAcesso);

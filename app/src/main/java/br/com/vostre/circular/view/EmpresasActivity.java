@@ -2,17 +2,22 @@ package br.com.vostre.circular.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityEmpresasBinding;
 import br.com.vostre.circular.model.Empresa;
+import br.com.vostre.circular.utils.DialogUtils;
 import br.com.vostre.circular.view.adapter.EmpresaAdapter;
 import br.com.vostre.circular.view.form.FormEmpresa;
 import br.com.vostre.circular.viewModel.EmpresasViewModel;
@@ -25,6 +30,8 @@ public class EmpresasActivity extends BaseActivity {
     RecyclerView listEmpresas;
     List<Empresa> empresas;
     EmpresaAdapter adapter;
+
+    FormEmpresa formEmpresa;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +54,7 @@ public class EmpresasActivity extends BaseActivity {
     }
 
     public void onFabClick(View v){
-        FormEmpresa formEmpresa = new FormEmpresa();
+        formEmpresa = new FormEmpresa();
         formEmpresa.flagInicioEdicao = false;
         formEmpresa.setCtx(getApplication());
         formEmpresa.show(getSupportFragmentManager(), "formEmpresa");
@@ -60,5 +67,28 @@ public class EmpresasActivity extends BaseActivity {
             adapter.notifyDataSetChanged();
         }
     };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        formEmpresa = (FormEmpresa) DialogUtils.getOpenedDialog(this);
+
+        if (requestCode == FormEmpresa.PICK_IMAGE) {
+
+            if (data != null) {
+                try {
+                    InputStream inputStream = getContentResolver().openInputStream(data.getData());
+                    viewModel.logo = BitmapFactory.decodeStream(inputStream);
+                    formEmpresa.exibeLogo();
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+        }
+
+    }
 
 }

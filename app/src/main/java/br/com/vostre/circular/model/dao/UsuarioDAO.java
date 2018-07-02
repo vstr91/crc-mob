@@ -36,10 +36,10 @@ public interface UsuarioDAO {
     @Query("SELECT * FROM usuario WHERE email LIKE :email LIMIT 1")
     Usuario encontrarPorEmail(String email);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<Usuario> usuarios);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserir(Usuario usuario);
 
     @Update

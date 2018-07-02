@@ -37,10 +37,10 @@ public interface BairroDAO {
     @Query("SELECT * FROM bairro WHERE nome LIKE :nome LIMIT 1")
     Bairro encontrarPorNome(String nome);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<Bairro> bairros);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserir(Bairro bairro);
 
     @Update

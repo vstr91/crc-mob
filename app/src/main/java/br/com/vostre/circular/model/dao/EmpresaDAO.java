@@ -27,7 +27,7 @@ public interface EmpresaDAO {
     @Query("SELECT * FROM empresa WHERE enviado = 0")
     List<Empresa> listarTodosAEnviar();
 
-    @Query("SELECT * FROM empresa WHERE imagemEnviada = 0")
+    @Query("SELECT * FROM empresa WHERE imagemEnviada = 0 AND logo IS NOT NULL")
     List<Empresa> listarTodosImagemAEnviar();
 
     @Query("SELECT * FROM empresa WHERE id = :id")
@@ -42,7 +42,7 @@ public interface EmpresaDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<Empresa> empresas);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserir(Empresa empresa);
 
     @Update

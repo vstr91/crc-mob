@@ -25,7 +25,7 @@ public interface CidadeDAO {
     @Query("SELECT * FROM cidade WHERE enviado = 0")
     List<Cidade> listarTodosAEnviar();
 
-    @Query("SELECT * FROM cidade WHERE imagemEnviada = 0")
+    @Query("SELECT * FROM cidade WHERE imagemEnviada = 0 AND brasao IS NOT NULL")
     List<Cidade> listarTodosImagemAEnviar();
 
     @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado FROM cidade c INNER JOIN estado e ON e.id = c.estado")
@@ -37,10 +37,10 @@ public interface CidadeDAO {
     @Query("SELECT * FROM cidade WHERE nome LIKE :nome LIMIT 1")
     Cidade encontrarPorNome(String nome);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<Cidade> cidadees);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserir(Cidade cidade);
 
     @Update

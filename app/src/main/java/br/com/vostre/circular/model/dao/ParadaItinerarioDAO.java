@@ -44,10 +44,10 @@ public interface ParadaItinerarioDAO {
     @Query("UPDATE parada_itinerario SET ativo = 0 WHERE itinerario = :itinerario")
     void invalidaTodosPorItinerario(String itinerario);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<ParadaItinerario> paradasItinerarios);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserir(ParadaItinerario paradaItinerario);
 
     @Update

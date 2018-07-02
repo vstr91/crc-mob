@@ -42,10 +42,10 @@ public interface HorarioItinerarioDAO {
     @Query("SELECT * FROM horario_itinerario WHERE id = :id")
     LiveData<HorarioItinerario> carregarPorId(String id);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<HorarioItinerario> horarioItinerarios);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserir(HorarioItinerario horarioItinerario);
 
     @Update

@@ -60,7 +60,7 @@ public class FormCidade extends FormBase {
 
     static Application ctx;
 
-    private static final int PICK_IMAGE = 300;
+    public static final int PICK_IMAGE = 300;
 
     public CidadeEstado getCidade() {
         return cidade;
@@ -105,7 +105,7 @@ public class FormCidade extends FormBase {
         imageViewBrasao.setVisibility(View.GONE);
         btnTrocarBrasao.setVisibility(View.GONE);
 
-        viewModel = ViewModelProviders.of(this).get(CidadesViewModel.class);
+        viewModel = ViewModelProviders.of(this.getActivity()).get(CidadesViewModel.class);
 
         binding.setView(this);
         binding.setViewModel(viewModel);
@@ -226,7 +226,7 @@ public class FormCidade extends FormBase {
         binding.btnBrasao.setVisibility(View.VISIBLE);
     }
 
-    private void exibeBrasao(){
+    public void exibeBrasao(){
         imageViewBrasao.setImageBitmap(viewModel.brasao);
         imageViewBrasao.invalidate();
         imageViewBrasao.setVisibility(View.VISIBLE);
@@ -273,7 +273,7 @@ public class FormCidade extends FormBase {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Escolha a imagem do brasão"), PICK_IMAGE);
+        getActivity().startActivityForResult(Intent.createChooser(intent, "Escolha a imagem do brasão"), PICK_IMAGE);
     }
 
     @BindingAdapter("srcCompat")
@@ -283,27 +283,6 @@ public class FormCidade extends FormBase {
             imageView.setImageBitmap(bitmap);
         }
 
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-
-        if (requestCode == PICK_IMAGE) {
-
-            if(data != null){
-                try {
-                    InputStream inputStream = ctx.getContentResolver().openInputStream(data.getData());
-                    viewModel.brasao = BitmapFactory.decodeStream(inputStream);
-                    exibeBrasao();
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-
-
-        }
     }
 
     Observer<List<Estado>> estadosObserver = new Observer<List<Estado>>() {

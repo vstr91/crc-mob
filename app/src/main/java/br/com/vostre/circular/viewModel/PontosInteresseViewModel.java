@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -37,7 +38,7 @@ import br.com.vostre.circular.utils.StringUtils;
 
 public class PontosInteresseViewModel extends AndroidViewModel {
 
-    private AppDatabase appDatabase;
+    private static AppDatabase appDatabase;
 
     public LiveData<List<PontoInteresse>> pontosInteresse;
     public PontoInteresse pontoInteresse;
@@ -158,6 +159,7 @@ public class PontosInteresseViewModel extends AndroidViewModel {
                     }
 
                     pontoInteresse.setImagem(file.getName());
+                    pontoInteresse.setImagemEnviada(false);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -207,6 +209,15 @@ public class PontosInteresseViewModel extends AndroidViewModel {
     // fim adicionar
 
     // editar
+
+    public static void edit(final PontoInteresse pontoInteresse, Context context) {
+
+        if(appDatabase == null){
+            appDatabase = AppDatabase.getAppDatabase(context.getApplicationContext());
+        }
+
+        new editAsyncTask(appDatabase).execute(pontoInteresse);
+    }
 
     public void edit(final PontoInteresse pontoInteresse) {
 

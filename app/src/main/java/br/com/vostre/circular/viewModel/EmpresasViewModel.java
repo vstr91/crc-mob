@@ -3,6 +3,7 @@ package br.com.vostre.circular.viewModel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 
@@ -112,6 +113,7 @@ public class EmpresasViewModel extends AndroidViewModel {
                     }
 
                     empresa.setLogo(file.getName());
+                    empresa.setImagemEnviada(false);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -151,7 +153,11 @@ public class EmpresasViewModel extends AndroidViewModel {
 
     // editar
 
-    public static void editEmpresa(final Empresa empresa) {
+    public static void editEmpresa(final Empresa empresa, Context context) {
+
+        if(appDatabase == null){
+            appDatabase = AppDatabase.getAppDatabase(context.getApplicationContext());
+        }
 
         new editEmpresaAsyncTask(appDatabase).execute(empresa);
     }

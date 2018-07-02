@@ -66,6 +66,8 @@ import br.com.vostre.circular.view.BaseActivity;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 import br.com.vostre.circular.viewModel.CidadesViewModel;
 import br.com.vostre.circular.viewModel.EmpresasViewModel;
+import br.com.vostre.circular.viewModel.ParadasViewModel;
+import br.com.vostre.circular.viewModel.PontosInteresseViewModel;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -187,11 +189,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
         }
 
-        System.out.println("PARAM "+parametroInterno.getIdentificadorUnico());
+        System.out.println("ID UNICO >>>>>>>>>>>> "+parametroInterno.getIdentificadorUnico());
 
         try {
             requisitaToken(parametroInterno.getIdentificadorUnico(), 0);
-            requisitaToken(parametroInterno.getIdentificadorUnico(), 1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -202,13 +203,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     public void onResponse(Call<String> call, Response<String> response) {
 
         if(response.code() == 200){
-            Toast.makeText(ctx, "Envio de dados efetuado com sucesso!", Toast.LENGTH_SHORT).show();
-            Toast.makeText(ctx, "Iniciando recebimento de dados...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx, "Envio de dados efetuado com sucesso! Iniciando recebimento de dados...",
+                    Toast.LENGTH_SHORT).show();
 
             chamaAPI(0, null, 1, baseUrl, token);
 
         } else{
-            Toast.makeText(ctx, "Código de resposta: "+response.code()+" | Mensagem: "+response.message(),
+            Toast.makeText(ctx, "Erro ao enviar dados. Código de resposta: "+response.code()+" | Mensagem: "+response.message(),
                     Toast.LENGTH_SHORT).show();
         }
 
@@ -216,7 +217,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
     @Override
     public void onFailure(Call<String> call, Throwable t) {
-        Toast.makeText(ctx, "Problema ao acessar: "+t.getMessage(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(ctx, "Problema ao acessar para enviar dados: "+t.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
     private void requisitaToken(String id, int tipo) throws Exception{
@@ -235,12 +236,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
 
-                    System.out.println("RESP CODE >>>>> "+response.code());
-
                     if(response.code() == 200){
 
                         token = response.body();
-                        System.out.println("TOKEN >>>>> "+token);
+
+                        System.out.println("TOKEN "+token);
 
                         try {
                             token = crypt.bytesToHex(crypt.encrypt(token));
@@ -251,14 +251,18 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         new listaDadosAsyncTask(appDatabase).execute();
 
                     } else{
-                        //erro
+                        Toast.makeText(getContext().getApplicationContext(),
+                                "Erro "+response.code()+" ("+response.message()+") ao requisitar token.",
+                                Toast.LENGTH_SHORT).show();
                     }
 
                 }
 
                 @Override
                 public void onFailure(Call<String> call, Throwable t) {
-
+                    Toast.makeText(getContext().getApplicationContext(),
+                            "Erro "+t.getMessage()+" ao requisitar token.",
+                            Toast.LENGTH_SHORT).show();
                 }
             });
         } else{
@@ -267,12 +271,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
 
-                    System.out.println("RESP CODE >>>>> "+response.code());
-
                     if(response.code() == 200){
 
                         tokenImagem = response.body();
-                        System.out.println("TOKEN >>>>> "+tokenImagem);
+
+                        System.out.println("TOKEN IMAGEM "+tokenImagem);
 
                         try {
                             tokenImagem = crypt.bytesToHex(crypt.encrypt(tokenImagem));
@@ -283,7 +286,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         new enviaImagemAsyncTask(appDatabase).execute();
 
                     } else{
-                        //erro
+                        Toast.makeText(getContext().getApplicationContext(),
+                                "Erro "+response.code()+" ("+response.message()+") ao requisitar token de imagem.",
+                                Toast.LENGTH_SHORT).show();
                     }
 
                 }
@@ -347,11 +352,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
                     Toast.makeText(ctx, "Recebimento de dados efetuado com sucesso! Iniciando processamento...", Toast.LENGTH_SHORT).show();
-
                     try {
+                        requisitaToken(parametroInterno.getIdentificadorUnico(), 1);
                         processaJson(response);
                     } catch (JSONException e) {
                         Toast.makeText(ctx, "Problema ao processar dados: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
 
                 }
@@ -448,6 +455,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     cidade = (Cidade) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Cidade.class, 1);
                     cidade.setEnviado(true);
+                    cidade.setImagemEnviada(false);
 
                     lstCidades.add(cidade);
 
@@ -514,6 +522,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     empresa = (Empresa) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Empresa.class, 1);
                     empresa.setEnviado(true);
+                    empresa.setImagemEnviada(false);
 
                     lstEmpresas.add(empresa);
 
@@ -712,6 +721,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     pontoInteresse = (PontoInteresse) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), PontoInteresse.class, 1);
                     pontoInteresse.setEnviado(true);
+                    pontoInteresse.setImagemEnviada(false);
 
                     lstPontosInteresse.add(pontoInteresse);
 
@@ -754,8 +764,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     private void atualizaDataAcesso(Response response){
 
         String date = response.headers().get("date");
-
-        System.out.println("DATE >>>>>>>>>>>>> "+date);
 
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat(
@@ -904,13 +912,23 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 call.enqueue(new Callback<String>() {
                     @Override
                     public void onResponse(Call<String> call, Response<String> response) {
-                        cidade.setImagemEnviada(true);
-                        CidadesViewModel.edit(cidade);
+
+                        if(response.code() == 200){
+                            cidade.setImagemEnviada(true);
+                            CidadesViewModel.edit(cidade, getContext().getApplicationContext());
+                        } else{
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro ao enviar imagem de "+cidade.getNome()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
                     }
 
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
-
+                        Toast.makeText(getContext().getApplicationContext(),
+                                "Erro ao enviar imagem de "+cidade.getNome()+" para o servidor",
+                                Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -929,8 +947,86 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 call.enqueue(new Callback<String>() {
                     @Override
                     public void onResponse(Call<String> call, Response<String> response) {
-                        empresa.setImagemEnviada(true);
-                        EmpresasViewModel.editEmpresa(empresa);
+
+                        if(response.code() == 200){
+                            empresa.setImagemEnviada(true);
+                            EmpresasViewModel.editEmpresa(empresa, getContext().getApplicationContext());
+                        } else{
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro ao enviar imagem de "+empresa.getNome()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+
+                    }
+                });
+
+            }
+
+            for(final Parada parada : paradas){
+
+                File imagem = new File(getContext().getApplicationContext().getFilesDir(),  parada.getImagem());
+
+                RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
+                MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
+                RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
+
+                CircularAPI api = retrofit.create(CircularAPI.class);
+                Call<String> call = api.enviaImagem(body, name, tokenImagem);
+                call.enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+
+                        if(response.code() == 200){
+                            parada.setImagemEnviada(true);
+                            ParadasViewModel.edit(parada, getContext().getApplicationContext());
+                        } else{
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro ao enviar imagem de "+parada.getNome()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+
+                    }
+                });
+
+            }
+
+            System.out.println("PI :::::::: "+pontosInteresse.size());
+
+            for(final PontoInteresse pontoInteresse : pontosInteresse){
+
+                File imagem = new File(getContext().getApplicationContext().getFilesDir(),  pontoInteresse.getImagem());
+
+                RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
+                MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
+                RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
+
+                CircularAPI api = retrofit.create(CircularAPI.class);
+                Call<String> call = api.enviaImagem(body, name, tokenImagem);
+                call.enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+
+                        if(response.code() == 200){
+                            pontoInteresse.setImagemEnviada(true);
+                            PontosInteresseViewModel.edit(pontoInteresse, getContext().getApplicationContext());
+                        } else{
+                            System.out.println("RESP IMAGEM "+response.body()+" | "+response.message()+" | "
+                                    +response.headers()+" | "+call.request().url());
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+response.code()+" ("+response.message()+") ao enviar imagem de "+pontoInteresse.getNome()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
                     }
 
                     @Override
@@ -995,67 +1091,67 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             switch(entidade){
                 case "pais":
-                    db.paisDAO().deletarTodos();
+                    //db.paisDAO().deletarTodos();
                     db.paisDAO().inserirTodos((List<Pais>) params[0]);
                     break;
                 case "empresa":
-                    db.empresaDAO().deletarTodos();
+                    //db.empresaDAO().deletarTodos();
                     db.empresaDAO().inserirTodos((List<Empresa>) params[0]);
                     break;
                 case "onibus":
-                    db.onibusDAO().deletarTodos();
+                    //db.onibusDAO().deletarTodos();
                     db.onibusDAO().inserirTodos((List<Onibus>) params[0]);
                     break;
                 case "estado":
-                    db.estadoDAO().deletarTodos();
+                    //db.estadoDAO().deletarTodos();
                     db.estadoDAO().inserirTodos((List<Estado>) params[0]);
                     break;
                 case "cidade":
-                    db.cidadeDAO().deletarTodos();
+                    //db.cidadeDAO().deletarTodos();
                     db.cidadeDAO().inserirTodos((List<Cidade>) params[0]);
                     break;
                 case "bairro":
-                    db.bairroDAO().deletarTodos();
+                    //db.bairroDAO().deletarTodos();
                     db.bairroDAO().inserirTodos((List<Bairro>) params[0]);
                     break;
                 case "parada":
-                    db.paradaDAO().deletarTodos();
+                    //db.paradaDAO().deletarTodos();
                     db.paradaDAO().inserirTodos((List<Parada>) params[0]);
                     break;
                 case "itinerario":
-                    db.itinerarioDAO().deletarTodos();
+                    //db.itinerarioDAO().deletarTodos();
                     db.itinerarioDAO().inserirTodos((List<Itinerario>) params[0]);
                     break;
                 case "horario":
-                    db.horarioDAO().deletarTodos();
+                    //db.horarioDAO().deletarTodos();
                     db.horarioDAO().inserirTodos((List<Horario>) params[0]);
                     break;
                 case "parada_itinerario":
-                    db.paradaItinerarioDAO().deletarTodos();
+                    //db.paradaItinerarioDAO().deletarTodos();
                     db.paradaItinerarioDAO().inserirTodos((List<ParadaItinerario>) params[0]);
                     break;
                 case "secao_itinerario":
-                    db.secaoItinerarioDAO().deletarTodos();
+                    //db.secaoItinerarioDAO().deletarTodos();
                     db.secaoItinerarioDAO().inserirTodos((List<SecaoItinerario>) params[0]);
                     break;
                 case "horario_itinerario":
-                    db.horarioItinerarioDAO().deletarTodos();
+                    //db.horarioItinerarioDAO().deletarTodos();
                     db.horarioItinerarioDAO().inserirTodos((List<HorarioItinerario>) params[0]);
                     break;
                 case "mensagem":
-                    db.mensagemDAO().deletarTodos();
+                    //db.mensagemDAO().deletarTodos();
                     db.mensagemDAO().inserirTodos((List<Mensagem>) params[0]);
                     break;
                 case "parametro":
-                    db.parametroDAO().deletarTodos();
+                    //db.parametroDAO().deletarTodos();
                     db.parametroDAO().inserirTodos((List<Parametro>) params[0]);
                     break;
                 case "ponto_interesse":
-                    db.pontoInteresseDAO().deletarTodos();
+                    //db.pontoInteresseDAO().deletarTodos();
                     db.pontoInteresseDAO().inserirTodos((List<PontoInteresse>) params[0]);
                     break;
                 case "usuario":
-                    db.usuarioDAO().deletarTodos();
+                    //db.usuarioDAO().deletarTodos();
                     db.usuarioDAO().inserirTodos((List<Usuario>) params[0]);
                     break;
             }

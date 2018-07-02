@@ -57,7 +57,7 @@ public class FormPontoInteresse extends FormPOIBase {
     static Application ctx;
     PontosInteresseViewModel viewModel;
 
-    private static final int PICK_IMAGE = 500;
+    public static final int PICK_IMAGE = 500;
 
     public Double getLatitude() {
         return latitude;
@@ -105,7 +105,7 @@ public class FormPontoInteresse extends FormPOIBase {
                 inflater, R.layout.form_ponto_interesse, container, false);
         super.onCreate(savedInstanceState);
 
-        viewModel = ViewModelProviders.of(this).get(PontosInteresseViewModel.class);
+        viewModel = ViewModelProviders.of(getActivity()).get(PontosInteresseViewModel.class);
 
         binding.setView(this);
         binding.setViewModel(viewModel);
@@ -280,7 +280,7 @@ public class FormPontoInteresse extends FormPOIBase {
         binding.btnFoto.setVisibility(View.VISIBLE);
     }
 
-    private void exibeImagem(){
+    public void exibeImagem(){
         imageViewFoto.setImageBitmap(viewModel.foto);
         imageViewFoto.invalidate();
         imageViewFoto.setVisibility(View.VISIBLE);
@@ -292,7 +292,7 @@ public class FormPontoInteresse extends FormPOIBase {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Escolha uma foto do ponto de interesse"), PICK_IMAGE);
+        getActivity().startActivityForResult(Intent.createChooser(intent, "Escolha uma foto do ponto de interesse"), PICK_IMAGE);
     }
 
     @BindingAdapter("srcCompat")

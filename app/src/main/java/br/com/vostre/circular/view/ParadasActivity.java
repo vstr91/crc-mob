@@ -4,10 +4,12 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.support.annotation.NonNull;
@@ -42,6 +44,8 @@ import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.List;
 
 import br.com.vostre.circular.R;
@@ -49,6 +53,7 @@ import br.com.vostre.circular.databinding.ActivityParadasBinding;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.DialogUtils;
 import br.com.vostre.circular.view.form.FormPais;
 import br.com.vostre.circular.view.form.FormParada;
 import br.com.vostre.circular.view.utils.InfoWindow;
@@ -69,6 +74,8 @@ public class ParadasActivity extends BaseActivity {
     AppCompatActivity ctx;
     MyLocationNewOverlay mLocationOverlay;
     MapEventsOverlay overlayEvents;
+
+    FormParada formParada;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,7 +134,7 @@ public class ParadasActivity extends BaseActivity {
             MapEventsReceiver receiver = new MapEventsReceiver() {
                 @Override
                 public boolean singleTapConfirmedHelper(GeoPoint p) {
-                    FormParada formParada = new FormParada();
+                    formParada = new FormParada();
                     formParada.setLatitude(p.getLatitude());
                     formParada.setLongitude(p.getLongitude());
                     formParada.setCtx(getApplication());
@@ -178,7 +185,7 @@ public class ParadasActivity extends BaseActivity {
     public void onFabClick(View v){
 
         if(viewModel.localAtual != null){
-            FormParada formParada = new FormParada();
+            formParada = new FormParada();
             formParada.setLatitude(viewModel.localAtual.getValue().getLatitude());
             formParada.setLongitude(viewModel.localAtual.getValue().getLongitude());
             formParada.setCtx(getApplication());
@@ -371,6 +378,29 @@ public class ParadasActivity extends BaseActivity {
 
         if(geoPoint != null){
             map.getController().setCenter(geoPoint);
+        }
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        formParada = (FormParada) DialogUtils.getOpenedDialog(this);
+
+        if (requestCode == FormParada.PICK_IMAGE) {
+
+            if (data != null) {
+                try {
+                    InputStream inputStream = getContentResolver().openInputStream(data.getData());
+                    viewModel.foto = BitmapFactory.decodeStream(inputStream);
+                    formParada.exibeImagem();
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
         }
 
     }

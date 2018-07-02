@@ -33,10 +33,10 @@ public interface EstadoDAO {
     @Query("SELECT * FROM estado WHERE sigla LIKE :sigla LIMIT 1")
     Estado encontrarPorSigla(String sigla);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<Estado> estadoes);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserir(Estado estado);
 
     @Update

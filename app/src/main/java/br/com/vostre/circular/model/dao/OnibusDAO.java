@@ -33,10 +33,10 @@ public interface OnibusDAO {
     @Query("SELECT * FROM onibus WHERE id = :id")
     LiveData<Onibus> carregar(String id);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<Onibus> onibus);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserir(Onibus onibus);
 
     @Update

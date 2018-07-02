@@ -33,10 +33,10 @@ public interface SecaoItinerarioDAO {
     @Query("SELECT * FROM secao_itinerario WHERE id = :id")
     LiveData<SecaoItinerario> carregarPorId(String id);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<SecaoItinerario> secaoItinerarioes);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserir(SecaoItinerario secaoItinerario);
 
     @Update

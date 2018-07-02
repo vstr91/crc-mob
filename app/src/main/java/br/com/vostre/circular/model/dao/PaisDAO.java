@@ -39,7 +39,7 @@ public interface PaisDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<Pais> paises);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserir(Pais pais);
 
     @Update

@@ -37,10 +37,10 @@ public interface ParametroDAO {
     @Query("SELECT * FROM parametro WHERE nome LIKE :nome LIMIT 1")
     Parametro encontrarPorNome(String nome);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<Parametro> parametros);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserir(Parametro parametro);
 
     @Update

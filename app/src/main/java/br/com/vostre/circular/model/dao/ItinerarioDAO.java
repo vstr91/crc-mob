@@ -98,10 +98,10 @@ public interface ItinerarioDAO {
             "WHERE i.id = :itinerario")
     LiveData<ItinerarioPartidaDestino> carregar(String itinerario);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<Itinerario> itinerarios);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserir(Itinerario itinerario);
 
     @Update

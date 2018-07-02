@@ -24,7 +24,7 @@ public interface ParadaDAO {
     @Query("SELECT * FROM parada WHERE enviado = 0")
     List<Parada> listarTodosAEnviar();
 
-    @Query("SELECT * FROM parada WHERE imagemEnviada = 0")
+    @Query("SELECT * FROM parada WHERE imagemEnviada = 0 AND imagem IS NOT NULL")
     List<Parada> listarTodosImagemAEnviar();
 
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
@@ -51,10 +51,10 @@ public interface ParadaDAO {
     @Query("SELECT * FROM parada WHERE slug LIKE :slug LIMIT 1")
     Parada encontrarPorSlug(String slug);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<Parada> paradas);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserir(Parada parada);
 
     @Update

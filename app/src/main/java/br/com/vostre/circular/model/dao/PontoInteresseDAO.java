@@ -24,7 +24,7 @@ public interface PontoInteresseDAO {
     @Query("SELECT * FROM ponto_interesse WHERE enviado = 0")
     List<PontoInteresse> listarTodosAEnviar();
 
-    @Query("SELECT * FROM ponto_interesse WHERE imagemEnviada = 0")
+    @Query("SELECT * FROM ponto_interesse WHERE imagemEnviada = 0 AND imagem IS NOT NULL")
     List<PontoInteresse> listarTodosImagemAEnviar();
 
     @Query("SELECT * FROM ponto_interesse WHERE id IN (:ids)")
@@ -36,10 +36,10 @@ public interface PontoInteresseDAO {
     @Query("SELECT * FROM ponto_interesse WHERE slug LIKE :slug LIMIT 1")
     PontoInteresse encontrarPorSlug(String slug);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<PontoInteresse> pontosInteresse);
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserir(PontoInteresse pontoInteresse);
 
     @Update

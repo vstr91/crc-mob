@@ -5,6 +5,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -41,7 +42,7 @@ import br.com.vostre.circular.utils.StringUtils;
 
 public class ParadasViewModel extends AndroidViewModel {
 
-    private AppDatabase appDatabase;
+    private static AppDatabase appDatabase;
 
     public LiveData<List<ParadaBairro>> paradas;
     public ParadaBairro parada;
@@ -242,6 +243,15 @@ public class ParadasViewModel extends AndroidViewModel {
     // fim adicionar
 
     // editar
+
+    public static void edit(final Parada parada, Context context) {
+
+        if(appDatabase == null){
+            appDatabase = AppDatabase.getAppDatabase(context.getApplicationContext());
+        }
+
+        new editAsyncTask(appDatabase).execute(parada);
+    }
 
     public void edit(final Parada parada) {
 

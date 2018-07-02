@@ -66,7 +66,7 @@ public class FormParada extends FormBase {
 
     BairroAdapterSpinner adapter;
 
-    private static final int PICK_IMAGE = 400;
+    public static final int PICK_IMAGE = 400;
 
     public ParadaBairro getParada() {
         return parada;
@@ -114,7 +114,7 @@ public class FormParada extends FormBase {
                 inflater, R.layout.form_parada, container, false);
         super.onCreate(savedInstanceState);
 
-        viewModel = ViewModelProviders.of(this).get(ParadasViewModel.class);
+        viewModel = ViewModelProviders.of(getActivity()).get(ParadasViewModel.class);
 
         binding.setView(this);
         binding.setViewModel(viewModel);
@@ -250,7 +250,7 @@ public class FormParada extends FormBase {
         binding.btnFoto.setVisibility(View.VISIBLE);
     }
 
-    private void exibeImagem(){
+    public void exibeImagem(){
         imageViewFoto.setImageBitmap(viewModel.foto);
         imageViewFoto.invalidate();
         imageViewFoto.setVisibility(View.VISIBLE);
@@ -273,7 +273,7 @@ public class FormParada extends FormBase {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Escolha uma foto da parada"), PICK_IMAGE);
+        getActivity().startActivityForResult(Intent.createChooser(intent, "Escolha uma foto da parada"), PICK_IMAGE);
     }
 
     @BindingAdapter("srcCompat")
@@ -315,26 +315,6 @@ public class FormParada extends FormBase {
         }
 
 
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        if (requestCode == PICK_IMAGE) {
-
-            if(data != null){
-                try {
-                    InputStream inputStream = ctx.getContentResolver().openInputStream(data.getData());
-                    viewModel.foto = BitmapFactory.decodeStream(inputStream);
-                    exibeImagem();
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-
-
-        }
     }
 
     public void setSpinnerEntries(Spinner spinner, List<BairroCidade> bairros){

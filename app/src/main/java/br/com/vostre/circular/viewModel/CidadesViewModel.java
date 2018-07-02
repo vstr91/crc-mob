@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -179,7 +180,11 @@ public class CidadesViewModel extends AndroidViewModel {
 
     // editar
 
-    public static void edit(final Cidade cidade) {
+    public static void edit(final Cidade cidade, Context context) {
+
+        if(appDatabase == null){
+            appDatabase = AppDatabase.getAppDatabase(context.getApplicationContext());
+        }
 
         new editCidadeAsyncTask(appDatabase).execute(cidade);
     }

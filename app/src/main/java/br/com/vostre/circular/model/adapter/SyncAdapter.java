@@ -9,15 +9,20 @@ import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SyncResult;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.WorkerThread;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -28,8 +33,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -90,7 +97,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     // Define a variable to contain a content resolver instance
     ContentResolver mContentResolver;
 
-    Context ctx;
+    static Context ctx;
     AppDatabase appDatabase;
     String baseUrl;
 
@@ -378,6 +385,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
         String dados = response.body();
 
+        System.out.println("DADOS >>>>> "+dados);
+
         if(dados != null){
 
             JSONObject arrayObject = new JSONObject(dados);
@@ -456,15 +465,20 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     cidade = (Cidade) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Cidade.class, 1);
                     cidade.setEnviado(true);
-                    cidade.setImagemEnviada(false);
+                    cidade.setImagemEnviada(true);
 
                     lstCidades.add(cidade);
 
-                    if(!cidade.getBrasao().isEmpty()){
+                    System.out.println("CIDADE "+cidade.getBrasao());
+
+                    if(cidade.getBrasao() != null && !cidade.getBrasao().isEmpty()){
                         File brasao = new File(getContext().getApplicationContext().getFilesDir(), cidade.getBrasao());
 
-                        if(!brasao.exists() && !brasao.canWrite()){
-//                            Picasso.get().load("localhost/crc-web/web/app_dev.php/api/recebe-imagem/"+cidade.getBrasao().replace(".png", "")).
+                        if(!brasao.exists() || !brasao.canWrite()){
+                            System.out.println("BAIXANDO BRASAO");
+                            imageDownload(baseUrl, cidade.getBrasao());
+                        } else{
+                            System.out.println("RESP BRASAO >>>>>>> "+brasao.exists());
                         }
                     }
 
@@ -1175,5 +1189,51 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     }
 
     // fim adicionar
+
+    public static void imageDownload(String baseUrl, final String imagem){
+        Picasso.get()
+                .load(baseUrl.concat("/api/recebe-imagem/"+imagem))
+                .into(getTarget(ctx.getFilesDir().getAbsolutePath().concat("/"+imagem)));
+    }
+
+    private static Target getTarget(final String url){
+        Target target = new Target(){
+
+            @Override
+            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        File file = new File(ctx.getFilesDir(), url);
+
+                        System.out.println("FILE RESP "+file.getAbsolutePath());
+
+                        try {
+                            file.createNewFile();
+                            FileOutputStream ostream = new FileOutputStream(file);
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
+                            ostream.flush();
+                            ostream.close();
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+
+            }
+
+            @Override
+            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        };
+        return target;
+    }
 
 }

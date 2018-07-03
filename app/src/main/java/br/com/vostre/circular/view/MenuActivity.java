@@ -1,5 +1,6 @@
 package br.com.vostre.circular.view;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.ContentResolver;
@@ -8,12 +9,18 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsListener;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
@@ -56,11 +63,28 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     // A content resolver for accessing the provider
     ContentResolver mResolver;
 
+    int permissionStorage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_menu);
         super.onCreate(savedInstanceState);
         binding.setView(this);
+
+        MultiplePermissionsListener listener = DialogOnAnyDeniedMultiplePermissionsListener.Builder
+                .withContext(this)
+                .withTitle("Permissões Negadas")
+                .withMessage("Permita os acessos à Internet, armazenamento externo e GPS para acessar esta página")
+                .build();
+
+        Dexter.withActivity(this)
+                .withPermissions(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ).withListener(listener)
+                .check();
+
+        permissionStorage = ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         // Create the dummy account
         mAccount = CreateSyncAccount(this);

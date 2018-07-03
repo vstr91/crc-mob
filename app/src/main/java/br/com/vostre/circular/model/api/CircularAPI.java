@@ -25,6 +25,9 @@ public interface CircularAPI {
     @POST("api/envia-imagem/{token}")
     Call<String> enviaImagem(@Part MultipartBody.Part image, @Part("name") RequestBody name, @Path("token") String id);
 
+    @GET("api/recebe-imagem/{imagem}")
+    Call<String> recebeImagem(@Path("imagem") String imagem);
+
     @Headers("Content-Type: application/json")
     @POST("api/envia-dados/{token}")
     Call<String> enviaDados(@Body String json, @Path("token") String token);

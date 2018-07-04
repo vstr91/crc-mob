@@ -4,6 +4,7 @@ import java.util.Map;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
@@ -26,7 +27,7 @@ public interface CircularAPI {
     Call<String> enviaImagem(@Part MultipartBody.Part image, @Part("name") RequestBody name, @Path("token") String id);
 
     @GET("api/recebe-imagem/{imagem}")
-    Call<String> recebeImagem(@Path("imagem") String imagem);
+    Call<ResponseBody> recebeImagem(@Path("imagem") String imagem);
 
     @Headers("Content-Type: application/json")
     @POST("api/envia-dados/{token}")

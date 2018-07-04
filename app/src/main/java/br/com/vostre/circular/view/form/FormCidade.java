@@ -114,7 +114,9 @@ public class FormCidade extends FormBase {
             viewModel.cidade = cidade;
 
             if(cidade.getCidade().getBrasao() != null){
-                File brasao = new File(ctx.getFilesDir(), cidade.getCidade().getBrasao());
+                File brasao = new File(getContext().getApplicationContext().getFilesDir(),  cidade.getCidade().getBrasao());//new File(ctx.getApplicationContext().getFilesDir(), cidade.getCidade().getBrasao());
+
+                System.out.println("CAMINHO: "+brasao.getAbsolutePath()+" | EXISTE: "+brasao.exists()+" | LE: "+brasao.canRead());
 
                 if(brasao.exists() && brasao.canRead()){
                     Bitmap bmp = BitmapFactory.decodeFile(brasao.getAbsolutePath());

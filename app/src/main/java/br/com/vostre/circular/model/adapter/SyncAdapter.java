@@ -21,8 +21,6 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -79,6 +77,7 @@ import br.com.vostre.circular.viewModel.PontosInteresseViewModel;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -1023,8 +1022,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             }
 
-            System.out.println("PI :::::::: "+pontosInteresse.size());
-
             for(final PontoInteresse pontoInteresse : pontosInteresse){
 
                 File imagem = new File(getContext().getApplicationContext().getFilesDir(),  pontoInteresse.getImagem());
@@ -1191,49 +1188,48 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     // fim adicionar
 
     public static void imageDownload(String baseUrl, final String imagem){
-        Picasso.get()
-                .load(baseUrl.concat("/api/recebe-imagem/"+imagem))
-                .into(getTarget(ctx.getFilesDir().getAbsolutePath().concat("/"+imagem)));
-    }
+        Retrofit retrofit = new Retrofit.Builder()
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .baseUrl(baseUrl)
+                .build();
 
-    private static Target getTarget(final String url){
-        Target target = new Target(){
-
+        CircularAPI api = retrofit.create(CircularAPI.class);
+        Call<ResponseBody> call = api.recebeImagem(imagem.replace(".png", ""));
+        call.enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        File file = new File(ctx.getFilesDir(), url);
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                System.out.println("RESP IMAGEM >>>>>>>> "+response.message()+" | "+response.code());
 
-                        System.out.println("FILE RESP "+file.getAbsolutePath());
+                if(response.code() == 200){
+                    FileOutputStream fos = null;
+                    File file = new File(ctx.getApplicationContext().getFilesDir(), imagem);
 
+                    try {
+                        fos = new FileOutputStream(file);
+                        Bitmap bmp = BitmapFactory.decodeStream(response.body().byteStream());
+                        bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } finally {
                         try {
-                            file.createNewFile();
-                            FileOutputStream ostream = new FileOutputStream(file);
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
-                            ostream.flush();
-                            ostream.close();
-                        }
-                        catch (Exception e) {
+                            if (fos != null) {
+                                fos.close();
+                                Toast.makeText(ctx, "Imagem "+imagem+" recebida.", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
-                }).start();
+
+                }
 
             }
 
             @Override
-            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                System.out.println("RESP IMAGEM ERRO >>>>>>>>>>> "+t.getMessage());
             }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-        };
-        return target;
+        });
     }
 
 }

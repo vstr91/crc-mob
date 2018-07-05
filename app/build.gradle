@@ -33,6 +33,7 @@ android {
         }
         usuario {
             dimension "main"
+            applicationIdSuffix ".user"
         }
     }
 }

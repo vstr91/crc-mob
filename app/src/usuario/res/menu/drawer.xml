@@ -1,0 +1,25 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" >
+
+    <!--<group android:checkableBehavior="single">-->
+        <!--<item-->
+            <!--android:id="@+id/nav_consulta"-->
+            <!--android:checked="true"-->
+            <!--android:title="Consulta de Dados"/>-->
+        <!--<item-->
+            <!--android:id="@+id/nav_cadastro"-->
+            <!--android:title="Cadastro de Dados"/>-->
+    <!--</group>-->
+    <item android:title="Outras Opções">
+        <menu>
+            <item
+                android:id="@+id/opcoes"
+                android:title="Opcoes" />
+            <item
+                android:id="@+id/sobre"
+                android:title="Sobre" />
+        </menu>
+    </item>
+
+</menu>

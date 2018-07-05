@@ -46,7 +46,13 @@
 
         <provider
             android:name=".utils.DataProvider"
-            android:authorities="br.com.vostre.circular.datasync.provider"
+            android:authorities="${applicationId}.datasync.provider"
+            android:exported="false"
+            android:syncable="true"/>
+
+        <provider
+            android:name=".utils.DataProviderUsuario"
+            android:authorities="${applicationId}.contentprovider"
             android:exported="false"
             android:syncable="true"/>
 

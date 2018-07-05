@@ -20,7 +20,10 @@ public interface CidadeDAO {
     LiveData<List<Cidade>> listarTodos();
 
     @Query("SELECT * FROM cidade WHERE ativo = 1 ORDER BY nome")
-    List<Cidade> listarTodosAtivos();
+    LiveData<List<Cidade>> listarTodosAtivos();
+
+    @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado FROM cidade c INNER JOIN estado e ON e.id = c.estado ORDER BY c.nome")
+    LiveData<List<CidadeEstado>> listarTodosAtivasComEstado();
 
     @Query("SELECT * FROM cidade WHERE enviado = 0")
     List<Cidade> listarTodosAEnviar();

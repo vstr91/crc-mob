@@ -9,7 +9,6 @@ import org.joda.time.format.DateTimeFormat;
 
 import br.com.vostre.circular.databinding.LinhaUsuariosBinding;
 import br.com.vostre.circular.model.Usuario;
-import br.com.vostre.circular.view.form.FormUsuario;
 
 public class UsuarioViewHolder extends RecyclerView.ViewHolder {
 

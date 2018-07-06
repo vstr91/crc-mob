@@ -33,9 +33,7 @@ import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
-import br.com.vostre.circular.view.adapter.PaisAdapterSpinner;
 import br.com.vostre.circular.viewModel.EstadosViewModel;
-import br.com.vostre.circular.viewModel.HorariosItinerarioViewModel;
 
 public class FormHorarioItinerario extends FormBase {
 

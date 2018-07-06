@@ -14,10 +14,6 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityEmpresasBinding;
 import br.com.vostre.circular.databinding.ActivityParametrosBinding;
 import br.com.vostre.circular.model.Parametro;
-import br.com.vostre.circular.view.adapter.ParametroAdapter;
-import br.com.vostre.circular.view.form.FormEmpresa;
-import br.com.vostre.circular.view.form.FormParametro;
-import br.com.vostre.circular.viewModel.ParametrosViewModel;
 
 public class ParametrosActivity extends BaseActivity {
 

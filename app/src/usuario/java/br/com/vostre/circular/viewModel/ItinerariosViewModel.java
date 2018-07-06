@@ -25,6 +25,7 @@ import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
+import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
@@ -37,7 +38,27 @@ public class ItinerariosViewModel extends AndroidViewModel {
     public Itinerario itinerario;
 
     public LiveData<List<CidadeEstado>> cidades;
-    public ParadaItinerarioBairro parada;
+    public CidadeEstado cidadePartida;
+
+    public LiveData<List<BairroCidade>> bairros;
+    public BairroCidade bairroPartida;
+
+    public CidadeEstado getCidadePartida() {
+        return cidadePartida;
+    }
+
+    public void setCidadePartida(CidadeEstado cidadePartida) {
+        this.cidadePartida = cidadePartida;
+        bairros = appDatabase.bairroDAO().listarTodosComCidadePorCidade(cidadePartida.getCidade().getId());
+    }
+
+    public BairroCidade getBairroPartida() {
+        return bairroPartida;
+    }
+
+    public void setBairroPartida(BairroCidade bairroPartida) {
+        this.bairroPartida = bairroPartida;
+    }
 
     public LiveData<List<Itinerario>> getItinerarios() {
         return itinerarios;
@@ -63,20 +84,14 @@ public class ItinerariosViewModel extends AndroidViewModel {
         this.cidades = cidades;
     }
 
-    public ParadaItinerarioBairro getParada() {
-        return parada;
-    }
-
-    public void setParada(ParadaItinerarioBairro parada) {
-        this.parada = parada;
-    }
-
     public ItinerariosViewModel(Application app){
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         itinerario = new Itinerario();
         itinerarios = appDatabase.itinerarioDAO().listarTodos();
         cidades = appDatabase.cidadeDAO().listarTodosAtivasComEstado();
+        bairroPartida = new BairroCidade();
+        bairros = appDatabase.bairroDAO().listarTodosComCidadePorCidade(null);
     }
 
 }

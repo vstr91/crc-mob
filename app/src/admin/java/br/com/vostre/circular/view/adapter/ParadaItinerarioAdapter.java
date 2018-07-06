@@ -11,7 +11,6 @@ import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaParadasItinerariosBinding;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
-import br.com.vostre.circular.view.viewHolder.ParadaItinerarioViewHolder;
 
 public class ParadaItinerarioAdapter extends RecyclerView.Adapter<ParadaItinerarioViewHolder> implements ItemTouchHelperAdapter {
 

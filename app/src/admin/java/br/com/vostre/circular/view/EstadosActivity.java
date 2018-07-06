@@ -15,10 +15,6 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityEstadosBinding;
 import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.Pais;
-import br.com.vostre.circular.view.adapter.EstadoAdapter;
-import br.com.vostre.circular.view.adapter.PaisAdapter;
-import br.com.vostre.circular.view.form.FormEstado;
-import br.com.vostre.circular.view.form.FormPais;
 import br.com.vostre.circular.viewModel.EstadosViewModel;
 
 public class EstadosActivity extends BaseActivity {

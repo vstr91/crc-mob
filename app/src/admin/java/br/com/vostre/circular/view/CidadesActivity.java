@@ -22,8 +22,6 @@ import br.com.vostre.circular.databinding.ActivityCidadesBinding;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.utils.DialogUtils;
 import br.com.vostre.circular.view.adapter.CidadeAdapter;
-import br.com.vostre.circular.view.form.FormCidade;
-import br.com.vostre.circular.viewModel.CidadesViewModel;
 
 public class CidadesActivity extends BaseActivity {
 

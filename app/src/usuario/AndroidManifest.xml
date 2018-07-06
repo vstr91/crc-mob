@@ -44,6 +44,12 @@
                 android:resource="@xml/syncadapter" />
         </service>
 
+        <provider
+            android:name=".utils.DataProviderUsuario"
+            android:authorities="br.com.vostre.circular.datasync.provider"
+            android:exported="false"
+            android:syncable="true"/>
+
         <activity android:name=".view.LoginActivity" />
         <activity android:name=".view.MenuActivity">
             <intent-filter>
@@ -53,7 +59,23 @@
             </intent-filter>
         </activity>
         <activity android:name=".view.BaseActivity" />
+        <activity android:name=".view.PaisesActivity" />
+        <activity android:name=".view.EstadosActivity" />
+        <activity android:name=".view.CidadesActivity" />
+        <activity android:name=".view.BairrosActivity" />
+        <activity android:name=".view.ParadasActivity" />
         <activity android:name=".view.ItinerariosActivity" />
+        <activity android:name=".view.PontosInteresseActivity" />
+        <activity android:name=".view.EmpresasActivity" />
+        <activity android:name=".view.ParametrosActivity" />
+        <activity android:name=".view.UsuariosActivity" />
+        <activity android:name=".view.MensagensActivity" />
+        <activity android:name=".view.DetalhesEmpresaActivity" />
+        <activity android:name=".view.DetalhesOnibusActivity" />
+        <activity android:name=".view.DetalhesItinerarioActivity" />
+        <activity android:name=".view.SecoesItinerarioActivity" />
+        <activity android:name=".view.HorariosActivity" />
+        <activity android:name=".view.HorariosItinerarioActivity"></activity>
     </application>
 
 </manifest>

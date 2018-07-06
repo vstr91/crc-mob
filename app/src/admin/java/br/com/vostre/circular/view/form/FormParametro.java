@@ -21,7 +21,6 @@ import java.util.TimeZone;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormParametroBinding;
 import br.com.vostre.circular.model.Parametro;
-import br.com.vostre.circular.viewModel.ParametrosViewModel;
 
 public class FormParametro extends FormBase {
 

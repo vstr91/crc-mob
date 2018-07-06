@@ -1,9 +1,6 @@
 package br.com.vostre.circular.model.adapter;
 
 import android.accounts.Account;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
@@ -11,12 +8,9 @@ import android.content.Context;
 import android.content.SyncResult;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.WorkerThread;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -24,8 +18,6 @@ import com.google.gson.GsonBuilder;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,12 +26,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -68,8 +58,6 @@ import br.com.vostre.circular.utils.Constants;
 import br.com.vostre.circular.utils.Crypt;
 import br.com.vostre.circular.utils.JsonUtils;
 import br.com.vostre.circular.utils.Unique;
-import br.com.vostre.circular.view.BaseActivity;
-import br.com.vostre.circular.viewModel.BaseViewModel;
 import br.com.vostre.circular.viewModel.CidadesViewModel;
 import br.com.vostre.circular.viewModel.EmpresasViewModel;
 import br.com.vostre.circular.viewModel.ParadasViewModel;
@@ -84,7 +72,6 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
-import retrofit2.http.Header;
 
 /**
  * Handle the transfer of data between a server and an

@@ -1,5 +1,6 @@
 package br.com.vostre.circular.view.viewHolder;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -9,14 +10,23 @@ import org.joda.time.format.DateTimeFormat;
 
 import br.com.vostre.circular.databinding.LinhaBairrosBinding;
 import br.com.vostre.circular.model.pojo.BairroCidade;
-import br.com.vostre.circular.view.form.FormBairro;
+import br.com.vostre.circular.view.listener.SelectListener;
 
 public class BairroViewHolder extends RecyclerView.ViewHolder {
 
     private final LinhaBairrosBinding binding;
-    AppCompatActivity ctx;
+    Context ctx;
+    SelectListener listener;
 
-    public BairroViewHolder(LinhaBairrosBinding binding, AppCompatActivity context) {
+    public SelectListener getListener() {
+        return listener;
+    }
+
+    public void setListener(SelectListener listener) {
+        this.listener = listener;
+    }
+
+    public BairroViewHolder(LinhaBairrosBinding binding, Context context) {
         super(binding.getRoot());
         this.binding = binding;
         this.ctx = context;
@@ -25,28 +35,11 @@ public class BairroViewHolder extends RecyclerView.ViewHolder {
     public void bind(final BairroCidade bairro) {
         binding.setBairro(bairro);
 
-        if(bairro.getBairro().getProgramadoPara() != null && bairro.getBairro().getProgramadoPara().isAfterNow()){
-            binding.btnProgramado.setVisibility(View.VISIBLE);
-            binding.btnProgramado.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(v.getContext(), DateTimeFormat.forPattern("dd/MM/yyyy HH:mm")
-                            .print(bairro.getBairro().getProgramadoPara()), Toast.LENGTH_SHORT).show();
-                }
-            });
-        } else{
-            binding.btnProgramado.setVisibility(View.GONE);
-        }
-
-        binding.cardview.setOnLongClickListener(new View.OnLongClickListener() {
+        binding.textViewNome.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View v) {
-                FormBairro formBairro = new FormBairro();
-                formBairro.setBairro(bairro);
-                formBairro.setCtx(ctx.getApplication());
-                formBairro.flagInicioEdicao = true;
-                formBairro.show(ctx.getSupportFragmentManager(), "formBairro");
-                return false;
+            public void onClick(View view) {
+                Toast.makeText(ctx, bairro.getBairro().getNome(), Toast.LENGTH_SHORT).show();
+                listener.onSelected(bairro.getBairro().getId());
             }
         });
 

@@ -20,8 +20,6 @@ import java.util.UUID;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.Pais;
-import br.com.vostre.circular.view.HorariosActivity;
-import br.com.vostre.circular.view.MensagensActivity;
 import br.com.vostre.circular.view.MenuActivity;
 
 import static android.content.Context.ACCOUNT_SERVICE;
@@ -42,7 +40,7 @@ public class ToolbarUtils {
     public static final Integer PICK_FILE = 310;
 
     // The authority for the sync adapter's content provider
-    public static final String AUTHORITY = "br.com.vostre.circular.datasync.provider";
+    public static final String AUTHORITY = "br.com.vostre.circular.admin.datasync.provider";
     // An account type, in the form of a domain name
     public static final String ACCOUNT_TYPE = "br.com.vostre.circular";
     // The account name

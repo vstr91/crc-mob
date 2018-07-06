@@ -41,9 +41,7 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormParadaBinding;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
-import br.com.vostre.circular.view.adapter.BairroAdapterSpinner;
 import br.com.vostre.circular.viewModel.BairrosViewModel;
-import br.com.vostre.circular.viewModel.ParadasViewModel;
 
 public class FormParada extends FormBase {
 

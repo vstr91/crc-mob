@@ -45,7 +45,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
     // Constants
     // The authority for the sync adapter's content provider
-    public static String AUTHORITY;
+    public static final String AUTHORITY = "br.com.vostre.circular.datasync.provider";
     // An account type, in the form of a domain name
     public static final String ACCOUNT_TYPE = "br.com.vostre.circular";
     // The account name
@@ -70,8 +70,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         binding = DataBindingUtil.setContentView(this, R.layout.activity_menu);
         super.onCreate(savedInstanceState);
         binding.setView(this);
-
-        AUTHORITY = getApplicationContext().getPackageName()+".datasync.provider";
 
         MultiplePermissionsListener listener = DialogOnAnyDeniedMultiplePermissionsListener.Builder
                 .withContext(this)

@@ -9,7 +9,6 @@ import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaParametrosBinding;
 import br.com.vostre.circular.model.Parametro;
-import br.com.vostre.circular.view.viewHolder.ParametroViewHolder;
 
 public class ParametroAdapter extends RecyclerView.Adapter<ParametroViewHolder> {
 

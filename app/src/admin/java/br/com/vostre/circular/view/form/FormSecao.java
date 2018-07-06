@@ -23,8 +23,6 @@ import br.com.vostre.circular.databinding.FormPaisBinding;
 import br.com.vostre.circular.databinding.FormSecaoBinding;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.SecaoItinerario;
-import br.com.vostre.circular.viewModel.PaisesViewModel;
-import br.com.vostre.circular.viewModel.SecoesItinerarioViewModel;
 
 public class FormSecao extends FormBase {
 

@@ -9,7 +9,6 @@ import org.joda.time.format.DateTimeFormat;
 
 import br.com.vostre.circular.databinding.LinhaBairrosBinding;
 import br.com.vostre.circular.model.pojo.BairroCidade;
-import br.com.vostre.circular.view.form.FormBairro;
 
 public class BairroViewHolder extends RecyclerView.ViewHolder {
 

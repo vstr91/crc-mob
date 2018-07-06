@@ -10,8 +10,6 @@ import org.joda.time.format.DateTimeFormat;
 
 import br.com.vostre.circular.databinding.LinhaEmpresasBinding;
 import br.com.vostre.circular.model.Empresa;
-import br.com.vostre.circular.view.DetalhesEmpresaActivity;
-import br.com.vostre.circular.view.form.FormEmpresa;
 
 public class EmpresaViewHolder extends RecyclerView.ViewHolder {
 

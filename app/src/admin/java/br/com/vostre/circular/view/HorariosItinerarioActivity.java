@@ -14,8 +14,6 @@ import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
-import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
-import br.com.vostre.circular.viewModel.HorariosItinerarioViewModel;
 import br.com.vostre.circular.databinding.ActivityHorariosItinerarioBinding;
 
 public class HorariosItinerarioActivity extends BaseActivity {

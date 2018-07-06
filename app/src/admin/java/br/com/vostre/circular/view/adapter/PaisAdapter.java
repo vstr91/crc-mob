@@ -10,7 +10,6 @@ import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaPaisesBinding;
 import br.com.vostre.circular.model.Pais;
-import br.com.vostre.circular.view.viewHolder.PaisViewHolder;
 
 public class PaisAdapter extends RecyclerView.Adapter<PaisViewHolder> {
 

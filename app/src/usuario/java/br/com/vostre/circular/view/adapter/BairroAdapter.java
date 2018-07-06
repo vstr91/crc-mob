@@ -1,5 +1,6 @@
 package br.com.vostre.circular.view.adapter;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,15 +9,28 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaBairrosBinding;
+import br.com.vostre.circular.databinding.LinhaCidadesBinding;
 import br.com.vostre.circular.model.pojo.BairroCidade;
+import br.com.vostre.circular.model.pojo.CidadeEstado;
+import br.com.vostre.circular.view.listener.SelectListener;
 import br.com.vostre.circular.view.viewHolder.BairroViewHolder;
+import br.com.vostre.circular.view.viewHolder.CidadeViewHolder;
 
-public class BairroAdapter extends RecyclerView.Adapter<BairroViewHolder> {
+public class BairroAdapter extends RecyclerView.Adapter<BairroViewHolder> implements SelectListener {
 
     public List<BairroCidade> bairros;
-    AppCompatActivity ctx;
+    Context ctx;
+    SelectListener listener;
 
-    public BairroAdapter(List<BairroCidade> bairros, AppCompatActivity context){
+    public SelectListener getListener() {
+        return listener;
+    }
+
+    public void setListener(SelectListener listener) {
+        this.listener = listener;
+    }
+
+    public BairroAdapter(List<BairroCidade> bairros, Context context){
         this.bairros = bairros;
         ctx = context;
     }
@@ -33,6 +47,7 @@ public class BairroAdapter extends RecyclerView.Adapter<BairroViewHolder> {
     @Override
     public void onBindViewHolder(BairroViewHolder holder, int position) {
         BairroCidade bairro = bairros.get(position);
+        holder.setListener(this);
         holder.bind(bairro);
     }
 
@@ -46,5 +61,10 @@ public class BairroAdapter extends RecyclerView.Adapter<BairroViewHolder> {
         }
 
 
+    }
+
+    @Override
+    public String onSelected(String id) {
+        return listener.onSelected(id);
     }
 }

@@ -54,10 +54,7 @@ import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.DialogUtils;
-import br.com.vostre.circular.view.form.FormPais;
-import br.com.vostre.circular.view.form.FormParada;
 import br.com.vostre.circular.view.utils.InfoWindow;
-import br.com.vostre.circular.viewModel.ParadasViewModel;
 
 public class ParadasActivity extends BaseActivity {
 

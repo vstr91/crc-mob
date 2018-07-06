@@ -9,7 +9,6 @@ import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaEstadosBinding;
 import br.com.vostre.circular.model.Estado;
-import br.com.vostre.circular.view.viewHolder.EstadoViewHolder;
 
 public class EstadoAdapter extends RecyclerView.Adapter<EstadoViewHolder> {
 

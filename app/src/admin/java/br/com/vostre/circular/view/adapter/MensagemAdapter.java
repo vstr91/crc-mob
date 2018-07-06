@@ -9,7 +9,6 @@ import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaMensagensBinding;
 import br.com.vostre.circular.model.Mensagem;
-import br.com.vostre.circular.view.viewHolder.MensagemViewHolder;
 
 public class MensagemAdapter extends RecyclerView.Adapter<MensagemViewHolder> {
 

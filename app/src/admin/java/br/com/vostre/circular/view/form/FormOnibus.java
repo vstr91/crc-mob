@@ -27,9 +27,6 @@ import br.com.vostre.circular.databinding.FormOnibusBinding;
 import br.com.vostre.circular.databinding.FormPaisBinding;
 import br.com.vostre.circular.model.Onibus;
 import br.com.vostre.circular.model.Pais;
-import br.com.vostre.circular.viewModel.DetalhesEmpresaViewModel;
-import br.com.vostre.circular.viewModel.OnibusViewModel;
-import br.com.vostre.circular.viewModel.PaisesViewModel;
 
 public class FormOnibus extends FormBase {
 

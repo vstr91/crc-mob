@@ -38,8 +38,6 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormCidadeBinding;
 import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
-import br.com.vostre.circular.view.adapter.EstadoAdapterSpinner;
-import br.com.vostre.circular.viewModel.CidadesViewModel;
 
 public class FormCidade extends FormBase {
 

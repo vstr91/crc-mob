@@ -42,7 +42,7 @@ import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
-import br.com.vostre.circular.view.adapter.ParadaItinerarioAdapter;
+import br.com.vostre.circular.view.form.FormItinerario;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.view.utils.SortListItemHelper;
 import br.com.vostre.circular.viewModel.ItinerariosViewModel;

@@ -32,7 +32,6 @@ import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
-import br.com.vostre.circular.view.adapter.CidadeAdapterSpinner;
 import br.com.vostre.circular.viewModel.BairrosViewModel;
 
 public class FormBairro extends FormBase {

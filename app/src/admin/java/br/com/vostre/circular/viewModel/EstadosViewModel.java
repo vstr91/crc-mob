@@ -20,8 +20,6 @@ import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.dao.EstadoDAO;
 import br.com.vostre.circular.model.dao.PaisDAO;
 import br.com.vostre.circular.utils.StringUtils;
-import br.com.vostre.circular.view.adapter.PaisAdapter;
-import br.com.vostre.circular.view.adapter.PaisAdapterSpinner;
 
 public class EstadosViewModel extends AndroidViewModel {
 

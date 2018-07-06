@@ -13,8 +13,6 @@ import java.util.List;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityMensagensBinding;
 import br.com.vostre.circular.model.Mensagem;
-import br.com.vostre.circular.view.adapter.MensagemAdapter;
-import br.com.vostre.circular.view.form.FormMensagem;
 import br.com.vostre.circular.viewModel.MensagensViewModel;
 
 public class MensagensActivity extends BaseActivity {

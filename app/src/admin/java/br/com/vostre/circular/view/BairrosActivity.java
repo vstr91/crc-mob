@@ -13,8 +13,6 @@ import java.util.List;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityBairrosBinding;
 import br.com.vostre.circular.model.pojo.BairroCidade;
-import br.com.vostre.circular.view.adapter.BairroAdapter;
-import br.com.vostre.circular.view.form.FormBairro;
 import br.com.vostre.circular.viewModel.BairrosViewModel;
 
 public class BairrosActivity extends BaseActivity {

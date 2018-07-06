@@ -12,10 +12,7 @@ import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.Usuario;
-import br.com.vostre.circular.view.adapter.UsuarioAdapter;
-import br.com.vostre.circular.view.form.FormUsuario;
 import br.com.vostre.circular.databinding.ActivityUsuariosBinding;
-import br.com.vostre.circular.viewModel.UsuariosViewModel;
 
 public class UsuariosActivity extends BaseActivity {
 

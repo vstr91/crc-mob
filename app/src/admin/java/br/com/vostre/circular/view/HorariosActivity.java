@@ -14,11 +14,6 @@ import br.com.vostre.circular.databinding.ActivityHorariosBinding;
 import br.com.vostre.circular.databinding.ActivityPaisesBinding;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.Pais;
-import br.com.vostre.circular.view.adapter.HorarioAdapter;
-import br.com.vostre.circular.view.adapter.PaisAdapter;
-import br.com.vostre.circular.view.form.FormPais;
-import br.com.vostre.circular.viewModel.HorariosViewModel;
-import br.com.vostre.circular.viewModel.PaisesViewModel;
 
 public class HorariosActivity extends BaseActivity {
 

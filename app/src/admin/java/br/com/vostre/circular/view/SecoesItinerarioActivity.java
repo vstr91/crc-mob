@@ -13,9 +13,6 @@ import java.util.List;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.SecaoItinerario;
-import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
-import br.com.vostre.circular.view.form.FormSecao;
-import br.com.vostre.circular.viewModel.SecoesItinerarioViewModel;
 import br.com.vostre.circular.databinding.ActivitySecoesItinerarioBinding;
 
 public class SecoesItinerarioActivity extends BaseActivity {

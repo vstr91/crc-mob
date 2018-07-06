@@ -2,13 +2,20 @@ package br.com.vostre.circular.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
+import java.io.File;
 import java.util.List;
 
+import br.com.vostre.circleview.CircleView;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityItinerariosBinding;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
@@ -22,7 +29,7 @@ public class ItinerariosActivity extends BaseActivity {
     RecyclerView listCidades;
     CidadeAdapter adapter;
 
-    AppCompatActivity ctx;
+    static AppCompatActivity ctx;
 
     ItinerariosViewModel viewModel;
 
@@ -30,20 +37,19 @@ public class ItinerariosActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_itinerarios);
+        binding.setView(this);
         super.onCreate(savedInstanceState);
-            binding.setView(this);
-            setTitle("Itinerários");
-            getSupportActionBar().setDisplayShowTitleEnabled(true);
+        setTitle("Itinerários");
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        viewModel = ViewModelProviders.of(this).get(ItinerariosViewModel.class);
+        viewModel.cidades.observe(this, cidadesObserver);
 
-            viewModel = ViewModelProviders.of(this).get(ItinerariosViewModel.class);
-            viewModel.cidades.observe(this, cidadesObserver);
+        ctx = this;
 
-            ctx = this;
+        listCidades = binding.listCidades;
+        adapter = new CidadeAdapter(viewModel.cidades.getValue(), this);
 
-            listCidades = binding.listCidades;
-            adapter = new CidadeAdapter(viewModel.cidades.getValue(), this);
-
-            listCidades.setAdapter(adapter);
+        listCidades.setAdapter(adapter);
 
 
 
@@ -57,6 +63,22 @@ public class ItinerariosActivity extends BaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
+    }
+
+    @BindingAdapter("app:imagem")
+    public static void setImagem(CircleView view, String imagem){
+
+        if(imagem != null){
+            File brasao = new File(ctx.getApplicationContext().getFilesDir(),  imagem);
+
+            if(brasao.exists() && brasao.canRead()){
+                view.setImagem(Drawable.createFromPath(brasao.getAbsolutePath()));
+            }
+
+        } else{
+            view.setImagem(null);
+        }
+
     }
 
     Observer<List<CidadeEstado>> cidadesObserver = new Observer<List<CidadeEstado>>() {

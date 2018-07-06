@@ -11,6 +11,11 @@
         android:title="@string/action_config"
         app:showAsAction="always" />-->
 
+    <item android:id="@+id/icon_sync"
+        android:title="Sincronização"
+        app:actionLayout="@layout/toolbar_sync_icon"
+        app:showAsAction="always" />
+
     <item android:id="@+id/icon_favoritos"
         android:title="Favoritos"
         app:actionLayout="@layout/toolbar_favoritos_icon"

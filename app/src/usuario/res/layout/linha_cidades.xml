@@ -23,8 +23,9 @@
             android:layout_marginTop="8dp"
             app:corArcoMaior="@color/azul"
             app:corArcoMenor="@color/azul"
-            app:espessuraArcoMaior="15"
+            app:espessuraArcoMaior="20"
             app:espessuraArcoMenor="2"
+            app:imagem="@{cidade.cidade.brasao}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

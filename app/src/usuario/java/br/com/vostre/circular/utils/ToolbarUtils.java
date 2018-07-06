@@ -1,7 +1,6 @@
 package br.com.vostre.circular.utils;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -14,17 +13,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.joda.time.DateTime;
-
-import java.util.UUID;
-
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.model.Pais;
-import br.com.vostre.circular.view.HorariosActivity;
-import br.com.vostre.circular.view.MensagensActivity;
-import br.com.vostre.circular.view.MenuActivity;
-
-import static android.content.Context.ACCOUNT_SERVICE;
 
 /**
  * Created by Almir on 16/12/2015.
@@ -34,6 +23,7 @@ public class ToolbarUtils {
     static TextView textViewBadgeMsg;
     static ImageButton imageButtonMsg;
     static ImageButton imageButtonFavoritos;
+    static ImageButton imageButtonSync;
     static View.OnClickListener mListener;
     public static int NOVAS_MENSAGENS = 0;
 
@@ -56,6 +46,9 @@ public class ToolbarUtils {
         MenuItem itemFavoritos = menu.findItem(R.id.icon_favoritos);
         MenuItemCompat.getActionView(itemFavoritos).setOnClickListener(listener);
 
+        MenuItem itemSync = menu.findItem(R.id.icon_sync);
+        MenuItemCompat.getActionView(itemSync).setOnClickListener(listener);
+
         mListener = listener;
 
         NOVAS_MENSAGENS = 0;
@@ -65,6 +58,9 @@ public class ToolbarUtils {
 
         imageButtonFavoritos = MenuItemCompat.getActionView(itemFavoritos).findViewById(R.id.imageButtonFavoritos);
         imageButtonFavoritos.setOnClickListener(mListener);
+
+        imageButtonSync = MenuItemCompat.getActionView(itemSync).findViewById(R.id.imageButtonSync);
+        imageButtonSync.setOnClickListener(mListener);
 
         if(NOVAS_MENSAGENS < 1){
             textViewBadgeMsg = MenuItemCompat.getActionView(itemMsg).findViewById(R.id.textViewBadgeMsg);
@@ -87,14 +83,32 @@ public class ToolbarUtils {
             case R.id.imageButtonMsg:
             case R.id.msg:
             case R.id.icon_msg:
-                Intent intent = new Intent(activity, MensagensActivity.class);
-                activity.startActivity(intent);
+//                Intent intent = new Intent(activity, MensagensActivity.class);
+//                activity.startActivity(intent);
                 break;
             case R.id.imageButtonFavoritos:
             case R.id.favoritos:
             case R.id.icon_favoritos:
-                Intent i = new Intent(activity, MensagensActivity.class);
-                activity.startActivity(i);
+//                Intent i = new Intent(activity, MensagensActivity.class);
+//                activity.startActivity(i);
+                break;
+            case R.id.imageButtonSync:
+            case R.id.icon_sync:
+            case R.id.sync:
+
+                // Pass the settings flags by inserting them in a bundle
+                Bundle settingsBundle = new Bundle();
+                settingsBundle.putBoolean(
+                        ContentResolver.SYNC_EXTRAS_MANUAL, true);
+                settingsBundle.putBoolean(
+                        ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+                /*
+                 * Request the sync for the default account, authority, and
+                 * manual sync settings
+                 */
+                ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
+                Toast.makeText(activity.getApplicationContext(), "Iniciando sincronização", Toast.LENGTH_SHORT).show();
+
                 break;
         }
     }

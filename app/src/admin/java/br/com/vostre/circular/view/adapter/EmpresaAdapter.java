@@ -9,7 +9,6 @@ import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaEmpresasBinding;
 import br.com.vostre.circular.model.Empresa;
-import br.com.vostre.circular.view.viewHolder.EmpresaViewHolder;
 
 public class EmpresaAdapter extends RecyclerView.Adapter<EmpresaViewHolder> {
 

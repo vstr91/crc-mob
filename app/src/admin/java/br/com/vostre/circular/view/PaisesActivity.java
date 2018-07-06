@@ -12,9 +12,6 @@ import java.util.List;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityPaisesBinding;
 import br.com.vostre.circular.model.Pais;
-import br.com.vostre.circular.view.adapter.PaisAdapter;
-import br.com.vostre.circular.view.form.FormPais;
-import br.com.vostre.circular.viewModel.PaisesViewModel;
 
 public class PaisesActivity extends BaseActivity {
 

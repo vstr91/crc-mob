@@ -21,7 +21,6 @@ import java.util.TimeZone;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormUsuarioBinding;
 import br.com.vostre.circular.model.Usuario;
-import br.com.vostre.circular.viewModel.UsuariosViewModel;
 
 public class FormUsuario extends FormBase {
 

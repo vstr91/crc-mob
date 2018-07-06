@@ -32,7 +32,6 @@ import java.util.TimeZone;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormEmpresaBinding;
 import br.com.vostre.circular.model.Empresa;
-import br.com.vostre.circular.viewModel.EmpresasViewModel;
 
 public class FormEmpresa extends FormBase {
 

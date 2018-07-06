@@ -29,11 +29,11 @@ android {
     productFlavors {
         admin {
             dimension "main"
-            applicationIdSuffix ".admin"
+            applicationId "br.com.vostre.circular.admin"
         }
         usuario {
             dimension "main"
-            applicationIdSuffix ".user"
+            applicationId "br.com.vostre.circular"
         }
     }
 }

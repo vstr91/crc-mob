@@ -31,6 +31,10 @@ public interface BairroDAO {
             "INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado")
     LiveData<List<BairroCidade>> listarTodosComCidade();
 
+    @Query("SELECT b.*, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado FROM bairro b " +
+            "INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado WHERE b.cidade = :cidade")
+    LiveData<List<BairroCidade>> listarTodosComCidadePorCidade(String cidade);
+
     @Query("SELECT * FROM bairro WHERE id IN (:ids)")
     List<Bairro> carregarTodosPorIds(int[] ids);
 

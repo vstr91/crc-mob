@@ -12,8 +12,6 @@ import br.com.vostre.circular.databinding.LinhaParadasBinding;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
-import br.com.vostre.circular.view.viewHolder.ItinerarioViewHolder;
-import br.com.vostre.circular.view.viewHolder.ParadaViewHolder;
 
 public class ItinerarioAdapter extends RecyclerView.Adapter<ItinerarioViewHolder> {
 

@@ -9,6 +9,7 @@ import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaUsuariosBinding;
 import br.com.vostre.circular.model.Usuario;
+import br.com.vostre.circular.view.viewHolder.UsuarioViewHolder;
 
 public class UsuarioAdapter extends RecyclerView.Adapter<UsuarioViewHolder> {
 

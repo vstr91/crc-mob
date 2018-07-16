@@ -11,6 +11,7 @@ import br.com.vostre.circular.databinding.LinhaPaisesBinding;
 import br.com.vostre.circular.databinding.LinhaSecoesBinding;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.SecaoItinerario;
+import br.com.vostre.circular.view.viewHolder.SecaoItinerarioViewHolder;
 
 public class SecaoItinerarioAdapter extends RecyclerView.Adapter<SecaoItinerarioViewHolder> {
 

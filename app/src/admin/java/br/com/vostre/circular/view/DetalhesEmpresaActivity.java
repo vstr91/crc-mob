@@ -17,6 +17,10 @@ import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Onibus;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.databinding.ActivityDetalhesEmpresaBinding;
+import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
+import br.com.vostre.circular.view.adapter.OnibusAdapter;
+import br.com.vostre.circular.view.form.FormOnibus;
+import br.com.vostre.circular.viewModel.DetalhesEmpresaViewModel;
 
 public class DetalhesEmpresaActivity extends BaseActivity {
 

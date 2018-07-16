@@ -25,10 +25,19 @@ public class HorariosItinerarioViewModel extends AndroidViewModel {
     private AppDatabase appDatabase;
 
     public LiveData<List<HorarioItinerarioNome>> horarios;
+    public LiveData<List<HorarioItinerarioNome>> horariosCadastrados;
     public HorarioItinerarioNome horario;
 
     public LiveData<ItinerarioPartidaDestino> itinerario;
     public ObservableField<ItinerarioPartidaDestino> iti;
+
+    public LiveData<List<HorarioItinerarioNome>> getHorariosCadastrados() {
+        return horariosCadastrados;
+    }
+
+    public void setHorariosCadastrados(LiveData<List<HorarioItinerarioNome>> horariosCadastrados) {
+        this.horariosCadastrados = horariosCadastrados;
+    }
 
     public LiveData<List<HorarioItinerarioNome>> getHorarios() {
         return horarios;
@@ -42,6 +51,8 @@ public class HorariosItinerarioViewModel extends AndroidViewModel {
         this.itinerario = appDatabase.itinerarioDAO().carregar(itinerario);
         horarios = appDatabase.horarioItinerarioDAO()
                 .listarTodosAtivosPorItinerario(itinerario);
+        horariosCadastrados = appDatabase.horarioItinerarioDAO()
+                .listarApenasAtivosPorItinerario(itinerario);
     }
 
     public HorarioItinerarioNome getHorario() {
@@ -70,6 +81,7 @@ public class HorariosItinerarioViewModel extends AndroidViewModel {
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         horario = new HorarioItinerarioNome();
         horarios = appDatabase.horarioItinerarioDAO().listarTodosAtivosPorItinerario("");
+        horariosCadastrados = appDatabase.horarioItinerarioDAO().listarTodosAtivosPorItinerario("");
         iti = new ObservableField<>(new ItinerarioPartidaDestino());
     }
 

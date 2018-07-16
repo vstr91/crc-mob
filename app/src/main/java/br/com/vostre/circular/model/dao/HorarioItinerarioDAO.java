@@ -26,9 +26,16 @@ public interface HorarioItinerarioDAO {
     List<HorarioItinerario> listarTodosAEnviar();
 
     @Query("SELECT hi.*, h.id AS idHorario, h.nome AS nomeHorario " +
-            "FROM horario h LEFT JOIN horario_itinerario hi ON hi.horario = h.id " +
+            "FROM horario h LEFT JOIN horario_itinerario hi ON hi.horario = h.id AND hi.itinerario = :itinerario " +
             "WHERE h.ativo = 1 AND (hi.ativo = 1 OR hi.ativo IS NULL) AND (hi.itinerario = :itinerario OR hi.itinerario IS NULL) ORDER BY h.nome")
     LiveData<List<HorarioItinerarioNome>> listarTodosAtivosPorItinerario(String itinerario);
+
+    @Query("SELECT hi.*, h.id AS idHorario, h.nome AS nomeHorario " +
+            "FROM horario h INNER JOIN horario_itinerario hi ON hi.horario = h.id AND hi.itinerario = :itinerario " +
+            "WHERE h.ativo = 1 AND (domingo = 1 OR segunda = 1 OR terca = 1 " +
+            "OR quarta = 1 OR quinta = 1 OR sexta = 1 OR sabado = 1) " +
+            "AND hi.ativo = 1 AND hi.itinerario = :itinerario ORDER BY h.nome")
+    LiveData<List<HorarioItinerarioNome>> listarApenasAtivosPorItinerario(String itinerario);
 
     @Query("SELECT hi.* FROM horario_itinerario hi WHERE hi.horario = :horario AND hi.itinerario = :itinerario")
     HorarioItinerario checaDuplicidade(String horario, String itinerario);
@@ -41,6 +48,28 @@ public interface HorarioItinerarioDAO {
 
     @Query("SELECT * FROM horario_itinerario WHERE id = :id")
     LiveData<HorarioItinerario> carregarPorId(String id);
+
+    @Query("SELECT hi.* FROM horario_itinerario hi " +
+            "INNER JOIN horario h ON h.id = hi.horario WHERE itinerario IN (SELECT pi.itinerario " +
+            "FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada WHERE itinerario IN " +
+            "(SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada " +
+            "WHERE p.bairro = :idPartida AND pi.ordem = 1) " +
+            "AND p.bairro = :idDestino AND pi.ordem > 1) " +
+            "AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= :hora AND hi.ativo = 1 " +
+            "AND :dia = 1 ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1")
+    LiveData<HorarioItinerario> carregarProximoPorPartidaEDestino(String idPartida, String idDestino,
+                                                                  String hora, String dia);
+
+    @Query("SELECT TIME(h.nome/1000, 'unixepoch', 'localtime'), hi.* FROM horario_itinerario hi " +
+            "INNER JOIN horario h ON h.id = hi.horario WHERE itinerario IN (SELECT pi.itinerario " +
+            "FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada WHERE itinerario IN " +
+            "(SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada " +
+            "WHERE p.bairro = :idPartida AND pi.ordem = 1) " +
+            "AND p.bairro = :idDestino AND pi.ordem > 1) " +
+            "AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= :hora AND hi.ativo = 1 " +
+            "AND :dia = 1 ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1")
+    LiveData<HorarioItinerario> carregarPrimeiroPorPartidaEDestino(String idPartida, String idDestino,
+                                                                  String hora, String dia);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<HorarioItinerario> horarioItinerarios);

@@ -19,8 +19,8 @@ import retrofit2.http.Path;
 
 public interface CircularAPI {
 
-    @GET("api/{id}/token")
-    Call<String> requisitaToken(@Path("id") String id);
+    @GET("api/{id}/token/{tipo}")
+    Call<String> requisitaToken(@Path("id") String id, @Path("tipo") int tipo);
 
     @Multipart
     @POST("api/envia-imagem/{token}")

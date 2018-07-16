@@ -145,7 +145,6 @@
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             android:onItemSelected="@{view::onItemSelectedSpinnerEstado}"
             app:entries="@{viewModel.estados}"
             app:layout_constraintBottom_toTopOf="@+id/switchProgramado"
@@ -161,7 +160,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:scaleType="centerInside"
-            app:layout_constraintBottom_toTopOf="@+id/textView8"
+            app:layout_constraintBottom_toTopOf="@+id/textViewCidadeDestino"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btnBrasao"
             app:srcCompat="@mipmap/ic_onibus_azul" />

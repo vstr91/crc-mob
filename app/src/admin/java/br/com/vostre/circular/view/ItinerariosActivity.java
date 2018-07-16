@@ -40,8 +40,11 @@ import br.com.vostre.circular.databinding.ActivityItinerariosBinding;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
+import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
+import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
+import br.com.vostre.circular.view.adapter.ParadaItinerarioAdapter;
 import br.com.vostre.circular.view.form.FormItinerario;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.view.utils.SortListItemHelper;
@@ -55,6 +58,9 @@ public class ItinerariosActivity extends BaseActivity {
 
     RecyclerView listParadas;
     ParadaItinerarioAdapter adapter;
+
+    RecyclerView listItinerarios;
+    ItinerarioAdapter adapterItinerarios;
 
     int permissionGPS;
     int permissionStorage;
@@ -108,6 +114,7 @@ public class ItinerariosActivity extends BaseActivity {
             viewModel = ViewModelProviders.of(this).get(ItinerariosViewModel.class);
             viewModel.paradas.observe(this, paradasObserver);
             viewModel.paradasItinerario.observe(this, paradasItinerarioObserver);
+            viewModel.itinerarios.observe(this, itinerariosObserver);
 
             viewModel.localAtual.observe(this, centroObserver);
             viewModel.retorno.observe(this, retornoObserver);
@@ -151,10 +158,14 @@ public class ItinerariosActivity extends BaseActivity {
             overlayEvents = new MapEventsOverlay(getBaseContext(), receiver);
 
             listParadas = binding.listParadas;
+            listItinerarios = binding.listItinerarios;
             adapter = new ParadaItinerarioAdapter(viewModel.paradasItinerario.getValue(), this,
                     false);
 
+            adapterItinerarios = new ItinerarioAdapter(viewModel.itinerarios.getValue(), this);
+
             listParadas.setAdapter(adapter);
+            listItinerarios.setAdapter(adapterItinerarios);
 
             ItemTouchHelper.Callback callback =
                     new SortListItemHelper(adapter);
@@ -268,6 +279,14 @@ public class ItinerariosActivity extends BaseActivity {
         public void onChanged(List<ParadaItinerarioBairro> paradas) {
             adapter.paradas = paradas;
             adapter.notifyDataSetChanged();
+        }
+    };
+
+    Observer<List<ItinerarioPartidaDestino>> itinerariosObserver = new Observer<List<ItinerarioPartidaDestino>>() {
+        @Override
+        public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
+            adapterItinerarios.itinerarios = itinerarios;
+            adapterItinerarios.notifyDataSetChanged();
         }
     };
 

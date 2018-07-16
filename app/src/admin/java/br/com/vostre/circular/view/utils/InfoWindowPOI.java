@@ -21,6 +21,8 @@ import br.com.vostre.circular.databinding.InfowindowPoiBinding;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.view.form.FormBase;
+import br.com.vostre.circular.view.form.FormPontoInteresse;
+import br.com.vostre.circular.viewModel.InfoWindowPOIViewModel;
 
 public class InfoWindowPOI extends FormBase {
 

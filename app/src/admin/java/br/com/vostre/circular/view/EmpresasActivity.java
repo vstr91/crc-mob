@@ -18,6 +18,9 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityEmpresasBinding;
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.utils.DialogUtils;
+import br.com.vostre.circular.view.adapter.EmpresaAdapter;
+import br.com.vostre.circular.view.form.FormEmpresa;
+import br.com.vostre.circular.viewModel.EmpresasViewModel;
 
 public class EmpresasActivity extends BaseActivity {
 

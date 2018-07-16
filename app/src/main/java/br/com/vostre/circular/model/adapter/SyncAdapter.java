@@ -183,10 +183,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
         }
 
-        System.out.println("ID UNICO >>>>>>>>>>>> "+parametroInterno.getIdentificadorUnico());
-
         try {
             requisitaToken(parametroInterno.getIdentificadorUnico(), 0);
+            requisitaToken(parametroInterno.getIdentificadorUnico(), 1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -225,7 +224,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         id = crypt.bytesToHex(crypt.encrypt(id));
 
         if(tipo == 0){
-            Call<String> call = api.requisitaToken(id);
+            Call<String> call = api.requisitaToken(id, tipo);
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
@@ -233,8 +232,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     if(response.code() == 200){
 
                         token = response.body();
-
-                        System.out.println("TOKEN "+token);
 
                         try {
                             token = crypt.bytesToHex(crypt.encrypt(token));
@@ -260,7 +257,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 }
             });
         } else{
-            Call<String> call = api.requisitaToken(id);
+            Call<String> call = api.requisitaToken(id, tipo);
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
@@ -268,8 +265,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     if(response.code() == 200){
 
                         tokenImagem = response.body();
-
-                        System.out.println("TOKEN IMAGEM "+tokenImagem);
 
                         try {
                             tokenImagem = crypt.bytesToHex(crypt.encrypt(tokenImagem));
@@ -289,7 +284,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 @Override
                 public void onFailure(Call<String> call, Throwable t) {
-
+                    Toast.makeText(getContext().getApplicationContext(),
+                            "Erro "+t.getMessage()+" ao requisitar token de imagem.",
+                            Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -350,9 +347,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         requisitaToken(parametroInterno.getIdentificadorUnico(), 1);
                         processaJson(response);
                     } catch (JSONException e) {
-                        Toast.makeText(ctx, "Problema ao processar dados: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ctx, "Problema ao processar dados: "+e.getMessage(), Toast.LENGTH_LONG).show();
                     } catch (Exception e) {
                         e.printStackTrace();
+                        Toast.makeText(ctx, "Problema ao processar dados: "+e.getMessage(), Toast.LENGTH_LONG).show();
                     }
 
                 }
@@ -370,8 +368,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     private void processaJson(Response<String> response) throws JSONException {
 
         String dados = response.body();
-
-        System.out.println("DADOS >>>>> "+dados);
 
         if(dados != null){
 
@@ -455,16 +451,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     lstCidades.add(cidade);
 
-                    System.out.println("CIDADE "+cidade.getBrasao());
-
                     if(cidade.getBrasao() != null && !cidade.getBrasao().isEmpty()){
                         File brasao = new File(getContext().getApplicationContext().getFilesDir(), cidade.getBrasao());
 
                         if(!brasao.exists() || !brasao.canWrite()){
-                            System.out.println("BAIXANDO BRASAO");
                             imageDownload(baseUrl, cidade.getBrasao());
-                        } else{
-                            System.out.println("RESP BRASAO >>>>>>> "+brasao.exists());
                         }
                     }
 
@@ -509,8 +500,17 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     parada = (Parada) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Parada.class, 1);
                     parada.setEnviado(true);
+                    parada.setImagemEnviada(true);
 
                     lstParadas.add(parada);
+
+                    if(parada.getImagem() != null && !parada.getImagem().isEmpty()){
+                        File imagem = new File(getContext().getApplicationContext().getFilesDir(), parada.getImagem());
+
+                        if(!imagem.exists() || !imagem.canWrite()){
+                            imageDownload(baseUrl, parada.getImagem());
+                        }
+                    }
 
                 }
 
@@ -531,9 +531,17 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     empresa = (Empresa) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Empresa.class, 1);
                     empresa.setEnviado(true);
-                    empresa.setImagemEnviada(false);
+                    empresa.setImagemEnviada(true);
 
                     lstEmpresas.add(empresa);
+
+                    if(empresa.getLogo() != null && !empresa.getLogo().isEmpty()){
+                        File logo = new File(getContext().getApplicationContext().getFilesDir(), empresa.getLogo());
+
+                        if(!logo.exists() || !logo.canWrite()){
+                            imageDownload(baseUrl, empresa.getLogo());
+                        }
+                    }
 
                 }
 
@@ -730,9 +738,17 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     pontoInteresse = (PontoInteresse) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), PontoInteresse.class, 1);
                     pontoInteresse.setEnviado(true);
-                    pontoInteresse.setImagemEnviada(false);
+                    pontoInteresse.setImagemEnviada(true);
 
                     lstPontosInteresse.add(pontoInteresse);
+
+                    if(pontoInteresse.getImagem() != null && !pontoInteresse.getImagem().isEmpty()){
+                        File imagem = new File(getContext().getApplicationContext().getFilesDir(), pontoInteresse.getImagem());
+
+                        if(!imagem.exists() || !imagem.canWrite()){
+                            imageDownload(baseUrl, pontoInteresse.getImagem());
+                        }
+                    }
 
                 }
 
@@ -970,7 +986,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
-
+                        Toast.makeText(getContext().getApplicationContext(),
+                                "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+empresa.getNome()+" para o servidor",
+                                Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -1003,7 +1021,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
-
+                        Toast.makeText(getContext().getApplicationContext(),
+                                "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+parada.getNome()+" para o servidor",
+                                Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -1027,8 +1047,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                             pontoInteresse.setImagemEnviada(true);
                             PontosInteresseViewModel.edit(pontoInteresse, getContext().getApplicationContext());
                         } else{
-                            System.out.println("RESP IMAGEM "+response.body()+" | "+response.message()+" | "
-                                    +response.headers()+" | "+call.request().url());
                             Toast.makeText(getContext().getApplicationContext(),
                                     "Erro "+response.code()+" ("+response.message()+") ao enviar imagem de "+pontoInteresse.getNome()+" para o servidor",
                                     Toast.LENGTH_SHORT).show();
@@ -1038,7 +1056,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
-
+                        Toast.makeText(getContext().getApplicationContext(),
+                                "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+pontoInteresse.getNome()+" para o servidor",
+                                Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -1098,67 +1118,51 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             switch(entidade){
                 case "pais":
-                    //db.paisDAO().deletarTodos();
                     db.paisDAO().inserirTodos((List<Pais>) params[0]);
                     break;
                 case "empresa":
-                    //db.empresaDAO().deletarTodos();
                     db.empresaDAO().inserirTodos((List<Empresa>) params[0]);
                     break;
                 case "onibus":
-                    //db.onibusDAO().deletarTodos();
                     db.onibusDAO().inserirTodos((List<Onibus>) params[0]);
                     break;
                 case "estado":
-                    //db.estadoDAO().deletarTodos();
                     db.estadoDAO().inserirTodos((List<Estado>) params[0]);
                     break;
                 case "cidade":
-                    //db.cidadeDAO().deletarTodos();
                     db.cidadeDAO().inserirTodos((List<Cidade>) params[0]);
                     break;
                 case "bairro":
-                    //db.bairroDAO().deletarTodos();
                     db.bairroDAO().inserirTodos((List<Bairro>) params[0]);
                     break;
                 case "parada":
-                    //db.paradaDAO().deletarTodos();
                     db.paradaDAO().inserirTodos((List<Parada>) params[0]);
                     break;
                 case "itinerario":
-                    //db.itinerarioDAO().deletarTodos();
                     db.itinerarioDAO().inserirTodos((List<Itinerario>) params[0]);
                     break;
                 case "horario":
-                    //db.horarioDAO().deletarTodos();
                     db.horarioDAO().inserirTodos((List<Horario>) params[0]);
                     break;
                 case "parada_itinerario":
-                    //db.paradaItinerarioDAO().deletarTodos();
                     db.paradaItinerarioDAO().inserirTodos((List<ParadaItinerario>) params[0]);
                     break;
                 case "secao_itinerario":
-                    //db.secaoItinerarioDAO().deletarTodos();
                     db.secaoItinerarioDAO().inserirTodos((List<SecaoItinerario>) params[0]);
                     break;
                 case "horario_itinerario":
-                    //db.horarioItinerarioDAO().deletarTodos();
                     db.horarioItinerarioDAO().inserirTodos((List<HorarioItinerario>) params[0]);
                     break;
                 case "mensagem":
-                    //db.mensagemDAO().deletarTodos();
                     db.mensagemDAO().inserirTodos((List<Mensagem>) params[0]);
                     break;
                 case "parametro":
-                    //db.parametroDAO().deletarTodos();
                     db.parametroDAO().inserirTodos((List<Parametro>) params[0]);
                     break;
                 case "ponto_interesse":
-                    //db.pontoInteresseDAO().deletarTodos();
                     db.pontoInteresseDAO().inserirTodos((List<PontoInteresse>) params[0]);
                     break;
                 case "usuario":
-                    //db.usuarioDAO().deletarTodos();
                     db.usuarioDAO().inserirTodos((List<Usuario>) params[0]);
                     break;
             }
@@ -1185,7 +1189,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                System.out.println("RESP IMAGEM >>>>>>>> "+response.message()+" | "+response.code());
 
                 if(response.code() == 200){
                     FileOutputStream fos = null;
@@ -1197,6 +1200,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
+                        Toast.makeText(ctx, "Erro ("+e.getMessage()+") ao receber imagem.", Toast.LENGTH_SHORT).show();
                     } finally {
                         try {
                             if (fos != null) {
@@ -1214,7 +1218,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                System.out.println("RESP IMAGEM ERRO >>>>>>>>>>> "+t.getMessage());
+                Toast.makeText(ctx, "Erro ("+t.getMessage()+") ao receber imagem.", Toast.LENGTH_SHORT).show();
             }
         });
     }

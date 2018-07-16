@@ -54,7 +54,9 @@ import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.DialogUtils;
+import br.com.vostre.circular.view.form.FormParada;
 import br.com.vostre.circular.view.utils.InfoWindow;
+import br.com.vostre.circular.viewModel.ParadasViewModel;
 
 public class ParadasActivity extends BaseActivity {
 
@@ -131,6 +133,7 @@ public class ParadasActivity extends BaseActivity {
             MapEventsReceiver receiver = new MapEventsReceiver() {
                 @Override
                 public boolean singleTapConfirmedHelper(GeoPoint p) {
+                    viewModel.parada = new ParadaBairro();
                     formParada = new FormParada();
                     formParada.setLatitude(p.getLatitude());
                     formParada.setLongitude(p.getLongitude());

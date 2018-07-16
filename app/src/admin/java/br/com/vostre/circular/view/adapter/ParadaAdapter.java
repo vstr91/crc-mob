@@ -12,6 +12,7 @@ import br.com.vostre.circular.databinding.LinhaParadasBinding;
 import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.view.viewHolder.ParadaViewHolder;
 
 public class ParadaAdapter extends RecyclerView.Adapter<ParadaViewHolder> {
 

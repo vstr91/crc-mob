@@ -1,5 +1,7 @@
 package br.com.vostre.circular.view.viewHolder;
 
+import android.databinding.BindingAdapter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.BundleCompat;
 import android.support.v4.app.FragmentManager;
@@ -8,14 +10,27 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.File;
+
+import br.com.vostre.circleview.CircleView;
 import br.com.vostre.circular.databinding.LinhaCidadesBinding;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.view.form.FormBairro;
+import br.com.vostre.circular.view.listener.SelectListener;
 
 public class CidadeViewHolder extends RecyclerView.ViewHolder {
 
     private final LinhaCidadesBinding binding;
     AppCompatActivity ctx;
+    SelectListener myListener;
+
+    public SelectListener getListener() {
+        return myListener;
+    }
+
+    public void setListener(SelectListener listener) {
+        this.myListener = listener;
+    }
 
     public CidadeViewHolder(LinhaCidadesBinding binding, AppCompatActivity context) {
         super(binding.getRoot());
@@ -25,19 +40,21 @@ public class CidadeViewHolder extends RecyclerView.ViewHolder {
 
     public void bind(final CidadeEstado cidade) {
         binding.setCidade(cidade);
+        //binding.circleView2.setImagem(null);
 
-        View.OnClickListener listener = new View.OnClickListener() {
+//        final File brasao = new File(ctx.getApplicationContext().getFilesDir(),  cidade.getCidade().getBrasao());
+//
+//        if(brasao.exists() && brasao.canRead()){
+//            final Drawable drawable = Drawable.createFromPath(brasao.getAbsolutePath());
+//            binding.circleView2.setImagem(drawable);
+//        }
+//
+//        binding.textViewNome.setText(cidade.getCidade().getNome());
+
+        final View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FormBairro formBairro = new FormBairro();
-
-                Bundle bundle = new Bundle();
-                bundle.putString("cidade", cidade.getCidade().getId());
-
-                formBairro.setArguments(bundle);
-                formBairro.setCtx(ctx.getApplication());
-                formBairro.show(ctx.getSupportFragmentManager(), "formBairro");
-
+                myListener.onSelected(cidade.getCidade().getId());
             }
         };
 
@@ -46,4 +63,5 @@ public class CidadeViewHolder extends RecyclerView.ViewHolder {
 
         binding.executePendingBindings();
     }
+
 }

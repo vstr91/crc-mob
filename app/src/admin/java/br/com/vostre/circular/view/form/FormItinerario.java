@@ -32,6 +32,7 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormItinerarioBinding;
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.Itinerario;
+import br.com.vostre.circular.view.adapter.EmpresaAdapterSpinner;
 import br.com.vostre.circular.viewModel.ItinerariosViewModel;
 
 public class FormItinerario extends FormBase {

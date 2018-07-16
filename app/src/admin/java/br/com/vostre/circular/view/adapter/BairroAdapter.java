@@ -9,6 +9,7 @@ import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaBairrosBinding;
 import br.com.vostre.circular.model.pojo.BairroCidade;
+import br.com.vostre.circular.view.viewHolder.BairroViewHolder;
 
 public class BairroAdapter extends RecyclerView.Adapter<BairroViewHolder> {
 

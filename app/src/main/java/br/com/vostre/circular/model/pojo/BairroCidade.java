@@ -18,6 +18,9 @@ public class BairroCidade {
     @ColumnInfo(name = "nomeCidade")
     String nomeCidade;
 
+    @ColumnInfo(name = "brasao")
+    String brasao;
+
     @ColumnInfo(name = "idEstado")
     String idEstado;
 
@@ -29,6 +32,14 @@ public class BairroCidade {
 
     @Ignore
     String nomeCidadeComEstado;
+
+    public String getBrasao() {
+        return brasao;
+    }
+
+    public void setBrasao(String brasao) {
+        this.brasao = brasao;
+    }
 
     public BairroCidade(){
         setBairro(new Bairro());

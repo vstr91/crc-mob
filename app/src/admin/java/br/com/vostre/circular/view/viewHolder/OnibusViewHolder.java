@@ -12,6 +12,8 @@ import br.com.vostre.circular.databinding.LinhaOnibusBinding;
 import br.com.vostre.circular.databinding.LinhaPaisesBinding;
 import br.com.vostre.circular.model.Onibus;
 import br.com.vostre.circular.model.Pais;
+import br.com.vostre.circular.view.DetalhesOnibusActivity;
+import br.com.vostre.circular.view.form.FormOnibus;
 
 public class OnibusViewHolder extends RecyclerView.ViewHolder {
 

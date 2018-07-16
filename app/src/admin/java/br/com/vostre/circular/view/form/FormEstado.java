@@ -34,6 +34,7 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormEstadoBinding;
 import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.Pais;
+import br.com.vostre.circular.view.adapter.PaisAdapterSpinner;
 import br.com.vostre.circular.viewModel.EstadosViewModel;
 
 public class FormEstado extends FormBase {

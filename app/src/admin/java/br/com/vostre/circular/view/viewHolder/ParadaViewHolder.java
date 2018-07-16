@@ -11,6 +11,7 @@ import br.com.vostre.circular.databinding.LinhaBairrosBinding;
 import br.com.vostre.circular.databinding.LinhaParadasBinding;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.view.form.FormParada;
 
 public class ParadaViewHolder extends RecyclerView.ViewHolder {
 

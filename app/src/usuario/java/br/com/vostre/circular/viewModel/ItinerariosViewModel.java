@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
@@ -22,6 +23,7 @@ import java.util.List;
 
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.Horario;
+import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
@@ -34,14 +36,17 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
     private AppDatabase appDatabase;
 
-    public LiveData<List<Itinerario>> itinerarios;
-    public Itinerario itinerario;
+    public LiveData<HorarioItinerario> itinerario;
 
     public LiveData<List<CidadeEstado>> cidades;
     public CidadeEstado cidadePartida;
+    public CidadeEstado cidadeDestino;
 
     public LiveData<List<BairroCidade>> bairros;
-    public BairroCidade bairroPartida;
+    public LiveData<BairroCidade> bairroPartida;
+    public LiveData<BairroCidade> bairroDestino;
+
+    public int escolhaAtual = 0; // 0 partida - 1 destino
 
     public CidadeEstado getCidadePartida() {
         return cidadePartida;
@@ -52,27 +57,36 @@ public class ItinerariosViewModel extends AndroidViewModel {
         bairros = appDatabase.bairroDAO().listarTodosComCidadePorCidade(cidadePartida.getCidade().getId());
     }
 
-    public BairroCidade getBairroPartida() {
+    public CidadeEstado getCidadeDestino() {
+        return cidadeDestino;
+    }
+
+    public void setCidadeDestino(CidadeEstado cidadeDestino) {
+        this.cidadeDestino = cidadeDestino;
+        bairros = appDatabase.bairroDAO().listarTodosComCidadePorCidade(cidadeDestino.getCidade().getId());
+    }
+
+    public LiveData<BairroCidade> getBairroDestino() {
+        return bairroDestino;
+    }
+
+    public void setBairroDestino(BairroCidade bairroDestino) {
+        this.bairroDestino = appDatabase.bairroDAO().carregar(bairroDestino.getBairro().getId());
+    }
+
+    public LiveData<BairroCidade> getBairroPartida() {
         return bairroPartida;
     }
 
-    public void setBairroPartida(BairroCidade bairroPartida) {
-        this.bairroPartida = bairroPartida;
+    public void setBairroPartida(BairroCidade umBairroPartida) {
+        this.bairroPartida = appDatabase.bairroDAO().carregar(umBairroPartida.getBairro().getId());
     }
 
-    public LiveData<List<Itinerario>> getItinerarios() {
-        return itinerarios;
-    }
-
-    public void setItinerarios(LiveData<List<Itinerario>> itinerarios) {
-        this.itinerarios = itinerarios;
-    }
-
-    public Itinerario getItinerario() {
+    public LiveData<HorarioItinerario> getItinerario() {
         return itinerario;
     }
 
-    public void setItinerario(Itinerario itinerario) {
+    public void setItinerario(LiveData<HorarioItinerario> itinerario) {
         this.itinerario = itinerario;
     }
 
@@ -87,11 +101,24 @@ public class ItinerariosViewModel extends AndroidViewModel {
     public ItinerariosViewModel(Application app){
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
-        itinerario = new Itinerario();
-        itinerarios = appDatabase.itinerarioDAO().listarTodos();
+        itinerario = appDatabase.horarioItinerarioDAO()
+                .carregarProximoPorPartidaEDestino("", "", "", "domingo");
         cidades = appDatabase.cidadeDAO().listarTodosAtivasComEstado();
-        bairroPartida = new BairroCidade();
+        bairroPartida = appDatabase.bairroDAO().carregar(null);
+        bairroDestino = appDatabase.bairroDAO().carregar(null);
         bairros = appDatabase.bairroDAO().listarTodosComCidadePorCidade(null);
+    }
+
+    public void carregaResultado(String hora, String dia){
+        itinerario = appDatabase.horarioItinerarioDAO()
+                .carregarProximoPorPartidaEDestino(bairroPartida.getValue().getBairro().getId(),
+                        bairroDestino.getValue().getBairro().getId(), "12:00", dia);
+    }
+
+    public void carregaResultadoDiaSeguinte(String dia){
+        itinerario = appDatabase.horarioItinerarioDAO()
+                .carregarPrimeiroPorPartidaEDestino(bairroPartida.getValue().getBairro().getId(),
+                        bairroDestino.getValue().getBairro().getId(), "00:00", dia);
     }
 
 }

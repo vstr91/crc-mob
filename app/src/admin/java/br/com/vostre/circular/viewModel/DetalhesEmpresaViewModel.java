@@ -52,7 +52,7 @@ public class DetalhesEmpresaViewModel extends AndroidViewModel {
         itinerario = new Itinerario();
         umOnibus = new Onibus();
         empresa = appDatabase.empresaDAO().carregar("");
-        itinerarios = appDatabase.itinerarioDAO().listarTodosAtivos();
+        itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosPorEmpresa("");
         onibus = appDatabase.onibusDAO().listarTodosAtivos();
     }
 

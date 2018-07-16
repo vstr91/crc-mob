@@ -28,6 +28,7 @@
             android:paddingRight="10dp"
             android:paddingTop="10dp"
             android:text="@{bairro.bairro.nome}"
+            android:textAppearance="@style/texto_azul"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

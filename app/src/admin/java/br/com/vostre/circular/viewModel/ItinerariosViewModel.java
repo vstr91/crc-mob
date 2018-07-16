@@ -25,6 +25,7 @@ import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
+import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 
@@ -32,7 +33,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
     private AppDatabase appDatabase;
 
-    public LiveData<List<Itinerario>> itinerarios;
+    public LiveData<List<ItinerarioPartidaDestino>> itinerarios;
     public Itinerario itinerario;
 
     public MutableLiveData<List<ParadaItinerarioBairro>> paradasItinerario;
@@ -48,13 +49,13 @@ public class ItinerariosViewModel extends AndroidViewModel {
     public Empresa empresa;
     public LiveData<List<Empresa>> empresas;
 
-    public LiveData<List<Itinerario>> getItinerarios() {
+    public LiveData<List<ItinerarioPartidaDestino>> getItinerarios() {
         return itinerarios;
     }
 
     public static MutableLiveData<Integer> retorno;
 
-    public void setItinerarios(LiveData<List<Itinerario>> itinerarios) {
+    public void setItinerarios(LiveData<List<ItinerarioPartidaDestino>> itinerarios) {
         this.itinerarios = itinerarios;
     }
 
@@ -94,7 +95,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         itinerario = new Itinerario();
-        itinerarios = appDatabase.itinerarioDAO().listarTodos();
+        itinerarios = appDatabase.itinerarioDAO().listarTodosAtivos();
         paradas = appDatabase.paradaDAO().listarTodosAtivosComBairro();
         empresas = appDatabase.empresaDAO().listarTodosAtivos();
 

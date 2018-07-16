@@ -11,6 +11,7 @@ import br.com.vostre.circular.databinding.LinhaHorariosBinding;
 import br.com.vostre.circular.databinding.LinhaPaisesBinding;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.Pais;
+import br.com.vostre.circular.view.viewHolder.HorarioViewHolder;
 
 public class HorarioAdapter extends RecyclerView.Adapter<HorarioViewHolder> {
 

@@ -34,6 +34,7 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.Onibus;
 import br.com.vostre.circular.databinding.ActivityDetalhesOnibusBinding;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
+import br.com.vostre.circular.viewModel.DetalhesOnibusViewModel;
 
 public class DetalhesOnibusActivity extends BaseActivity {
 

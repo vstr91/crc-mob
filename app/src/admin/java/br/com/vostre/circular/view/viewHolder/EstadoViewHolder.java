@@ -10,6 +10,7 @@ import org.joda.time.format.DateTimeFormat;
 import br.com.vostre.circular.databinding.LinhaEstadosBinding;
 import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.Pais;
+import br.com.vostre.circular.view.form.FormEstado;
 
 public class EstadoViewHolder extends RecyclerView.ViewHolder {
 

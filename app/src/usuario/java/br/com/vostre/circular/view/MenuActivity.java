@@ -47,7 +47,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     // The authority for the sync adapter's content provider
     public static final String AUTHORITY = "br.com.vostre.circular.datasync.provider";
     // An account type, in the form of a domain name
-    public static final String ACCOUNT_TYPE = "br.com.vostre.circular";
+    public static final String ACCOUNT_TYPE = "br.com.vostre.circular.usuario";
     // The account name
     public static final String ACCOUNT = "dummyaccount";
     // Instance fields

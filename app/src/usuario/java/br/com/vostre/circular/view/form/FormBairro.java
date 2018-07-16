@@ -35,6 +35,7 @@ import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.view.adapter.BairroAdapter;
+import br.com.vostre.circular.view.listener.ItemListener;
 import br.com.vostre.circular.view.listener.SelectListener;
 import br.com.vostre.circular.viewModel.BairrosViewModel;
 import br.com.vostre.circular.viewModel.ItinerariosViewModel;
@@ -51,15 +52,24 @@ public class FormBairro extends FormBase implements SelectListener {
     BairroAdapter adapter;
     RecyclerView listBairros;
 
-    CidadeEstado cidadePartida;
+    CidadeEstado cidade;
+    ItemListener listener;
 
-    public CidadeEstado getCidadePartida() {
-        return cidadePartida;
+    public ItemListener getListener() {
+        return listener;
     }
 
-    public void setCidadePartida(CidadeEstado cidadePartida) {
-        this.cidadePartida = cidadePartida;
-        viewModel.setCidadePartida(cidadePartida);
+    public void setListener(ItemListener listener) {
+        this.listener = listener;
+    }
+
+    public CidadeEstado getCidade() {
+        return cidade;
+    }
+
+    public void setCidade(CidadeEstado cidade) {
+        this.cidade = cidade;
+        viewModel.setCidadePartida(cidade);
     }
 
     public Application getCtx() {
@@ -95,11 +105,18 @@ public class FormBairro extends FormBase implements SelectListener {
         viewModel = ViewModelProviders.of(this.getActivity()).get(ItinerariosViewModel.class);
 
         if(getArguments() != null){
-            Cidade cidade = new Cidade();
-            cidade.setId(getArguments().getString("cidade"));
-            cidadePartida = new CidadeEstado();
-            cidadePartida.setCidade(cidade);
-            viewModel.setCidadePartida(cidadePartida);
+            Cidade umaCidade = new Cidade();
+            umaCidade.setId(getArguments().getString("cidade"));
+            cidade = new CidadeEstado();
+            cidade.setCidade(umaCidade);
+
+            if(viewModel.escolhaAtual == 0){
+                viewModel.setCidadePartida(cidade);
+                //viewModel.escolhaAtual = 1;
+            } else{
+                viewModel.setCidadeDestino(cidade);
+            }
+
         }
 
         binding.setView(this);
@@ -127,10 +144,9 @@ public class FormBairro extends FormBase implements SelectListener {
 
     @Override
     public String onSelected(String id) {
+        listener.onItemSelected(id);
         dismiss();
-        Bairro bairro = new Bairro();
-        bairro.setId(id);
-        Toast.makeText(ctx, "Escolheu bairro id "+id+"!", Toast.LENGTH_SHORT).show();
-        return null;
+
+        return id;
     }
 }

@@ -6,29 +6,41 @@
         <variable
             name="cidade"
             type="br.com.vostre.circular.model.pojo.CidadeEstado" />
+        <variable
+            name="imagem"
+            type="android.graphics.drawable.Drawable" />
     </data>
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <br.com.vostre.circleview.CircleView
+        <ImageView
             android:id="@+id/circleView2"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            app:corArcoMaior="@color/azul"
-            app:corArcoMenor="@color/azul"
-            app:espessuraArcoMaior="20"
-            app:espessuraArcoMenor="2"
             app:imagem="@{cidade.cidade.brasao}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <!--<br.com.vostre.circleview.CircleView-->
+            <!--android:id="@+id/circleView2"-->
+            <!--android:layout_width="100dp"-->
+            <!--android:layout_height="100dp"-->
+            <!--android:layout_marginEnd="8dp"-->
+            <!--android:layout_marginLeft="8dp"-->
+            <!--android:layout_marginRight="8dp"-->
+            <!--android:layout_marginStart="8dp"-->
+            <!--android:layout_marginTop="8dp"-->
+            <!--app:corArcoMaior="@color/azul"-->
+            <!--app:corArcoMenor="@color/azul"-->
+            <!--app:imagem="@{cidade.cidade.brasao}"-->
+            <!--app:espessuraArcoMaior="8"-->
+            <!--app:espessuraArcoMenor="8"-->
+            <!--app:layout_constraintEnd_toEndOf="parent"-->
+            <!--app:layout_constraintStart_toStartOf="parent"-->
+            <!--app:layout_constraintTop_toTopOf="parent" />-->
 
         <TextView
             android:id="@+id/textViewNome"

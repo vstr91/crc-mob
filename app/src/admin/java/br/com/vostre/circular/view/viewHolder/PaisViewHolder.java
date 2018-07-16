@@ -12,6 +12,7 @@ import org.joda.time.format.DateTimeFormat;
 
 import br.com.vostre.circular.databinding.LinhaPaisesBinding;
 import br.com.vostre.circular.model.Pais;
+import br.com.vostre.circular.view.form.FormPais;
 
 public class PaisViewHolder extends RecyclerView.ViewHolder {
 

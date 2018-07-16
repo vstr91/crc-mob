@@ -11,6 +11,7 @@ import br.com.vostre.circular.databinding.LinhaMensagensBinding;
 import br.com.vostre.circular.databinding.LinhaRespostasBinding;
 import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.MensagemResposta;
+import br.com.vostre.circular.view.viewHolder.MensagemRespostaViewHolder;
 
 public class MensagemRespostaAdapter extends RecyclerView.Adapter<MensagemRespostaViewHolder> {
 

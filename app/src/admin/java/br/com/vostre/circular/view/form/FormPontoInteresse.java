@@ -30,6 +30,7 @@ import java.util.TimeZone;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormPontoInteresseBinding;
 import br.com.vostre.circular.model.PontoInteresse;
+import br.com.vostre.circular.viewModel.PontosInteresseViewModel;
 
 public class FormPontoInteresse extends FormPOIBase {
 

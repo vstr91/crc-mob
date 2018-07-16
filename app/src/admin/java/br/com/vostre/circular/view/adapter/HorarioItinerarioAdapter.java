@@ -12,6 +12,8 @@ import br.com.vostre.circular.databinding.LinhaHorariosItinerariosBinding;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
+import br.com.vostre.circular.view.viewHolder.HorarioItinerarioViewHolder;
+import br.com.vostre.circular.viewModel.HorariosItinerarioViewModel;
 
 public class HorarioItinerarioAdapter extends RecyclerView.Adapter<HorarioItinerarioViewHolder> {
 

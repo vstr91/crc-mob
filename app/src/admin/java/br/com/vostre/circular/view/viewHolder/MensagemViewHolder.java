@@ -9,6 +9,8 @@ import org.joda.time.format.DateTimeFormat;
 
 import br.com.vostre.circular.databinding.LinhaMensagensBinding;
 import br.com.vostre.circular.model.Mensagem;
+import br.com.vostre.circular.view.form.FormDetalheMensagem;
+import br.com.vostre.circular.view.form.FormMensagem;
 
 public class MensagemViewHolder extends RecyclerView.ViewHolder {
 

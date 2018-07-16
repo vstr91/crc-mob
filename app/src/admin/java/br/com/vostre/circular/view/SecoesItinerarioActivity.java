@@ -14,6 +14,9 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.databinding.ActivitySecoesItinerarioBinding;
+import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
+import br.com.vostre.circular.view.form.FormSecao;
+import br.com.vostre.circular.viewModel.SecoesItinerarioViewModel;
 
 public class SecoesItinerarioActivity extends BaseActivity {
 

@@ -21,6 +21,7 @@ import java.util.TimeZone;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormPaisBinding;
 import br.com.vostre.circular.model.Pais;
+import br.com.vostre.circular.viewModel.PaisesViewModel;
 
 public class FormPais extends FormBase {
 

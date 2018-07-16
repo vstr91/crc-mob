@@ -12,6 +12,7 @@ import br.com.vostre.circular.databinding.LinhaItinerariosBinding;
 import br.com.vostre.circular.databinding.LinhaParadasBinding;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.view.DetalhesItinerarioActivity;
 
 public class ItinerarioViewHolder extends RecyclerView.ViewHolder {
 

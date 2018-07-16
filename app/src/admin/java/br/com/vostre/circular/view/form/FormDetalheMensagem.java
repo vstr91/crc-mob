@@ -29,6 +29,7 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormDetalheMensagemBinding;
 import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.MensagemResposta;
+import br.com.vostre.circular.view.adapter.MensagemRespostaAdapter;
 import br.com.vostre.circular.viewModel.DetalheMensagensViewModel;
 
 public class FormDetalheMensagem extends FormBase {

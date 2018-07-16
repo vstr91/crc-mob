@@ -24,6 +24,7 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.InfowindowBinding;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.view.form.FormBase;
+import br.com.vostre.circular.view.form.FormParada;
 import br.com.vostre.circular.viewModel.InfoWindowViewModel;
 
 public class InfoWindow extends FormBase {

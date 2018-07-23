@@ -2,21 +2,16 @@ package br.com.vostre.circular.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.format.DateTimeFormat;
 
@@ -26,9 +21,10 @@ import java.util.List;
 import br.com.vostre.circleview.CircleView;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityItinerariosBinding;
-import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
+import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
+import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.view.adapter.CidadeAdapter;
 import br.com.vostre.circular.view.form.FormBairro;
 import br.com.vostre.circular.view.listener.ItemListener;
@@ -39,12 +35,16 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     ActivityItinerariosBinding binding;
 
-    RecyclerView listCidades;
+    RecyclerView listCidadesPartida;
     CidadeAdapter adapter;
 
     static AppCompatActivity ctx;
 
     ItinerariosViewModel viewModel;
+
+    String dia = "";
+    String diaSeguinte = "";
+    boolean consultaDiaSeguinte = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,11 +62,11 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
         ctx = this;
 
-        listCidades = binding.listCidades;
+        listCidadesPartida = binding.listCidadesPartida;
         adapter = new CidadeAdapter(viewModel.cidades.getValue(), this);
         adapter.setListener(this);
 
-        listCidades.setAdapter(adapter);
+        listCidadesPartida.setAdapter(adapter);
     }
 
     @Override
@@ -81,11 +81,14 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     @BindingAdapter("app:imagem")
     public static void setimagem(ImageView view, String imagem){
-        final File brasao = new File(ctx.getApplicationContext().getFilesDir(),  imagem);
 
-        if(brasao.exists() && brasao.canRead()){
-            final Drawable drawable = Drawable.createFromPath(brasao.getAbsolutePath());
-            view.setImageDrawable(drawable);
+        if(imagem != null){
+            final File brasao = new File(ctx.getApplicationContext().getFilesDir(),  imagem);
+
+            if(brasao.exists() && brasao.canRead()){
+                final Drawable drawable = Drawable.createFromPath(brasao.getAbsolutePath());
+                view.setImageDrawable(drawable);
+            }
         }
 
     }
@@ -98,10 +101,18 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
             if(brasao.exists() && brasao.canRead()){
                 final Drawable drawable = Drawable.createFromPath(brasao.getAbsolutePath());
+                view.setImagem(null);
                 view.setImagem(drawable);
+                view.refreshDrawableState();
             }
         }
 
+    }
+
+    public void onClickBtnEditarPartida(View v){
+        binding.cardViewPartida.setVisibility(View.GONE);
+        binding.cardViewListPartida.setVisibility(View.VISIBLE);
+        viewModel.escolhaAtual = 0;
     }
 
     Observer<List<CidadeEstado>> cidadesObserver = new Observer<List<CidadeEstado>>() {
@@ -123,6 +134,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
                     binding.textViewBairroPartida.setText(bairro.getBairro().getNome());
                     binding.textViewCidadePartida.setText(bairro.getNomeCidade());
                     setimagem(binding.circleViewPartida, bairro.getBrasao());
+                    binding.cardViewListPartida.setVisibility(View.GONE);
                 }
             } else{
                 if(bairro != null){
@@ -137,14 +149,62 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         }
     };
 
-    Observer<HorarioItinerario> itinerarioObserver = new Observer<HorarioItinerario>() {
+    Observer<HorarioItinerarioNome> itinerarioObserver = new Observer<HorarioItinerarioNome>() {
         @Override
-        public void onChanged(HorarioItinerario horario) {
+        public void onChanged(HorarioItinerarioNome horario) {
 
-            if(horario != null){
-                System.out.println("HORARIO:: "+horario.getHorario());
-            } else{
-                viewModel.carregaResultadoDiaSeguinte(date);
+            if(horario != null && horario.getIdHorario() != null){
+                exibeDados(horario);
+                viewModel.carregaHorarios(horario);
+                viewModel.horarioAnterior.observe(ctx, horarioAnteriorObserver);
+                viewModel.horarioSeguinte.observe(ctx, horarioSeguinteObserver);
+            } else if(!consultaDiaSeguinte){
+                consultaDiaSeguinte = true;
+                viewModel.carregaResultadoDiaSeguinte(diaSeguinte);
+                viewModel.itinerario.observe(ctx, itinerarioObserver);
+            }
+
+        }
+    };
+
+    Observer<HorarioItinerarioNome> horarioAnteriorObserver = new Observer<HorarioItinerarioNome>() {
+        @Override
+        public void onChanged(HorarioItinerarioNome horario) {
+
+            if(horario != null && horario.getIdHorario() != null){
+                exibeHorarioAnterior(horario);
+            } else if(!consultaDiaSeguinte){
+//                consultaDiaSeguinte = true;
+//                viewModel.carregaResultadoDiaSeguinte(diaSeguinte);
+//                viewModel.itinerario.observe(ctx, itinerarioObserver);
+            }
+
+        }
+    };
+
+    Observer<HorarioItinerarioNome> horarioSeguinteObserver = new Observer<HorarioItinerarioNome>() {
+        @Override
+        public void onChanged(HorarioItinerarioNome horario) {
+
+            if(horario != null && horario.getIdHorario() != null){
+                exibeHorarioSeguinte(horario);
+            } else if(!consultaDiaSeguinte){
+//                consultaDiaSeguinte = true;
+//                viewModel.carregaResultadoDiaSeguinte(diaSeguinte);
+//                viewModel.itinerario.observe(ctx, itinerarioObserver);
+            }
+
+        }
+    };
+
+    Observer<ItinerarioPartidaDestino> itinerarioResultadoObserver = new Observer<ItinerarioPartidaDestino>() {
+        @Override
+        public void onChanged(ItinerarioPartidaDestino itinerario) {
+
+            if(itinerario != null){
+                System.out.println("HORARIO:: "+itinerario.getNomeBairroPartida()+" | "
+                        +itinerario.getNomeBairroDestino());
+                exibeDadosResultado();
             }
 
         }
@@ -185,29 +245,35 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     private String getDiaAtual(){
         DateTime dateTime = new DateTime();
-        String dia = "";
 
         switch(dateTime.get(DateTimeFieldType.dayOfWeek())){
             case 0:
                 dia = "domingo";
+                diaSeguinte = "segunda";
                 break;
             case 1:
                 dia = "segunda";
+                diaSeguinte = "terca";
                 break;
             case 2:
                 dia = "terca";
+                diaSeguinte = "quarta";
                 break;
             case 3:
                 dia = "quarta";
+                diaSeguinte = "quinta";
                 break;
             case 4:
                 dia = "quinta";
+                diaSeguinte = "sexta";
                 break;
             case 5:
                 dia = "sexta";
+                diaSeguinte = "sabado";
                 break;
             case 6:
                 dia = "sabado";
+                diaSeguinte = "domingo";
                 break;
         }
 
@@ -217,40 +283,59 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     private void mostraResultado(){
 
         DateTime dateTime = new DateTime();
-        String dia = "";
-
-        switch(dateTime.get(DateTimeFieldType.dayOfWeek())){
-            case 0:
-                dia = "domingo";
-                break;
-            case 1:
-                dia = "segunda";
-                break;
-            case 2:
-                dia = "terca";
-                break;
-            case 3:
-                dia = "quarta";
-                break;
-            case 4:
-                dia = "quinta";
-                break;
-            case 5:
-                dia = "sexta";
-                break;
-            case 6:
-                dia = "sabado";
-                break;
-        }
+        String dia = getDiaAtual();
 
         viewModel.carregaResultado(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia);
 
         viewModel.itinerario.observe(this, itinerarioObserver);
 
-        binding.cardView.setVisibility(View.GONE);
+        binding.cardViewListDestino.setVisibility(View.GONE);
         binding.cardViewResultado.setVisibility(View.VISIBLE);
 
 //        binding.textViewBairroPartidaResultado.setText(viewModel.);
+
+    }
+
+    public void exibeDados(HorarioItinerarioNome horario){
+        viewModel.carregaItinerarioResultado();
+        viewModel.itinerarioResultado.observe(this, itinerarioResultadoObserver);
+    }
+
+    public void exibeHorarioAnterior(HorarioItinerarioNome horario){
+        binding.textViewHorarioAnterior.setText(DateTimeFormat.forPattern("HH:mm").print(horario.getNomeHorario()));
+    }
+
+    public void exibeHorarioSeguinte(HorarioItinerarioNome horario){
+        binding.textViewHorarioSeguinte.setText(DateTimeFormat.forPattern("HH:mm").print(horario.getNomeHorario()));
+    }
+
+    public void exibeDadosResultado(){
+        binding.textViewBairroPartidaResultado.setText(viewModel.itinerarioResultado.getValue().getNomeBairroPartida());
+        binding.textViewBairroDestinoResultado.setText(viewModel.itinerarioResultado.getValue().getNomeBairroDestino());
+
+        binding.textViewCidadePartidaResultado.setText(viewModel.itinerarioResultado.getValue().getNomeCidadePartida());
+        binding.textViewCidadeDestinoResultado.setText(viewModel.itinerarioResultado.getValue().getNomeCidadeDestino());
+
+        binding.textViewHorario.setText(DateTimeFormat.forPattern("HH:mm")
+                .print(viewModel.itinerario.getValue().getNomeHorario()));
+        binding.textViewDuracao.setText(DateTimeFormat.forPattern("HH:mm")
+                .print(viewModel.itinerarioResultado.getValue().getItinerario().getTempo()));
+
+        binding.textViewDistancia.setText(viewModel.itinerarioResultado.getValue().getItinerario().getDistancia().toString());
+        binding.textView11.setText(viewModel.itinerarioResultado.getValue().getNomeEmpresa());
+        binding.textViewParada.setText(viewModel.itinerarioResultado.getValue().getNomePartida());
+
+        if(viewModel.itinerario.getValue().getHorarioItinerario().getObservacao() != null){
+            binding.textViewObservacao.setText(viewModel.itinerario.getValue().getHorarioItinerario().getObservacao());
+        } else{
+            binding.textViewObservacao.setVisibility(View.GONE);
+        }
+
+        if(!viewModel.itinerarioResultado.getValue().getItinerario().getAcessivel()){
+            binding.imageView8.setVisibility(View.GONE);
+        }
+
+        binding.textViewTarifa.setText(viewModel.itinerarioResultado.getValue().getItinerario().getTarifa().toString());
 
     }
 

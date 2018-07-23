@@ -36,6 +36,17 @@ public class ItinerarioPartidaDestino {
     @ColumnInfo(name = "cidadeDestino")
     String nomeCidadeDestino;
 
+    @ColumnInfo(name = "nomeEmpresa")
+    String nomeEmpresa;
+
+    public String getNomeEmpresa() {
+        return nomeEmpresa;
+    }
+
+    public void setNomeEmpresa(String nomeEmpresa) {
+        this.nomeEmpresa = nomeEmpresa;
+    }
+
     public ItinerarioPartidaDestino(){
         Itinerario itinerario = new Itinerario();
         this.itinerario = itinerario;

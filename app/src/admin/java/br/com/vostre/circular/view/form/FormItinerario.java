@@ -215,6 +215,13 @@ public class FormItinerario extends FormBase {
                 binding.spinnerEmpresa.setSelection(i);
             }
 
+            if(viewModel.empresa != null){
+                Empresa empresa = new Empresa();
+                empresa.setId(viewModel.empresa.getId());
+                int i = viewModel.empresas.getValue().indexOf(empresa);
+                binding.spinnerEmpresa.setSelection(i);
+            }
+
         }
 
     }

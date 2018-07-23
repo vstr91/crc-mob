@@ -38,11 +38,53 @@
             android:scaleType="fitCenter"
             android:src="@drawable/ic_swap_vert_blue_24dp"
             android:translationZ="3dp"
-            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/cardViewDestino"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cardViewPartida" />
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/cardViewListPartida"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="24dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            app:cardCornerRadius="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/textView14"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:text="De qual cidade você sairá?"
+                    android:textAppearance="@style/texto_azul" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/listCidadesPartida"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:stretchColumns="true"
+                    app:layoutManager="android.support.v7.widget.GridLayoutManager"
+                    app:spanCount="3"
+                    tools:listitem="@layout/linha_cidades" />
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
             android:id="@+id/cardViewPartida"
@@ -53,11 +95,10 @@
             android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:visibility="gone"
             app:cardCornerRadius="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar">
+            app:layout_constraintTop_toBottomOf="@+id/cardViewListPartida">
 
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
@@ -79,7 +120,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <br.com.vostre.circleview.CircleView
+                <ImageView
                     android:id="@+id/circleViewPartida"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
@@ -129,24 +170,56 @@
                     android:layout_marginBottom="8dp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginRight="16dp"
+                    android:onClick="@{view::onClickBtnEditarPartida}"
                     android:src="@drawable/ic_edit_blue_24dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView26" />
 
-                <android.support.constraint.Group
-                    android:id="@+id/group"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    app:constraint_referenced_ids="textViewBairroPartida"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/circleViewPartida"
-                    app:layout_constraintTop_toBottomOf="@+id/textView26" />
             </android.support.constraint.ConstraintLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/cardViewListDestino"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="24dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            app:cardCornerRadius="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cardViewPartida">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:text="De qual cidade você sairá?"
+                    android:textAppearance="@style/texto_azul" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/listCidades"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:stretchColumns="true"
+                    app:layoutManager="android.support.v7.widget.GridLayoutManager"
+                    app:spanCount="3"
+                    tools:listitem="@layout/linha_cidades" />
+            </LinearLayout>
 
         </android.support.v7.widget.CardView>
 
@@ -159,11 +232,10 @@
             android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:visibility="gone"
             app:cardCornerRadius="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardViewPartida">
+            app:layout_constraintTop_toBottomOf="@+id/cardViewListDestino">
 
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
@@ -199,7 +271,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <br.com.vostre.circleview.CircleView
+                <ImageView
                     android:id="@+id/circleViewDestino"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
@@ -252,7 +324,6 @@
             android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:visibility="gone"
             app:cardCornerRadius="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -674,49 +745,6 @@
                     app:layout_constraintTop_toBottomOf="@+id/textViewHorarioSeguinte" />
 
             </android.support.constraint.ConstraintLayout>
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:id="@+id/cardView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="24dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            app:cardCornerRadius="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardViewResultado">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <TextView
-                    android:id="@+id/textView2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="10dp"
-                    android:paddingTop="10dp"
-                    android:text="De qual cidade você sairá?"
-                    android:textAppearance="@style/texto_azul" />
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/listCidades"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:stretchColumns="true"
-                    app:layoutManager="android.support.v7.widget.GridLayoutManager"
-                    app:spanCount="3"
-                    tools:listitem="@layout/linha_cidades" />
-            </LinearLayout>
 
         </android.support.v7.widget.CardView>
 

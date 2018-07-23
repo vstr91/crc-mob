@@ -29,6 +29,8 @@ import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
+import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
+import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 
@@ -36,7 +38,9 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
     private AppDatabase appDatabase;
 
-    public LiveData<HorarioItinerario> itinerario;
+    public LiveData<HorarioItinerarioNome> itinerario;
+    public LiveData<HorarioItinerarioNome> horarioAnterior;
+    public LiveData<HorarioItinerarioNome> horarioSeguinte;
 
     public LiveData<List<CidadeEstado>> cidades;
     public CidadeEstado cidadePartida;
@@ -45,6 +49,8 @@ public class ItinerariosViewModel extends AndroidViewModel {
     public LiveData<List<BairroCidade>> bairros;
     public LiveData<BairroCidade> bairroPartida;
     public LiveData<BairroCidade> bairroDestino;
+
+    public LiveData<ItinerarioPartidaDestino> itinerarioResultado;
 
     public int escolhaAtual = 0; // 0 partida - 1 destino
 
@@ -82,11 +88,11 @@ public class ItinerariosViewModel extends AndroidViewModel {
         this.bairroPartida = appDatabase.bairroDAO().carregar(umBairroPartida.getBairro().getId());
     }
 
-    public LiveData<HorarioItinerario> getItinerario() {
+    public LiveData<HorarioItinerarioNome> getItinerario() {
         return itinerario;
     }
 
-    public void setItinerario(LiveData<HorarioItinerario> itinerario) {
+    public void setItinerario(LiveData<HorarioItinerarioNome> itinerario) {
         this.itinerario = itinerario;
     }
 
@@ -102,23 +108,41 @@ public class ItinerariosViewModel extends AndroidViewModel {
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         itinerario = appDatabase.horarioItinerarioDAO()
-                .carregarProximoPorPartidaEDestino("", "", "", "domingo");
+                .carregarProximoPorPartidaEDestino("", "", "domingo");
         cidades = appDatabase.cidadeDAO().listarTodosAtivasComEstado();
         bairroPartida = appDatabase.bairroDAO().carregar(null);
         bairroDestino = appDatabase.bairroDAO().carregar(null);
         bairros = appDatabase.bairroDAO().listarTodosComCidadePorCidade(null);
+        itinerarioResultado = appDatabase.itinerarioDAO().carregar("");
     }
 
     public void carregaResultado(String hora, String dia){
         itinerario = appDatabase.horarioItinerarioDAO()
                 .carregarProximoPorPartidaEDestino(bairroPartida.getValue().getBairro().getId(),
-                        bairroDestino.getValue().getBairro().getId(), "12:00", dia);
+                        bairroDestino.getValue().getBairro().getId(), "00:00:00");
     }
 
     public void carregaResultadoDiaSeguinte(String dia){
         itinerario = appDatabase.horarioItinerarioDAO()
                 .carregarPrimeiroPorPartidaEDestino(bairroPartida.getValue().getBairro().getId(),
-                        bairroDestino.getValue().getBairro().getId(), "00:00", dia);
+                        bairroDestino.getValue().getBairro().getId(), "00:00");
+    }
+
+    public void carregaItinerarioResultado(){
+        itinerarioResultado = appDatabase.itinerarioDAO()
+                .carregar(itinerario.getValue().getHorarioItinerario().getItinerario());
+    }
+
+    public void carregaHorarios(HorarioItinerarioNome horario){
+        horarioAnterior = appDatabase.horarioItinerarioDAO()
+                .carregarAnteriorPorPartidaEDestino(bairroPartida.getValue().getBairro().getId(),
+                        bairroDestino.getValue().getBairro().getId(),
+                        DateTimeFormat.forPattern("HH:mm:00").print(horario.getNomeHorario()));
+
+        horarioSeguinte = appDatabase.horarioItinerarioDAO()
+                .carregarSeguintePorPartidaEDestino(bairroPartida.getValue().getBairro().getId(),
+                        bairroDestino.getValue().getBairro().getId(),
+                        DateTimeFormat.forPattern("HH:mm:00").print(horario.getNomeHorario()));
     }
 
 }

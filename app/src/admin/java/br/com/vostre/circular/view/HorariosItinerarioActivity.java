@@ -69,13 +69,11 @@ public class HorariosItinerarioActivity extends BaseActivity {
         listHorarios = binding.listHorarios;
         listHorariosCadastrados = binding.listHorariosCadastrados;
 
-        adapter = new HorarioItinerarioAdapter(horarios, this, viewModel);
-        adapterCadastrados = new HorarioItinerarioAdapter(viewModel.horarios.getValue(), this, viewModel);
+        adapter = new HorarioItinerarioAdapter(horarios, this, viewModel, true);
+        adapterCadastrados = new HorarioItinerarioAdapter(viewModel.horarios.getValue(), this, viewModel, false);
 
         listHorarios.setAdapter(adapter);
         listHorariosCadastrados.setAdapter(adapterCadastrados);
-        listHorariosCadastrados.setEnabled(false);
-        listHorariosCadastrados.setClickable(false);
 
     }
 

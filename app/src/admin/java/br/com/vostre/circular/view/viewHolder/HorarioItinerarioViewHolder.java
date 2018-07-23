@@ -24,13 +24,15 @@ public class HorarioItinerarioViewHolder extends RecyclerView.ViewHolder {
     private final LinhaHorariosItinerariosBinding binding;
     AppCompatActivity ctx;
     HorariosItinerarioViewModel viewModel;
+    boolean clickListener = false;
 
     public HorarioItinerarioViewHolder(LinhaHorariosItinerariosBinding binding, AppCompatActivity context,
-                                       HorariosItinerarioViewModel viewModel) {
+                                       HorariosItinerarioViewModel viewModel, boolean clickListener) {
         super(binding.getRoot());
         this.binding = binding;
         this.ctx = context;
         this.viewModel = viewModel;
+        this.clickListener = clickListener;
     }
 
     public void bind(final HorarioItinerarioNome horarioItinerario) {
@@ -63,36 +65,38 @@ public class HorarioItinerarioViewHolder extends RecyclerView.ViewHolder {
             binding.textViewObservacao.setVisibility(View.VISIBLE);
         }
 
-        binding.cardview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        if(clickListener){
+            binding.cardview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-                if(horarioItinerario.isAtivo()){
-                    horarioItinerario.reseta();
-                    viewModel.setHorario(horarioItinerario);
-                    viewModel.editarHorario();
-                } else{
+                    if(horarioItinerario.isAtivo()){
+                        horarioItinerario.reseta();
+                        viewModel.setHorario(horarioItinerario);
+                        viewModel.editarHorario();
+                    } else{
+                        FormHorarioItinerario formHorario = new FormHorarioItinerario();
+                        formHorario.setHorario(horarioItinerario);
+                        formHorario.setCtx(ctx.getApplication());
+                        formHorario.flagInicioEdicao = true;
+                        formHorario.show(ctx.getSupportFragmentManager(), "formHorario");
+                    }
+
+                }
+            });
+
+            binding.cardview.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
                     FormHorarioItinerario formHorario = new FormHorarioItinerario();
                     formHorario.setHorario(horarioItinerario);
                     formHorario.setCtx(ctx.getApplication());
                     formHorario.flagInicioEdicao = true;
                     formHorario.show(ctx.getSupportFragmentManager(), "formHorario");
+                    return false;
                 }
-
-            }
-        });
-
-        binding.cardview.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                FormHorarioItinerario formHorario = new FormHorarioItinerario();
-                formHorario.setHorario(horarioItinerario);
-                formHorario.setCtx(ctx.getApplication());
-                formHorario.flagInicioEdicao = true;
-                formHorario.show(ctx.getSupportFragmentManager(), "formHorario");
-                return false;
-            }
-        });
+            });
+        }
 
         binding.executePendingBindings();
     }

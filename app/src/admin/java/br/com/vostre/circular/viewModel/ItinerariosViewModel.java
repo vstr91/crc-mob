@@ -49,6 +49,8 @@ public class ItinerariosViewModel extends AndroidViewModel {
     public Empresa empresa;
     public LiveData<List<Empresa>> empresas;
 
+    public LiveData<Empresa> umaEmpresa;
+
     public LiveData<List<ItinerarioPartidaDestino>> getItinerarios() {
         return itinerarios;
     }
@@ -89,6 +91,10 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
     public void setParadas(LiveData<List<ParadaBairro>> paradas) {
         this.paradas = paradas;
+    }
+
+    public void setEmpresa(String empresa) {
+        this.umaEmpresa = appDatabase.empresaDAO().carregar(empresa);
     }
 
     public ItinerariosViewModel(Application app){

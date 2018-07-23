@@ -37,6 +37,7 @@ import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityItinerariosBinding;
+import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
@@ -71,6 +72,15 @@ public class ItinerariosActivity extends BaseActivity {
     MapEventsOverlay overlayEvents;
 
     ItinerariosViewModel viewModel;
+    Empresa empresa;
+
+    public Empresa getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(Empresa empresa) {
+        this.empresa = empresa;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,6 +128,11 @@ public class ItinerariosActivity extends BaseActivity {
 
             viewModel.localAtual.observe(this, centroObserver);
             viewModel.retorno.observe(this, retornoObserver);
+
+            if(getIntent().getStringExtra("empresa") != null){
+                viewModel.setEmpresa(getIntent().getStringExtra("empresa"));
+                viewModel.umaEmpresa.observe(this, empresaObserver);
+            }
 
             configuraMapa();
 
@@ -287,6 +302,13 @@ public class ItinerariosActivity extends BaseActivity {
         public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
             adapterItinerarios.itinerarios = itinerarios;
             adapterItinerarios.notifyDataSetChanged();
+        }
+    };
+
+    Observer<Empresa> empresaObserver = new Observer<Empresa>() {
+        @Override
+        public void onChanged(Empresa empresa) {
+            viewModel.empresa = empresa;
         }
     };
 

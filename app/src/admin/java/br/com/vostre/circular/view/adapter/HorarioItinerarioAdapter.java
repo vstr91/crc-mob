@@ -20,12 +20,14 @@ public class HorarioItinerarioAdapter extends RecyclerView.Adapter<HorarioItiner
     public List<HorarioItinerarioNome> horarios;
     AppCompatActivity ctx;
     HorariosItinerarioViewModel viewModel;
+    boolean clickListener = false;
 
     public HorarioItinerarioAdapter(List<HorarioItinerarioNome> horarios, AppCompatActivity context,
-                                    HorariosItinerarioViewModel viewModel){
+                                    HorariosItinerarioViewModel viewModel, boolean clickListener){
         this.horarios = horarios;
         ctx = context;
         this.viewModel = viewModel;
+        this.clickListener = clickListener;
     }
 
     @Override
@@ -34,7 +36,7 @@ public class HorarioItinerarioAdapter extends RecyclerView.Adapter<HorarioItiner
                 LayoutInflater.from(parent.getContext());
         LinhaHorariosItinerariosBinding itemBinding =
                 LinhaHorariosItinerariosBinding.inflate(layoutInflater, parent, false);
-        return new HorarioItinerarioViewHolder(itemBinding, ctx, viewModel);
+        return new HorarioItinerarioViewHolder(itemBinding, ctx, viewModel, this.clickListener);
     }
 
     @Override

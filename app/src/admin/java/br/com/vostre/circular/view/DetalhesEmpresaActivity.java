@@ -2,8 +2,10 @@ package br.com.vostre.circular.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TabHost;
@@ -36,6 +38,7 @@ public class DetalhesEmpresaActivity extends BaseActivity {
     OnibusAdapter adapterOnibus;
 
     TabHost tabHost;
+    AppCompatActivity ctx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +48,9 @@ public class DetalhesEmpresaActivity extends BaseActivity {
         viewModel = ViewModelProviders.of(this).get(DetalhesEmpresaViewModel.class);
 
         viewModel.setEmpresa(getIntent().getStringExtra("empresa"));
+        ctx = this;
 
         viewModel.empresa.observe(this, empresaObserver);
-        viewModel.itinerarios.observe(this, itinerariosObserver);
-        viewModel.onibus.observe(this, onibusObserver);
 
         binding.setView(this);
         setTitle("Detalhes Empresa");
@@ -83,7 +85,9 @@ public class DetalhesEmpresaActivity extends BaseActivity {
     public void onFabClick(View v){
 
         if(tabHost.getCurrentTab() == 0){
-
+            Intent i = new Intent(getApplicationContext(), ItinerariosActivity.class);
+            i.putExtra("empresa", viewModel.empresa.getValue().getId());
+            startActivity(i);
         } else{
             FormOnibus formOnibus = new FormOnibus();
             formOnibus.setCtx(getApplication());
@@ -116,6 +120,8 @@ public class DetalhesEmpresaActivity extends BaseActivity {
             if(empresa != null){
                 binding.textViewEmpresa.setText(empresa.getNome());
                 viewModel.carregarItinerarios(empresa.getId());
+                viewModel.itinerarios.observe(ctx, itinerariosObserver);
+                viewModel.onibus.observe(ctx, onibusObserver);
             }
 
         }

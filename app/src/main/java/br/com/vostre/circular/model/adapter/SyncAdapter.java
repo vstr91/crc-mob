@@ -229,6 +229,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
 
+                    System.out.println("RESPONSE: "+response.code());
+
                     if(response.code() == 200){
 
                         token = response.body();
@@ -252,7 +254,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 @Override
                 public void onFailure(Call<String> call, Throwable t) {
                     Toast.makeText(getContext().getApplicationContext(),
-                            "Erro "+t.getMessage()+" ao requisitar token.",
+                            "Erro "+t.getLocalizedMessage()+" ao requisitar token.",
                             Toast.LENGTH_SHORT).show();
                 }
             });

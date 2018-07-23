@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.github.imangazalievm:slugify-1.0.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/slugify-1.0.0.aar/2a04556611f41b424cc356433b0ae688/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/slugify-1.0.0.aar/2a04556611f41b424cc356433b0ae688/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.imangazalievm/slugify/1.0.0/29c3e218e6f5287571e159139eaa15897144ce36/slugify-1.0.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

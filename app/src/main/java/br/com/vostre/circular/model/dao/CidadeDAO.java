@@ -34,6 +34,9 @@ public interface CidadeDAO {
     @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado FROM cidade c INNER JOIN estado e ON e.id = c.estado ORDER BY c.nome")
     LiveData<List<CidadeEstado>> listarTodosComEstado();
 
+    @Query("SELECT * FROM cidade WHERE id = :id")
+    LiveData<CidadeEstado> carregar(String id);
+
     @Query("SELECT * FROM cidade WHERE id IN (:ids)")
     List<Cidade> carregarTodosPorIds(int[] ids);
 

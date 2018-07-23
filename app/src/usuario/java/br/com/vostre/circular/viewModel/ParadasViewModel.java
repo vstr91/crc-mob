@@ -37,6 +37,7 @@ import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.BairroCidade;
+import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.StringUtils;
 
@@ -44,17 +45,15 @@ public class ParadasViewModel extends AndroidViewModel {
 
     private static AppDatabase appDatabase;
 
-    public LiveData<List<ParadaBairro>> paradas;
-    public ParadaBairro parada;
+    public LiveData<CidadeEstado> cidade;
 
-    public LiveData<List<BairroCidade>> bairros;
+    public LiveData<List<CidadeEstado>> cidades;
+
+    public LiveData<List<ParadaBairro>> paradas;
+
     public BairroCidade bairro;
 
-    public boolean centralizaMapa = true;
-
-    public FusedLocationProviderClient mFusedLocationClient;
-    public LocationCallback mLocationCallback;
-    public MutableLiveData<Location> localAtual;
+    ParadaBairro parada;
 
     public Bitmap foto;
 
@@ -66,63 +65,30 @@ public class ParadasViewModel extends AndroidViewModel {
         this.foto = foto;
     }
 
-    public GeoPoint getCentroMapa() {
-
-        if(localAtual != null){
-            return new GeoPoint(localAtual.getValue().getLatitude(), localAtual.getValue().getLongitude());
-        } else{
-            return null;
-        }
-
-    }
-
-    public LiveData<List<ParadaBairro>> getParadas() {
-        return paradas;
-    }
-
-    public void setParadas(LiveData<List<ParadaBairro>> paradas) {
-        this.paradas = paradas;
-    }
-
     public ParadaBairro getParada() {
         return parada;
     }
 
     public void setParada(ParadaBairro parada) {
         this.parada = parada;
-
-
-
         foto = BitmapFactory.decodeFile(parada.getParada().getImagem());
     }
 
-    public LiveData<List<BairroCidade>> getBairros() {
-        return bairros;
+    public LiveData<CidadeEstado> getCidade() {
+        return cidade;
     }
 
-    public void setBairros(LiveData<List<BairroCidade>> bairros) {
-        this.bairros = bairros;
-    }
-
-    public BairroCidade getBairro() {
-        return bairro;
-    }
-
-    public void setBairro(BairroCidade bairro) {
-        this.bairro = bairro;
+    public void setCidade(String cidade) {
+        this.cidade = appDatabase.cidadeDAO().carregar(cidade);
+        paradas = appDatabase.paradaDAO().listarTodosComBairroPorCidade(cidade);
     }
 
     public ParadasViewModel(Application app){
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
-        parada = new ParadaBairro();
-        paradas = appDatabase.paradaDAO().listarTodosComBairro();
-
-        bairros = new MutableLiveData<>();
-        bairros = appDatabase.bairroDAO().listarTodosComCidade();
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplication());
-        localAtual = new MutableLiveData<>();
-        localAtual.setValue(new Location(LocationManager.GPS_PROVIDER));
+        cidades = appDatabase.cidadeDAO().listarTodosAtivasComEstado();
+        cidade = appDatabase.cidadeDAO().carregar("");
+        paradas = appDatabase.paradaDAO().listarTodosComBairroPorCidade("");
     }
 
     public void salvarParada(){
@@ -288,29 +254,5 @@ public class ParadasViewModel extends AndroidViewModel {
     }
 
     // fim editar
-
-    public void iniciarAtualizacoesPosicao(){
-        mLocationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    return;
-                }
-                for (Location location : locationResult.getLocations()) {
-
-                    if(location.getAccuracy() <= 20){
-                        localAtual.setValue(location);
-
-                        if(localAtual.getValue() != null){
-                            localAtual.getValue().setLatitude(localAtual.getValue().getLatitude());
-                            localAtual.getValue().setLongitude(localAtual.getValue().getLongitude());
-                        }
-
-                    }
-
-                }
-            }
-        };
-    }
 
 }

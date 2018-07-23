@@ -136,9 +136,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnParadas(View v){
-//        Intent i = new Intent(getApplicationContext(), EstadosActivity.class);
-//        startActivity(i);
-        Toast.makeText(getApplicationContext(), "Paradas", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(getApplicationContext(), ParadasActivity.class);
+        startActivity(i);
     }
 
     public void onClickBtnMapa(View v){

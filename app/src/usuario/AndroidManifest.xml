@@ -22,25 +22,25 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <service
-            android:name="br.com.vostre.circular.model.service.AuthenticatorService">
+        <service android:name=".model.service.AuthenticatorService">
             <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator"/>
+                <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
+
             <meta-data
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
-
         <service
             android:name=".model.service.SyncService"
             android:exported="true"
             android:process=":sync">
             <intent-filter>
-                <action android:name="android.content.SyncAdapter"/>
+                <action android:name="android.content.SyncAdapter" />
             </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter"
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
                 android:resource="@xml/syncadapter" />
         </service>
 
@@ -48,7 +48,7 @@
             android:name=".utils.DataProviderUsuario"
             android:authorities="br.com.vostre.circular.datasync.provider"
             android:exported="false"
-            android:syncable="true"/>
+            android:syncable="true" />
 
         <activity android:name=".view.LoginActivity" />
         <activity android:name=".view.MenuActivity">
@@ -75,7 +75,8 @@
         <activity android:name=".view.DetalhesItinerarioActivity" />
         <activity android:name=".view.SecoesItinerarioActivity" />
         <activity android:name=".view.HorariosActivity" />
-        <activity android:name=".view.HorariosItinerarioActivity"></activity>
+        <activity android:name=".view.HorariosItinerarioActivity" />
+        <activity android:name=".view.DetalheParadaActivity"></activity>
     </application>
 
 </manifest>

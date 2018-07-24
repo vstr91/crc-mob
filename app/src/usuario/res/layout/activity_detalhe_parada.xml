@@ -4,21 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="view"
-            type="br.com.vostre.circular.view.ParadasActivity" />
+            type="br.com.vostre.circular.view.DetalheParadaActivity" />
 
         <variable
             name="viewModel"
-            type="br.com.vostre.circular.viewModel.ParadasViewModel" />
+            type="br.com.vostre.circular.viewModel.DetalhesParadaViewModel" />
+        <variable
+            name="umaParada"
+            type="br.com.vostre.circular.model.pojo.ParadaBairro" />
     </data>
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/gradiente"
-        tools:context="br.com.vostre.circular.view.ParadasActivity">
+        tools:context="br.com.vostre.circular.view.DetalheParadaActivity">
 
         <include
             android:id="@+id/toolbar"
@@ -30,7 +32,7 @@
         <android.support.v7.widget.CardView
             android:id="@+id/cardViewListCidade"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
             android:layout_marginEnd="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
@@ -41,122 +43,163 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <TextView
-                    android:id="@+id/textView14"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="10dp"
-                    android:paddingTop="10dp"
-                    android:text="Escolha uma cidade abaixo"
-                    android:textAppearance="@style/texto_azul" />
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/listCidades"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:stretchColumns="true"
-                    app:layoutManager="android.support.v7.widget.GridLayoutManager"
-                    app:spanCount="3"
-                    tools:listitem="@layout/linha_cidades" />
-            </LinearLayout>
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:id="@+id/cardViewCidade"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:visibility="gone"
-            app:cardCornerRadius="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardViewListCidade">
 
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-
-                <ImageView
-                    android:id="@+id/circleViewPartida"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:layout_marginBottom="16dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    app:corArcoMaior="@color/azul"
-                    app:corArcoMenor="@color/azul"
-                    app:espessuraArcoMaior="4"
-                    app:espessuraArcoMenor="4"
-                    app:imagem="@{viewModel.cidade.cidade.brasao}"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                android:layout_height="match_parent">
 
                 <TextView
-                    android:id="@+id/textViewBairroPartida"
+                    android:id="@+id/textView16"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
                     android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_weight="1"
-                    android:text="@{viewModel.cidade.cidade.nome}"
-                    android:textAppearance="@style/texto_azul"
-                    android:textColor="@color/cinzaEscuro"
-                    app:layout_constraintBottom_toBottomOf="@+id/circleViewPartida"
-                    app:layout_constraintStart_toEndOf="@+id/circleViewPartida"
-                    app:layout_constraintTop_toTopOf="@+id/circleViewPartida"
-                    tools:text="Cidade" />
+                    android:background="@drawable/dia_rounded_corner"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="@{umaParada.parada.taxaDeEmbarque == null ? `Não há taxa de embarque`: `Taxa de embarque: R$ `+umaParada.parada.taxaDeEmbarque}"
+                    android:textColor="@color/branco"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Não há taxa de embarque" />
 
-                <ImageButton
-                    android:id="@+id/imageButton"
-                    style="@style/botao_transparente"
+                <ImageView
+                    android:id="@+id/imageView9"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    app:srcCompat="@mipmap/ic_onibus_azul" />
+
+                <TextView
+                    android:id="@+id/textView15"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginTop="8dp"
-                    android:onClick="@{view::onClickBtnEditarPartida}"
-                    android:src="@drawable/ic_edit_blue_24dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/fundo_cinza_rounded_corner"
+                    android:padding="5dp"
+                    android:text="Ver pontos de interesse próximos"
+                    android:textColor="@color/branco"
+                    app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <LinearLayout
+                    android:id="@+id/linearLayout4"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/dia_rounded_corner"
+                    android:orientation="horizontal"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintEnd_toEndOf="@+id/imageView9"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <LinearLayout
+                        android:id="@+id/linearLayout2"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="8dp"
+                        android:layout_weight="3"
+                        android:orientation="vertical"
+                        android:paddingLeft="10dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/imageButton3"
+                        app:layout_constraintStart_toStartOf="parent">
+
+                        <TextView
+                            android:id="@+id/textViewNome"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:gravity="bottom|center_vertical"
+                            android:text="@={umaParada.parada.nome}"
+                            android:textColor="@color/branco"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/textViewBairro"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:gravity="top"
+                            android:text="@{umaParada.nomeBairro+` - `+umaParada.nomeCidade}"
+                            android:textColor="@color/branco" />
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/imageButton3"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="8dp"
+                        android:layout_weight=".5"
+                        android:background="@color/transparente"
+                        android:src="@drawable/ic_map_white_24dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                    <ImageButton
+                        android:id="@+id/imageButton4"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="10dp"
+                        android:layout_weight=".5"
+                        android:background="@color/transparente"
+                        android:src="@drawable/ic_star_white_24dp" />
+
+                </LinearLayout>
 
             </android.support.constraint.ConstraintLayout>
 
         </android.support.v7.widget.CardView>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/listParadas"
-            android:layout_width="0dp"
-            android:layout_height="400dp"
+        <TextView
+            android:id="@+id/textView17"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:minHeight="300dp"
+            android:text="Próximos Itinerários"
+            android:textAppearance="@style/texto_branco"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cardViewListCidade" />
+
+        <TextView
+            android:id="@+id/textView18"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:text="Horários de saída do ponto inicial"
+            android:textAppearance="@style/texto_branco"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView17" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/listItinerarios"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             app:layoutManager="android.support.v7.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardViewCidade"
-            tools:listitem="@layout/linha_paradas" />
+            app:layout_constraintTop_toBottomOf="@+id/textView18"
+            tools:listitem="@layout/linha_itinerarios" />
 
     </android.support.constraint.ConstraintLayout>
 

@@ -12,6 +12,9 @@
         <variable
             name="viewModel"
             type="br.com.vostre.circular.viewModel.ParadasViewModel" />
+        <variable
+            name="cidade"
+            type="br.com.vostre.circular.model.pojo.CidadeEstado" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -100,7 +103,7 @@
                     app:corArcoMenor="@color/azul"
                     app:espessuraArcoMaior="4"
                     app:espessuraArcoMenor="4"
-                    app:imagem="@{viewModel.cidade.cidade.brasao}"
+                    app:imagem="@{cidade.cidade.brasao}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
 
@@ -108,15 +111,13 @@
                     android:id="@+id/textViewBairroPartida"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="16dp"
                     android:layout_weight="1"
-                    android:text="@{viewModel.cidade.cidade.nome}"
+                    android:text="@{cidade.cidade.nome}"
                     android:textAppearance="@style/texto_azul"
                     android:textColor="@color/cinzaEscuro"
-                    app:layout_constraintBottom_toBottomOf="@+id/circleViewPartida"
                     app:layout_constraintStart_toEndOf="@+id/circleViewPartida"
                     app:layout_constraintTop_toTopOf="@+id/circleViewPartida"
                     tools:text="Cidade" />
@@ -136,6 +137,18 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <TextView
+                    android:id="@+id/textView10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="@{cidade.nomeEstado}"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/circleViewPartida"
+                    app:layout_constraintStart_toStartOf="@+id/textViewBairroPartida"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewBairroPartida"
+                    tools:text="estado" />
+
             </android.support.constraint.ConstraintLayout>
 
         </android.support.v7.widget.CardView>
@@ -150,6 +163,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:minHeight="300dp"
+            android:layoutAnimation="@anim/layout_animation_fall_down"
             app:layoutManager="android.support.v7.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

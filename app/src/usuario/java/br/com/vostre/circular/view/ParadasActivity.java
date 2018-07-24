@@ -100,6 +100,8 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
                 final Drawable drawable = Drawable.createFromPath(brasao.getAbsolutePath());
                 view.setImageDrawable(drawable);
             }
+        } else{
+            view.setImageDrawable(null);
         }
 
     }
@@ -139,8 +141,9 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
         public void onChanged(CidadeEstado cidade) {
 
             if(cidade != null){
+                binding.setCidade(cidade);
                 binding.cardViewCidade.setVisibility(View.VISIBLE);
-                setimagem(binding.circleViewPartida, cidade.getCidade().getBrasao());
+                //setimagem(binding.circleViewPartida, cidade.getCidade().getBrasao());
                 binding.cardViewListCidade.setVisibility(View.GONE);
             }
 
@@ -155,6 +158,7 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
                 adapterParadas.paradas = paradas;
                 adapterParadas.bairroAtual = "";
                 adapterParadas.notifyDataSetChanged();
+                binding.listParadas.scheduleLayoutAnimation();
                 binding.listParadas.setVisibility(View.VISIBLE);
             }
 

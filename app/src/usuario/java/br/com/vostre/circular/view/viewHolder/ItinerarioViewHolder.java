@@ -1,35 +1,33 @@
 package br.com.vostre.circular.view.viewHolder;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
-import br.com.vostre.circular.databinding.LinhaCidadesBinding;
+import br.com.vostre.circular.databinding.LinhaItinerariosBinding;
 import br.com.vostre.circular.databinding.LinhaParadasBinding;
-import br.com.vostre.circular.model.pojo.CidadeEstado;
+import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.view.DetalheParadaActivity;
-import br.com.vostre.circular.view.listener.SelectListener;
 
-public class ParadaViewHolder extends RecyclerView.ViewHolder {
+public class ItinerarioViewHolder extends RecyclerView.ViewHolder {
 
-    private final LinhaParadasBinding binding;
+    private final LinhaItinerariosBinding binding;
     AppCompatActivity ctx;
 
-    public ParadaViewHolder(LinhaParadasBinding binding, AppCompatActivity context) {
+    public ItinerarioViewHolder(LinhaItinerariosBinding binding, AppCompatActivity context) {
         super(binding.getRoot());
         this.binding = binding;
         this.ctx = context;
     }
 
-    public void bind(final ParadaBairro parada, boolean mostraBairro) {
-        binding.setParada(parada);
+    public void bind(final ItinerarioPartidaDestino itinerario) {
+        binding.setItinerario(itinerario);
 
-        if(parada.getParada().getImagem() == null){
-            binding.circleView2.setBackgroundColor(Color.parseColor("#000088"));
+        if(!itinerario.getItinerario().getAcessivel()){
+            binding.imageView12.setVisibility(View.GONE);
         }
 
         //binding.circleView2.setImagem(null);
@@ -43,23 +41,18 @@ public class ParadaViewHolder extends RecyclerView.ViewHolder {
 //
 //        binding.textViewNome.setText(cidade.getCidade().getNome());
 
-        if(!mostraBairro){
-            binding.textViewBairro.setVisibility(View.GONE);
-        } else{
-            binding.textViewBairro.setVisibility(View.VISIBLE);
-        }
-
         final View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(ctx, DetalheParadaActivity.class);
-                i.putExtra("parada", parada.getParada().getId());
-                ctx.startActivity(i);
+//                Intent i = new Intent(ctx, DetalheParadaActivity.class);
+//                i.putExtra("parada", parada.getParada().getId());
+//                ctx.startActivity(i);
+                Toast.makeText(ctx, itinerario.getNomeEmpresa(), Toast.LENGTH_SHORT).show();
             }
         };
-
-        binding.circleView2.setOnClickListener(listener);
-        binding.textViewNome.setOnClickListener(listener);
+//
+//        binding.circleView2.setOnClickListener(listener);
+//        binding.textViewNome.setOnClickListener(listener);
 
         binding.executePendingBindings();
     }

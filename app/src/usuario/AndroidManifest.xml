@@ -62,7 +62,7 @@
         <activity android:name=".view.PaisesActivity" />
         <activity android:name=".view.EstadosActivity" />
         <activity android:name=".view.CidadesActivity" />
-        <activity android:name=".view.BairrosActivity" />
+        <activity android:name=".view.DetalheParadaActivity" />
         <activity android:name=".view.ParadasActivity" />
         <activity android:name=".view.ItinerariosActivity" />
         <activity android:name=".view.PontosInteresseActivity" />
@@ -76,7 +76,6 @@
         <activity android:name=".view.SecoesItinerarioActivity" />
         <activity android:name=".view.HorariosActivity" />
         <activity android:name=".view.HorariosItinerarioActivity" />
-        <activity android:name=".view.DetalheParadaActivity"></activity>
     </application>
 
 </manifest>

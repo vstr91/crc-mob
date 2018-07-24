@@ -39,12 +39,23 @@ public class ItinerarioPartidaDestino {
     @ColumnInfo(name = "nomeEmpresa")
     String nomeEmpresa;
 
+    @ColumnInfo(name = "proximoHorario")
+    String proximoHorario;
+
     public String getNomeEmpresa() {
         return nomeEmpresa;
     }
 
     public void setNomeEmpresa(String nomeEmpresa) {
         this.nomeEmpresa = nomeEmpresa;
+    }
+
+    public String getProximoHorario() {
+        return proximoHorario;
+    }
+
+    public void setProximoHorario(String proximoHorario) {
+        this.proximoHorario = proximoHorario;
     }
 
     public ItinerarioPartidaDestino(){

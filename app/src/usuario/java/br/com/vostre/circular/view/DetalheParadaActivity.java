@@ -13,6 +13,8 @@ import android.widget.Toast;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
 
 import br.com.vostre.circular.BR;
@@ -59,11 +61,11 @@ public class DetalheParadaActivity extends BaseActivity {
 
     }
 
-    @BindingAdapter("app:text")
-    public static void setText(TextView view, Double val){
+    @BindingAdapter("app:textDinheiro")
+    public static void setTextDinheiro(TextView view, Double val){
 
         if(val != null){
-            view.setText(String.valueOf(val));
+            view.setText(NumberFormat.getCurrencyInstance().format(val));
         } else{
             view.setText("-");
         }
@@ -71,6 +73,31 @@ public class DetalheParadaActivity extends BaseActivity {
     }
 
     @BindingAdapter("app:text")
+    public static void setText(TextView view, Double val){
+
+        if(val != null){
+            view.setText(NumberFormat.getNumberInstance().format(val));
+        } else{
+            view.setText("-");
+        }
+
+    }
+
+    @BindingAdapter("app:textDistancia")
+    public static void setTextDistancia(TextView view, Double val){
+
+        if(val != null){
+            DecimalFormat format = new DecimalFormat();
+            format.setMinimumFractionDigits(1);
+            format.setMaximumFractionDigits(1);
+            view.setText(format.format(val)+" Km");
+        } else{
+            view.setText("-");
+        }
+
+    }
+
+    @BindingAdapter("app:textData")
     public static void setText(TextView view, DateTime val){
 
         if(val != null){

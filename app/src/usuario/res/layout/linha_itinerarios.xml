@@ -32,6 +32,7 @@
         <!--app:layout_constraintTop_toTopOf="parent" />-->
 
         <android.support.v7.widget.CardView
+            android:id="@+id/cardView2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -184,18 +185,16 @@
                     android:id="@+id/textView20"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    app:text="@{itinerario.itinerario.tarifa}"
                     android:textColor="@color/cinzaEscuro"
-                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="@+id/imageView9"
                     app:layout_constraintStart_toStartOf="@+id/imageView9"
                     app:layout_constraintTop_toBottomOf="@+id/imageView9"
+                    app:textDinheiro="@{itinerario.itinerario.tarifa}"
                     tools:text="R$ 0,00" />
 
                 <TextView
@@ -207,11 +206,11 @@
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    app:text="@{itinerario.itinerario.tempo}"
                     android:textColor="@color/cinzaEscuro"
                     app:layout_constraintEnd_toEndOf="@+id/imageView10"
                     app:layout_constraintStart_toStartOf="@+id/imageView10"
                     app:layout_constraintTop_toBottomOf="@+id/imageView10"
+                    app:textData="@{itinerario.itinerario.tempo}"
                     tools:text="15 min." />
 
                 <TextView
@@ -223,11 +222,11 @@
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    app:text="@{itinerario.itinerario.distancia}"
                     android:textColor="@color/cinzaEscuro"
                     app:layout_constraintEnd_toEndOf="@+id/imageView11"
                     app:layout_constraintStart_toStartOf="@+id/imageView11"
                     app:layout_constraintTop_toBottomOf="@+id/imageView11"
+                    app:textDistancia="@{itinerario.itinerario.distancia}"
                     tools:text="3 Km" />
 
                 <TextView
@@ -249,6 +248,25 @@
                     app:layout_constraintStart_toEndOf="@+id/textView16"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="00:00" />
+
+                <TextView
+                    android:id="@+id/textView24"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="@{itinerario.itinerario.observacao}"
+                    android:textAppearance="@style/texto_azul"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView21"
+                    tools:text="obs." />
 
             </android.support.constraint.ConstraintLayout>
         </android.support.v7.widget.CardView>

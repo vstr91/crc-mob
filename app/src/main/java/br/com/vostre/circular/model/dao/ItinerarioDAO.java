@@ -44,10 +44,11 @@ public interface ItinerarioDAO {
             "WHERE i.ativo = 1")
     LiveData<List<ItinerarioPartidaDestino>> listarTodosAtivos();
 
-    @Query("SELECT DISTINCT (SELECT TIME(h.nome/1000, 'unixepoch', 'localtime') " +
+    @Query("SELECT DISTINCT (SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
             "FROM horario_itinerario hi INNER JOIN " +
             "horario h ON h.id = hi.horario " +
-            "WHERE itinerario = i.id AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= :hora LIMIT 1) AS 'proximoHorario', i.*, " +
+            "WHERE itinerario = i.id AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= :hora " +
+            "ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ) AS 'proximoHorario', i.*, " +
             "(SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
             "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'nomePartida', " +
             "(SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
@@ -66,7 +67,11 @@ public interface ItinerarioDAO {
             "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
             "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
             ") AS 'cidadeDestino' FROM parada_itinerario pit INNER JOIN itinerario i ON i.id = pit.itinerario " +
-            "WHERE i.ativo = 1 AND pit.parada = :parada")
+            "WHERE i.ativo = 1 AND pit.parada = :parada " +
+            "ORDER BY (SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+            "FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario " +
+            "WHERE itinerario = i.id AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= :hora" +
+            " ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 )")
     LiveData<List<ItinerarioPartidaDestino>> listarTodosAtivosPorParadaComBairroEHorario(String parada, String hora);
 
     @Query("SELECT * FROM itinerario WHERE enviado = 0")

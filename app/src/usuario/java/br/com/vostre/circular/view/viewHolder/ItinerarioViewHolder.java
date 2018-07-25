@@ -30,6 +30,11 @@ public class ItinerarioViewHolder extends RecyclerView.ViewHolder {
             binding.imageView12.setVisibility(View.GONE);
         }
 
+        if(itinerario.getItinerario().getObservacao() != null && (itinerario.getItinerario().getObservacao().isEmpty() ||
+                itinerario.getItinerario().getObservacao().equals("null"))){
+            binding.textView24.setVisibility(View.GONE);
+        }
+
         //binding.circleView2.setImagem(null);
 
 //        final File brasao = new File(ctx.getApplicationContext().getFilesDir(),  cidade.getCidade().getBrasao());

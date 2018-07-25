@@ -15,6 +15,7 @@ import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
+import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 
 @Dao
@@ -31,6 +32,12 @@ public interface ParadaItinerarioDAO {
             "INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade " +
             "WHERE pi.ativo = 1 AND pi.itinerario = :itinerario ORDER BY pi.ordem")
     LiveData<List<ParadaItinerarioBairro>> listarTodosAtivosPorItinerarioComBairro(String itinerario);
+
+    @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado " +
+            "FROM parada_itinerario pi " +
+            "INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado " +
+            "WHERE pi.ativo = 1 AND pi.itinerario = :itinerario ORDER BY pi.ordem")
+    LiveData<List<ParadaBairro>> listarParadasAtivasPorItinerarioComBairro(String itinerario);
 
     @Query("SELECT i.* FROM parada_itinerario pi INNER JOIN itinerario i ON i.id = pi.itinerario " +
             "WHERE pi.parada = :parada AND pi.ativo = 1 AND i.ativo = 1")

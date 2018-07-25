@@ -47,7 +47,6 @@ import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.DialogUtils;
 import br.com.vostre.circular.view.form.FormPontoInteresse;
 import br.com.vostre.circular.view.utils.InfoWindow;
-import br.com.vostre.circular.view.utils.InfoWindowPOI;
 import br.com.vostre.circular.viewModel.PontosInteresseViewModel;
 
 public class PontosInteresseActivity extends BaseActivity {

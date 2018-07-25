@@ -10,6 +10,7 @@ import br.com.vostre.circular.databinding.LinhaItinerariosBinding;
 import br.com.vostre.circular.databinding.LinhaParadasBinding;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.view.DetalheItinerarioActivity;
 import br.com.vostre.circular.view.DetalheParadaActivity;
 
 public class ItinerarioViewHolder extends RecyclerView.ViewHolder {
@@ -26,12 +27,12 @@ public class ItinerarioViewHolder extends RecyclerView.ViewHolder {
     public void bind(final ItinerarioPartidaDestino itinerario) {
         binding.setItinerario(itinerario);
 
-        if(!itinerario.getItinerario().getAcessivel()){
-            binding.imageView12.setVisibility(View.GONE);
-        }
+//        if(!itinerario.getItinerario().getAcessivel()){
+//            binding.imageView12.setVisibility(View.GONE);
+//        }
 
         if(itinerario.getItinerario().getObservacao() != null && (itinerario.getItinerario().getObservacao().isEmpty() ||
-                itinerario.getItinerario().getObservacao().equals("null"))){
+                itinerario.getItinerario().getObservacao().equals("null") || itinerario.getItinerario().getObservacao().equals(""))){
             binding.textView24.setVisibility(View.GONE);
         }
 
@@ -49,14 +50,13 @@ public class ItinerarioViewHolder extends RecyclerView.ViewHolder {
         final View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent i = new Intent(ctx, DetalheParadaActivity.class);
-//                i.putExtra("parada", parada.getParada().getId());
-//                ctx.startActivity(i);
-                Toast.makeText(ctx, itinerario.getNomeEmpresa(), Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(ctx, DetalheItinerarioActivity.class);
+                i.putExtra("itinerario", itinerario.getItinerario().getId());
+                ctx.startActivity(i);
             }
         };
 //
-//        binding.circleView2.setOnClickListener(listener);
+        binding.cardView2.setOnClickListener(listener);
 //        binding.textViewNome.setOnClickListener(listener);
 
         binding.executePendingBindings();

@@ -69,9 +69,9 @@
             android:src="@drawable/ic_menu_mylocation"
             app:backgroundTint="@color/verde"
             app:fabSize="mini"
-            app:layout_constraintBottom_toTopOf="@+id/floatingActionButton"
-            app:layout_constraintEnd_toEndOf="@+id/floatingActionButton"
-            app:layout_constraintStart_toStartOf="@+id/floatingActionButton" />
+            app:layout_constraintBottom_toTopOf="@+id/fabParada"
+            app:layout_constraintEnd_toEndOf="@+id/fabParada"
+            app:layout_constraintStart_toStartOf="@+id/fabParada" />
 
     </android.support.constraint.ConstraintLayout>
 

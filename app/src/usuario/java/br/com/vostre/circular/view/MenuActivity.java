@@ -141,9 +141,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnMapa(View v){
-//        Intent i = new Intent(getApplicationContext(), CidadesActivity.class);
-//        startActivity(i);
-        Toast.makeText(getApplicationContext(), "Mapa", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(getApplicationContext(), MapaActivity.class);
+        startActivity(i);
     }
 
     public void onClickBtnQRCode(View v){

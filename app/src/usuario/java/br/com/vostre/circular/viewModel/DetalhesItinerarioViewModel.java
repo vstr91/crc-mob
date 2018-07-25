@@ -16,6 +16,8 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
 import org.joda.time.DateTime;
+import org.osmdroid.util.BoundingBox;
+import org.osmdroid.util.GeoPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +25,9 @@ import java.util.List;
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.ParadaItinerario;
+import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
+import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
@@ -34,57 +38,23 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
     public LiveData<ItinerarioPartidaDestino> itinerario;
 
-    public MutableLiveData<List<ParadaItinerarioBairro>> paradasItinerario;
-    public LiveData<List<ParadaItinerarioBairro>> pits;
-    public ParadaItinerarioBairro parada;
-
     public LiveData<List<ParadaBairro>> paradas;
+    public LiveData<List<HorarioItinerarioNome>> horarios;
+    public LiveData<List<SecaoItinerario>> secoes;
     public MutableLiveData<Location> localAtual;
     public boolean centralizaMapa = true;
 
     public FusedLocationProviderClient mFusedLocationClient;
     public LocationCallback mLocationCallback;
 
-    public Empresa empresa;
-    public LiveData<List<Empresa>> empresas;
-
     public static MutableLiveData<Integer> retorno;
-
-    public ObservableField<ItinerarioPartidaDestino> iti;
-
-    public ObservableField<ItinerarioPartidaDestino> getIti() {
-        return iti;
-    }
-
-    public void setIti(ObservableField<ItinerarioPartidaDestino> iti) {
-        this.iti = iti;
-    }
-
-    public LiveData<ItinerarioPartidaDestino> getItinerario() {
-        return itinerario;
-    }
+    Location l;
 
     public void setItinerario(String itinerario) {
         this.itinerario = appDatabase.itinerarioDAO().carregar(itinerario);
-        this.pits = appDatabase.paradaItinerarioDAO().listarTodosAtivosPorItinerarioComBairro(itinerario);
-//        paradasItinerario.setValue(appDatabase.paradaItinerarioDAO()
-//                .listarTodosAtivosPorItinerarioComBairro(itinerario).getValue());
-    }
-
-    public LiveData<List<ParadaItinerarioBairro>> getParadasItinerario() {
-        return paradasItinerario;
-    }
-
-    public void setParadasItinerario(MutableLiveData<List<ParadaItinerarioBairro>> paradasItinerario) {
-        this.paradasItinerario = paradasItinerario;
-    }
-
-    public ParadaItinerarioBairro getParada() {
-        return parada;
-    }
-
-    public void setParada(ParadaItinerarioBairro parada) {
-        this.parada = parada;
+        this.paradas = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro(itinerario);
+        this.horarios = appDatabase.horarioItinerarioDAO().listarApenasAtivosPorItinerario(itinerario);
+        this.secoes = appDatabase.secaoItinerarioDAO().listarTodosPorItinerario(itinerario);
     }
 
     public LiveData<List<ParadaBairro>> getParadas() {
@@ -99,203 +69,23 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         itinerario = appDatabase.itinerarioDAO().carregar("");
-        paradas = appDatabase.paradaDAO().listarTodosAtivosComBairro();
-        empresas = appDatabase.empresaDAO().listarTodosAtivos();
-
-        iti = new ObservableField<>(new ItinerarioPartidaDestino());
+        paradas = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro("");
+        horarios = appDatabase.horarioItinerarioDAO().listarApenasAtivosPorItinerario("");
+        secoes = appDatabase.secaoItinerarioDAO().listarTodosPorItinerario("");
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplication());
 
         localAtual = new MutableLiveData<>();
-        localAtual.setValue(new Location(LocationManager.GPS_PROVIDER));
 
-        paradasItinerario = new MutableLiveData<>();
-        paradasItinerario.setValue(new ArrayList<ParadaItinerarioBairro>());
+        l = new Location(LocationManager.NETWORK_PROVIDER);
+        l.setLatitude(0);
+        l.setLongitude(0);
+
+        localAtual.setValue(l);
 
         retorno = new MutableLiveData<>();
         retorno.setValue(-1);
     }
-
-    public void salvarItinerario(){
-
-        Itinerario umItinerario = itinerario.getValue().getItinerario();
-        umItinerario.setEmpresa(empresa.getId());
-
-        if(umItinerario.valida(umItinerario)){
-            add(umItinerario);
-            addParadas(this.paradasItinerario.getValue());
-
-        } else{
-            retorno.setValue(0);
-        }
-
-    }
-
-    public void editarItinerario(){
-
-        Itinerario umItinerario = itinerario.getValue().getItinerario();
-        umItinerario.setEmpresa(empresa.getId());
-
-        if(umItinerario.valida(umItinerario)){
-            edit(umItinerario);
-        } else{
-            retorno.setValue(0);
-        }
-
-    }
-
-    public void salvarParadas(){
-        addParadas(this.paradasItinerario.getValue());
-    }
-
-    public void editarParada(){
-        List<ParadaItinerarioBairro> pibs = this.paradasItinerario.getValue();
-//        ParadaItinerarioBairro pib = pibs.get(pibs.indexOf(parada));
-//        pib = parada;
-        this.paradasItinerario.postValue(pibs);
-        this.parada = null;
-
-    }
-
-    // adicionar paradas
-
-    public void addParadas(List<ParadaItinerarioBairro> pibs) {
-
-        int cont = 1;
-
-        new invalidaParadasAsyncTask(appDatabase).execute(itinerario.getValue().getItinerario());
-
-        for(ParadaItinerarioBairro pib : pibs){
-            pib.getParadaItinerario().setItinerario(itinerario.getValue().getItinerario().getId());
-            pib.getParadaItinerario().setOrdem(cont);
-            pib.getParadaItinerario().setAtivo(true);
-
-            pib.getParadaItinerario().setDataCadastro(new DateTime());
-            pib.getParadaItinerario().setUltimaAlteracao(new DateTime());
-            pib.getParadaItinerario().setEnviado(false);
-
-            new addParadaAsyncTask(appDatabase).execute(pib.getParadaItinerario());
-
-            cont++;
-        }
-
-        paradasItinerario.postValue(appDatabase.paradaItinerarioDAO().listarTodosAtivosPorItinerarioComBairro(itinerario.getValue().getItinerario().getId()).getValue());
-
-    }
-
-    private static class invalidaParadasAsyncTask extends AsyncTask<Itinerario, Void, Void> {
-
-        private AppDatabase db;
-
-        invalidaParadasAsyncTask(AppDatabase appDatabase) {
-            db = appDatabase;
-        }
-
-        @Override
-        protected Void doInBackground(final Itinerario... params) {
-
-            db.paradaItinerarioDAO().invalidaTodosPorItinerario(params[0].getId());
-
-            return null;
-        }
-
-    }
-
-    private static class addParadaAsyncTask extends AsyncTask<ParadaItinerario, Void, Void> {
-
-        private AppDatabase db;
-
-        addParadaAsyncTask(AppDatabase appDatabase) {
-            db = appDatabase;
-        }
-
-        @Override
-        protected Void doInBackground(final ParadaItinerario... params) {
-
-            ParadaItinerario paradaItinerario = db.paradaItinerarioDAO().checaDuplicidade(params[0].getParada(), params[0].getItinerario());
-
-            if(paradaItinerario != null){
-                ParadaItinerario pi = params[0];
-
-                paradaItinerario.setAtivo(true);
-                paradaItinerario.setOrdem(pi.getOrdem());
-                paradaItinerario.setDestaque(pi.getDestaque());
-                paradaItinerario.setValorAnterior(pi.getValorAnterior());
-                paradaItinerario.setValorSeguinte(pi.getValorSeguinte());
-
-                db.paradaItinerarioDAO().editar(paradaItinerario);
-            } else{
-                db.paradaItinerarioDAO().inserir(params[0]);
-            }
-
-
-            return null;
-        }
-
-    }
-
-    // fim adicionar paradas
-
-    // adicionar
-
-    public void add(final Itinerario itinerario) {
-
-        itinerario.setDataCadastro(new DateTime());
-        itinerario.setUltimaAlteracao(new DateTime());
-        itinerario.setEnviado(false);
-
-        new addAsyncTask(appDatabase).execute(itinerario);
-    }
-
-    private static class addAsyncTask extends AsyncTask<Itinerario, Void, Void> {
-
-        private AppDatabase db;
-
-        addAsyncTask(AppDatabase appDatabase) {
-            db = appDatabase;
-        }
-
-        @Override
-        protected Void doInBackground(final Itinerario... params) {
-            db.itinerarioDAO().inserir((params[0]));
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            DetalhesItinerarioViewModel.retorno.setValue(1);
-        }
-    }
-
-    // fim adicionar
-
-    // editar
-
-    public void edit(final Itinerario itinerario) {
-
-        itinerario.setUltimaAlteracao(new DateTime());
-        itinerario.setEnviado(false);
-
-        new editAsyncTask(appDatabase).execute(itinerario);
-    }
-
-    private static class editAsyncTask extends AsyncTask<Itinerario, Void, Void> {
-
-        private AppDatabase db;
-
-        editAsyncTask(AppDatabase appDatabase) {
-            db = appDatabase;
-        }
-
-        @Override
-        protected Void doInBackground(final Itinerario... params) {
-            db.itinerarioDAO().editar((params[0]));
-            return null;
-        }
-
-    }
-
-    // fim editar
 
     public void iniciarAtualizacoesPosicao(){
         mLocationCallback = new LocationCallback() {
@@ -319,6 +109,32 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
                 }
             }
         };
+    }
+
+    public void atualizaPontoMapa(){
+        List<ParadaBairro> p = paradas.getValue();
+        ParadaBairro paradaInicial = p.get(0);
+        ParadaBairro paradaFinal = p.get(p.size()-1);
+
+        midPoint(paradaInicial.getParada().getLatitude(), paradaInicial.getParada().getLongitude(), paradaFinal.getParada().getLatitude(), paradaFinal.getParada().getLongitude());
+
+    }
+
+    private void midPoint(double lat1,double lon1,double lat2,double lon2){
+
+        double dLon = Math.toRadians(lon2 - lon1);
+
+        GeoPoint origin = new GeoPoint(lat1,lon1);
+        //create destination geopoints from parameters
+        GeoPoint destination = new GeoPoint(lat2,lon2);
+        //calculate and return center
+        GeoPoint point = GeoPoint.fromCenterBetween(origin, destination);
+
+        l.setLatitude(point.getLatitude());
+        l.setLongitude(point.getLongitude());
+
+        localAtual.postValue(l);
+
     }
 
 }

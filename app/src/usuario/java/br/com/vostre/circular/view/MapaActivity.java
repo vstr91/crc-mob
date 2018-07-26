@@ -2,21 +2,26 @@ package br.com.vostre.circular.view;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.IntentService;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DrawableUtils;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,11 +52,13 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityDetalheItinerarioBinding;
 import br.com.vostre.circular.databinding.ActivityMapaBinding;
 import br.com.vostre.circular.model.Parada;
+import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
+import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ParadaAdapter;
 import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
 import br.com.vostre.circular.view.utils.InfoWindow;
@@ -64,6 +71,7 @@ public class MapaActivity extends BaseActivity {
     ActivityMapaBinding binding;
     MapaViewModel viewModel;
     ParadaAdapter adapter;
+    ItinerarioAdapter adapterItinerarios;
 
     AppCompatActivity ctx;
 
@@ -74,6 +82,9 @@ public class MapaActivity extends BaseActivity {
     int permissionGPS;
     int permissionStorage;
     int permissionInternet;
+
+    BottomSheetDialog bsd;
+    BottomSheetDialog bsdPoi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,8 +146,19 @@ public class MapaActivity extends BaseActivity {
         binding.setViewModel(viewModel);
 
         viewModel.paradas.observe(this, paradasObserver);
+        viewModel.pois.observe(this, poisObserver);
         viewModel.localAtual.observe(this, localObserver);
         viewModel.iniciarAtualizacoesPosicao();
+
+        bsd = new BottomSheetDialog(ctx);
+        bsd.setCanceledOnTouchOutside(true);
+
+        bsd.setContentView(R.layout.infowindow_parada);
+
+        bsdPoi = new BottomSheetDialog(ctx);
+        bsdPoi.setCanceledOnTouchOutside(true);
+
+        bsdPoi.setContentView(R.layout.infowindow_poi);
 
         configuraMapa();
     }
@@ -170,6 +192,13 @@ public class MapaActivity extends BaseActivity {
         }
     };
 
+    Observer<List<PontoInteresse>> poisObserver = new Observer<List<PontoInteresse>>() {
+        @Override
+        public void onChanged(List<PontoInteresse> pois) {
+            atualizarPoisMapa(pois);
+        }
+    };
+
     Observer<Location> localObserver = new Observer<Location>() {
         @Override
         public void onChanged(Location local) {
@@ -177,6 +206,19 @@ public class MapaActivity extends BaseActivity {
             if(viewModel.centralizaMapa && local.getLatitude() != 0.0 && local.getLongitude() != 0.0){
                 setMapCenter(map, new GeoPoint(local.getLatitude(), local.getLongitude()));
                 //viewModel.centralizaMapa = false;
+            }
+
+        }
+    };
+
+    Observer<List<ItinerarioPartidaDestino>> itinerariosObserver = new Observer<List<ItinerarioPartidaDestino>>() {
+        @Override
+        public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
+            adapterItinerarios.itinerarios = itinerarios;
+            adapterItinerarios.notifyDataSetChanged();
+
+            if(!bsd.isShowing()){
+                bsd.show();
             }
 
         }
@@ -207,13 +249,93 @@ public class MapaActivity extends BaseActivity {
                     @Override
                     public boolean onMarkerClick(Marker marker, MapView mapView) {
 
-                        ParadaBairro pb = getParadaFromMarker(marker, paradas);
+                        final ParadaBairro pb = getParadaFromMarker(marker, paradas);
 
-                        InfoWindowParada infoWindow = new InfoWindowParada();
-                        infoWindow.setParada(pb);
-                        infoWindow.setCtx(ctx);
-                        infoWindow.show(getSupportFragmentManager(), "infoWindow");
+                        viewModel.setParada(pb);
+                        viewModel.itinerarios.observe(ctx, itinerariosObserver);
+
+                        RecyclerView listItinerarios = bsd.findViewById(R.id.listItinerarios);
+
+                        adapterItinerarios = new ItinerarioAdapter(viewModel.itinerarios.getValue(), ctx);
+                        listItinerarios.setAdapter(adapterItinerarios);
+
+                        // bottom menu
+
+                        TextView textViewReferencia = bsd.findViewById(R.id.textViewReferencia);
+                        TextView textViewBairro = bsd.findViewById(R.id.textViewBairro);
+
+                        textViewReferencia.setText(pb.getParada().getNome());
+                        textViewBairro.setText(pb.getNomeBairroComCidade());
+
+                        Button btnDetalhes = bsd.findViewById(R.id.btnDetalhes);
+                        btnDetalhes.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Intent i = new Intent(ctx, DetalheParadaActivity.class);
+                                i.putExtra("parada", pb.getParada().getId());
+                                ctx.startActivity(i);
+                            }
+                        });
+
+                        Button btnFechar = bsd.findViewById(R.id.btnFechar);
+                        btnFechar.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                bsd.dismiss();
+                            }
+                        });
+
+                        // fim bottom menu
+
                         mapController.animateTo(marker.getPosition());
+
+                        return true;
+                    }
+                });
+                map.getOverlays().add(m);
+            }
+
+        }
+
+    }
+
+    private void atualizarPoisMapa(final List<PontoInteresse> pois){
+
+        if(pois != null){
+
+            for(final PontoInteresse p : pois){
+
+                Marker m = new Marker(map);
+                m.setPosition(new GeoPoint(p.getLatitude(), p.getLongitude()));
+                m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                m.setTitle(p.getNome());
+                m.setDraggable(true);
+                m.setIcon(getResources().getDrawable(R.mipmap.ic_launcher));
+                m.setId(p.getId());
+                m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker, MapView mapView) {
+
+                        final PontoInteresse poi = getPoiFromMarker(marker, pois);
+
+                        // bottom menu
+
+                        TextView textViewReferencia = bsdPoi.findViewById(R.id.textViewReferencia);
+
+                        textViewReferencia.setText(poi.getNome());
+
+                        Button btnFechar = bsdPoi.findViewById(R.id.btnFechar);
+                        btnFechar.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                bsdPoi.dismiss();
+                            }
+                        });
+
+                        // fim bottom menu
+
+                        mapController.animateTo(marker.getPosition());
+                        bsdPoi.show();
 
                         return true;
                     }
@@ -237,6 +359,17 @@ public class MapaActivity extends BaseActivity {
         pb.getParada().setLatitude(marker.getPosition().getLatitude());
         pb.getParada().setLongitude(marker.getPosition().getLongitude());
         return pb;
+    }
+
+    @NonNull
+    private PontoInteresse getPoiFromMarker(Marker marker, List<PontoInteresse> pois) {
+        PontoInteresse p = new PontoInteresse();
+        p.setId(marker.getId());
+
+        p = pois.get(pois.indexOf(p));
+        p.setLatitude(marker.getPosition().getLatitude());
+        p.setLongitude(marker.getPosition().getLongitude());
+        return p;
     }
 
     public void onFabClick(View v){

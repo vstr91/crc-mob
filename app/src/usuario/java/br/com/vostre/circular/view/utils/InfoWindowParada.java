@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageView;
 
 import java.util.List;
@@ -102,6 +103,7 @@ public class InfoWindowParada extends FormBase {
         public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
             adapter.itinerarios = itinerarios;
             adapter.notifyDataSetChanged();
+            binding.invalidateAll();
         }
     };
 

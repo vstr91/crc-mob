@@ -19,7 +19,7 @@ public interface PontoInteresseDAO {
     LiveData<List<PontoInteresse>> listarTodos();
 
     @Query("SELECT * FROM ponto_interesse WHERE ativo = 1")
-    List<PontoInteresse> listarTodosAtivos();
+    LiveData<List<PontoInteresse>> listarTodosAtivos();
 
     @Query("SELECT * FROM ponto_interesse WHERE enviado = 0")
     List<PontoInteresse> listarTodosAEnviar();

@@ -3,10 +3,16 @@ package br.com.vostre.circular.view;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.annotation.SuppressLint;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
+import android.location.Location;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
@@ -18,7 +24,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.location.LocationRequest;
 import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
@@ -31,10 +41,12 @@ import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.TimeZone;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityMenuBinding;
+import br.com.vostre.circular.viewModel.BaseViewModel;
 
 public class MenuActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -64,6 +76,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     ContentResolver mResolver;
 
     int permissionStorage;
+    Location localAnterior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,16 +84,27 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         super.onCreate(savedInstanceState);
         binding.setView(this);
 
-        MultiplePermissionsListener listener = DialogOnAnyDeniedMultiplePermissionsListener.Builder
-                .withContext(this)
-                .withTitle("Permissões Negadas")
-                .withMessage("Permita os acessos à Internet, armazenamento externo e GPS para acessar esta página")
-                .build();
-
         Dexter.withActivity(this)
                 .withPermissions(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ).withListener(listener)
+                ).withListener(new MultiplePermissionsListener() {
+            @Override
+            public void onPermissionsChecked(MultiplePermissionsReport report) {
+
+                if(report.areAllPermissionsGranted()){
+                    configuraActivity();
+                } else{
+                    Toast.makeText(getApplicationContext(), "Acesso ao GPS e armazenamento interno é necessário para aproveitar ao máximo o Circular!", Toast.LENGTH_LONG).show();
+                }
+
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                token.continuePermissionRequest();
+            }
+        })
                 .check();
 
         permissionStorage = ContextCompat.checkSelfPermission(getApplicationContext(),
@@ -128,6 +152,14 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         drawer.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
+    }
+
+    private void configuraActivity(){
+        viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
+        viewModel.localAtual.observe(this, localObserver);
+        viewModel.iniciarAtualizacoesPosicao();
+        localAnterior = new Location(LocationManager.GPS_PROVIDER);
+        startLocationUpdates();
     }
 
     public void onClickBtnItinerarios(View v){
@@ -186,17 +218,75 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
              * then call context.setIsSyncable(account, AUTHORITY, 1)
              * here.
              */
-            System.out.println("AQUI!!!!");
         } else {
             /*
              * The account exists or some other error occurred. Log this, report it,
              * or handle it internally.
              */
-            System.out.println("EXISTE!!!!");
         }
 
         return null;
 
     }
+
+    private boolean checarPermissoes(){
+        return ContextCompat.checkSelfPermission(getApplicationContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @SuppressLint("MissingPermission")
+    private void startLocationUpdates() {
+
+        if(checarPermissoes()){
+
+            LocationRequest locationRequest = new LocationRequest();
+            locationRequest.setInterval(3000);
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            locationRequest.setMaxWaitTime(5000);
+
+            if(viewModel != null){
+                viewModel.mFusedLocationClient.requestLocationUpdates(locationRequest,
+                        viewModel.mLocationCallback,
+                        null);
+            }
+
+        }
+
+    }
+
+    private void stopLocationUpdates() {
+
+        if(viewModel != null && viewModel.mFusedLocationClient != null){
+            viewModel.mFusedLocationClient.removeLocationUpdates(viewModel.mLocationCallback);
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        startLocationUpdates();
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        stopLocationUpdates();
+
+    }
+
+    Observer<Location> localObserver = new Observer<Location>() {
+        @Override
+        public void onChanged(Location local) {
+
+            if(local.getLatitude() != 0.0 && local.getLongitude() != 0.0 && local.distanceTo(localAnterior) > 20){
+                viewModel.buscaParadasProximas(local);
+            }
+
+        }
+    };
 
 }

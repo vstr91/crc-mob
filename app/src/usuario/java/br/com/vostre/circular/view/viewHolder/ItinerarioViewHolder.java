@@ -31,7 +31,7 @@ public class ItinerarioViewHolder extends RecyclerView.ViewHolder {
 //            binding.imageView12.setVisibility(View.GONE);
 //        }
 
-        if(itinerario.getItinerario().getObservacao() != null && (itinerario.getItinerario().getObservacao().isEmpty() ||
+        if(itinerario.getItinerario().getObservacao() == null || (itinerario.getItinerario().getObservacao().isEmpty() ||
                 itinerario.getItinerario().getObservacao().equals("null") || itinerario.getItinerario().getObservacao().equals(""))){
             binding.textView24.setVisibility(View.GONE);
         }

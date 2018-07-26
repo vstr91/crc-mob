@@ -165,7 +165,7 @@
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/button5"
+                    app:layout_constraintStart_toEndOf="@+id/btnDetalhes"
                     app:layout_constraintTop_toBottomOf="@+id/button4" />
 
                 <Button
@@ -184,7 +184,7 @@
                     app:layout_constraintEnd_toStartOf="@+id/button8"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/button5" />
+                    app:layout_constraintTop_toBottomOf="@+id/btnDetalhes" />
 
                 <Button
                     android:id="@+id/button8"

@@ -3,8 +3,16 @@ package br.com.vostre.circular.viewModel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.databinding.ObservableField;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -33,6 +41,7 @@ import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.dao.PaisDAO;
+import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.StringUtils;
 import br.com.vostre.circular.utils.Unique;
 
@@ -40,6 +49,9 @@ public class BaseViewModel extends AndroidViewModel {
 
     private AppDatabase appDatabase;
     ObservableField<String> id;
+    public MutableLiveData<Location> localAtual;
+    public FusedLocationProviderClient mFusedLocationClient;
+    public LocationCallback mLocationCallback;
 
     public ObservableField<String> getId() {
         return id;
@@ -53,7 +65,61 @@ public class BaseViewModel extends AndroidViewModel {
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         id = new ObservableField<>();
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplication());
+
+        localAtual = new MutableLiveData<>();
+        localAtual.postValue(new Location(LocationManager.GPS_PROVIDER));
         new paramAsyncTask(appDatabase).execute();
+    }
+
+    public void iniciarAtualizacoesPosicao(){
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+
+                    if(location.getAccuracy() <= 20){
+                        localAtual.postValue(location);
+
+                        if(localAtual.getValue() != null){
+                            localAtual.getValue().setLatitude(localAtual.getValue().getLatitude());
+                            localAtual.getValue().setLongitude(localAtual.getValue().getLongitude());
+                        }
+
+                    }
+
+                }
+            }
+        };
+    }
+
+    public void buscaParadasProximas(Location local){
+        new buscaAsyncTask(appDatabase, local).execute();
+    }
+
+    private class buscaAsyncTask extends AsyncTask<List<ParadaBairro>, Void, Void> {
+
+        private AppDatabase db;
+        private ParametroInterno parametro;
+        private Location local;
+
+        buscaAsyncTask(AppDatabase appDatabase, Location local) {
+            db = appDatabase;
+            this.local = local;
+        }
+
+        @Override
+        protected Void doInBackground(final List<ParadaBairro>... params) {
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
     }
 
     public void salvar(List<? extends EntidadeBase> dados, String entidade){

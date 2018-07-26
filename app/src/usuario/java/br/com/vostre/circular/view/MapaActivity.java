@@ -55,6 +55,7 @@ import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ParadaAdapter;
 import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
 import br.com.vostre.circular.view.utils.InfoWindow;
+import br.com.vostre.circular.view.utils.InfoWindowParada;
 import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
 import br.com.vostre.circular.viewModel.MapaViewModel;
 
@@ -208,7 +209,7 @@ public class MapaActivity extends BaseActivity {
 
                         ParadaBairro pb = getParadaFromMarker(marker, paradas);
 
-                        InfoWindow infoWindow = new InfoWindow();
+                        InfoWindowParada infoWindow = new InfoWindowParada();
                         infoWindow.setParada(pb);
                         infoWindow.setCtx(ctx);
                         infoWindow.show(getSupportFragmentManager(), "infoWindow");

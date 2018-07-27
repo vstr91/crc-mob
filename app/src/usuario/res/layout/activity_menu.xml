@@ -21,6 +21,7 @@
                 tools:context=".view.MenuActivity">
 
                 <include
+                    android:id="@+id/toolbar"
                     layout="@layout/toolbar"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -35,15 +36,15 @@
                     android:layout_marginLeft="24dp"
                     android:layout_marginRight="24dp"
                     android:layout_marginStart="24dp"
-                    android:src="@mipmap/ic_onibus_branco"
                     android:onClick="onClickBtnLogo"
+                    android:src="@mipmap/ic_onibus_branco"
                     app:layout_constraintBottom_toTopOf="@+id/guideline"
                     app:layout_constraintEnd_toEndOf="@+id/circleView"
                     app:layout_constraintStart_toStartOf="@+id/circleView"
                     app:layout_constraintTop_toTopOf="@+id/guideline2"
                     app:srcCompat="@mipmap/ic_onibus_branco" />
 
-                <br.com.vostre.circleview.CircleView
+                <br.com.vostre.circular.view.utils.CircleView
                     android:id="@+id/circleView"
                     android:layout_width="200dp"
                     android:layout_height="200dp"
@@ -51,7 +52,7 @@
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="32dp"
+                    android:layout_marginTop="50dp"
                     app:corArcoMaior="@color/branco"
                     app:corArcoMenor="@color/branco"
                     app:espessuraArcoMaior="45"
@@ -67,7 +68,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="32dp"
+                    android:layout_marginTop="50dp"
                     android:onClick="@{view::onClickBtnItinerarios}"
                     android:text="Itinerários"
                     android:textAllCaps="false"
@@ -85,7 +86,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="32dp"
+                    android:layout_marginTop="50dp"
                     android:onClick="@{view::onClickBtnParadas}"
                     android:text="Paradas"
                     android:textAllCaps="false"
@@ -138,14 +139,57 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    app:layout_constraintGuide_begin="224dp" />
+                    app:layout_constraintGuide_begin="241dp" />
 
                 <android.support.constraint.Guideline
                     android:id="@+id/guideline2"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    app:layout_constraintGuide_begin="74dp" />
+                    app:layout_constraintGuide_begin="94dp" />
+
+                <TextView
+                    android:id="@+id/textViewParada"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="38dp"
+                    android:gravity="center"
+                    android:onClick="onClickBtnLogo"
+                    android:textAppearance="@style/texto_branco"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="@+id/circleView"
+                    app:layout_constraintStart_toStartOf="@+id/circleView"
+                    app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+
+                <TextView
+                    android:id="@+id/textViewDistancia"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginStart="8dp"
+                    android:onClick="onClickBtnLogo"
+                    android:textAppearance="@style/texto_branco"
+                    android:textSize="10sp"
+                    app:layout_constraintEnd_toEndOf="@+id/circleView"
+                    app:layout_constraintStart_toStartOf="@+id/circleView"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewParada"
+                    tools:text="~50m" />
+
+                <TextView
+                    android:id="@+id/textView36"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
+                    android:text="Próximo a você"
+                    android:textAppearance="@style/texto_branco"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+                    app:layout_constraintEnd_toEndOf="@+id/circleView"
+                    app:layout_constraintStart_toStartOf="@+id/circleView" />
 
             </android.support.constraint.ConstraintLayout>
 

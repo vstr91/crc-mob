@@ -4,6 +4,7 @@ import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ContentResolver;
@@ -11,6 +12,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
@@ -40,12 +43,17 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 
+import java.io.File;
+import java.text.NumberFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityMenuBinding;
+import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
 public class MenuActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -77,6 +85,9 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
     int permissionStorage;
     Location localAnterior;
+
+    AppCompatActivity ctx;
+    ParadaBairro paradaAtual;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,6 +170,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         viewModel.localAtual.observe(this, localObserver);
         viewModel.iniciarAtualizacoesPosicao();
         localAnterior = new Location(LocationManager.GPS_PROVIDER);
+        ctx = this;
+        binding.textView36.setVisibility(View.GONE);
         startLocationUpdates();
     }
 
@@ -184,9 +197,13 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnLogo(View v){
-//        Intent i = new Intent(getApplicationContext(), BairrosActivity.class);
-//        startActivity(i);
-        Toast.makeText(getApplicationContext(), "Logo", Toast.LENGTH_SHORT).show();
+
+        if(paradaAtual != null){
+            Intent i = new Intent(ctx, DetalheParadaActivity.class);
+            i.putExtra("parada", paradaAtual.getParada().getId());
+            startActivity(i);
+        }
+
     }
 
     @Override
@@ -283,10 +300,90 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         public void onChanged(Location local) {
 
             if(local.getLatitude() != 0.0 && local.getLongitude() != 0.0 && local.distanceTo(localAnterior) > 20){
+                localAnterior = local;
                 viewModel.buscaParadasProximas(local);
+                viewModel.paradas.observe(ctx, paradasObserver);
             }
 
         }
     };
+
+    Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {
+        @Override
+        public void onChanged(List<ParadaBairro> paradas) {
+
+            double latitude = -22.470612;
+            double longitude = -43.8263613;
+
+            Location l0 = new Location(LocationManager.GPS_PROVIDER);
+            l0.setLatitude(latitude);
+            l0.setLongitude(longitude);
+
+            adicionaListaALogo(paradas, l0);
+
+        }
+    };
+
+    private void adicionaListaALogo(List<ParadaBairro> paradas, Location localAtual){
+
+        NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setMaximumFractionDigits(0);
+
+        if(paradas != null && paradas.size() > 0){
+            for(ParadaBairro p : paradas){
+
+                Location l = new Location(LocationManager.GPS_PROVIDER);
+                l.setLatitude(p.getParada().getLatitude());
+                l.setLongitude(p.getParada().getLongitude());
+
+                if(p.getParada().getImagem() != null && !p.getParada().getImagem().equals("")){
+
+                    File foto = new File(getApplication().getFilesDir(), p.getParada().getImagem());
+
+                    if(foto.exists() && foto.canRead()){
+                        final Drawable drawable = Drawable.createFromPath(foto.getAbsolutePath());
+                        binding.circleView.setImagem(drawable);
+                    } else{
+                        binding.circleView.setImagem(null);
+                        binding.circleView.invalidate();
+                    }
+
+                }
+
+
+
+                String distancia = nf.format(l.distanceTo(localAtual));
+
+                binding.textViewParada.setText(p.getParada().getNome());
+                binding.textViewDistancia.setText("~"+distancia+" m");
+
+                if(binding.textViewParada.getVisibility() == View.GONE){
+                    binding.textViewParada.setVisibility(View.VISIBLE);
+                }
+
+                if(binding.textViewDistancia.getVisibility() == View.GONE){
+                    binding.textViewDistancia.setVisibility(View.VISIBLE);
+                }
+
+                if(binding.textView36.getVisibility() == View.GONE){
+                    binding.textView36.setVisibility(View.VISIBLE);
+                }
+
+                paradaAtual = p;
+
+//                System.out.println("PARADA PROXIMA:: "+p.getParada().getNome()+" - "+p.getParada().getLatitude()+" | "
+//                        +p.getParada().getLongitude()+" || Distancia: "+l.distanceTo(localAtual));
+            }
+        } else{
+            binding.textViewParada.setVisibility(View.GONE);
+            binding.textViewDistancia.setVisibility(View.GONE);
+            binding.textView36.setVisibility(View.GONE);
+            binding.circleView.setImagem(null);
+            binding.circleView.invalidate();
+        }
+
+
+
+    }
 
 }

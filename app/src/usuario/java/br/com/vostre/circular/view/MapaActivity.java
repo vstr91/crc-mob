@@ -52,6 +52,7 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityDetalheItinerarioBinding;
 import br.com.vostre.circular.databinding.ActivityMapaBinding;
 import br.com.vostre.circular.model.Parada;
+import br.com.vostre.circular.model.ParadaSugestao;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
@@ -61,6 +62,7 @@ import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ParadaAdapter;
 import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
+import br.com.vostre.circular.view.form.FormParada;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.view.utils.InfoWindowParada;
 import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
@@ -85,6 +87,8 @@ public class MapaActivity extends BaseActivity {
 
     BottomSheetDialog bsd;
     BottomSheetDialog bsdPoi;
+
+    FormParada formParada;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,6 +150,7 @@ public class MapaActivity extends BaseActivity {
         binding.setViewModel(viewModel);
 
         viewModel.paradas.observe(this, paradasObserver);
+        viewModel.paradasSugeridas.observe(this, paradasSugeridasObserver);
         viewModel.pois.observe(this, poisObserver);
         viewModel.localAtual.observe(this, localObserver);
         viewModel.iniciarAtualizacoesPosicao();
@@ -189,6 +194,13 @@ public class MapaActivity extends BaseActivity {
         @Override
         public void onChanged(List<ParadaBairro> paradas) {
             atualizarParadasMapa(paradas);
+        }
+    };
+
+    Observer<List<ParadaSugestao>> paradasSugeridasObserver = new Observer<List<ParadaSugestao>>() {
+        @Override
+        public void onChanged(List<ParadaSugestao> paradas) {
+            atualizarSugestoessMapa(paradas);
         }
     };
 
@@ -285,6 +297,18 @@ public class MapaActivity extends BaseActivity {
                             }
                         });
 
+                        Button btnEdicao = bsd.findViewById(R.id.btnEdicao);
+                        btnEdicao.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                viewModel.paradaNova = new ParadaSugestao();
+                                formParada = new FormParada();
+                                formParada.setParadaRelativa(pb);
+                                formParada.setCtx(getApplication());
+                                formParada.show(getSupportFragmentManager(), "formParada");
+                            }
+                        });
+
                         // fim bottom menu
 
                         mapController.animateTo(marker.getPosition());
@@ -347,6 +371,93 @@ public class MapaActivity extends BaseActivity {
 
     }
 
+    private void atualizarSugestoessMapa(final List<ParadaSugestao> paradasSugeridas){
+
+        if(paradasSugeridas != null){
+
+            for(final ParadaSugestao p : paradasSugeridas){
+
+                Marker m = new Marker(map);
+                m.setPosition(new GeoPoint(p.getLatitude(), p.getLongitude()));
+                m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                m.setTitle(p.getNome());
+                m.setDraggable(true);
+                m.setId(p.getId());
+                m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker, MapView mapView) {
+
+                        final ParadaSugestao p = getSugestaoFromMarker(marker, paradasSugeridas);
+
+                        viewModel.setParadaNova(p);
+
+                        // bottom menu
+
+                        TextView textViewReferencia = bsd.findViewById(R.id.textViewReferencia);
+                        TextView textViewBairro = bsd.findViewById(R.id.textViewBairro);
+
+                        bsd.findViewById(R.id.textView32).setVisibility(View.GONE);
+                        bsd.findViewById(R.id.textView33).setVisibility(View.GONE);
+
+                        textViewReferencia.setText(p.getNome());
+                        //textViewBairro.setText(p.getNomeBairroComCidade());
+
+                        Button btnDetalhes = bsd.findViewById(R.id.btnDetalhes);
+                        btnDetalhes.setVisibility(View.GONE);
+
+                        Button btnEdicao = bsd.findViewById(R.id.btnEdicao);
+                        btnEdicao.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                formParada = new FormParada();
+                                formParada.setParada(p);
+                                formParada.setCtx(getApplication());
+                                formParada.show(getSupportFragmentManager(), "formParada");
+                            }
+                        });
+
+                        Button btnFechar = bsd.findViewById(R.id.btnFechar);
+                        btnFechar.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                bsd.dismiss();
+                            }
+                        });
+
+                        // fim bottom menu
+
+                        mapController.animateTo(marker.getPosition());
+                        bsd.show();
+
+                        return true;
+                    }
+                });
+                m.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
+                    @Override
+                    public void onMarkerDrag(Marker marker) {
+
+                    }
+
+                    @Override
+                    public void onMarkerDragEnd(Marker marker) {
+                        ParadaSugestao p = getSugestaoFromMarker(marker, paradasSugeridas);
+                        viewModel.setParadaNova(p);
+                        viewModel.editarParada();
+                        Toast.makeText(getApplicationContext(), "Sugestão alterada", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onMarkerDragStart(Marker marker) {
+
+                    }
+                });
+                map.getOverlays().add(m);
+            }
+
+        }
+
+    }
+
     @NonNull
     private ParadaBairro getParadaFromMarker(Marker marker, List<ParadaBairro> paradas) {
         Parada p = new Parada();
@@ -372,15 +483,26 @@ public class MapaActivity extends BaseActivity {
         return p;
     }
 
-    public void onFabClick(View v){
+    @NonNull
+    private ParadaSugestao getSugestaoFromMarker(Marker marker, List<ParadaSugestao> sugestoes) {
+        ParadaSugestao p = new ParadaSugestao();
+        p.setId(marker.getId());
 
-//        if(viewModel.localAtual != null){
-//            formParada = new FormParada();
-//            formParada.setLatitude(viewModel.localAtual.getValue().getLatitude());
-//            formParada.setLongitude(viewModel.localAtual.getValue().getLongitude());
-//            formParada.setCtx(getApplication());
-//            formParada.show(getSupportFragmentManager(), "formParada");
-//        }
+        p = sugestoes.get(sugestoes.indexOf(p));
+        p.setLatitude(marker.getPosition().getLatitude());
+        p.setLongitude(marker.getPosition().getLongitude());
+        return p;
+    }
+
+    public void onFabParadaClick(View v){
+
+        if(viewModel.localAtual != null){
+            formParada = new FormParada();
+            formParada.setLatitude(viewModel.localAtual.getValue().getLatitude());
+            formParada.setLongitude(viewModel.localAtual.getValue().getLongitude());
+            formParada.setCtx(getApplication());
+            formParada.show(getSupportFragmentManager(), "formParada");
+        }
 
     }
 

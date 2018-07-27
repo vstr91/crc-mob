@@ -52,6 +52,7 @@ public class BaseViewModel extends AndroidViewModel {
     public MutableLiveData<Location> localAtual;
     public FusedLocationProviderClient mFusedLocationClient;
     public LocationCallback mLocationCallback;
+    public LiveData<List<ParadaBairro>> paradas;
 
     public ObservableField<String> getId() {
         return id;
@@ -69,6 +70,7 @@ public class BaseViewModel extends AndroidViewModel {
 
         localAtual = new MutableLiveData<>();
         localAtual.postValue(new Location(LocationManager.GPS_PROVIDER));
+        paradas = appDatabase.paradaDAO().listarTodosAtivosProximos(0,0,0,0);
         new paramAsyncTask(appDatabase).execute();
     }
 
@@ -97,29 +99,28 @@ public class BaseViewModel extends AndroidViewModel {
     }
 
     public void buscaParadasProximas(Location local){
-        new buscaAsyncTask(appDatabase, local).execute();
-    }
 
-    private class buscaAsyncTask extends AsyncTask<List<ParadaBairro>, Void, Void> {
+        double latitude = local.getLatitude();
+        double longitude = local.getLongitude();
 
-        private AppDatabase db;
-        private ParametroInterno parametro;
-        private Location local;
+        // Centro - Barra do Pirai
+//        double latitude = -22.470612;
+//        double longitude = -43.8263613;
 
-        buscaAsyncTask(AppDatabase appDatabase, Location local) {
-            db = appDatabase;
-            this.local = local;
-        }
+        int raioEmMetros = 100;
 
-        @Override
-        protected Void doInBackground(final List<ParadaBairro>... params) {
-            return null;
-        }
+// 6378000 Size of the Earth (in meters)
+        double longitudeD = (Math.asin(raioEmMetros / (6378000 * Math.cos(Math.PI*latitude/180))))*180/Math.PI;
+        double latitudeD = (Math.asin((double)raioEmMetros / (double)6378000))*180/Math.PI;
 
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-        }
+        double latitudeMax = latitude+(latitudeD);
+        double latitudeMin = latitude-(latitudeD);
+        double longitudeMax = longitude+(longitudeD);
+        double longitudeMin = longitude-(longitudeD);
+
+        paradas = appDatabase.paradaDAO().listarTodosAtivosProximos(latitudeMin, latitudeMax, longitudeMin, longitudeMax);
+
+        //new buscaAsyncTask(appDatabase, local, this).execute();
     }
 
     public void salvar(List<? extends EntidadeBase> dados, String entidade){

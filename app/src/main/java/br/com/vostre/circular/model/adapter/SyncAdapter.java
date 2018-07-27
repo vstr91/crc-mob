@@ -47,6 +47,7 @@ import br.com.vostre.circular.model.Onibus;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
+import br.com.vostre.circular.model.ParadaSugestao;
 import br.com.vostre.circular.model.Parametro;
 import br.com.vostre.circular.model.ParametroInterno;
 import br.com.vostre.circular.model.PontoInteresse;
@@ -107,6 +108,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     List<? extends EntidadeBase> parametros;
     List<? extends EntidadeBase> pontosInteresse;
     List<? extends EntidadeBase> usuarios;
+
+    List<? extends EntidadeBase> paradaSugestoes;
 
     Crypt crypt;
 
@@ -391,6 +394,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             JSONArray mensagens = arrayObject.getJSONArray("mensagens");
             JSONArray parametros = arrayObject.getJSONArray("parametros");
             JSONArray usuarios = arrayObject.getJSONArray("usuarios");
+
+            JSONArray paradasSugestoes = arrayObject.getJSONArray("paradas_sugestoes");
 
             // PAISES
 
@@ -780,6 +785,37 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             }
 
+            // PARADAS SUGESTOES
+
+            if(paradasSugestoes.length() > 0){
+
+                int total = paradasSugestoes.length();
+                List<ParadaSugestao> lstParadas = new ArrayList<>();
+
+                for(int i = 0; i < total; i++){
+                    ParadaSugestao parada;
+                    JSONObject obj = paradasSugestoes.getJSONObject(i);
+
+                    parada = (ParadaSugestao) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), ParadaSugestao.class, 1);
+                    parada.setEnviado(true);
+                    parada.setImagemEnviada(true);
+
+                    lstParadas.add(parada);
+
+                    if(parada.getImagem() != null && !parada.getImagem().isEmpty()){
+                        File imagem = new File(getContext().getApplicationContext().getFilesDir(), parada.getImagem());
+
+                        if(!imagem.exists() || !imagem.canWrite()){
+                            imageDownload(baseUrl, parada.getImagem());
+                        }
+                    }
+
+                }
+
+                add(lstParadas, "parada_sugestao");
+
+            }
+
         }
 
         if(response.code() == 200){
@@ -836,6 +872,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             pontosInteresse = appDatabase.pontoInteresseDAO().listarTodosAEnviar();
             usuarios = appDatabase.usuarioDAO().listarTodosAEnviar();
 
+            paradaSugestoes = appDatabase.paradaSugestaoDAO().listarTodosAEnviar();
+
             return null;
         }
 
@@ -859,10 +897,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             String strPontosInteresse = "\"pontos_interesse\": "+JsonUtils.toJson((List<EntidadeBase>) pontosInteresse);
             String strUsuarios = "\"usuarios\": "+JsonUtils.toJson((List<EntidadeBase>) usuarios);
 
+            String strParadasSugestoes = "\"paradas_sugestoes\": "+JsonUtils.toJson((List<EntidadeBase>) paradaSugestoes);
+
             String json = "{"+strPaises+","+strEmpresas+","+strOnibus+","+strEstados+","+strCidades+","
                     +strBairros+","+strParadas+","+strItinerarios+","+strHorarios+","+strParadasItinerarios+","
                     +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
-                    +strPontosInteresse+","+strUsuarios+"}";
+                    +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+"}";
 
             // EXPORTA ARQUIVO DE DADOS
             ///*
@@ -883,7 +923,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             int registros = paises.size()+empresas.size()+onibus.size()+estados.size()+cidades.size()
                     +bairros.size()+paradas.size()+itinerarios.size()+horarios.size()+paradasItinerario.size()
-                    +secoesItinerarios.size()+horariosItinerarios.size()+mensagens.size()+parametros.size()+pontosInteresse.size()+usuarios.size();
+                    +secoesItinerarios.size()+horariosItinerarios.size()+mensagens.size()+parametros.size()+pontosInteresse.size()+usuarios.size()+paradaSugestoes.size();
 
             if(registros > 0){
                 chamaAPI(registros, json, 0, baseUrl, token);
@@ -1166,6 +1206,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     break;
                 case "usuario":
                     db.usuarioDAO().inserirTodos((List<Usuario>) params[0]);
+                    break;
+                case "parada_sugestao":
+                    db.paradaSugestaoDAO().inserirTodos((List<ParadaSugestao>) params[0]);
                     break;
             }
 

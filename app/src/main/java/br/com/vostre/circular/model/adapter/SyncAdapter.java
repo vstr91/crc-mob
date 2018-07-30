@@ -11,10 +11,12 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -378,442 +380,455 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             JSONObject arrayObject = new JSONObject(dados);
 
-            JSONArray paises = arrayObject.getJSONArray("paises");
-            JSONArray empresas = arrayObject.getJSONArray("empresas");
-            JSONArray onibus = arrayObject.getJSONArray("onibus");
-            JSONArray estados = arrayObject.getJSONArray("estados");
-            JSONArray cidades = arrayObject.getJSONArray("cidades");
-            JSONArray bairros = arrayObject.getJSONArray("bairros");
-            JSONArray paradas = arrayObject.getJSONArray("paradas");
-            JSONArray itinerarios = arrayObject.getJSONArray("itinerarios");
-            JSONArray horarios = arrayObject.getJSONArray("horarios");
-            JSONArray paradasItinerarios = arrayObject.getJSONArray("paradas_itinerarios");
-            JSONArray secoesItinerarios = arrayObject.getJSONArray("secoes_itinerarios");
-            JSONArray horariosItinerarios = arrayObject.getJSONArray("horarios_itinerarios");
-            JSONArray pontosInteresse = arrayObject.getJSONArray("pontos_interesse");
-            JSONArray mensagens = arrayObject.getJSONArray("mensagens");
-            JSONArray parametros = arrayObject.getJSONArray("parametros");
-            JSONArray usuarios = arrayObject.getJSONArray("usuarios");
+            JSONArray meta = arrayObject.getJSONArray("meta");
 
-            JSONArray paradasSugestoes = arrayObject.getJSONArray("paradas_sugestoes");
+            int registros = Integer.parseInt(meta.getJSONObject(0).get("registros").toString());
 
-            // PAISES
+            if(registros > 0){
+                JSONArray paises = arrayObject.getJSONArray("paises");
+                JSONArray empresas = arrayObject.getJSONArray("empresas");
+                JSONArray onibus = arrayObject.getJSONArray("onibus");
+                JSONArray estados = arrayObject.getJSONArray("estados");
+                JSONArray cidades = arrayObject.getJSONArray("cidades");
+                JSONArray bairros = arrayObject.getJSONArray("bairros");
+                JSONArray paradas = arrayObject.getJSONArray("paradas");
+                JSONArray itinerarios = arrayObject.getJSONArray("itinerarios");
+                JSONArray horarios = arrayObject.getJSONArray("horarios");
+                JSONArray paradasItinerarios = arrayObject.getJSONArray("paradas_itinerarios");
+                JSONArray secoesItinerarios = arrayObject.getJSONArray("secoes_itinerarios");
+                JSONArray horariosItinerarios = arrayObject.getJSONArray("horarios_itinerarios");
+                JSONArray pontosInteresse = arrayObject.getJSONArray("pontos_interesse");
+                JSONArray mensagens = arrayObject.getJSONArray("mensagens");
+                JSONArray parametros = arrayObject.getJSONArray("parametros");
+                JSONArray usuarios = arrayObject.getJSONArray("usuarios");
 
-            if(paises.length() > 0){
+                JSONArray paradasSugestoes = null;
 
-                int total = paises.length();
-                List<Pais> lstPaises = new ArrayList<>();
-
-                for(int i = 0; i < total; i++){
-                    Pais pais;
-                    JSONObject obj = paises.getJSONObject(i);
-
-                    pais = (Pais) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Pais.class, 1);
-                    pais.setEnviado(true);
-
-                    lstPaises.add(pais);
-
+                if(arrayObject.optJSONArray("paradas_sugestoes") != null){
+                    paradasSugestoes = arrayObject.getJSONArray("paradas_sugestoes");
                 }
 
-                add(lstPaises, "pais");
+                // PAISES
 
-            }
+                if(paises.length() > 0){
 
-            // ESTADOS
+                    int total = paises.length();
+                    List<Pais> lstPaises = new ArrayList<>();
 
-            if(estados.length() > 0){
+                    for(int i = 0; i < total; i++){
+                        Pais pais;
+                        JSONObject obj = paises.getJSONObject(i);
 
-                int total = estados.length();
-                List<Estado> lstEstados = new ArrayList<>();
+                        pais = (Pais) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Pais.class, 1);
+                        pais.setEnviado(true);
 
-                for(int i = 0; i < total; i++){
-                    Estado estado;
-                    JSONObject obj = estados.getJSONObject(i);
+                        lstPaises.add(pais);
 
-                    estado = (Estado) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Estado.class, 1);
-                    estado.setEnviado(true);
-
-                    lstEstados.add(estado);
-
-                }
-
-                add(lstEstados, "estado");
-
-            }
-
-            // CIDADES
-
-            if(cidades.length() > 0){
-
-                int total = cidades.length();
-                List<Cidade> lstCidades = new ArrayList<>();
-
-                for(int i = 0; i < total; i++){
-                    Cidade cidade;
-                    JSONObject obj = cidades.getJSONObject(i);
-
-                    cidade = (Cidade) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Cidade.class, 1);
-                    cidade.setEnviado(true);
-                    cidade.setImagemEnviada(true);
-
-                    lstCidades.add(cidade);
-
-                    if(cidade.getBrasao() != null && !cidade.getBrasao().isEmpty()){
-                        File brasao = new File(getContext().getApplicationContext().getFilesDir(), cidade.getBrasao());
-
-                        if(!brasao.exists() || !brasao.canWrite()){
-                            imageDownload(baseUrl, cidade.getBrasao());
-                        }
                     }
 
-                }
-
-                add(lstCidades, "cidade");
-
-            }
-
-            // BAIRROS
-
-            if(bairros.length() > 0){
-
-                int total = bairros.length();
-                List<Bairro> lstBairros = new ArrayList<>();
-
-                for(int i = 0; i < total; i++){
-                    Bairro bairro;
-                    JSONObject obj = bairros.getJSONObject(i);
-
-                    bairro = (Bairro) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Bairro.class, 1);
-                    bairro.setEnviado(true);
-
-                    lstBairros.add(bairro);
+                    add(lstPaises, "pais");
 
                 }
 
-                add(lstBairros, "bairro");
+                // ESTADOS
 
-            }
+                if(estados.length() > 0){
 
-            // PARADAS
+                    int total = estados.length();
+                    List<Estado> lstEstados = new ArrayList<>();
 
-            if(paradas.length() > 0){
+                    for(int i = 0; i < total; i++){
+                        Estado estado;
+                        JSONObject obj = estados.getJSONObject(i);
 
-                int total = paradas.length();
-                List<Parada> lstParadas = new ArrayList<>();
+                        estado = (Estado) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Estado.class, 1);
+                        estado.setEnviado(true);
 
-                for(int i = 0; i < total; i++){
-                    Parada parada;
-                    JSONObject obj = paradas.getJSONObject(i);
+                        lstEstados.add(estado);
 
-                    parada = (Parada) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Parada.class, 1);
-                    parada.setEnviado(true);
-                    parada.setImagemEnviada(true);
-
-                    lstParadas.add(parada);
-
-                    if(parada.getImagem() != null && !parada.getImagem().isEmpty()){
-                        File imagem = new File(getContext().getApplicationContext().getFilesDir(), parada.getImagem());
-
-                        if(!imagem.exists() || !imagem.canWrite()){
-                            imageDownload(baseUrl, parada.getImagem());
-                        }
                     }
 
+                    add(lstEstados, "estado");
+
                 }
 
-                add(lstParadas, "parada");
+                // CIDADES
 
-            }
+                if(cidades.length() > 0){
 
-            // EMPRESAS
+                    int total = cidades.length();
+                    List<Cidade> lstCidades = new ArrayList<>();
 
-            if(empresas.length() > 0){
+                    for(int i = 0; i < total; i++){
+                        Cidade cidade;
+                        JSONObject obj = cidades.getJSONObject(i);
 
-                int total = empresas.length();
-                List<Empresa> lstEmpresas = new ArrayList<>();
+                        cidade = (Cidade) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Cidade.class, 1);
+                        cidade.setEnviado(true);
+                        cidade.setImagemEnviada(true);
 
-                for(int i = 0; i < total; i++){
-                    Empresa empresa;
-                    JSONObject obj = empresas.getJSONObject(i);
+                        lstCidades.add(cidade);
 
-                    empresa = (Empresa) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Empresa.class, 1);
-                    empresa.setEnviado(true);
-                    empresa.setImagemEnviada(true);
+                        if(cidade.getBrasao() != null && !cidade.getBrasao().isEmpty()){
+                            File brasao = new File(getContext().getApplicationContext().getFilesDir(), cidade.getBrasao());
 
-                    lstEmpresas.add(empresa);
-
-                    if(empresa.getLogo() != null && !empresa.getLogo().isEmpty()){
-                        File logo = new File(getContext().getApplicationContext().getFilesDir(), empresa.getLogo());
-
-                        if(!logo.exists() || !logo.canWrite()){
-                            imageDownload(baseUrl, empresa.getLogo());
+                            if(!brasao.exists() || !brasao.canWrite()){
+                                imageDownload(baseUrl, cidade.getBrasao());
+                            }
                         }
+
                     }
 
-                }
-
-                add(lstEmpresas, "empresa");
-
-            }
-
-            // ONIBUS
-
-            if(onibus.length() > 0){
-
-                int total = onibus.length();
-                List<Onibus> lstOnibus = new ArrayList<>();
-
-                for(int i = 0; i < total; i++){
-                    Onibus umOnibus;
-                    JSONObject obj = onibus.getJSONObject(i);
-
-                    umOnibus = (Onibus) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Onibus.class, 1);
-                    umOnibus.setEnviado(true);
-
-                    lstOnibus.add(umOnibus);
+                    add(lstCidades, "cidade");
 
                 }
 
-                add(lstOnibus, "onibus");
+                // BAIRROS
 
-            }
+                if(bairros.length() > 0){
 
-            // ITINERARIOS
+                    int total = bairros.length();
+                    List<Bairro> lstBairros = new ArrayList<>();
 
-            if(itinerarios.length() > 0){
+                    for(int i = 0; i < total; i++){
+                        Bairro bairro;
+                        JSONObject obj = bairros.getJSONObject(i);
 
-                int total = itinerarios.length();
-                List<Itinerario> lstItinerarios = new ArrayList<>();
+                        bairro = (Bairro) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Bairro.class, 1);
+                        bairro.setEnviado(true);
 
-                for(int i = 0; i < total; i++){
-                    Itinerario itinerario;
-                    JSONObject obj = itinerarios.getJSONObject(i);
+                        lstBairros.add(bairro);
 
-                    itinerario = (Itinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Itinerario.class, 1);
-                    itinerario.setEnviado(true);
-
-                    lstItinerarios.add(itinerario);
-
-                }
-
-                add(lstItinerarios, "itinerario");
-
-            }
-
-            // HORARIOS
-
-            if(horarios.length() > 0){
-
-                int total = horarios.length();
-                List<Horario> lstHorarios = new ArrayList<>();
-
-                for(int i = 0; i < total; i++){
-                    Horario horario;
-                    JSONObject obj = horarios.getJSONObject(i);
-
-                    horario = (Horario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Horario.class, 1);
-                    horario.setEnviado(true);
-
-                    lstHorarios.add(horario);
-
-                }
-
-                add(lstHorarios, "horario");
-
-            }
-
-            // PARADAS ITINERARIOS
-
-            if(paradasItinerarios.length() > 0){
-
-                int total = paradasItinerarios.length();
-                List<ParadaItinerario> lstParadasItinerarios = new ArrayList<>();
-
-                for(int i = 0; i < total; i++){
-                    ParadaItinerario paradaItinerario;
-                    JSONObject obj = paradasItinerarios.getJSONObject(i);
-
-                    paradaItinerario = (ParadaItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), ParadaItinerario.class, 1);
-                    paradaItinerario.setEnviado(true);
-
-                    lstParadasItinerarios.add(paradaItinerario);
-
-                }
-
-                add(lstParadasItinerarios, "parada_itinerario");
-
-            }
-
-            // SECOES ITINERARIOS
-
-            if(secoesItinerarios.length() > 0){
-
-                int total = secoesItinerarios.length();
-                List<SecaoItinerario> lstSecoesItinerarios = new ArrayList<>();
-
-                for(int i = 0; i < total; i++){
-                    SecaoItinerario secaoItinerario;
-                    JSONObject obj = secoesItinerarios.getJSONObject(i);
-
-                    secaoItinerario = (SecaoItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), SecaoItinerario.class, 1);
-                    secaoItinerario.setEnviado(true);
-
-                    lstSecoesItinerarios.add(secaoItinerario);
-
-                }
-
-                add(lstSecoesItinerarios, "secao_itinerario");
-
-            }
-
-            // HORARIOS ITINERARIOS
-
-            if(horariosItinerarios.length() > 0){
-
-                int total = horariosItinerarios.length();
-                List<HorarioItinerario> lstHorariosItinerarios = new ArrayList<>();
-
-                for(int i = 0; i < total; i++){
-                    HorarioItinerario horarioItinerario;
-                    JSONObject obj = horariosItinerarios.getJSONObject(i);
-
-                    horarioItinerario = (HorarioItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), HorarioItinerario.class, 1);
-                    horarioItinerario.setEnviado(true);
-
-                    lstHorariosItinerarios.add(horarioItinerario);
-
-                }
-
-                add(lstHorariosItinerarios, "horario_itinerario");
-
-            }
-
-            // MENSAGENS
-
-            if(mensagens.length() > 0){
-
-                int total = mensagens.length();
-                List<Mensagem> lstMensagens = new ArrayList<>();
-
-                for(int i = 0; i < total; i++){
-                    Mensagem mensagem;
-                    JSONObject obj = mensagens.getJSONObject(i);
-
-                    mensagem = (Mensagem) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Mensagem.class, 1);
-                    mensagem.setEnviado(true);
-
-                    lstMensagens.add(mensagem);
-
-                }
-
-                add(lstMensagens, "mensagem");
-
-            }
-
-            // PARAMETROS
-
-            if(parametros.length() > 0){
-
-                int total = parametros.length();
-                List<Parametro> lstParametros = new ArrayList<>();
-
-                for(int i = 0; i < total; i++){
-                    Parametro parametro;
-                    JSONObject obj = parametros.getJSONObject(i);
-
-                    parametro = (Parametro) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Parametro.class, 1);
-                    parametro.setEnviado(true);
-
-                    lstParametros.add(parametro);
-
-                }
-
-                add(lstParametros, "parametro");
-
-            }
-
-            // PONTOS INTERESSE
-
-            if(pontosInteresse.length() > 0){
-
-                int total = pontosInteresse.length();
-                List<PontoInteresse> lstPontosInteresse = new ArrayList<>();
-
-                for(int i = 0; i < total; i++){
-                    PontoInteresse pontoInteresse;
-                    JSONObject obj = pontosInteresse.getJSONObject(i);
-
-                    pontoInteresse = (PontoInteresse) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), PontoInteresse.class, 1);
-                    pontoInteresse.setEnviado(true);
-                    pontoInteresse.setImagemEnviada(true);
-
-                    lstPontosInteresse.add(pontoInteresse);
-
-                    if(pontoInteresse.getImagem() != null && !pontoInteresse.getImagem().isEmpty()){
-                        File imagem = new File(getContext().getApplicationContext().getFilesDir(), pontoInteresse.getImagem());
-
-                        if(!imagem.exists() || !imagem.canWrite()){
-                            imageDownload(baseUrl, pontoInteresse.getImagem());
-                        }
                     }
 
-                }
-
-                add(lstPontosInteresse, "ponto_interesse");
-
-            }
-
-            // USUARIOS
-
-            if(usuarios.length() > 0){
-
-                int total = usuarios.length();
-                List<Usuario> lstUsuarios = new ArrayList<>();
-
-                for(int i = 0; i < total; i++){
-                    Usuario usuario;
-                    JSONObject obj = usuarios.getJSONObject(i);
-
-                    usuario = (Usuario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Usuario.class, 1);
-                    usuario.setEnviado(true);
-
-                    lstUsuarios.add(usuario);
+                    add(lstBairros, "bairro");
 
                 }
 
-                add(lstUsuarios, "usuario");
+                // PARADAS
 
-            }
+                if(paradas.length() > 0){
 
-            // PARADAS SUGESTOES
+                    int total = paradas.length();
+                    List<Parada> lstParadas = new ArrayList<>();
 
-            if(paradasSugestoes.length() > 0){
+                    for(int i = 0; i < total; i++){
+                        Parada parada;
+                        JSONObject obj = paradas.getJSONObject(i);
 
-                int total = paradasSugestoes.length();
-                List<ParadaSugestao> lstParadas = new ArrayList<>();
+                        parada = (Parada) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Parada.class, 1);
+                        parada.setEnviado(true);
+                        parada.setImagemEnviada(true);
 
-                for(int i = 0; i < total; i++){
-                    ParadaSugestao parada;
-                    JSONObject obj = paradasSugestoes.getJSONObject(i);
+                        lstParadas.add(parada);
 
-                    parada = (ParadaSugestao) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), ParadaSugestao.class, 1);
-                    parada.setEnviado(true);
-                    parada.setImagemEnviada(true);
+                        if(parada.getImagem() != null && !parada.getImagem().isEmpty()){
+                            File imagem = new File(getContext().getApplicationContext().getFilesDir(), parada.getImagem());
 
-                    lstParadas.add(parada);
-
-                    if(parada.getImagem() != null && !parada.getImagem().isEmpty()){
-                        File imagem = new File(getContext().getApplicationContext().getFilesDir(), parada.getImagem());
-
-                        if(!imagem.exists() || !imagem.canWrite()){
-                            imageDownload(baseUrl, parada.getImagem());
+                            if(!imagem.exists() || !imagem.canWrite()){
+                                imageDownload(baseUrl, parada.getImagem());
+                            }
                         }
+
                     }
 
+                    add(lstParadas, "parada");
+
                 }
 
-                add(lstParadas, "parada_sugestao");
+                // EMPRESAS
 
+                if(empresas.length() > 0){
+
+                    int total = empresas.length();
+                    List<Empresa> lstEmpresas = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        Empresa empresa;
+                        JSONObject obj = empresas.getJSONObject(i);
+
+                        empresa = (Empresa) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Empresa.class, 1);
+                        empresa.setEnviado(true);
+                        empresa.setImagemEnviada(true);
+
+                        lstEmpresas.add(empresa);
+
+                        if(empresa.getLogo() != null && !empresa.getLogo().isEmpty()){
+                            File logo = new File(getContext().getApplicationContext().getFilesDir(), empresa.getLogo());
+
+                            if(!logo.exists() || !logo.canWrite()){
+                                imageDownload(baseUrl, empresa.getLogo());
+                            }
+                        }
+
+                    }
+
+                    add(lstEmpresas, "empresa");
+
+                }
+
+                // ONIBUS
+
+                if(onibus.length() > 0){
+
+                    int total = onibus.length();
+                    List<Onibus> lstOnibus = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        Onibus umOnibus;
+                        JSONObject obj = onibus.getJSONObject(i);
+
+                        umOnibus = (Onibus) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Onibus.class, 1);
+                        umOnibus.setEnviado(true);
+
+                        lstOnibus.add(umOnibus);
+
+                    }
+
+                    add(lstOnibus, "onibus");
+
+                }
+
+                // ITINERARIOS
+
+                if(itinerarios.length() > 0){
+
+                    int total = itinerarios.length();
+                    List<Itinerario> lstItinerarios = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        Itinerario itinerario;
+                        JSONObject obj = itinerarios.getJSONObject(i);
+
+                        itinerario = (Itinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Itinerario.class, 1);
+                        itinerario.setEnviado(true);
+
+                        lstItinerarios.add(itinerario);
+
+                    }
+
+                    add(lstItinerarios, "itinerario");
+
+                }
+
+                // HORARIOS
+
+                if(horarios.length() > 0){
+
+                    int total = horarios.length();
+                    List<Horario> lstHorarios = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        Horario horario;
+                        JSONObject obj = horarios.getJSONObject(i);
+
+                        horario = (Horario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Horario.class, 1);
+                        horario.setEnviado(true);
+
+                        lstHorarios.add(horario);
+
+                    }
+
+                    add(lstHorarios, "horario");
+
+                }
+
+                // PARADAS ITINERARIOS
+
+                if(paradasItinerarios.length() > 0){
+
+                    int total = paradasItinerarios.length();
+                    List<ParadaItinerario> lstParadasItinerarios = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        ParadaItinerario paradaItinerario;
+                        JSONObject obj = paradasItinerarios.getJSONObject(i);
+
+                        paradaItinerario = (ParadaItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), ParadaItinerario.class, 1);
+                        paradaItinerario.setEnviado(true);
+
+                        lstParadasItinerarios.add(paradaItinerario);
+
+                    }
+
+                    add(lstParadasItinerarios, "parada_itinerario");
+
+                }
+
+                // SECOES ITINERARIOS
+
+                if(secoesItinerarios.length() > 0){
+
+                    int total = secoesItinerarios.length();
+                    List<SecaoItinerario> lstSecoesItinerarios = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        SecaoItinerario secaoItinerario;
+                        JSONObject obj = secoesItinerarios.getJSONObject(i);
+
+                        secaoItinerario = (SecaoItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), SecaoItinerario.class, 1);
+                        secaoItinerario.setEnviado(true);
+
+                        lstSecoesItinerarios.add(secaoItinerario);
+
+                    }
+
+                    add(lstSecoesItinerarios, "secao_itinerario");
+
+                }
+
+                // HORARIOS ITINERARIOS
+
+                if(horariosItinerarios.length() > 0){
+
+                    int total = horariosItinerarios.length();
+                    List<HorarioItinerario> lstHorariosItinerarios = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        HorarioItinerario horarioItinerario;
+                        JSONObject obj = horariosItinerarios.getJSONObject(i);
+
+                        horarioItinerario = (HorarioItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), HorarioItinerario.class, 1);
+                        horarioItinerario.setEnviado(true);
+
+                        lstHorariosItinerarios.add(horarioItinerario);
+
+                    }
+
+                    add(lstHorariosItinerarios, "horario_itinerario");
+
+                }
+
+                // MENSAGENS
+
+                if(mensagens.length() > 0){
+
+                    int total = mensagens.length();
+                    List<Mensagem> lstMensagens = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        Mensagem mensagem;
+                        JSONObject obj = mensagens.getJSONObject(i);
+
+                        mensagem = (Mensagem) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Mensagem.class, 1);
+                        mensagem.setEnviado(true);
+
+                        lstMensagens.add(mensagem);
+
+                    }
+
+                    add(lstMensagens, "mensagem");
+
+                }
+
+                // PARAMETROS
+
+                if(parametros.length() > 0){
+
+                    int total = parametros.length();
+                    List<Parametro> lstParametros = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        Parametro parametro;
+                        JSONObject obj = parametros.getJSONObject(i);
+
+                        parametro = (Parametro) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Parametro.class, 1);
+                        parametro.setEnviado(true);
+
+                        lstParametros.add(parametro);
+
+                    }
+
+                    add(lstParametros, "parametro");
+
+                }
+
+                // PONTOS INTERESSE
+
+                if(pontosInteresse.length() > 0){
+
+                    int total = pontosInteresse.length();
+                    List<PontoInteresse> lstPontosInteresse = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        PontoInteresse pontoInteresse;
+                        JSONObject obj = pontosInteresse.getJSONObject(i);
+
+                        pontoInteresse = (PontoInteresse) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), PontoInteresse.class, 1);
+                        pontoInteresse.setEnviado(true);
+                        pontoInteresse.setImagemEnviada(true);
+
+                        lstPontosInteresse.add(pontoInteresse);
+
+                        if(pontoInteresse.getImagem() != null && !pontoInteresse.getImagem().isEmpty()){
+                            File imagem = new File(getContext().getApplicationContext().getFilesDir(), pontoInteresse.getImagem());
+
+                            if(!imagem.exists() || !imagem.canWrite()){
+                                imageDownload(baseUrl, pontoInteresse.getImagem());
+                            }
+                        }
+
+                    }
+
+                    add(lstPontosInteresse, "ponto_interesse");
+
+                }
+
+                // USUARIOS
+
+                if(usuarios.length() > 0){
+
+                    int total = usuarios.length();
+                    List<Usuario> lstUsuarios = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        Usuario usuario;
+                        JSONObject obj = usuarios.getJSONObject(i);
+
+                        usuario = (Usuario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Usuario.class, 1);
+                        usuario.setEnviado(true);
+
+                        lstUsuarios.add(usuario);
+
+                    }
+
+                    add(lstUsuarios, "usuario");
+
+                }
+
+                // PARADAS SUGESTOES
+
+                if(paradasSugestoes != null && paradasSugestoes.length() > 0){
+
+                    int total = paradasSugestoes.length();
+                    List<ParadaSugestao> lstParadas = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        ParadaSugestao parada;
+                        JSONObject obj = paradasSugestoes.getJSONObject(i);
+
+                        parada = (ParadaSugestao) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), ParadaSugestao.class, 1);
+                        parada.setEnviado(true);
+                        parada.setImagemEnviada(true);
+
+                        lstParadas.add(parada);
+
+                        if(parada.getImagem() != null && !parada.getImagem().isEmpty()){
+                            File imagem = new File(getContext().getApplicationContext().getFilesDir(), parada.getImagem());
+
+                            if(!imagem.exists() || !imagem.canWrite()){
+                                imageDownload(baseUrl, parada.getImagem());
+                            }
+                        }
+
+                    }
+
+                    add(lstParadas, "parada_sugestao");
+
+                } else{
+                    Toast.makeText(ctx, "Nenhum registro para ser recebido. Seu sistema está atualizado!",
+                            Toast.LENGTH_SHORT).show();
+                }
             }
 
         }

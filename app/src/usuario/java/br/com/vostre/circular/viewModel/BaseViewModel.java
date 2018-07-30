@@ -53,6 +53,7 @@ public class BaseViewModel extends AndroidViewModel {
     public FusedLocationProviderClient mFusedLocationClient;
     public LocationCallback mLocationCallback;
     public LiveData<List<ParadaBairro>> paradas;
+    public boolean isRunningNearPlaces = false;
 
     public ObservableField<String> getId() {
         return id;
@@ -100,12 +101,14 @@ public class BaseViewModel extends AndroidViewModel {
 
     public void buscaParadasProximas(Location local){
 
-        double latitude = local.getLatitude();
-        double longitude = local.getLongitude();
+//        double latitude = local.getLatitude();
+//        double longitude = local.getLongitude();
+
+        isRunningNearPlaces = true;
 
         // Centro - Barra do Pirai
-//        double latitude = -22.470612;
-//        double longitude = -43.8263613;
+        double latitude = -22.470612;
+        double longitude = -43.8263613;
 
         int raioEmMetros = 100;
 

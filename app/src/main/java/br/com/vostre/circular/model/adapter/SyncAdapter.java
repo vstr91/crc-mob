@@ -919,6 +919,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
                     +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+"}";
 
+            System.out.println("PAR::: "+strParadasSugestoes);
+
             // EXPORTA ARQUIVO DE DADOS
             ///*
             File caminho = Environment.getExternalStorageDirectory();
@@ -1239,6 +1241,51 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     // fim adicionar
 
     public static void imageDownload(String baseUrl, final String imagem){
+        Retrofit retrofit = new Retrofit.Builder()
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .baseUrl(baseUrl)
+                .build();
+
+        CircularAPI api = retrofit.create(CircularAPI.class);
+        Call<ResponseBody> call = api.recebeImagem(imagem.replace(".png", ""));
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                if(response.code() == 200){
+                    FileOutputStream fos = null;
+                    File file = new File(ctx.getApplicationContext().getFilesDir(), imagem);
+
+                    try {
+                        fos = new FileOutputStream(file);
+                        Bitmap bmp = BitmapFactory.decodeStream(response.body().byteStream());
+                        bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                        Toast.makeText(ctx, "Erro ("+e.getMessage()+") ao receber imagem.", Toast.LENGTH_SHORT).show();
+                    } finally {
+                        try {
+                            if (fos != null) {
+                                fos.close();
+                                Toast.makeText(ctx, "Imagem "+imagem+" recebida.", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(ctx, "Erro ("+t.getMessage()+") ao receber imagem.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public static void imageDownload(String baseUrl, final String imagem, final Context ctx){
         Retrofit retrofit = new Retrofit.Builder()
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .baseUrl(baseUrl)

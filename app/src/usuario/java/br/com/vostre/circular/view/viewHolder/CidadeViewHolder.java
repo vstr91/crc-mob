@@ -14,7 +14,9 @@ import java.io.File;
 
 import br.com.vostre.circleview.CircleView;
 import br.com.vostre.circular.databinding.LinhaCidadesBinding;
+import br.com.vostre.circular.model.adapter.SyncAdapter;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
+import br.com.vostre.circular.utils.tasks.ImageDownloadAsyncTask;
 import br.com.vostre.circular.view.form.FormBairro;
 import br.com.vostre.circular.view.listener.SelectListener;
 
@@ -42,14 +44,16 @@ public class CidadeViewHolder extends RecyclerView.ViewHolder {
         binding.setCidade(cidade);
         //binding.circleView2.setImagem(null);
 
-//        final File brasao = new File(ctx.getApplicationContext().getFilesDir(),  cidade.getCidade().getBrasao());
-//
-//        if(brasao.exists() && brasao.canRead()){
-//            final Drawable drawable = Drawable.createFromPath(brasao.getAbsolutePath());
-//            binding.circleView2.setImagem(drawable);
-//        }
-//
-//        binding.textViewNome.setText(cidade.getCidade().getNome());
+        if(cidade.getCidade().getBrasao() != null && !cidade.getCidade().getBrasao().isEmpty()){
+
+            final File brasao = new File(ctx.getApplicationContext().getFilesDir(),  cidade.getCidade().getBrasao());
+
+            if(!brasao.exists() || !brasao.canRead()){
+                ImageDownloadAsyncTask imageDownloadAsyncTask = new ImageDownloadAsyncTask(ctx, cidade.getCidade().getBrasao());
+                imageDownloadAsyncTask.execute();
+            }
+
+        }
 
         final View.OnClickListener listener = new View.OnClickListener() {
             @Override

@@ -28,6 +28,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.location.LocationRequest;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
@@ -165,6 +166,15 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         drawer.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
+
+//        SignInButton btnLogin = drawer.findViewById(R.id.btnLogin);
+//
+//        btnLogin.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Toast.makeText(ctx, "Login!", Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
     }
 

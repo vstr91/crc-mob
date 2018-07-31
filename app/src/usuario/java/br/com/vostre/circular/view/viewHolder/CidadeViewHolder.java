@@ -44,13 +44,17 @@ public class CidadeViewHolder extends RecyclerView.ViewHolder {
         binding.setCidade(cidade);
         //binding.circleView2.setImagem(null);
 
-        if(cidade.getCidade().getBrasao() != null && !cidade.getCidade().getBrasao().isEmpty()){
+        if(ctx != null){
 
-            final File brasao = new File(ctx.getApplicationContext().getFilesDir(),  cidade.getCidade().getBrasao());
+            if(cidade.getCidade().getBrasao() != null && !cidade.getCidade().getBrasao().isEmpty()){
 
-            if(!brasao.exists() || !brasao.canRead()){
-                ImageDownloadAsyncTask imageDownloadAsyncTask = new ImageDownloadAsyncTask(ctx, cidade.getCidade().getBrasao());
-                imageDownloadAsyncTask.execute();
+                final File brasao = new File(ctx.getApplicationContext().getFilesDir(),  cidade.getCidade().getBrasao());
+
+                if(!brasao.exists() || !brasao.canRead()){
+                    ImageDownloadAsyncTask imageDownloadAsyncTask = new ImageDownloadAsyncTask(ctx, cidade.getCidade().getBrasao());
+                    imageDownloadAsyncTask.execute();
+                }
+
             }
 
         }

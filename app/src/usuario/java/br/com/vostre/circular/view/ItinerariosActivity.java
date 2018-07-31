@@ -49,6 +49,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        ctx = this;
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_itinerarios);
         binding.setView(this);
         super.onCreate(savedInstanceState);
@@ -59,8 +61,6 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         viewModel.escolhaAtual = 0;
 
         binding.setViewModel(viewModel);
-
-        ctx = this;
 
         listCidadesPartida = binding.listCidadesPartida;
         adapter = new CidadeAdapter(viewModel.cidades.getValue(), this);
@@ -79,7 +79,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         super.onPause();
     }
 
-    @BindingAdapter("app:imagem")
+    @BindingAdapter("app:imagemParada")
     public static void setimagem(ImageView view, String imagem){
 
         if(imagem != null){

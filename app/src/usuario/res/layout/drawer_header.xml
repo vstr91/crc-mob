@@ -24,6 +24,7 @@
             android:textAppearance="@style/texto_azul"
             android:visibility="visible" />
 
+
     </LinearLayout>
 
 </layout>

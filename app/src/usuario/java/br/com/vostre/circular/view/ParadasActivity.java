@@ -53,7 +53,7 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        ctx = this;
         binding = DataBindingUtil.setContentView(this, R.layout.activity_paradas);
         binding.setView(this);
         super.onCreate(savedInstanceState);
@@ -65,8 +65,6 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
         viewModel.cidade.observe(this, cidadeObserver);
 
         binding.setViewModel(viewModel);
-
-        ctx = this;
 
         listCidades = binding.listCidades;
         adapter = new CidadeAdapter(viewModel.cidades.getValue(), this);
@@ -172,4 +170,5 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
         viewModel.paradas.observe(this, paradasObserver);
         return id;
     }
+
 }

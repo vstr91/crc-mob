@@ -92,7 +92,7 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
     public static void setimagem(ImageView view, String imagem){
 
         if(imagem != null){
-            final File brasao = new File(ctx.getApplicationContext().getFilesDir(),  imagem);
+            final File brasao = new File(view.getContext().getApplicationContext().getFilesDir(),  imagem);
 
             if(brasao.exists() && brasao.canRead()){
                 final Drawable drawable = Drawable.createFromPath(brasao.getAbsolutePath());

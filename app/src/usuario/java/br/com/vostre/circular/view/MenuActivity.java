@@ -24,12 +24,22 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -46,6 +56,7 @@ import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 
 import java.io.File;
+import java.sql.SQLOutput;
 import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -55,8 +66,12 @@ import java.util.TimeZone;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityMenuBinding;
+import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.viewModel.BaseViewModel;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class MenuActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -92,6 +107,9 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     ParadaBairro paradaAtual;
 
     Handler handler;
+    GoogleSignInClient mGoogleSignInClient;
+
+    static int RC_SIGN_IN = 450;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -190,6 +208,13 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             handler.removeCallbacksAndMessages(null);
         }
 
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.server_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
         startLocationUpdates();
     }
 
@@ -222,6 +247,52 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             startActivity(i);
         }
 
+    }
+
+    public void onClickBtnLogin(View v){
+
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+
+    }
+
+    public void onClickBtnSair(View v){
+        signOut();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        updateUI(account);
+    }
+
+    private void updateUI(GoogleSignInAccount account){
+
+        if(account != null){
+            binding.btnLogin.setVisibility(View.GONE);
+            binding.textViewEmail.setText(account.getEmail());
+            binding.textViewEmail.setVisibility(View.VISIBLE);
+            binding.textView34.setVisibility(View.VISIBLE);
+            binding.btnSair.setVisibility(View.VISIBLE);
+        } else{
+            binding.btnLogin.setVisibility(View.VISIBLE);
+            binding.textViewEmail.setText("");
+            binding.textViewEmail.setVisibility(View.GONE);
+            binding.textView34.setVisibility(View.GONE);
+            binding.btnSair.setVisibility(View.GONE);
+        }
+
+    }
+
+    private void signOut() {
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        updateUI(null);
+                    }
+                });
     }
 
     @Override
@@ -315,6 +386,32 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             handler.removeCallbacksAndMessages(null);
         }
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(requestCode == RC_SIGN_IN){
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
+
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            String idToken = account.getIdToken();
+            System.out.println("TOKEN: "+idToken);
+
+            // Signed in successfully, show authenticated UI.
+            updateUI(account);
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.w("SIGN", "signInResult:failed code=" + e.getStatusCode()+" | "+e.getMessage());
+            updateUI(null);
+        }
     }
 
     Observer<Location> localObserver = new Observer<Location>() {

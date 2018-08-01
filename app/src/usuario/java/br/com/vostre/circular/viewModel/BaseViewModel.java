@@ -39,11 +39,18 @@ import br.com.vostre.circular.model.ParametroInterno;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Usuario;
+import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.dao.PaisDAO;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.StringUtils;
 import br.com.vostre.circular.utils.Unique;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class BaseViewModel extends AndroidViewModel {
 
@@ -124,6 +131,29 @@ public class BaseViewModel extends AndroidViewModel {
         paradas = appDatabase.paradaDAO().listarTodosAtivosProximos(latitudeMin, latitudeMax, longitudeMin, longitudeMax);
 
         //new buscaAsyncTask(appDatabase, local, this).execute();
+    }
+
+    public void validaUsuario(String idToken, String id){
+
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl(baseUrl)
+//                .addConverterFactory(ScalarsConverterFactory.create())
+//                .build();
+//
+//        CircularAPI api = retrofit.create(CircularAPI.class);
+//        Call<String> call = api.validaUsuario(idToken, id);
+//        call.enqueue(new Callback<String>() {
+//            @Override
+//            public void onResponse(Call<String> call, Response<String> response) {
+//
+//            }
+//
+//            @Override
+//            public void onFailure(Call<String> call, Throwable t) {
+//
+//            }
+//        });
+
     }
 
     public void salvar(List<? extends EntidadeBase> dados, String entidade){

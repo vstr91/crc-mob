@@ -47,6 +47,7 @@ dependencies {
     implementation 'com.github.imangazalievm:slugify:1.0.0'
 
     implementation 'com.google.android.gms:play-services-location:15.0.1'
+    implementation 'com.google.android.gms:play-services-auth:15.0.1'
 
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.squareup.retrofit2:retrofit:2.0.2'

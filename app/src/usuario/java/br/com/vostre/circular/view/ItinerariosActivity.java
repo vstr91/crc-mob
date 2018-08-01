@@ -79,11 +79,11 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         super.onPause();
     }
 
-    @BindingAdapter("app:imagemParada")
+    @BindingAdapter("app:imagem")
     public static void setimagem(ImageView view, String imagem){
 
         if(imagem != null){
-            final File brasao = new File(ctx.getApplicationContext().getFilesDir(),  imagem);
+            final File brasao = new File(view.getContext().getApplicationContext().getFilesDir(),  imagem);
 
             if(brasao.exists() && brasao.canRead()){
                 final Drawable drawable = Drawable.createFromPath(brasao.getAbsolutePath());

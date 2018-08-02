@@ -59,7 +59,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".view.BaseActivity" />
-        <activity android:name=".view.PaisesActivity" />
+        <activity android:name=".view.LoginActivity" />
         <activity android:name=".view.EstadosActivity" />
         <activity android:name=".view.CidadesActivity" />
         <activity android:name=".view.DetalheParadaActivity" />

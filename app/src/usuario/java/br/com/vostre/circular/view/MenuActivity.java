@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
+import android.databinding.Observable;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -27,6 +28,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -64,10 +66,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import br.com.vostre.circular.App;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityMenuBinding;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -108,8 +112,13 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
     Handler handler;
     GoogleSignInClient mGoogleSignInClient;
+    GoogleSignInAccount account;
+
+    ProgressBar progressBar;
+    SignInButton btnLogin;
 
     static int RC_SIGN_IN = 450;
+    boolean flag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -197,6 +206,10 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     private void configuraActivity(){
+
+        progressBar = binding.progressBar;
+        btnLogin = binding.btnLogin;
+
         viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
         viewModel.localAtual.observe(this, localObserver);
         viewModel.iniciarAtualizacoesPosicao();
@@ -214,7 +227,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
         startLocationUpdates();
     }
 
@@ -253,6 +265,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
+        btnLogin.setEnabled(false);
 
     }
 
@@ -270,13 +283,16 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     private void updateUI(GoogleSignInAccount account){
 
         if(account != null){
-            binding.btnLogin.setVisibility(View.GONE);
-            binding.textViewEmail.setText(account.getEmail());
+
+            String id = PreferenceUtils.carregarUsuarioLogado(getApplicationContext());
+
+            btnLogin.setVisibility(View.GONE);
+            binding.textViewEmail.setText(account.getEmail()+" | "+id);
             binding.textViewEmail.setVisibility(View.VISIBLE);
             binding.textView34.setVisibility(View.VISIBLE);
             binding.btnSair.setVisibility(View.VISIBLE);
         } else{
-            binding.btnLogin.setVisibility(View.VISIBLE);
+            btnLogin.setVisibility(View.VISIBLE);
             binding.textViewEmail.setText("");
             binding.textViewEmail.setVisibility(View.GONE);
             binding.textView34.setVisibility(View.GONE);
@@ -293,6 +309,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                         updateUI(null);
                     }
                 });
+        PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), "");
     }
 
     @Override
@@ -394,6 +411,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         if(requestCode == RC_SIGN_IN){
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
+            progressBar.setVisibility(View.VISIBLE);
         }
 
     }
@@ -402,17 +420,43 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             String idToken = account.getIdToken();
-            System.out.println("TOKEN: "+idToken);
 
-            // Signed in successfully, show authenticated UI.
-            updateUI(account);
+            viewModel.validaUsuario(idToken, account.getId());
+            viewModel.usuarioValidado.observe(this, loginObserver);
+
+            this.account = account;
+
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w("SIGN", "signInResult:failed code=" + e.getStatusCode()+" | "+e.getMessage());
             updateUI(null);
+            btnLogin.setEnabled(true);
+            progressBar.setVisibility(View.GONE);
+            Toast.makeText(getApplicationContext(), "Erro ao efeutar login: "+e.getMessage()+". Por favor tente novamente.", Toast.LENGTH_SHORT).show();
         }
     }
+
+    Observer<Boolean> loginObserver = new Observer<Boolean>() {
+        @Override
+        public void onChanged(Boolean logado) {
+
+            if(logado){
+                updateUI(account);
+            } else{
+                updateUI(null);
+                signOut();
+            }
+
+            if(flag){
+                btnLogin.setEnabled(true);
+                progressBar.setVisibility(View.GONE);
+            }
+
+            flag = true;
+
+        }
+    };
 
     Observer<Location> localObserver = new Observer<Location>() {
         @Override
@@ -437,12 +481,12 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
             viewModel.isRunningNearPlaces = false;
 
-            double latitude = -22.470612;
-            double longitude = -43.8263613;
+            //double latitude = -22.470612;
+            //double longitude = -43.8263613;
 
             Location l0 = new Location(LocationManager.GPS_PROVIDER);
-            l0.setLatitude(latitude);
-            l0.setLongitude(longitude);
+            //l0.setLatitude(latitude);
+            //l0.setLongitude(longitude);
 
             adicionaListaALogo(paradas, l0);
 

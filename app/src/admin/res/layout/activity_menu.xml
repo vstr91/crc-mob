@@ -145,7 +145,7 @@
                     android:textAllCaps="false"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/button6"
+                    app:layout_constraintEnd_toStartOf="@+id/btnEntrar"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/button3" />
@@ -202,7 +202,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/button7"
-                    app:layout_constraintTop_toBottomOf="@+id/button6" />
+                    app:layout_constraintTop_toBottomOf="@+id/btnEntrar" />
 
                 <Button
                     android:id="@+id/button9"

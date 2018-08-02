@@ -4,15 +4,20 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.gson.JsonObject;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -21,6 +26,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Observable;
 
+import br.com.vostre.circular.App;
+import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Empresa;
@@ -43,6 +50,8 @@ import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.dao.PaisDAO;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.Crypt;
+import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.StringUtils;
 import br.com.vostre.circular.utils.Unique;
 import retrofit2.Call;
@@ -62,6 +71,10 @@ public class BaseViewModel extends AndroidViewModel {
     public LiveData<List<ParadaBairro>> paradas;
     public boolean isRunningNearPlaces = false;
 
+    public MutableLiveData usuarioValidado;
+
+    String baseUrl;
+
     public ObservableField<String> getId() {
         return id;
     }
@@ -80,6 +93,9 @@ public class BaseViewModel extends AndroidViewModel {
         localAtual.postValue(new Location(LocationManager.GPS_PROVIDER));
         paradas = appDatabase.paradaDAO().listarTodosAtivosProximos(0,0,0,0);
         new paramAsyncTask(appDatabase).execute();
+        usuarioValidado = new MutableLiveData<>();
+        usuarioValidado.postValue(false);
+        new baseUrlAsyncTask(appDatabase).execute();
     }
 
     public void iniciarAtualizacoesPosicao(){
@@ -135,24 +151,58 @@ public class BaseViewModel extends AndroidViewModel {
 
     public void validaUsuario(String idToken, String id){
 
-//        Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(baseUrl)
-//                .addConverterFactory(ScalarsConverterFactory.create())
-//                .build();
-//
-//        CircularAPI api = retrofit.create(CircularAPI.class);
-//        Call<String> call = api.validaUsuario(idToken, id);
-//        call.enqueue(new Callback<String>() {
-//            @Override
-//            public void onResponse(Call<String> call, Response<String> response) {
-//
-//            }
-//
-//            @Override
-//            public void onFailure(Call<String> call, Throwable t) {
-//
-//            }
-//        });
+        final Crypt crypt = new Crypt();
+        try {
+
+            if(baseUrl != null){
+
+                baseUrl = "http://192.168.42.113/crc-web/web/app_dev.php/";
+
+                idToken = crypt.bytesToHex(crypt.encrypt(idToken));
+                id = crypt.bytesToHex(crypt.encrypt(id));
+
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(baseUrl)
+                        .addConverterFactory(ScalarsConverterFactory.create())
+                        .build();
+
+                CircularAPI api = retrofit.create(CircularAPI.class);
+                Call<String> call = api.validaUsuario(idToken, id);
+                call.enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+
+                        if(response.code() == 200){
+                            usuarioValidado.postValue(true);
+
+                            String id = response.body();
+                            try {
+                                id = new String(crypt.decrypt(id), "UTF-8");
+
+                                PreferenceUtils.salvarUsuarioLogado(getApplication().getApplicationContext(), id);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                        } else{
+                            usuarioValidado.postValue(false);
+                            Toast.makeText(getApplication().getApplicationContext(), "Erro ao processar a validação do usuário.", Toast.LENGTH_SHORT).show();
+                        }
+
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        usuarioValidado.postValue(false);
+                        Toast.makeText(getApplication().getApplicationContext(), "Erro ao validar usuário.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -256,6 +306,27 @@ public class BaseViewModel extends AndroidViewModel {
     }
 
     // fim adicionar
+
+    private class baseUrlAsyncTask extends AsyncTask<Void, Void, String> {
+
+        private AppDatabase db;
+
+        baseUrlAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected String doInBackground(final Void... params) {
+
+            return appDatabase.parametroDAO().carregarPorSlug("servidor");
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            baseUrl = result;
+        }
+    }
 
     private class paramAsyncTask extends AsyncTask<ParametroInterno, Void, Void> {
 

@@ -36,4 +36,8 @@ public interface CircularAPI {
     @GET("api/recebe-dados/{token}/{ultimoAcesso}")
     Call<String> recebeDados(@Path("token") String token, @Path("ultimoAcesso") String ultimoAcesso);
 
+    @FormUrlEncoded
+    @POST("api/valida-usuario")
+    Call<String> validaUsuario(@Field("idToken") String idToken, @Field("id") String id);
+
 }

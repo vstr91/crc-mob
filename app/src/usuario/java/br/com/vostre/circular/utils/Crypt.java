@@ -19,6 +19,8 @@ public class Crypt {
 
     private String SecretKey = "3c447059eba17a12";
 
+    static char[] HEX_CHARS = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+
     public Crypt() {
         ivspec = new IvParameterSpec(iv.getBytes());
 
@@ -54,9 +56,23 @@ public class Crypt {
     }
 
     public byte[] decrypt(String code) throws Exception {
-        if (code == null || code.length() == 0) {
+//        if (code == null || code.length() == 0) {
+//            throw new Exception("Empty string");
+//        }
+//
+//        byte[] decrypted = null;
+//
+//        try {
+//            cipher.init(Cipher.DECRYPT_MODE, keyspec, ivspec);
+//
+//            decrypted = cipher.doFinal(hexToBytes(code));
+//        } catch (Exception e) {
+//            throw new Exception("[decrypt] " + e.getMessage());
+//        }
+//        return decrypted;
+
+        if(code == null || code.length() == 0)
             throw new Exception("Empty string");
-        }
 
         byte[] decrypted = null;
 
@@ -64,27 +80,51 @@ public class Crypt {
             cipher.init(Cipher.DECRYPT_MODE, keyspec, ivspec);
 
             decrypted = cipher.doFinal(hexToBytes(code));
-        } catch (Exception e) {
+            //Remove trailing zeroes
+            if( decrypted.length > 0)
+            {
+                int trim = 0;
+                for( int i = decrypted.length - 1; i >= 0; i-- ) if( decrypted[i] == 0 ) trim++;
+
+                if( trim > 0 )
+                {
+                    byte[] newArray = new byte[decrypted.length - trim];
+                    System.arraycopy(decrypted, 0, newArray, 0, decrypted.length - trim);
+                    decrypted = newArray;
+                }
+            }
+        } catch (Exception e)
+        {
             throw new Exception("[decrypt] " + e.getMessage());
         }
         return decrypted;
+
     }
 
     public static String bytesToHex(byte[] data) {
-        if (data == null) {
-            return null;
-        }
+//        if (data == null) {
+//            return null;
+//        }
+//
+//        int len = data.length;
+//        String str = "";
+//        for (int i = 0; i < len; i++) {
+//            if ((data[i] & 0xFF) < 16) {
+//                str = str + "0" + java.lang.Integer.toHexString(data[i] & 0xFF);
+//            } else {
+//                str = str + java.lang.Integer.toHexString(data[i] & 0xFF);
+//            }
+//        }
+//        return str;
 
-        int len = data.length;
-        String str = "";
-        for (int i = 0; i < len; i++) {
-            if ((data[i] & 0xFF) < 16) {
-                str = str + "0" + java.lang.Integer.toHexString(data[i] & 0xFF);
-            } else {
-                str = str + java.lang.Integer.toHexString(data[i] & 0xFF);
-            }
+        char[] chars = new char[2 * data.length];
+        for (int i = 0; i < data.length; ++i)
+        {
+            chars[2 * i] = HEX_CHARS[(data[i] & 0xF0) >>> 4];
+            chars[2 * i + 1] = HEX_CHARS[data[i] & 0x0F];
         }
-        return str;
+        return new String(chars);
+
     }
 
     public static byte[] hexToBytes(String str) {

@@ -50,16 +50,17 @@
             android:exported="false"
             android:syncable="true" />
 
-        <activity android:name=".view.LoginActivity" />
-        <activity android:name=".view.MenuActivity">
+        <activity
+            android:name=".view.LoginActivity"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".view.MenuActivity" />
         <activity android:name=".view.BaseActivity" />
-        <activity android:name=".view.LoginActivity" />
         <activity android:name=".view.EstadosActivity" />
         <activity android:name=".view.CidadesActivity" />
         <activity android:name=".view.DetalheParadaActivity" />
@@ -76,6 +77,8 @@
         <activity android:name=".view.SecoesItinerarioActivity" />
         <activity android:name=".view.MapaActivity" />
         <activity android:name=".view.HorariosItinerarioActivity" />
+        <activity android:name=".view.SobreActivity" />
+        <activity android:name=".view.OpcoesActivity"></activity>
     </application>
 
 </manifest>

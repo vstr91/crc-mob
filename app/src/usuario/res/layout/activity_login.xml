@@ -10,9 +10,9 @@
     </data>
 
     <android.support.constraint.ConstraintLayout
-        android:background="@drawable/gradiente"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/gradiente"
         tools:context=".view.LoginActivity">
 
         <include
@@ -79,7 +79,8 @@
             android:layout_marginStart="16dp"
             android:gravity="center"
             android:padding="10dp"
-            android:text="Fazendo login com sua conta Google você soma pontos, aumenta seu nível e sobe no ranking Circular sempre que sugerir uma mudança que for aceita, como uma nova parada ou alterações de horários de itinerários! Participe, sugira mudanças e fique sempre no topo!"
+            android:text="Faça login para salvar suas preferências, como itinerários e paradas favoritas, e acessá-las de qualquer dispositivo!"
+            android:textSize="14sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -89,19 +90,63 @@
             android:id="@+id/btnLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:onClickListener="@{view::onBtnLoginClick}"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:onClickListener="@{view::onClickBtnLogin}"
+            app:layout_constraintEnd_toStartOf="@+id/btnEntrar"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView" />
 
         <Button
             android:id="@+id/btnEntrar"
-            style="@style/botao_principal"
+            style="@style/botao_branco"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:onClick="@{view::onClickBtnEntrar}"
+            android:padding="5dp"
+            android:text="Usar sem fazer login"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btnLogin"
+            app:layout_constraintTop_toTopOf="@+id/progressBar" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:paddingTop="10dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/btnLogin" />
+
+        <TextView
+            android:id="@+id/textView35"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="Caso mude de ideia, você poderá fazer login no menu de opções dentro do aplicativo"
+            android:textAppearance="@style/texto_branco"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/checkBoxLembrar" />
+
+        <CheckBox
+            android:id="@+id/checkBoxLembrar"
+            style="@style/texto_branco"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -109,12 +154,14 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:padding="5dp"
-            android:text="Usar sem fazer login"
-            android:onClick="@{view::onBtnEntrarClick}"
+            android:buttonTint="@color/branco"
+            android:text="Não perguntar novamente"
+            android:textAppearance="@style/texto_branco"
+            android:textColorLink="@color/branco"
+            android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
+            app:layout_constraintTop_toBottomOf="@+id/btnEntrar" />
 
     </android.support.constraint.ConstraintLayout>
 

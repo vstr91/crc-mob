@@ -156,7 +156,7 @@ public class BaseViewModel extends AndroidViewModel {
 
             if(baseUrl != null){
 
-                baseUrl = "http://192.168.42.113/crc-web/web/app_dev.php/";
+                //baseUrl = "http://192.168.42.113/crc-web/web/app_dev.php/";
 
                 idToken = crypt.bytesToHex(crypt.encrypt(idToken));
                 id = crypt.bytesToHex(crypt.encrypt(id));

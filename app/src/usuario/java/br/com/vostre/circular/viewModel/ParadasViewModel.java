@@ -39,6 +39,7 @@ import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.StringUtils;
 
 public class ParadasViewModel extends AndroidViewModel {

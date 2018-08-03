@@ -1,6 +1,7 @@
 package br.com.vostre.circular.view;
 
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
@@ -8,20 +9,24 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityLoginBinding;
+import br.com.vostre.circular.utils.PreferenceUtils;
+import br.com.vostre.circular.viewModel.BaseViewModel;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends BaseActivity {
 
     ActivityLoginBinding binding;
 
@@ -31,17 +36,50 @@ public class LoginActivity extends AppCompatActivity {
     ProgressBar progressBar;
     SignInButton btnLogin;
 
+    BaseViewModel viewModel;
+
     static int RC_SIGN_IN = 480;
+    boolean flag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setHomeButtonEnabled(false);
         binding.setView(this);
+        viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        String lembrar = PreferenceUtils.carregarPreferencia(getApplicationContext(), "lembrar");
+
+        if(lembrar.equals("1")){
+            Intent i = new Intent(getApplicationContext(), MenuActivity.class);
+            startActivity(i);
+        } else{
+            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+
+            if(account != null){
+                Intent i = new Intent(getApplicationContext(), MenuActivity.class);
+                startActivity(i);
+            }
+        }
+
+
+
     }
 
     public void onClickBtnLogin(View v){
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.server_client_id))
+                .requestEmail()
+                .build();
 
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
         btnLogin.setEnabled(false);
@@ -49,6 +87,14 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onClickBtnEntrar(View v){
+        PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), "");
+
+        if(binding.checkBoxLembrar.isChecked()){
+            PreferenceUtils.salvarPreferencia(getApplicationContext(), "lembrar", "1");
+        } else{
+            PreferenceUtils.salvarPreferencia(getApplicationContext(), "lembrar", "0");
+        }
+
         Intent i = new Intent(getApplicationContext(), MenuActivity.class);
         startActivity(i);
     }
@@ -90,9 +136,16 @@ public class LoginActivity extends AppCompatActivity {
 
             if(logado){
 
+                if(binding.checkBoxLembrar.isChecked()){
+                    PreferenceUtils.salvarPreferencia(getApplicationContext(), "lembrar", "1");
+                } else{
+                    PreferenceUtils.salvarPreferencia(getApplicationContext(), "lembrar", "0");
+                }
+
+                Intent i = new Intent(getApplicationContext(), MenuActivity.class);
+                startActivity(i);
             } else{
-                updateUI(null);
-                signOut();
+
             }
 
             if(flag){

@@ -273,6 +273,18 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         signOut();
     }
 
+    public void onClickBtnOpcoes(View v){
+        drawer.closeDrawers();
+        Intent i = new Intent(getApplicationContext(), OpcoesActivity.class);
+        startActivity(i);
+    }
+
+    public void onClickBtnSobre(View v){
+        drawer.closeDrawers();
+        Intent i = new Intent(getApplicationContext(), SobreActivity.class);
+        startActivity(i);
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -286,13 +298,13 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
             String id = PreferenceUtils.carregarUsuarioLogado(getApplicationContext());
 
-            btnLogin.setVisibility(View.GONE);
+            binding.btnLogin.setVisibility(View.GONE);
             binding.textViewEmail.setText(account.getEmail()+" | "+id);
             binding.textViewEmail.setVisibility(View.VISIBLE);
             binding.textView34.setVisibility(View.VISIBLE);
             binding.btnSair.setVisibility(View.VISIBLE);
         } else{
-            btnLogin.setVisibility(View.VISIBLE);
+            binding.btnLogin.setVisibility(View.VISIBLE);
             binding.textViewEmail.setText("");
             binding.textViewEmail.setVisibility(View.GONE);
             binding.textView34.setVisibility(View.GONE);

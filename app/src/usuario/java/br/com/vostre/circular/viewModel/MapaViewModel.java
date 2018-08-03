@@ -36,6 +36,7 @@ import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.StringUtils;
 
 public class MapaViewModel extends AndroidViewModel {
@@ -232,6 +233,11 @@ public class MapaViewModel extends AndroidViewModel {
         parada.setEnviado(false);
         parada.setSlug(StringUtils.toSlug(parada.getNome()));
 
+        String id = PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext());
+
+        parada.setUsuarioCadastro(id);
+        parada.setUsuarioUltimaAlteracao(id);
+
         parada.setBairro(bairro.getBairro().getId());
 
         new addAsyncTask(appDatabase).execute(parada);
@@ -271,6 +277,10 @@ public class MapaViewModel extends AndroidViewModel {
         parada.setUltimaAlteracao(new DateTime());
         parada.setEnviado(false);
         parada.setSlug(StringUtils.toSlug(parada.getNome()));
+
+        String id = PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext());
+
+        parada.setUsuarioUltimaAlteracao(id);
 
         new editAsyncTask(appDatabase).execute(parada);
     }

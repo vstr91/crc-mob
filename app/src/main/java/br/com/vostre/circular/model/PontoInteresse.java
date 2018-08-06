@@ -5,6 +5,8 @@ import android.arch.persistence.room.Index;
 import android.support.annotation.NonNull;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 @Entity(tableName = "ponto_interesse")
 public class PontoInteresse extends EntidadeSlug {
@@ -77,6 +79,11 @@ public class PontoInteresse extends EntidadeSlug {
 
     public void setDataFinal(@NonNull DateTime dataFinal) {
         this.dataFinal = dataFinal;
+    }
+
+    public String getDatas(){
+        DateTimeFormatter dtf = DateTimeFormat.forPattern("dd/MM/YYYY");
+        return dtf.print(dataInicial)+" a "+dtf.print(dataFinal);
     }
 
     public boolean valida(PontoInteresse pontoInteresse) {

@@ -1,20 +1,30 @@
 package br.com.vostre.circular.view.form;
 
+import android.Manifest;
 import android.app.Application;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -59,6 +69,8 @@ public class FormMapa extends FormBase {
 
     static Application ctx;
 
+    int permissionGPS;
+
     public ParadaBairro getParada() {
         return parada;
     }
@@ -97,12 +109,43 @@ public class FormMapa extends FormBase {
                 inflater, R.layout.form_mapa, container, false);
         super.onCreate(savedInstanceState);
 
-        viewModel = ViewModelProviders.of(this.getActivity()).get(DetalhesParadaViewModel.class);
+        Dexter.withActivity(this.getActivity())
+                .withPermissions(
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                ).withListener(new MultiplePermissionsListener() {
+            @Override
+            public void onPermissionsChecked(MultiplePermissionsReport report) {
 
-        configuraMapa();
+                if(report.areAllPermissionsGranted()){
+                    configuraActivity();
+                } else{
+                    Toast.makeText(ctx, "Acesso ao GPS é necessário para o mapa funcionar corretamente!", Toast.LENGTH_LONG).show();
+                }
+
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                token.continuePermissionRequest();
+            }
+        })
+                .check();
+
+        permissionGPS = ContextCompat.checkSelfPermission(ctx,
+                android.Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if(permissionGPS == PackageManager.PERMISSION_GRANTED){
+            configuraActivity();
+        }
 
         return binding.getRoot();
 
+    }
+
+    private void configuraActivity(){
+        viewModel = ViewModelProviders.of(this.getActivity()).get(DetalhesParadaViewModel.class);
+
+        configuraMapa();
     }
 
     private void configuraMapa() {
@@ -147,7 +190,7 @@ public class FormMapa extends FormBase {
         pontoInteresse.setLatitude(this.parada.getParada().getLatitude());
         pontoInteresse.setLongitude(this.parada.getParada().getLongitude());
 
-        viewModel.carregaDirections(map, this.parada, this.pontoInteresse);
+        //viewModel.carregaDirections(map, this.parada, this.pontoInteresse);
 
         NumberFormat nf = new DecimalFormat();
         nf.setMaximumFractionDigits(0);

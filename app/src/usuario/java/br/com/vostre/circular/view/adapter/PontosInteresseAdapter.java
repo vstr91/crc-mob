@@ -1,5 +1,6 @@
 package br.com.vostre.circular.view.adapter;
 
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,11 +21,13 @@ public class PontosInteresseAdapter extends RecyclerView.Adapter<PontoInteresseV
     public List<PontoInteresse> pois;
     AppCompatActivity ctx;
     ParadaBairro parada;
+    BottomSheetDialog bsd;
 
-    public PontosInteresseAdapter(List<PontoInteresse> pois, AppCompatActivity context, ParadaBairro parada){
+    public PontosInteresseAdapter(List<PontoInteresse> pois, AppCompatActivity context, ParadaBairro parada, BottomSheetDialog bsd){
         this.pois = pois;
         ctx = context;
         this.parada = parada;
+        this.bsd = bsd;
     }
 
     @Override
@@ -33,7 +36,7 @@ public class PontosInteresseAdapter extends RecyclerView.Adapter<PontoInteresseV
                 LayoutInflater.from(parent.getContext());
         LinhaPontosInteresseBinding itemBinding =
                 LinhaPontosInteresseBinding.inflate(layoutInflater, parent, false);
-        return new PontoInteresseViewHolder(itemBinding, ctx, parada);
+        return new PontoInteresseViewHolder(itemBinding, ctx, parada, bsd);
     }
 
     @Override

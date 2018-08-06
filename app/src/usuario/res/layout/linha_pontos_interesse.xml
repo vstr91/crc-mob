@@ -14,14 +14,18 @@
 
         <TextView
             android:id="@+id/textViewNome"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
             android:layout_marginLeft="24dp"
+            android:layout_marginRight="8dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="16dp"
+            android:text="@{pontoInteresse.nome}"
             android:textAppearance="@style/texto_azul"
             android:textColor="@color/cinzaEscuro"
             android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/guideline6"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Festa do Bairro" />
@@ -30,11 +34,11 @@
             android:id="@+id/imageView11"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
             android:src="@drawable/ic_place_blue_24dp"
             app:layout_constraintBottom_toBottomOf="@+id/btnVerMapa"
-            app:layout_constraintEnd_toStartOf="@+id/btnVerMapa"
+            app:layout_constraintStart_toStartOf="@+id/guideline6"
             app:layout_constraintTop_toTopOf="@+id/btnVerMapa" />
 
         <Button
@@ -43,39 +47,54 @@
             android:layout_width="wrap_content"
             android:layout_height="20dp"
             android:layout_marginEnd="24dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginRight="24dp"
+            android:layout_marginStart="8dp"
             android:background="@color/transparente"
             android:text="Ver Local no mapa"
             android:textAppearance="@style/texto_azul"
+            android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="@+id/textViewNome"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageView11"
             app:layout_constraintTop_toTopOf="@+id/textViewNome" />
 
         <TextView
             android:id="@+id/textView41"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TextView"
             android:textSize="12sp"
             app:layout_constraintStart_toStartOf="@+id/textViewNome"
             app:layout_constraintTop_toBottomOf="@+id/textViewNome"
+            app:textData="@{pontoInteresse.datas}"
             tools:text="De 01/01/19 a 04/01/19" />
 
         <TextView
             android:id="@+id/textView42"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="24dp"
             android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
-            android:text="TextView"
+            android:text="Venha participar da festa do bairro. Diversas atrações todos os dias!"
             android:textAppearance="@style/texto_azul"
             android:textColor="@color/cinzaEscuro"
             android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="@+id/btnVerMapa"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView41"
             tools:text="Venha participar da festa do bairro. Diversas atrações todos os dias!" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="199dp" />
     </android.support.constraint.ConstraintLayout>
 
 </layout>

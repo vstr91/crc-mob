@@ -99,6 +99,7 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         parada = appDatabase.paradaDAO().carregarComBairro("");
         itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosPorParadaComBairroEHorario("", "");
+        localAtual = new MutableLiveData<>();
     }
 
     @BindingAdapter("srcCompat")
@@ -184,16 +185,16 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
 
     public void buscaPoisProximos(Location local){
 
-//        double latitude = local.getLatitude();
-//        double longitude = local.getLongitude();
+        double latitude = local.getLatitude();
+        double longitude = local.getLongitude();
 
 //        isRunningNearPlaces = true;
 
         // Centro - Barra do Pirai
-        double latitude = -22.470612;
-        double longitude = -43.8263613;
+        //double latitude = -22.470612;
+        //double longitude = -43.8263613;
 
-        int raioEmMetros = 100;
+        int raioEmMetros = 500;
 
 // 6378000 Size of the Earth (in meters)
         double longitudeD = (Math.asin(raioEmMetros / (6378000 * Math.cos(Math.PI*latitude/180))))*180/Math.PI;

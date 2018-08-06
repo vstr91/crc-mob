@@ -1,5 +1,6 @@
 package br.com.vostre.circular.view.viewHolder;
 
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -17,12 +18,14 @@ public class PontoInteresseViewHolder extends RecyclerView.ViewHolder {
     private final LinhaPontosInteresseBinding binding;
     AppCompatActivity ctx;
     ParadaBairro parada;
+    BottomSheetDialog bsd;
 
-    public PontoInteresseViewHolder(LinhaPontosInteresseBinding binding, AppCompatActivity context, ParadaBairro parada) {
+    public PontoInteresseViewHolder(LinhaPontosInteresseBinding binding, AppCompatActivity context, ParadaBairro parada, BottomSheetDialog bsd) {
         super(binding.getRoot());
         this.binding = binding;
         this.ctx = context;
         this.parada = parada;
+        this.bsd = bsd;
     }
 
     public void bind(final PontoInteresse poi) {
@@ -31,6 +34,7 @@ public class PontoInteresseViewHolder extends RecyclerView.ViewHolder {
         binding.btnVerMapa.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                bsd.dismiss();
                 Toast.makeText(ctx, "Clicou "+poi.getNome(), Toast.LENGTH_SHORT).show();
                 FormMapa formMapa = new FormMapa();
                 formMapa.setParada(parada);

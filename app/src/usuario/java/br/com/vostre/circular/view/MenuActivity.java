@@ -73,6 +73,11 @@ import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.viewModel.BaseViewModel;
+import es.usc.citius.hipster.algorithm.Hipster;
+import es.usc.citius.hipster.graph.GraphBuilder;
+import es.usc.citius.hipster.graph.GraphSearchProblem;
+import es.usc.citius.hipster.graph.HipsterDirectedGraph;
+import es.usc.citius.hipster.model.problem.SearchProblem;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
@@ -228,6 +233,31 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         startLocationUpdates();
+
+        // ************** TESTE DIJKSTRA ************************
+
+//        HipsterDirectedGraph<String,Double> graph =
+//                GraphBuilder.<String,Double>create()
+//                        .connect("A").to("B").withEdge(4d)
+//                        .connect("A").to("C").withEdge(2d)
+//                        .connect("B").to("C").withEdge(5d)
+//                        .connect("B").to("D").withEdge(10d)
+//                        .connect("C").to("E").withEdge(3d)
+//                        .connect("D").to("F").withEdge(11d)
+//                        .connect("E").to("D").withEdge(4d)
+//                        .createDirectedGraph();
+//
+//// Create the search problem. For graph problems, just use
+//// the GraphSearchProblem util class to generate the problem with ease.
+//        SearchProblem p = GraphSearchProblem
+//                .startingFrom("A")
+//                .in(graph)
+//                .takeCostsFromEdges()
+//                .build();
+//
+//// Search the shortest path from "A" to "F"
+//        System.out.println(Hipster.createDijkstra(p).search("D"));
+
     }
 
     public void onClickBtnItinerarios(View v){

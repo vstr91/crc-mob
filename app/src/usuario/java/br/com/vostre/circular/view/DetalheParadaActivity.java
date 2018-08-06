@@ -83,7 +83,7 @@ public class DetalheParadaActivity extends BaseActivity {
 
         bsd.setContentView(R.layout.bottom_sheet_pois);
 
-        listPois = bsd.findViewById(R.id.listSecoes);
+        listPois = bsd.findViewById(R.id.listPois);
         ImageButton btnFechar = bsd.findViewById(R.id.btnFechar);
         btnFechar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,10 +140,10 @@ public class DetalheParadaActivity extends BaseActivity {
     }
 
     @BindingAdapter("app:textData")
-    public static void setText(TextView view, DateTime val){
+    public static void setText(TextView view, String val){
 
         if(val != null){
-            view.setText(DateTimeFormat.forPattern("HH:mm").print(val));
+            view.setText(val);
         } else{
             view.setText("-");
         }
@@ -165,7 +165,7 @@ public class DetalheParadaActivity extends BaseActivity {
             if(parada != null){
                 binding.setUmaParada(parada);
 
-                adapterPois = new PontosInteresseAdapter(viewModel.pois.getValue(), ctx, parada);
+                adapterPois = new PontosInteresseAdapter(viewModel.pois.getValue(), ctx, parada, bsd);
                 listPois.setAdapter(adapterPois);
 
                 Location location = new Location(LocationManager.NETWORK_PROVIDER);

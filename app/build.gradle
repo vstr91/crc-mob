@@ -46,6 +46,8 @@ dependencies {
     implementation 'com.karumi:dexter:4.2.0'
     implementation 'com.github.imangazalievm:slugify:1.0.0'
 
+    implementation 'es.usc.citius.hipster:hipster-core:1.0.1'
+
     implementation 'com.google.android.gms:play-services-location:15.0.1'
     implementation 'com.google.android.gms:play-services-auth:15.0.1'
 

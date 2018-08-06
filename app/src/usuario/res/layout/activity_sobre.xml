@@ -43,17 +43,17 @@
 
                 <ImageView
                     android:id="@+id/imageView10"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="16dp"
+                    android:src="@drawable/logo_completa_azul"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:src="@mipmap/ic_onibus_azul" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/textViewVersao"
@@ -92,7 +92,7 @@
                     android:id="@+id/textView39"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
+                    android:layout_marginTop="8dp"
                     android:text="Base de Dados"
                     android:textAppearance="@style/texto_azul"
                     android:textSize="14sp"
@@ -106,7 +106,7 @@
                     android:id="@+id/textView40"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
+                    android:layout_marginTop="8dp"
                     android:text="Atualizado em"
                     android:textAppearance="@style/texto_azul"
                     android:textSize="14sp"
@@ -149,22 +149,14 @@
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:paddingBottom="10dp"
                     android:paddingLeft="30dp"
                     android:paddingRight="30dp"
-                    android:paddingTop="10dp"
                     android:text="Circular é um aplicativo de mobilidade urbana desenvolvido para facilitar a consulta de horários de ônibus em Barra do Piraí-RJ e região."
                     android:textColor="@color/cinzaEscuro"
+                    android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textViewBaseDados" />
-
-                <android.support.constraint.Guideline
-                    android:id="@+id/guideline7"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layout_constraintGuide_begin="203dp" />
 
                 <TextView
                     android:id="@+id/textView44"
@@ -174,12 +166,13 @@
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
                     android:paddingBottom="10dp"
                     android:paddingLeft="30dp"
                     android:paddingRight="30dp"
-                    android:paddingTop="10dp"
                     android:text="Foi desenvolvido e lançado por Almir Junior em 2015 e completamente remodelado no ano de 2018, sendo relançado em 2019 trazendo novas funções e uma navegação mais fácil e intuitiva."
                     android:textColor="@color/cinzaEscuro"
+                    android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView43" />
@@ -204,7 +197,6 @@
                     android:id="@+id/textView46"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"

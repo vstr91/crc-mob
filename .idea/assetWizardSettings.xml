@@ -86,8 +86,8 @@
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
                                       <entry key="iconShape" value="NONE" />
-                                      <entry key="imageAsset" value="C:\Users\Almir\Documents\Desenvolvimento\Projetos\Circular\Versão 2.x\Esboços\Nova-Logo-Onibus-Branco.png" />
-                                      <entry key="outputName" value="ic_onibus_branco" />
+                                      <entry key="imageAsset" value="C:\Users\Almir\Documents\Desenvolvimento\Projetos\Circular\Versão 2.x\Imagens\Logos\Logo-Completa-Azul.png" />
+                                      <entry key="outputName" value="logo_completa_azul" />
                                     </map>
                                   </option>
                                 </PersistentState>

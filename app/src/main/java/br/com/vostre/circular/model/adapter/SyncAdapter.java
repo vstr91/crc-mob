@@ -703,6 +703,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 if(mensagens.length() > 0){
 
+                    System.out.println("TEST:::: ENTROU MENSAGEM > "+mensagens.length());
+
                     int total = mensagens.length();
                     List<Mensagem> lstMensagens = new ArrayList<>();
 

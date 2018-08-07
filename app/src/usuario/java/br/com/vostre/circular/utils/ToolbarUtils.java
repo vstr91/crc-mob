@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import br.com.vostre.circular.R;
+import br.com.vostre.circular.view.MensagensActivity;
 
 /**
  * Created by Almir on 16/12/2015.
@@ -83,8 +84,8 @@ public class ToolbarUtils {
             case R.id.imageButtonMsg:
             case R.id.msg:
             case R.id.icon_msg:
-//                Intent intent = new Intent(activity, MensagensActivity.class);
-//                activity.startActivity(intent);
+                Intent intent = new Intent(activity, MensagensActivity.class);
+                activity.startActivity(intent);
                 break;
             case R.id.imageButtonFavoritos:
             case R.id.favoritos:

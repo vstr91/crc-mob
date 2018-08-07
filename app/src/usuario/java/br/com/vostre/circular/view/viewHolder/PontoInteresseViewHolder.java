@@ -35,7 +35,6 @@ public class PontoInteresseViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
                 bsd.dismiss();
-                Toast.makeText(ctx, "Clicou "+poi.getNome(), Toast.LENGTH_SHORT).show();
                 FormMapa formMapa = new FormMapa();
                 formMapa.setParada(parada);
                 formMapa.setPontoInteresse(poi);

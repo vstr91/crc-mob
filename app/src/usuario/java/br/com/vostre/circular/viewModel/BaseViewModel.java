@@ -124,14 +124,14 @@ public class BaseViewModel extends AndroidViewModel {
 
     public void buscaParadasProximas(Location local){
 
-//        double latitude = local.getLatitude();
-//        double longitude = local.getLongitude();
+        double latitude = local.getLatitude();
+        double longitude = local.getLongitude();
 
         isRunningNearPlaces = true;
 
         // Centro - Barra do Pirai
-        double latitude = -22.470612;
-        double longitude = -43.8263613;
+        //double latitude = -22.470612;
+        //double longitude = -43.8263613;
 
         int raioEmMetros = 100;
 

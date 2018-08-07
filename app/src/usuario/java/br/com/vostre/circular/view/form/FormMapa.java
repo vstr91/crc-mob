@@ -7,6 +7,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -31,16 +32,19 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormBairroBinding;
 import br.com.vostre.circular.databinding.FormMapaBinding;
+import br.com.vostre.circular.databinding.FormParadaBinding;
 import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.ParadaSugestao;
 import br.com.vostre.circular.model.PontoInteresse;
@@ -155,7 +159,7 @@ public class FormMapa extends FormBase {
         map.setMultiTouchControls(true);
 
         mapController = map.getController();
-        mapController.setZoom(19d);
+        mapController.setZoom(18d);
 //        GeoPoint startPoint = new GeoPoint(-22.470804460339885, -43.82463455200195);
 //        mapController.setCenter(startPoint);
 
@@ -182,20 +186,33 @@ public class FormMapa extends FormBase {
             map.getOverlays().add(m);
         }
 
-        Location parada = new Location(LocationManager.NETWORK_PROVIDER);
+        Location parada = new Location(LocationManager.GPS_PROVIDER);
         parada.setLatitude(this.parada.getParada().getLatitude());
         parada.setLongitude(this.parada.getParada().getLongitude());
 
-        Location pontoInteresse = new Location(LocationManager.NETWORK_PROVIDER);
-        pontoInteresse.setLatitude(this.parada.getParada().getLatitude());
-        pontoInteresse.setLongitude(this.parada.getParada().getLongitude());
+        Location pontoInteresse = new Location(LocationManager.GPS_PROVIDER);
+        pontoInteresse.setLatitude(this.pontoInteresse.getLatitude());
+        pontoInteresse.setLongitude(this.pontoInteresse.getLongitude());
+
+        Polyline polyline = new Polyline();
+        polyline.setColor(Color.parseColor("#000088"));
+        polyline.setWidth(2);
+        map.getOverlays().add(polyline);
+
+        ArrayList<GeoPoint> pathPoints = new ArrayList<>();
+
+        pathPoints.add(new GeoPoint(parada));
+        pathPoints.add(new GeoPoint(pontoInteresse));
+        polyline.setPoints(pathPoints);
+        map.invalidate();
 
         //viewModel.carregaDirections(map, this.parada, this.pontoInteresse);
+        viewModel.midPoint(parada.getLatitude(), parada.getLongitude(), pontoInteresse.getLatitude(), pontoInteresse.getLongitude());
 
-        NumberFormat nf = new DecimalFormat();
-        nf.setMaximumFractionDigits(0);
+        NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setMaximumFractionDigits(2);
 
-        binding.textViewDistancia.setText(nf.format(parada.distanceTo(pontoInteresse)));
+        binding.textViewDistancia.setText("~"+nf.format(parada.distanceTo(pontoInteresse))+" m");
         viewModel.localAtual.observe(this, localObserver);
 
     }

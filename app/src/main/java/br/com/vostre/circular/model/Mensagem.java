@@ -15,6 +15,18 @@ public class Mensagem extends EntidadeBase {
     private String descricao;
 
     @NonNull
+    private Boolean servidor;
+
+    @NonNull
+    public Boolean getServidor() {
+        return servidor;
+    }
+
+    public void setServidor(@NonNull Boolean servidor) {
+        this.servidor = servidor;
+    }
+
+    @NonNull
     public String getTitulo() {
         return titulo;
     }
@@ -42,7 +54,7 @@ public class Mensagem extends EntidadeBase {
 
     public boolean valida(Mensagem mensagem) {
 
-        if(super.valida(mensagem) && mensagem.getTitulo() != null && mensagem.getDescricao() != null){
+        if(super.valida(mensagem) && mensagem.getTitulo() != null && mensagem.getDescricao() != null && mensagem.getServidor() != null){
             return true;
         } else{
             return false;

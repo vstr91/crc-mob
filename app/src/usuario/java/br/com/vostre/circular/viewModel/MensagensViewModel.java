@@ -21,7 +21,16 @@ public class MensagensViewModel extends AndroidViewModel {
     private AppDatabase appDatabase;
 
     public LiveData<List<Mensagem>> mensagens;
+    public LiveData<List<Mensagem>> mensagensRecebidas;
     public Mensagem mensagem;
+
+    public LiveData<List<Mensagem>> getMensagensRecebidas() {
+        return mensagensRecebidas;
+    }
+
+    public void setMensagensRecebidas(LiveData<List<Mensagem>> mensagensRecebidas) {
+        this.mensagensRecebidas = mensagensRecebidas;
+    }
 
     public LiveData<List<Mensagem>> getMensagens() {
         return mensagens;
@@ -44,6 +53,7 @@ public class MensagensViewModel extends AndroidViewModel {
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         mensagem = new Mensagem();
         mensagens = appDatabase.mensagemDAO().listarTodos();
+        mensagensRecebidas = appDatabase.mensagemDAO().listarTodosRecebidos();
     }
 
     public void salvarMensagem(){
@@ -87,6 +97,13 @@ public class MensagensViewModel extends AndroidViewModel {
 
         @Override
         protected Void doInBackground(final Mensagem... params) {
+
+            if(params[0].getUsuarioCadastro() == null){
+                String id = db.parametroInternoDAO().carregar().getIdentificadorUnico();
+                params[0].setUsuarioCadastro(id);
+                params[0].setUsuarioUltimaAlteracao(id);
+            }
+
             db.mensagemDAO().inserir((params[0]));
             return null;
         }

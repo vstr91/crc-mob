@@ -16,8 +16,11 @@ import br.com.vostre.circular.model.Pais;
 @Dao
 public interface MensagemDAO {
 
-    @Query("SELECT * FROM mensagem")
+    @Query("SELECT * FROM mensagem WHERE servidor = 0")
     LiveData<List<Mensagem>> listarTodos();
+
+    @Query("SELECT * FROM mensagem WHERE servidor = 1")
+    LiveData<List<Mensagem>> listarTodosRecebidos();
 
     @Query("SELECT * FROM mensagem WHERE ativo = 1")
     List<Mensagem> listarTodosAtivos();

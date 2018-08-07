@@ -118,7 +118,7 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
                 pontoInteresse.getLatitude(), pontoInteresse.getLongitude());
     }
 
-    private void midPoint(double lat1,double lon1,double lat2,double lon2){
+    public void midPoint(double lat1,double lon1,double lat2,double lon2){
 
         double dLon = Math.toRadians(lon2 - lon1);
 
@@ -128,7 +128,7 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
         //calculate and return center
         GeoPoint point = GeoPoint.fromCenterBetween(origin, destination);
 
-        Location l = new Location(LocationManager.NETWORK_PROVIDER);
+        Location l = new Location(LocationManager.GPS_PROVIDER);
 
         l.setLatitude(point.getLatitude());
         l.setLongitude(point.getLongitude());

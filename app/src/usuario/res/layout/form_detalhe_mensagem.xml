@@ -106,7 +106,7 @@
         <ScrollView
             android:id="@+id/scrollView2"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="80dp"
             android:layout_marginEnd="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
@@ -124,7 +124,7 @@
                 <TextView
                     android:id="@+id/textViewDescricao"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_height="match_parent"
                     android:layout_marginEnd="16dp"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
@@ -156,7 +156,7 @@
                 android:id="@+id/editTextResposta"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Resposta"
+                android:hint="Enviar Resposta"
                 android:maxLines="5"
                 android:singleLine="false"
                 android:text="@={viewModel.resposta.resposta}" />
@@ -201,13 +201,29 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:maxHeight="200dp"
+            android:maxHeight="120dp"
             app:layoutManager="android.support.v7.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/scrollView2"
+            app:layout_constraintTop_toBottomOf="@+id/textView37"
             tools:listitem="@layout/linha_respostas" />
+
+        <TextView
+            android:id="@+id/textView37"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Respostas"
+            android:textAppearance="@style/texto_azul"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/divider2" />
 
     </android.support.constraint.ConstraintLayout>
 

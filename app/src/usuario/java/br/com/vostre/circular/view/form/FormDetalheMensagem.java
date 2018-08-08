@@ -79,7 +79,6 @@ public class FormDetalheMensagem extends FormBase {
         super.onCreate(savedInstanceState);
 
         viewModel = ViewModelProviders.of(this).get(DetalheMensagensViewModel.class);
-        viewModel.respostas.observe(this, respostasObserver);
 
         binding.setView(this);
         binding.setViewModel(viewModel);
@@ -88,6 +87,7 @@ public class FormDetalheMensagem extends FormBase {
         if(mensagem != null){
             viewModel.mensagem = mensagem;
             viewModel.carregarRespostas(mensagem);
+            viewModel.respostas.observe(this, respostasObserver);
         }
 
         listRespostas = binding.listRespostas;
@@ -105,6 +105,7 @@ public class FormDetalheMensagem extends FormBase {
         if(viewModel.resposta.getResposta() != null && !viewModel.resposta.getResposta().isEmpty()){
             viewModel.resposta.setMensagem(viewModel.mensagem.getId());
             viewModel.salvarResposta();
+            dismiss();
         } else{
             Toast.makeText(getContext(), "Por favor digite o texto de resposta", Toast.LENGTH_SHORT).show();
         }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <variable
@@ -11,31 +12,49 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-            <LinearLayout
-                android:id="@+id/linear1"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/textViewNome"
-                    style="@style/texto_lista"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="5"
-                    android:gravity="center_vertical"
-                    android:padding="10dp"
-                    android:text="@{resposta.resposta}" />
-
-            </LinearLayout>
+        <TextView
+            android:id="@+id/textViewNome"
+            style="@style/texto_lista"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="5"
+            android:gravity="left|center_vertical"
+            android:padding="10dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="0dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp"
+            android:text="@{resposta.resposta}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView38" />
 
         <View
             android:id="@+id/divider2"
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:layout_marginBottom="8dp"
             android:background="@color/cinzaClaro"
-            app:layout_constraintTop_toBottomOf="@id/linear1" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewNome" />
+
+        <TextView
+            android:id="@+id/textView38"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@{resposta.ultimaAlteracao}"
+            android:textColor="@color/cinzaMedio"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 

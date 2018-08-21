@@ -1,0 +1,100 @@
+package br.com.vostre.circular.view;
+
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
+import android.databinding.DataBindingUtil;
+import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.TabHost;
+
+import java.util.List;
+
+import br.com.vostre.circular.R;
+import br.com.vostre.circular.databinding.ActivityFavoritosBinding;
+import br.com.vostre.circular.databinding.ActivityMensagensBinding;
+import br.com.vostre.circular.model.Itinerario;
+import br.com.vostre.circular.model.Mensagem;
+import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
+import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
+import br.com.vostre.circular.view.adapter.MensagemAdapter;
+import br.com.vostre.circular.view.adapter.ParadaAdapter;
+import br.com.vostre.circular.view.form.FormMensagem;
+import br.com.vostre.circular.viewModel.FavoritosViewModel;
+import br.com.vostre.circular.viewModel.ItinerariosViewModel;
+import br.com.vostre.circular.viewModel.MensagensViewModel;
+import br.com.vostre.circular.viewModel.ParadasViewModel;
+
+public class FavoritosActivity extends BaseActivity {
+
+    ActivityFavoritosBinding binding;
+    FavoritosViewModel viewModel;
+
+    RecyclerView listParadas;
+    List<ParadaBairro> paradas;
+    ParadaAdapter adapterParada;
+
+    RecyclerView listItinerarios;
+    List<ItinerarioPartidaDestino> itinerarios;
+    ItinerarioAdapter adapterItinerarios;
+
+    TabHost tabHost;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_favoritos);
+        super.onCreate(savedInstanceState);
+
+        viewModel = ViewModelProviders.of(this).get(FavoritosViewModel.class);
+        //viewModel.mensagens.observe(this, mensagensObserver);
+        //viewModel.mensagensRecebidas.observe(this, mensagensRecebidasObserver);
+
+        binding.setView(this);
+        setTitle("Favoritos");
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+
+        listParadas = binding.listParadas;
+
+        adapterParada = new ParadaAdapter(paradas, this);
+
+        listParadas.setAdapter(adapterParada);
+
+        listItinerarios = binding.listItinerarios;
+
+        adapterItinerarios = new ItinerarioAdapter(itinerarios, this);
+
+        listItinerarios.setAdapter(adapterItinerarios);
+
+        tabHost = binding.tabs;
+        tabHost.setup();
+
+        TabHost.TabSpec spec = tabHost.newTabSpec("Itinerários");
+        spec.setContent(R.id.tab1);
+        spec.setIndicator("Itinerários");
+        tabHost.addTab(spec);
+
+        TabHost.TabSpec spec2 = tabHost.newTabSpec("Paradas");
+        spec2.setContent(R.id.tab2);
+        spec2.setIndicator("Paradas");
+        tabHost.addTab(spec2);
+
+    }
+
+    Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {
+        @Override
+        public void onChanged(List<ParadaBairro> paradas) {
+            adapterParada.paradas = paradas;
+            adapterParada.notifyDataSetChanged();
+        }
+    };
+
+    Observer<List<ItinerarioPartidaDestino>> itinerariosObserver = new Observer<List<ItinerarioPartidaDestino>>() {
+        @Override
+        public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
+            adapterItinerarios.itinerarios = itinerarios;
+            adapterItinerarios.notifyDataSetChanged();
+        }
+    };
+
+}

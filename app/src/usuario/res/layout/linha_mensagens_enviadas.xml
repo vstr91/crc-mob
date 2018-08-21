@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <import type="android.view.View" />
@@ -9,6 +8,7 @@
             type="br.com.vostre.circular.model.Mensagem" />
     </data>
     <android.support.constraint.ConstraintLayout
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -26,32 +26,43 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <android.support.constraint.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/textViewTitulo"
-                    style="@style/texto_lista"
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center_vertical"
-                    android:padding="10dp"
-                    android:text="@{mensagem.titulo}"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="teste" />
+                    android:layout_weight="5"
+                    android:orientation="vertical">
 
-            </android.support.constraint.ConstraintLayout>
+                    <TextView
+                        android:id="@+id/textViewTitulo"
+                        style="@style/texto_lista"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingTop="10dp"
+                        android:text="@{mensagem.titulo}" />
+
+                    <TextView
+                        android:id="@+id/textViewResumo"
+                        style="@style/texto_lista_menor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="10dp"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingTop="0dp"
+                        android:text="@{mensagem.resumo}"
+                        android:textSize="12sp"
+                        android:visibility="@{mensagem.resumo == null ? View.GONE : View.VISIBLE}" />
+
+                </LinearLayout>
+
+            </LinearLayout>
 
         </android.support.v7.widget.CardView>
     </android.support.constraint.ConstraintLayout>

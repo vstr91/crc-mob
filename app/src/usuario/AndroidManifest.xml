@@ -61,7 +61,7 @@
         </activity>
         <activity android:name=".view.MenuActivity" />
         <activity android:name=".view.BaseActivity" />
-        <activity android:name=".view.EstadosActivity" />
+        <activity android:name=".view.FavoritosActivity" />
         <activity android:name=".view.CidadesActivity" />
         <activity android:name=".view.DetalheParadaActivity" />
         <activity android:name=".view.ParadasActivity" />

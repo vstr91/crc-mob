@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import br.com.vostre.circular.R;
+import br.com.vostre.circular.view.FavoritosActivity;
 import br.com.vostre.circular.view.MensagensActivity;
 
 /**
@@ -90,8 +91,8 @@ public class ToolbarUtils {
             case R.id.imageButtonFavoritos:
             case R.id.favoritos:
             case R.id.icon_favoritos:
-//                Intent i = new Intent(activity, MensagensActivity.class);
-//                activity.startActivity(i);
+                Intent i = new Intent(activity, FavoritosActivity.class);
+                activity.startActivity(i);
                 break;
             case R.id.imageButtonSync:
             case R.id.icon_sync:

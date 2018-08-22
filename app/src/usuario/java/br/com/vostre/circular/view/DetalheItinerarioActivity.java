@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -49,6 +50,8 @@ import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.PreferenceUtils;
+import br.com.vostre.circular.utils.SnackbarHelper;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
@@ -72,6 +75,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
     MyLocationNewOverlay mLocationOverlay;
 
     BottomSheetDialog bsd;
+    boolean flagFavorito = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +144,30 @@ public class DetalheItinerarioActivity extends BaseActivity {
         map.setMinZoomLevel(8d);
     }
 
+    public void onClickBtnFavorito(View v){
+        List<String> lstItinerarios = PreferenceUtils.carregaItinerariosFavoritos(getApplicationContext());
+
+        List<ParadaBairro> paradas = viewModel.paradas.getValue();
+
+        if(!flagFavorito){
+            SnackbarHelper.notifica(v, "Itinerário adicionado aos favoritos!", Snackbar.LENGTH_LONG);
+            binding.imageButton4.setImageResource(R.drawable.ic_star_white_24dp);
+            flagFavorito = true;
+
+            lstItinerarios.add(paradas.get(0).getIdBairro()+"|"+paradas.get(paradas.size()-1).getIdBairro());
+
+        } else{
+            SnackbarHelper.notifica(v, "Itinerário removido dos favoritos!", Snackbar.LENGTH_LONG);
+            binding.imageButton4.setImageResource(R.drawable.ic_star_border_white_24dp);
+            flagFavorito = false;
+
+            lstItinerarios.remove(paradas.get(0).getIdBairro()+"|"+paradas.get(paradas.size()).getIdBairro());
+
+        }
+
+        PreferenceUtils.gravaItinerariosFavoritos(lstItinerarios, getApplicationContext());
+    }
+
 
     @BindingAdapter("app:textDinheiro")
     public static void setTextDinheiro(TextView view, Double val){
@@ -197,6 +225,21 @@ public class DetalheItinerarioActivity extends BaseActivity {
             viewModel.carregaDirections(map, paradas);
 
             atualizarParadasMapa(paradas);
+
+            List<String> lstItinerarios = PreferenceUtils.carregaItinerariosFavoritos(getApplicationContext());
+
+            List<ParadaBairro> listParadas = viewModel.paradas.getValue();
+
+            int i = lstItinerarios.indexOf(paradas.get(0).getIdBairro()+"|"+paradas.get(paradas.size()-1).getIdBairro());
+
+            if(i >= 0){
+                binding.imageButton4.setImageResource(R.drawable.ic_star_white_24dp);
+                flagFavorito = true;
+            } else{
+                binding.imageButton4.setImageResource(R.drawable.ic_star_border_white_24dp);
+                flagFavorito = false;
+            }
+
         }
     };
 

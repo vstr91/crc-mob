@@ -47,7 +47,7 @@ public class FavoritosActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         viewModel = ViewModelProviders.of(this).get(FavoritosViewModel.class);
-        //viewModel.mensagens.observe(this, mensagensObserver);
+        viewModel.paradas.observe(this, paradasObserver);
         //viewModel.mensagensRecebidas.observe(this, mensagensRecebidasObserver);
 
         binding.setView(this);

@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.support.design.widget.BottomSheetDialog;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -37,6 +38,8 @@ import br.com.vostre.circular.databinding.ActivityDetalheParadaBinding;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.PreferenceUtils;
+import br.com.vostre.circular.utils.SnackbarHelper;
 import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.PontosInteresseAdapter;
 import br.com.vostre.circular.view.form.FormMapa;
@@ -56,6 +59,9 @@ public class DetalheParadaActivity extends BaseActivity {
     BottomSheetDialog bsd;
     RecyclerView listPois;
 
+    boolean flagFavorito = false;
+    String idParada;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_parada);
@@ -71,7 +77,9 @@ public class DetalheParadaActivity extends BaseActivity {
 
         binding.setViewModel(viewModel);
 
-        viewModel.setParada(getIntent().getStringExtra("parada"));
+        idParada = getIntent().getStringExtra("parada");
+
+        viewModel.setParada(idParada);
 
         viewModel.parada.observe(this, paradaObserver);
 
@@ -101,6 +109,42 @@ public class DetalheParadaActivity extends BaseActivity {
         });
 
         viewModel.itinerarios.observe(this, itinerariosObserver);
+
+        List<String> lstParadas = PreferenceUtils.carregaParadasFavoritas(getApplicationContext());
+
+        int i = lstParadas.indexOf(idParada);
+
+        if(i >= 0){
+            binding.imageButton4.setImageResource(R.drawable.ic_star_white_24dp);
+            flagFavorito = true;
+        } else{
+            binding.imageButton4.setImageResource(R.drawable.ic_star_border_white_24dp);
+            flagFavorito = false;
+        }
+
+    }
+
+    public void onClickBtnFavorito(View v){
+
+        List<String> lstParadas = PreferenceUtils.carregaParadasFavoritas(getApplicationContext());
+
+        if(!flagFavorito){
+            SnackbarHelper.notifica(v, "Parada adicionada aos favoritos!", Snackbar.LENGTH_LONG);
+            binding.imageButton4.setImageResource(R.drawable.ic_star_white_24dp);
+            flagFavorito = true;
+
+            lstParadas.add(idParada);
+
+        } else{
+            SnackbarHelper.notifica(v, "Parada removida dos favoritos!", Snackbar.LENGTH_LONG);
+            binding.imageButton4.setImageResource(R.drawable.ic_star_border_white_24dp);
+            flagFavorito = false;
+
+            lstParadas.remove(idParada);
+
+        }
+
+        PreferenceUtils.gravaParadasFavoritas(lstParadas, getApplicationContext());
 
     }
 

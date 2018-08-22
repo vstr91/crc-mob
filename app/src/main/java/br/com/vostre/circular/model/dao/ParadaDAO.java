@@ -60,6 +60,12 @@ public interface ParadaDAO {
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada p " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
+            "estado e ON e.id = c.estado WHERE p.id = :parada")
+    ParadaBairro carregarComBairroSync(String parada);
+
+    @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
+            "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada p " +
+            "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
             "estado e ON e.id = c.estado WHERE (latitude >= :minLat AND latitude <= :maxLat) " +
             "AND (longitude >= :minLng AND longitude <= :maxLng)")
     LiveData<List<ParadaBairro>> listarTodosAtivosProximos(double minLat, double maxLat, double minLng, double maxLng);

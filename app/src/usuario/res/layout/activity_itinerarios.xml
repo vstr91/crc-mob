@@ -10,6 +10,12 @@
         <variable
             name="viewModel"
             type="br.com.vostre.circular.viewModel.ItinerariosViewModel" />
+        <variable
+            name="partida"
+            type="br.com.vostre.circular.model.pojo.BairroCidade" />
+        <variable
+            name="destino"
+            type="br.com.vostre.circular.model.pojo.BairroCidade" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -37,7 +43,9 @@
             android:background="@color/transparente"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_swap_vert_blue_24dp"
+            android:onClick="@{view::onClickBtnInverter}"
             android:translationZ="3dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/cardViewDestino"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -95,10 +103,11 @@
             android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
+            android:visibility="gone"
             app:cardCornerRadius="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardViewListPartida">
+            app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
@@ -132,7 +141,7 @@
                     app:corArcoMenor="@color/azul"
                     app:espessuraArcoMaior="4"
                     app:espessuraArcoMenor="4"
-                    app:imagem="@{viewModel.bairroPartida.brasao}"
+                    app:imagem="@{partida.brasao}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView26" />
@@ -145,7 +154,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="16dp"
                     android:layout_weight="1"
-                    android:text="@{viewModel.bairroPartida.bairro.nome}"
+                    android:text="@={partida.bairro.nome}"
                     android:textAppearance="@style/texto_azul"
                     android:textColor="@color/cinzaEscuro"
                     app:layout_constraintStart_toEndOf="@+id/circleViewPartida"
@@ -156,7 +165,7 @@
                     android:id="@+id/textViewCidadePartida"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{viewModel.bairroPartida.nomeCidade}"
+                    android:text="@={partida.nomeCidade}"
                     android:textSize="12sp"
                     app:layout_constraintStart_toStartOf="@+id/textViewBairroPartida"
                     app:layout_constraintTop_toBottomOf="@+id/textViewBairroPartida"
@@ -190,6 +199,7 @@
             android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
+            android:visibility="gone"
             app:cardCornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -208,7 +218,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="10dp"
                     android:paddingTop="10dp"
-                    android:text="De qual cidade você sairá?"
+                    android:text="Qual será o seu destino?"
                     android:textAppearance="@style/texto_azul" />
 
                 <android.support.v7.widget.RecyclerView
@@ -232,10 +242,11 @@
             android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
+            android:visibility="gone"
             app:cardCornerRadius="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardViewListDestino">
+            app:layout_constraintTop_toBottomOf="@+id/cardViewPartida">
 
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
@@ -251,6 +262,7 @@
                     android:layout_marginEnd="16dp"
                     android:layout_marginRight="16dp"
                     android:layout_marginTop="8dp"
+                    android:onClick="@{view::onClickBtnEditarDestino}"
                     android:src="@drawable/ic_edit_blue_24dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -281,6 +293,7 @@
                     android:layout_weight="1"
                     app:corArcoMaior="@color/azul"
                     app:corArcoMenor="@color/azul"
+                    app:imagem="@{destino.brasao}"
                     app:espessuraArcoMaior="4"
                     app:espessuraArcoMenor="4"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -295,7 +308,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="16dp"
                     android:layout_weight="1"
-                    android:text="@{viewModel.bairroDestino.bairro.nome}"
+                    android:text="@{destino.bairro.nome}"
                     android:textAppearance="@style/texto_azul"
                     android:textColor="@color/cinzaEscuro"
                     app:layout_constraintStart_toEndOf="@+id/circleViewDestino"
@@ -306,7 +319,7 @@
                     android:id="@+id/textViewCidadeDestino"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{viewModel.bairroDestino.nomeCidade}"
+                    android:text="@{destino.nomeCidade}"
                     android:textSize="12sp"
                     app:layout_constraintStart_toStartOf="@+id/textViewBairroDestino"
                     app:layout_constraintTop_toBottomOf="@+id/textViewBairroDestino"
@@ -324,6 +337,7 @@
             android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
+            android:visibility="gone"
             app:cardCornerRadius="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

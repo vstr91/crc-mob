@@ -18,8 +18,10 @@ import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
+import br.com.vostre.circular.view.adapter.ItinerarioFavoritoAdapter;
 import br.com.vostre.circular.view.adapter.MensagemAdapter;
 import br.com.vostre.circular.view.adapter.ParadaAdapter;
+import br.com.vostre.circular.view.adapter.ParadaFavoritaAdapter;
 import br.com.vostre.circular.view.form.FormMensagem;
 import br.com.vostre.circular.viewModel.FavoritosViewModel;
 import br.com.vostre.circular.viewModel.ItinerariosViewModel;
@@ -33,11 +35,11 @@ public class FavoritosActivity extends BaseActivity {
 
     RecyclerView listParadas;
     List<ParadaBairro> paradas;
-    ParadaAdapter adapterParada;
+    ParadaFavoritaAdapter adapterParada;
 
     RecyclerView listItinerarios;
     List<ItinerarioPartidaDestino> itinerarios;
-    ItinerarioAdapter adapterItinerarios;
+    ItinerarioFavoritoAdapter adapterItinerarios;
 
     TabHost tabHost;
 
@@ -48,7 +50,7 @@ public class FavoritosActivity extends BaseActivity {
 
         viewModel = ViewModelProviders.of(this).get(FavoritosViewModel.class);
         viewModel.paradas.observe(this, paradasObserver);
-        //viewModel.mensagensRecebidas.observe(this, mensagensRecebidasObserver);
+        viewModel.itinerarios.observe(this, itinerariosObserver);
 
         binding.setView(this);
         setTitle("Favoritos");
@@ -56,13 +58,13 @@ public class FavoritosActivity extends BaseActivity {
 
         listParadas = binding.listParadas;
 
-        adapterParada = new ParadaAdapter(paradas, this);
+        adapterParada = new ParadaFavoritaAdapter(paradas, this);
 
         listParadas.setAdapter(adapterParada);
 
         listItinerarios = binding.listItinerarios;
 
-        adapterItinerarios = new ItinerarioAdapter(itinerarios, this);
+        adapterItinerarios = new ItinerarioFavoritoAdapter(itinerarios, this);
 
         listItinerarios.setAdapter(adapterItinerarios);
 

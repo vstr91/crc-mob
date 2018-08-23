@@ -161,7 +161,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
             binding.imageButton4.setImageResource(R.drawable.ic_star_border_white_24dp);
             flagFavorito = false;
 
-            lstItinerarios.remove(paradas.get(0).getIdBairro()+"|"+paradas.get(paradas.size()).getIdBairro());
+            lstItinerarios.remove(paradas.get(0).getIdBairro()+"|"+paradas.get(paradas.size()-1).getIdBairro());
 
         }
 

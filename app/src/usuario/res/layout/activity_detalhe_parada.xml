@@ -136,6 +136,7 @@
                         android:layout_weight=".5"
                         android:background="@color/transparente"
                         android:src="@drawable/ic_map_white_24dp"
+                        android:onClick="onClickBtnMapa"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent" />
 

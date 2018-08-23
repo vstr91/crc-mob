@@ -24,7 +24,7 @@ public class FavoritosViewModel extends AndroidViewModel {
     private AppDatabase appDatabase;
 
     public MutableLiveData<List<ParadaBairro>> paradas;
-    public LiveData<List<ItinerarioPartidaDestino>> itinerarios;
+    public MutableLiveData<List<ItinerarioPartidaDestino>> itinerarios;
 
 
     public FavoritosViewModel(Application app){
@@ -32,9 +32,10 @@ public class FavoritosViewModel extends AndroidViewModel {
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
 
         paradas = new MutableLiveData<>();
+        itinerarios = new MutableLiveData<>();
 
         carregarParadasFavoritas();
-        //mensagensRecebidas = appDatabase.mensagemDAO().listarTodosRecebidos();
+        carregarItinerariosFavoritos();
     }
 
     private void carregarParadasFavoritas(){
@@ -59,6 +60,30 @@ public class FavoritosViewModel extends AndroidViewModel {
                 });
 
                 paradas.postValue(listParadas);
+
+            }
+        });
+
+    }
+
+    private void carregarItinerariosFavoritos(){
+        final List<ItinerarioPartidaDestino> listItinerarios = new ArrayList<>();
+
+        final List<String> itinerariosFavoritos = PreferenceUtils.carregaItinerariosFavoritos(getApplication());
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                for(String id : itinerariosFavoritos){
+
+                    String[] dados = id.split("\\|");
+
+                    ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO().carregarPorPartidaEDestinoSync(dados[0], dados[1]);
+                    listItinerarios.add(itinerario);
+                }
+
+                itinerarios.postValue(listItinerarios);
 
             }
         });

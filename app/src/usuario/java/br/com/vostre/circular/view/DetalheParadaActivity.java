@@ -124,6 +124,14 @@ public class DetalheParadaActivity extends BaseActivity {
 
     }
 
+    public void onClickBtnMapa(View v){
+        FormMapa formMapa = new FormMapa();
+        formMapa.setParada(binding.getUmaParada());
+        formMapa.setPontoInteresse(null);
+        formMapa.setCtx(ctx.getApplication());
+        formMapa.show(ctx.getSupportFragmentManager(), "formMapa");
+    }
+
     public void onClickBtnFavorito(View v){
 
         List<String> lstParadas = PreferenceUtils.carregaParadasFavoritas(getApplicationContext());

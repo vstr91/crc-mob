@@ -186,34 +186,47 @@ public class FormMapa extends FormBase {
             map.getOverlays().add(m);
         }
 
-        Location parada = new Location(LocationManager.GPS_PROVIDER);
-        parada.setLatitude(this.parada.getParada().getLatitude());
-        parada.setLongitude(this.parada.getParada().getLongitude());
+        if(parada != null && pontoInteresse != null){
+            Location parada = new Location(LocationManager.GPS_PROVIDER);
+            parada.setLatitude(this.parada.getParada().getLatitude());
+            parada.setLongitude(this.parada.getParada().getLongitude());
 
-        Location pontoInteresse = new Location(LocationManager.GPS_PROVIDER);
-        pontoInteresse.setLatitude(this.pontoInteresse.getLatitude());
-        pontoInteresse.setLongitude(this.pontoInteresse.getLongitude());
+            Location pontoInteresse = new Location(LocationManager.GPS_PROVIDER);
+            pontoInteresse.setLatitude(this.pontoInteresse.getLatitude());
+            pontoInteresse.setLongitude(this.pontoInteresse.getLongitude());
 
-        Polyline polyline = new Polyline();
-        polyline.setColor(Color.parseColor("#000088"));
-        polyline.setWidth(2);
-        map.getOverlays().add(polyline);
+            Polyline polyline = new Polyline();
+            polyline.setColor(Color.parseColor("#000088"));
+            polyline.setWidth(2);
+            map.getOverlays().add(polyline);
 
-        ArrayList<GeoPoint> pathPoints = new ArrayList<>();
+            ArrayList<GeoPoint> pathPoints = new ArrayList<>();
 
-        pathPoints.add(new GeoPoint(parada));
-        pathPoints.add(new GeoPoint(pontoInteresse));
-        polyline.setPoints(pathPoints);
-        map.invalidate();
+            pathPoints.add(new GeoPoint(parada));
+            pathPoints.add(new GeoPoint(pontoInteresse));
+            polyline.setPoints(pathPoints);
+            map.invalidate();
 
-        //viewModel.carregaDirections(map, this.parada, this.pontoInteresse);
-        viewModel.midPoint(parada.getLatitude(), parada.getLongitude(), pontoInteresse.getLatitude(), pontoInteresse.getLongitude());
+            //viewModel.carregaDirections(map, this.parada, this.pontoInteresse);
+            viewModel.midPoint(parada.getLatitude(), parada.getLongitude(), pontoInteresse.getLatitude(), pontoInteresse.getLongitude());
 
-        NumberFormat nf = NumberFormat.getNumberInstance();
-        nf.setMaximumFractionDigits(2);
+            NumberFormat nf = NumberFormat.getNumberInstance();
+            nf.setMaximumFractionDigits(2);
 
-        binding.textViewDistancia.setText("~"+nf.format(parada.distanceTo(pontoInteresse))+" m");
-        viewModel.localAtual.observe(this, localObserver);
+            binding.textViewDistancia.setText("~"+nf.format(parada.distanceTo(pontoInteresse))+" m");
+            viewModel.localAtual.observe(this, localObserver);
+        } else if(parada != null){
+            Location parada = new Location(LocationManager.GPS_PROVIDER);
+            parada.setLatitude(this.parada.getParada().getLatitude());
+            parada.setLongitude(this.parada.getParada().getLongitude());
+
+            viewModel.midPoint(parada.getLatitude(), parada.getLongitude(), parada.getLatitude(), parada.getLongitude());
+            viewModel.localAtual.observe(this, localObserver);
+            binding.textViewDistancia.setVisibility(View.GONE);
+        } else{
+            dismiss();
+        }
+
 
     }
 

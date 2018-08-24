@@ -13,6 +13,7 @@ import java.util.List;
 
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Parada;
+import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 
@@ -127,6 +128,14 @@ public interface ItinerarioDAO {
             "WHERE p.bairro = :idPartida AND pi.ordem = 1) " +
             "AND p.bairro = :idDestino AND pi.ordem > 1) LIMIT 1")
     ItinerarioPartidaDestino carregarPorPartidaEDestinoSync(String idPartida, String idDestino);
+
+    @Query("SELECT DISTINCT c.*, e.id AS idEstado, e.nome AS nomeEstado " +
+            "FROM itinerario i INNER JOIN parada_itinerario pit ON pit.itinerario = i.id INNER JOIN parada p ON p.id = pit.parada INNER JOIN " +
+            "bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado " +
+            "WHERE i.id IN (SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada WHERE itinerario IN " +
+            "(SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada " +
+            "WHERE p.bairro = :idPartida AND (pi.ordem = 1 OR (pi.ordem > 1 AND pi.destaque = 1)))) AND c.id <> (SELECT b.cidade FROM bairro b WHERE b.id = :idPartida)")
+    LiveData<List<CidadeEstado>> carregarDestinosPorPartida(String idPartida);
 
 //    @Query("SELECT i.*,   FROM parada_itinerario pi INNER JOIN itinerario i ON i.id = pi.itinerario " +
 //            "INNER JOIN parada WHERE ativo = 1")

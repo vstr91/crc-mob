@@ -43,6 +43,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
     public LiveData<HorarioItinerarioNome> horarioSeguinte;
 
     public LiveData<List<CidadeEstado>> cidades;
+    public LiveData<List<CidadeEstado>> cidadesDestino;
     public CidadeEstado cidadePartida;
     public CidadeEstado cidadeDestino;
 
@@ -86,6 +87,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
     public void setBairroPartida(BairroCidade umBairroPartida) {
         this.bairroPartida = appDatabase.bairroDAO().carregar(umBairroPartida.getBairro().getId());
+        this.cidadesDestino = appDatabase.itinerarioDAO().carregarDestinosPorPartida(umBairroPartida.getBairro().getId());
     }
 
     public LiveData<HorarioItinerarioNome> getItinerario() {
@@ -110,6 +112,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
         itinerario = appDatabase.horarioItinerarioDAO()
                 .carregarProximoPorPartidaEDestino("", "", "domingo");
         cidades = appDatabase.cidadeDAO().listarTodosAtivasComEstado();
+        cidadesDestino = appDatabase.itinerarioDAO().carregarDestinosPorPartida("");
         bairroPartida = appDatabase.bairroDAO().carregar(null);
         bairroDestino = appDatabase.bairroDAO().carregar(null);
         bairros = appDatabase.bairroDAO().listarTodosComCidadePorCidade(null);
@@ -117,9 +120,13 @@ public class ItinerariosViewModel extends AndroidViewModel {
     }
 
     public void carregaResultado(String hora, String dia){
+
+        BairroCidade partida = bairroPartida.getValue();
+        BairroCidade destino = bairroDestino.getValue();
+
         itinerario = appDatabase.horarioItinerarioDAO()
-                .carregarProximoPorPartidaEDestino(bairroPartida.getValue().getBairro().getId(),
-                        bairroDestino.getValue().getBairro().getId(), "00:00:00");
+                .carregarProximoPorPartidaEDestino(partida.getBairro().getId(),
+                        destino.getBairro().getId(), "00:00:00");
     }
 
     public void carregaResultadoDiaSeguinte(String dia){

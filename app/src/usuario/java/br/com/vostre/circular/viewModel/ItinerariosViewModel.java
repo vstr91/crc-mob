@@ -33,6 +33,11 @@ import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
+import es.usc.citius.hipster.algorithm.Hipster;
+import es.usc.citius.hipster.graph.GraphBuilder;
+import es.usc.citius.hipster.graph.GraphSearchProblem;
+import es.usc.citius.hipster.graph.HipsterDirectedGraph;
+import es.usc.citius.hipster.model.problem.SearchProblem;
 
 public class ItinerariosViewModel extends AndroidViewModel {
 
@@ -54,6 +59,8 @@ public class ItinerariosViewModel extends AndroidViewModel {
     public LiveData<ItinerarioPartidaDestino> itinerarioResultado;
 
     public int escolhaAtual = 0; // 0 partida - 1 destino
+
+    public LiveData<List<ItinerarioPartidaDestino>> itinerarios;
 
     public CidadeEstado getCidadePartida() {
         return cidadePartida;
@@ -87,7 +94,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
     public void setBairroPartida(BairroCidade umBairroPartida) {
         this.bairroPartida = appDatabase.bairroDAO().carregar(umBairroPartida.getBairro().getId());
-        this.cidadesDestino = appDatabase.itinerarioDAO().carregarDestinosPorPartida(umBairroPartida.getBairro().getId());
+        //this.cidadesDestino = appDatabase.cidadeDAO().listarTodosAtivasComEstado();//appDatabase.itinerarioDAO().carregarDestinosPorPartida(umBairroPartida.getBairro().getId());
     }
 
     public LiveData<HorarioItinerarioNome> getItinerario() {
@@ -112,17 +119,39 @@ public class ItinerariosViewModel extends AndroidViewModel {
         itinerario = appDatabase.horarioItinerarioDAO()
                 .carregarProximoPorPartidaEDestino("", "", "domingo");
         cidades = appDatabase.cidadeDAO().listarTodosAtivasComEstado();
-        cidadesDestino = appDatabase.itinerarioDAO().carregarDestinosPorPartida("");
+        cidadesDestino = appDatabase.cidadeDAO().listarTodosAtivasComEstado();//appDatabase.itinerarioDAO().carregarDestinosPorPartida("");
         bairroPartida = appDatabase.bairroDAO().carregar(null);
         bairroDestino = appDatabase.bairroDAO().carregar(null);
         bairros = appDatabase.bairroDAO().listarTodosComCidadePorCidade(null);
         itinerarioResultado = appDatabase.itinerarioDAO().carregar("");
+        this.itinerarios = appDatabase.itinerarioDAO().listarTodosAtivos();
     }
 
     public void carregaResultado(String hora, String dia){
 
         BairroCidade partida = bairroPartida.getValue();
         BairroCidade destino = bairroDestino.getValue();
+
+        GraphBuilder<String, Double> builder = GraphBuilder.create();
+
+        List<ItinerarioPartidaDestino> iti = itinerarios.getValue();
+
+        for(ItinerarioPartidaDestino i : iti){
+            builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(i.getItinerario().getDistancia());
+        }
+
+        HipsterDirectedGraph<String,Double> graph = builder.createDirectedGraph();
+
+// Create the search problem. For graph problems, just use
+// the GraphSearchProblem util class to generate the problem with ease.
+        SearchProblem p = GraphSearchProblem
+                .startingFrom(partida.getBairro().getId())
+                .in(graph)
+                .takeCostsFromEdges()
+                .build();
+
+// Search the shortest path from "A" to "F"
+        System.out.println("DIJ >>> "+Hipster.createDijkstra(p).search(destino.getBairro().getId()));
 
         itinerario = appDatabase.horarioItinerarioDAO()
                 .carregarProximoPorPartidaEDestino(partida.getBairro().getId(),

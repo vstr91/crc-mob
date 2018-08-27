@@ -38,7 +38,6 @@ public class BairroViewHolder extends RecyclerView.ViewHolder {
         binding.textViewNome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(ctx, bairro.getBairro().getNome(), Toast.LENGTH_SHORT).show();
                 listener.onSelected(bairro.getBairro().getId());
             }
         });

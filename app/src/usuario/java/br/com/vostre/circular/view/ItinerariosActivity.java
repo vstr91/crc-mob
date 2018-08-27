@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.joda.time.DateTime;
@@ -53,6 +54,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     BairroCidade bairroPartida;
     BairroCidade bairroDestino;
 
+    boolean inversao = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -66,6 +69,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         viewModel = ViewModelProviders.of(this).get(ItinerariosViewModel.class);
         viewModel.cidades.observe(this, cidadesObserver);
         viewModel.escolhaAtual = 0;
+
+        viewModel.itinerarios.observe(this, itinerariosObserver);
 
         binding.setViewModel(viewModel);
 
@@ -129,7 +134,9 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         binding.cardViewDestino.setVisibility(View.GONE);
         binding.cardViewResultado.setVisibility(View.GONE);
         binding.btnInverter.setVisibility(View.GONE);
+        binding.cardViewResultadoVazio.setVisibility(View.GONE);
         viewModel.escolhaAtual = 0;
+        consultaDiaSeguinte = false;
     }
 
     public void onClickBtnEditarDestino(View v){
@@ -137,25 +144,37 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         binding.cardViewListDestino.setVisibility(View.VISIBLE);
         binding.cardViewResultado.setVisibility(View.GONE);
         binding.btnInverter.setVisibility(View.GONE);
+        binding.cardViewResultadoVazio.setVisibility(View.GONE);
         viewModel.escolhaAtual = 1;
+        consultaDiaSeguinte = false;
     }
 
     public void onClickBtnInverter(View v){
 
-        viewModel.setBairroPartida(bairroDestino);
-        viewModel.bairroPartida.observe(this, bairroObserver);
-
-        viewModel.setBairroDestino(bairroPartida);
-        viewModel.bairroDestino.observe(this, bairroObserver);
+        inversao = true;
+        viewModel.escolhaAtual = 0;
 
         BairroCidade bairro = bairroPartida;
         bairroPartida = bairroDestino;
         bairroDestino = bairro;
 
-        mostraDadosBairroInversao(bairroPartida, 1);
-        mostraDadosBairroInversao(bairroDestino, 0);
+        viewModel.setBairroPartida(bairroPartida);
+        viewModel.bairroPartida.observe(this, bairroObserver);
+
+        viewModel.setBairroDestino(bairroDestino);
+        viewModel.bairroDestino.observe(this, bairroObserver);
+
+        mostraDadosBairroInversao(bairroPartida, 0);
+        mostraDadosBairroInversao(bairroDestino, 1);
 
     }
+
+    Observer<List<ItinerarioPartidaDestino>> itinerariosObserver = new Observer<List<ItinerarioPartidaDestino>>() {
+        @Override
+        public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
+            System.out.println("ITI: "+itinerarios.size());
+        }
+    };
 
     Observer<List<CidadeEstado>> cidadesObserver = new Observer<List<CidadeEstado>>() {
         @Override
@@ -216,9 +235,11 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
             viewModel.escolhaAtual = 1;
             binding.setPartida(bairro);
         } else{
+            viewModel.escolhaAtual = 0;
             binding.setDestino(bairro);
         }
 
+        binding.executePendingBindings();
 
     }
 
@@ -230,7 +251,10 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
                 binding.cardViewListDestino.setVisibility(View.GONE);
                 binding.cardViewResultado.setVisibility(View.VISIBLE);
+                binding.cardViewResultadoVazio.setVisibility(View.GONE);
                 binding.btnInverter.setVisibility(View.VISIBLE);
+
+                binding.setHorario(horario);
 
                 exibeDados(horario);
                 viewModel.carregaHorarios(horario);
@@ -241,8 +265,10 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
                 viewModel.carregaResultadoDiaSeguinte(diaSeguinte);
                 viewModel.itinerario.observe(ctx, itinerarioObserver);
             } else{
-                Toast.makeText(getApplicationContext(), "Nada encontrado!", Toast.LENGTH_SHORT).show();
+                binding.cardViewResultadoVazio.setVisibility(View.VISIBLE);
             }
+
+            binding.executePendingBindings();
 
         }
     };
@@ -266,12 +292,10 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         @Override
         public void onChanged(HorarioItinerarioNome horario) {
 
+            consultaDiaSeguinte = true;
+
             if(horario != null && horario.getIdHorario() != null){
                 exibeHorarioSeguinte(horario);
-            } else if(!consultaDiaSeguinte){
-//                consultaDiaSeguinte = true;
-//                viewModel.carregaResultadoDiaSeguinte(diaSeguinte);
-//                viewModel.itinerario.observe(ctx, itinerarioObserver);
             }
 
         }
@@ -283,8 +307,14 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
             if(itinerario != null){
                 System.out.println("HORARIO:: "+itinerario.getNomeBairroPartida()+" | "
-                        +itinerario.getNomeBairroDestino());
+                        +itinerario.getNomeBairroDestino()+" || "+itinerario.getProximoHorario());
+
+                binding.setItinerario(itinerario);
+
                 exibeDadosResultado();
+                inversao = false;
+                viewModel.escolhaAtual = 0;
+                binding.executePendingBindings();
             }
 
         }
@@ -312,10 +342,12 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         bairroCidade.getBairro().setId(id);
 
         if(viewModel.escolhaAtual == 0){
+            bairroPartida = bairroCidade;
             viewModel.setBairroPartida(bairroCidade);
             viewModel.bairroPartida.observe(this, bairroObserver);
         } else{
             viewModel.setBairroDestino(bairroCidade);
+            bairroDestino = bairroCidade;
             viewModel.bairroDestino.observe(this, bairroObserver);
         }
 
@@ -386,27 +418,51 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     public void exibeHorarioSeguinte(HorarioItinerarioNome horario){
         binding.textViewHorarioSeguinte.setText(DateTimeFormat.forPattern("HH:mm").print(horario.getNomeHorario()));
+        binding.executePendingBindings();
+    }
+
+    @BindingAdapter("app:horario")
+    public static void setHorario(TextView textView, String s){
+        textView.setText(s);
+    }
+
+    @BindingAdapter("app:horario")
+    public static void setHorario(TextView textView, Long l){
+
+        if(l != null){
+            textView.setText(DateTimeFormat.forPattern("HH:mm")
+                    .print(l));
+        }
+
+    }
+
+    @BindingAdapter("app:tempo")
+    public static void setTempo(TextView textView, DateTime dateTime){
+        textView.setText(DateTimeFormat.forPattern("HH:mm")
+                .print(dateTime));
+    }
+
+    @BindingAdapter("app:distancia")
+    public static void setDistancia(TextView textView, Double d){
+
+        if(d != null){
+            textView.setText(d.toString());
+        }
+
+    }
+
+    @BindingAdapter("app:tarifa")
+    public static void setTarifa(TextView textView, Double d){
+
+        if(d != null){
+            textView.setText(d.toString());
+        }
+
     }
 
     public void exibeDadosResultado(){
-        binding.textViewBairroPartidaResultado.setText(viewModel.itinerarioResultado.getValue().getNomeBairroPartida());
-        binding.textViewBairroDestinoResultado.setText(viewModel.itinerarioResultado.getValue().getNomeBairroDestino());
 
-        binding.textViewCidadePartidaResultado.setText(viewModel.itinerarioResultado.getValue().getNomeCidadePartida());
-        binding.textViewCidadeDestinoResultado.setText(viewModel.itinerarioResultado.getValue().getNomeCidadeDestino());
-
-        binding.textViewHorario.setText(DateTimeFormat.forPattern("HH:mm")
-                .print(viewModel.itinerario.getValue().getNomeHorario()));
-        binding.textViewDuracao.setText(DateTimeFormat.forPattern("HH:mm")
-                .print(viewModel.itinerarioResultado.getValue().getItinerario().getTempo()));
-
-        binding.textViewDistancia.setText(viewModel.itinerarioResultado.getValue().getItinerario().getDistancia().toString());
-        binding.textView11.setText(viewModel.itinerarioResultado.getValue().getNomeEmpresa());
-        binding.textViewParada.setText(viewModel.itinerarioResultado.getValue().getNomePartida());
-
-        if(viewModel.itinerario.getValue().getHorarioItinerario().getObservacao() != null){
-            binding.textViewObservacao.setText(viewModel.itinerario.getValue().getHorarioItinerario().getObservacao());
-        } else{
+        if(viewModel.itinerario.getValue().getHorarioItinerario().getObservacao() == null){
             binding.textViewObservacao.setVisibility(View.GONE);
         }
 
@@ -414,8 +470,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
             binding.imageView8.setVisibility(View.GONE);
         }
 
-        binding.textViewTarifa.setText(viewModel.itinerarioResultado.getValue().getItinerario().getTarifa().toString());
         binding.btnInverter.setVisibility(View.VISIBLE);
+        binding.cardViewResultadoVazio.setVisibility(View.GONE);
 
     }
 

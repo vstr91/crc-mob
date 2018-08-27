@@ -16,6 +16,12 @@
         <variable
             name="destino"
             type="br.com.vostre.circular.model.pojo.BairroCidade" />
+        <variable
+            name="itinerario"
+            type="br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino" />
+        <variable
+            name="horario"
+            type="br.com.vostre.circular.model.pojo.HorarioItinerarioNome" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -378,7 +384,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
                     android:layout_marginStart="16dp"
-                    android:text="@{viewModel.bairroPartida.bairro.nome}"
+                    android:text="@{partida.bairro.nome}"
                     android:textColor="@color/cinzaEscuro"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -392,7 +398,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:layout_marginStart="8dp"
-                    android:text="@{viewModel.bairroDestino.bairro.nome}"
+                    android:text="@{destino.bairro.nome}"
                     android:textColor="@color/cinzaEscuro"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -406,7 +412,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
                     android:layout_marginStart="16dp"
-                    android:text="@{viewModel.bairroPartida.nomeCidade}"
+                    android:text="@{partida.nomeCidade}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textViewBairroPartidaResultado"
                     tools:text="Cidade Partida" />
@@ -417,7 +423,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:layout_marginStart="8dp"
-                    android:text="@{viewModel.bairroDestino.nomeCidade}"
+                    android:text="@{destino.nomeCidade}"
                     app:layout_constraintStart_toStartOf="@+id/guideline3"
                     app:layout_constraintTop_toBottomOf="@+id/textViewBairroDestinoResultado"
                     tools:text="Cidade Destino" />
@@ -498,7 +504,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:layout_marginTop="8dp"
-                    android:text="Parada Saída"
+                    android:text="@{itinerario.nomePartida}"
                     android:textColor="@color/cinzaEscuro"
                     android:textSize="11sp"
                     app:layout_constraintBottom_toBottomOf="@+id/imageView"
@@ -521,7 +527,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:layout_marginTop="8dp"
-                    android:text="Empresa Responsável"
+                    android:text="@{itinerario.nomeEmpresa}"
                     android:textColor="@color/cinzaEscuro"
                     android:textSize="11sp"
                     app:layout_constraintBottom_toBottomOf="@+id/imageView4"
@@ -585,7 +591,7 @@
                     android:id="@+id/textViewTarifa"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="R$ 0,00"
+                    app:tarifa="@{itinerario.itinerario.tarifa}"
                     android:textColor="@color/cinzaEscuro"
                     android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="@+id/imageView5"
@@ -597,7 +603,7 @@
                     android:id="@+id/textViewDuracao"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="00 min."
+                    app:tempo="@{itinerario.itinerario.tempo}"
                     android:textColor="@color/cinzaEscuro"
                     android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="@+id/imageView6"
@@ -609,7 +615,7 @@
                     android:id="@+id/textViewDistancia"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0 Km"
+                    app:distancia="@{itinerario.itinerario.distancia}"
                     android:textColor="@color/cinzaEscuro"
                     android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="@+id/imageView7"
@@ -652,7 +658,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="20:00"
+                        app:horario="@{horario.nomeHorario}"
                         android:textAppearance="@style/texto_branco"
                         android:textSize="28sp"
                         android:textStyle="bold"
@@ -663,7 +669,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="Obs Atual"
+                        android:text="@{itinerario.itinerario.observacao}"
                         android:textAppearance="@style/texto_branco"
                         android:textSize="10sp" />
 
@@ -758,6 +764,61 @@
                     app:layout_constraintStart_toStartOf="@+id/textViewHorarioSeguinte"
                     app:layout_constraintTop_toBottomOf="@+id/textViewHorarioSeguinte" />
 
+            </android.support.constraint.ConstraintLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/cardViewResultadoVazio"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            app:cardCornerRadius="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cardViewDestino">
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView47"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="32dp"
+                    android:layout_marginLeft="32dp"
+                    android:layout_marginRight="32dp"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="Infelizmente não foi possível criar uma rota entre os locais selecionados..."
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Button
+                    android:id="@+id/btnReiniciar"
+                    style="@style/botao_fechar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:onClick="onClickBtnEditarPartida"
+                    android:text="Reiniciar Consulta"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView47" />
             </android.support.constraint.ConstraintLayout>
 
         </android.support.v7.widget.CardView>

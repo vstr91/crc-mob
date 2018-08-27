@@ -28,7 +28,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:stretchColumns="true"
-            app:layoutManager="android.support.v7.widget.GridLayoutManager"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

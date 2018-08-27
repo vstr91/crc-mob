@@ -18,6 +18,9 @@ public class ItinerarioPartidaDestino {
     @Ignore
     public List<ParadaItinerarioBairro> paradasItinerario;
 
+    @ColumnInfo(name = "idBairroPartida")
+    String idBairroPartida;
+
     @ColumnInfo(name = "nomePartida")
     String nomePartida;
 
@@ -26,6 +29,9 @@ public class ItinerarioPartidaDestino {
 
     @ColumnInfo(name = "cidadePartida")
     String nomeCidadePartida;
+
+    @ColumnInfo(name = "idBairroDestino")
+    String idBairroDestino;
 
     @ColumnInfo(name = "nomeDestino")
     String nomeDestino;
@@ -41,6 +47,22 @@ public class ItinerarioPartidaDestino {
 
     @ColumnInfo(name = "proximoHorario")
     String proximoHorario;
+
+    public String getIdBairroPartida() {
+        return idBairroPartida;
+    }
+
+    public void setIdBairroPartida(String idBairroPartida) {
+        this.idBairroPartida = idBairroPartida;
+    }
+
+    public String getIdBairroDestino() {
+        return idBairroDestino;
+    }
+
+    public void setIdBairroDestino(String idBairroDestino) {
+        this.idBairroDestino = idBairroDestino;
+    }
 
     public String getNomeEmpresa() {
         return nomeEmpresa;

@@ -69,8 +69,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         viewModel = ViewModelProviders.of(this).get(ItinerariosViewModel.class);
         viewModel.cidades.observe(this, cidadesObserver);
         viewModel.escolhaAtual = 0;
-
-        viewModel.itinerarios.observe(this, itinerariosObserver);
+        viewModel.resultadosItinerarios.observe(this, resultadoItinerarioObserver);
 
         binding.setViewModel(viewModel);
 
@@ -169,10 +168,10 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     }
 
-    Observer<List<ItinerarioPartidaDestino>> itinerariosObserver = new Observer<List<ItinerarioPartidaDestino>>() {
+    Observer<List<ItinerarioPartidaDestino>> resultadoItinerarioObserver = new Observer<List<ItinerarioPartidaDestino>>() {
         @Override
         public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
-            System.out.println("ITI: "+itinerarios.size());
+            System.out.println("ITI RES: "+itinerarios.size());
         }
     };
 

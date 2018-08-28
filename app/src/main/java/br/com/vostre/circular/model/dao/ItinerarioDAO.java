@@ -50,6 +50,33 @@ public interface ItinerarioDAO {
             "WHERE i.ativo = 1")
     LiveData<List<ItinerarioPartidaDestino>> listarTodosAtivos();
 
+    @Query("SELECT DISTINCT i.*, " +
+            "(SELECT pp.bairro FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'idBairroPartida', " +
+            "(SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'nomePartida', " +
+            "(SELECT pp.bairro FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'idBairroDestino'," +
+            "(SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'nomeDestino'," +
+            "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'bairroPartida', " +
+            "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'bairroDestino'," +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
+            ") AS 'cidadePartida', " +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
+            ") AS 'cidadeDestino' " +
+            "FROM parada_itinerario pit INNER JOIN itinerario i ON i.id = pit.itinerario " +
+            "WHERE i.ativo = 1")
+    List<ItinerarioPartidaDestino> listarTodosAtivosSync();
+
     @Query("SELECT DISTINCT (SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
             "FROM horario_itinerario hi INNER JOIN " +
             "horario h ON h.id = hi.horario " +
@@ -132,6 +159,37 @@ public interface ItinerarioDAO {
             "WHERE p.bairro = :idPartida AND pi.ordem = 1) " +
             "AND p.bairro = :idDestino AND pi.ordem > 1) LIMIT 1")
     ItinerarioPartidaDestino carregarPorPartidaEDestinoSync(String idPartida, String idDestino);
+
+    @Query("SELECT i.*, " +
+            "(SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+            "FROM horario_itinerario hi INNER JOIN " +
+            "horario h ON h.id = hi.horario " +
+            "WHERE itinerario = i.id AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= :hora " +
+            "ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ) AS 'proximoHorario', " +
+            "(SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'nomePartida', " +
+            "(SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'nomeDestino'," +
+            "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'bairroPartida', " +
+            "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'bairroDestino', " +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
+            ") AS 'cidadePartida', " +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
+            ") AS 'cidadeDestino' " +
+            "FROM itinerario i WHERE i.id IN (SELECT pi.itinerario " +
+            "FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada WHERE itinerario IN " +
+            "(SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada " +
+            "WHERE p.bairro = :idPartida AND pi.ordem = 1) " +
+            "AND p.bairro = :idDestino AND pi.ordem > 1) LIMIT 1")
+    ItinerarioPartidaDestino carregarPorPartidaEDestinoComHorarioSync(String idPartida, String idDestino, String hora);
 
     @Query("SELECT DISTINCT c.*, e.id AS idEstado, e.nome AS nomeEstado " +
             "FROM itinerario i INNER JOIN parada_itinerario pit ON pit.itinerario = i.id INNER JOIN parada p ON p.id = pit.parada INNER JOIN " +

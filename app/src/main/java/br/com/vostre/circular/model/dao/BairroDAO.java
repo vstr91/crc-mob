@@ -43,6 +43,10 @@ public interface BairroDAO {
             "INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado WHERE b.id LIKE :id")
     LiveData<BairroCidade> carregar(String id);
 
+    @Query("SELECT b.*, c.id AS idCidade, c.nome AS nomeCidade, c.brasao AS brasao, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado FROM bairro b " +
+            "INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado WHERE b.id LIKE :id")
+    BairroCidade carregarSync(String id);
+
     @Query("SELECT * FROM bairro WHERE nome LIKE :nome LIMIT 1")
     Bairro encontrarPorNome(String nome);
 

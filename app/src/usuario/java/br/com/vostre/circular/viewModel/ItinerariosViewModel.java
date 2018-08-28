@@ -17,8 +17,10 @@ import com.google.android.gms.location.LocationServices;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import br.com.vostre.circular.model.Empresa;
@@ -33,6 +35,7 @@ import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
+import es.usc.citius.hipster.algorithm.Algorithm;
 import es.usc.citius.hipster.algorithm.Hipster;
 import es.usc.citius.hipster.graph.GraphBuilder;
 import es.usc.citius.hipster.graph.GraphSearchProblem;
@@ -60,7 +63,8 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
     public int escolhaAtual = 0; // 0 partida - 1 destino
 
-    public LiveData<List<ItinerarioPartidaDestino>> itinerarios;
+    public List<ItinerarioPartidaDestino> itinerarios;
+    public MutableLiveData<List<ItinerarioPartidaDestino>> resultadosItinerarios;
 
     public CidadeEstado getCidadePartida() {
         return cidadePartida;
@@ -124,34 +128,90 @@ public class ItinerariosViewModel extends AndroidViewModel {
         bairroDestino = appDatabase.bairroDAO().carregar(null);
         bairros = appDatabase.bairroDAO().listarTodosComCidadePorCidade(null);
         itinerarioResultado = appDatabase.itinerarioDAO().carregar("");
-        this.itinerarios = appDatabase.itinerarioDAO().listarTodosAtivos();
+        resultadosItinerarios = new MutableLiveData<>();
     }
 
     public void carregaResultado(String hora, String dia){
 
-        BairroCidade partida = bairroPartida.getValue();
-        BairroCidade destino = bairroDestino.getValue();
+        final BairroCidade partida = bairroPartida.getValue();
+        final BairroCidade destino = bairroDestino.getValue();
 
-        GraphBuilder<String, Double> builder = GraphBuilder.create();
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                GraphBuilder<String, Double> builder = GraphBuilder.create();
 
-        List<ItinerarioPartidaDestino> iti = itinerarios.getValue();
+                itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosSync();
 
-        for(ItinerarioPartidaDestino i : iti){
-            builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(i.getItinerario().getDistancia());
-        }
+                for(ItinerarioPartidaDestino i : itinerarios){
+                    builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(i.getItinerario().getDistancia());
+                }
 
-        HipsterDirectedGraph<String,Double> graph = builder.createDirectedGraph();
+                HipsterDirectedGraph<String,Double> graph = builder.createDirectedGraph();
 
-// Create the search problem. For graph problems, just use
-// the GraphSearchProblem util class to generate the problem with ease.
-        SearchProblem p = GraphSearchProblem
-                .startingFrom(partida.getBairro().getId())
-                .in(graph)
-                .takeCostsFromEdges()
-                .build();
+                SearchProblem p = GraphSearchProblem
+                        .startingFrom(partida.getBairro().getId())
+                        .in(graph)
+                        .takeCostsFromEdges()
+                        .build();
 
-// Search the shortest path from "A" to "F"
-        System.out.println("DIJ >>> "+Hipster.createDijkstra(p).search(destino.getBairro().getId()));
+                Algorithm.SearchResult result = Hipster.createDijkstra(p).search(destino.getBairro().getId());
+
+                System.out.println("DIJ >>> "+result);
+
+                List<List> caminhos = result.getOptimalPaths();
+
+                for(List<List> caminho : caminhos){
+                    int cont = caminho.size();
+                    List<BairroCidade> passos = new ArrayList<>();
+
+                    for(int i = 0; i < cont; i++){
+
+                        BairroCidade bairro = appDatabase.bairroDAO().carregarSync(String.valueOf(caminho.get(i)));
+
+                        passos.add(bairro);
+                    }
+
+                    BairroCidade bairroAnterior = null;
+                    ItinerarioPartidaDestino itinerarioAnterior = null;
+                    List<ItinerarioPartidaDestino> itinerarios = new ArrayList<>();
+
+                    for(BairroCidade b : passos){
+
+                        if(bairroAnterior != null){
+
+                            String hora = "";
+
+                            if(itinerarioAnterior != null){
+                                String proximoHorario = itinerarioAnterior.getProximoHorario();
+                                String tempo = DateTimeFormat.forPattern("HH:mm").print(itinerarioAnterior.getItinerario().getTempo().getMillis());
+
+                                String soma = DateTimeFormat.forPattern("HH:mm").print(DateTime.parse(proximoHorario));
+
+                                System.out.println("AAA");
+                            } else{
+                                hora = "00:00";//DateTimeFormat.forPattern("HH:mm:00").print(DateTime.now());
+                            }
+
+                            ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO().carregarPorPartidaEDestinoComHorarioSync(bairroAnterior.getBairro().getId(), b.getBairro().getId(), hora);
+                            itinerarioAnterior = itinerario;
+
+                            itinerarios.add(itinerario);
+                            bairroAnterior = b;
+                        } else{
+                            bairroAnterior = b;
+                        }
+
+                    }
+
+                    resultadosItinerarios.postValue(itinerarios);
+                    System.out.println("ITI >>> "+itinerarios.size());
+
+                }
+            }
+        });
+
+
 
         itinerario = appDatabase.horarioItinerarioDAO()
                 .carregarProximoPorPartidaEDestino(partida.getBairro().getId(),

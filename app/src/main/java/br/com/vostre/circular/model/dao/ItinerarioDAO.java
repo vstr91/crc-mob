@@ -160,7 +160,7 @@ public interface ItinerarioDAO {
             "AND p.bairro = :idDestino AND pi.ordem > 1) LIMIT 1")
     ItinerarioPartidaDestino carregarPorPartidaEDestinoSync(String idPartida, String idDestino);
 
-    @Query("SELECT i.*, " +
+    @Query("SELECT i.*, e.nome AS 'nomeEmpresa', " +
             "(SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
             "FROM horario_itinerario hi INNER JOIN " +
             "horario h ON h.id = hi.horario " +
@@ -184,7 +184,7 @@ public interface ItinerarioDAO {
             "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
             "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
             ") AS 'cidadeDestino' " +
-            "FROM itinerario i WHERE i.id IN (SELECT pi.itinerario " +
+            "FROM itinerario i INNER JOIN empresa e ON e.id = i.empresa WHERE i.id IN (SELECT pi.itinerario " +
             "FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada WHERE itinerario IN " +
             "(SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada " +
             "WHERE p.bairro = :idPartida AND pi.ordem = 1) " +

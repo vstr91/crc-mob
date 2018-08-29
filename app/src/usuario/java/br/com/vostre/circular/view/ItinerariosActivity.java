@@ -28,6 +28,7 @@ import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.view.adapter.CidadeAdapter;
+import br.com.vostre.circular.view.adapter.ItinerarioResultadoAdapter;
 import br.com.vostre.circular.view.form.FormBairro;
 import br.com.vostre.circular.view.listener.ItemListener;
 import br.com.vostre.circular.view.listener.SelectListener;
@@ -42,6 +43,9 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     RecyclerView listCidadesDestino;
     CidadeAdapter adapterDestino;
+
+    RecyclerView listResultados;
+    ItinerarioResultadoAdapter adapterResultado;
 
     static AppCompatActivity ctx;
 
@@ -84,6 +88,10 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         adapterDestino.setListener(this);
 
         listCidadesDestino.setAdapter(adapterDestino);
+
+        listResultados = binding.listResultados;
+        adapterResultado = new ItinerarioResultadoAdapter(viewModel.resultadosItinerarios.getValue(), this);
+        listResultados.setAdapter(adapterResultado);
 
     }
 
@@ -131,7 +139,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         binding.cardViewPartida.setVisibility(View.GONE);
         binding.cardViewListPartida.setVisibility(View.VISIBLE);
         binding.cardViewDestino.setVisibility(View.GONE);
-        binding.cardViewResultado.setVisibility(View.GONE);
+        binding.listResultados.setVisibility(View.GONE);
         binding.btnInverter.setVisibility(View.GONE);
         binding.cardViewResultadoVazio.setVisibility(View.GONE);
         viewModel.escolhaAtual = 0;
@@ -141,7 +149,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     public void onClickBtnEditarDestino(View v){
         binding.cardViewDestino.setVisibility(View.GONE);
         binding.cardViewListDestino.setVisibility(View.VISIBLE);
-        binding.cardViewResultado.setVisibility(View.GONE);
+        binding.listResultados.setVisibility(View.GONE);
         binding.btnInverter.setVisibility(View.GONE);
         binding.cardViewResultadoVazio.setVisibility(View.GONE);
         viewModel.escolhaAtual = 1;
@@ -171,7 +179,20 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     Observer<List<ItinerarioPartidaDestino>> resultadoItinerarioObserver = new Observer<List<ItinerarioPartidaDestino>>() {
         @Override
         public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
-            System.out.println("ITI RES: "+itinerarios.size());
+
+            if(itinerarios != null){
+                binding.cardViewListDestino.setVisibility(View.GONE);
+                binding.listResultados.setVisibility(View.VISIBLE);
+                binding.cardViewResultadoVazio.setVisibility(View.GONE);
+                binding.btnInverter.setVisibility(View.VISIBLE);
+            } else{
+                binding.listResultados.setVisibility(View.GONE);
+                binding.cardViewResultadoVazio.setVisibility(View.VISIBLE);
+                binding.btnInverter.setVisibility(View.GONE);
+            }
+
+            adapterResultado.itinerarios = itinerarios;
+            adapterResultado.notifyDataSetChanged();
         }
     };
 
@@ -246,28 +267,28 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         @Override
         public void onChanged(HorarioItinerarioNome horario) {
 
-            if(horario != null && horario.getIdHorario() != null){
-
-                binding.cardViewListDestino.setVisibility(View.GONE);
-                binding.cardViewResultado.setVisibility(View.VISIBLE);
-                binding.cardViewResultadoVazio.setVisibility(View.GONE);
-                binding.btnInverter.setVisibility(View.VISIBLE);
-
-                binding.setHorario(horario);
-
-                exibeDados(horario);
-                viewModel.carregaHorarios(horario);
-                viewModel.horarioAnterior.observe(ctx, horarioAnteriorObserver);
-                viewModel.horarioSeguinte.observe(ctx, horarioSeguinteObserver);
-            } else if(!consultaDiaSeguinte){
-                consultaDiaSeguinte = true;
-                viewModel.carregaResultadoDiaSeguinte(diaSeguinte);
-                viewModel.itinerario.observe(ctx, itinerarioObserver);
-            } else{
-                binding.cardViewResultadoVazio.setVisibility(View.VISIBLE);
-            }
-
-            binding.executePendingBindings();
+//            if(horario != null && horario.getIdHorario() != null){
+//
+//                binding.cardViewListDestino.setVisibility(View.GONE);
+//                binding.listResultados.setVisibility(View.VISIBLE);
+//                binding.cardViewResultadoVazio.setVisibility(View.GONE);
+//                binding.btnInverter.setVisibility(View.VISIBLE);
+//
+//                binding.setHorario(horario);
+//
+//                exibeDados(horario);
+//                viewModel.carregaHorarios(horario);
+//                viewModel.horarioAnterior.observe(ctx, horarioAnteriorObserver);
+//                viewModel.horarioSeguinte.observe(ctx, horarioSeguinteObserver);
+//            } else if(!consultaDiaSeguinte){
+//                consultaDiaSeguinte = true;
+//                viewModel.carregaResultadoDiaSeguinte(diaSeguinte);
+//                viewModel.itinerario.observe(ctx, itinerarioObserver);
+//            } else{
+//                binding.cardViewResultadoVazio.setVisibility(View.VISIBLE);
+//            }
+//
+//            binding.executePendingBindings();
 
         }
     };
@@ -304,17 +325,15 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         @Override
         public void onChanged(ItinerarioPartidaDestino itinerario) {
 
-            if(itinerario != null){
-                System.out.println("HORARIO:: "+itinerario.getNomeBairroPartida()+" | "
-                        +itinerario.getNomeBairroDestino()+" || "+itinerario.getProximoHorario());
-
-                binding.setItinerario(itinerario);
-
-                exibeDadosResultado();
-                inversao = false;
-                viewModel.escolhaAtual = 0;
-                binding.executePendingBindings();
-            }
+//            if(itinerario != null){
+//
+//                binding.setItinerario(itinerario);
+//
+//                exibeDadosResultado();
+//                inversao = false;
+//                viewModel.escolhaAtual = 0;
+//                binding.executePendingBindings();
+//            }
 
         }
     };
@@ -412,12 +431,11 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     }
 
     public void exibeHorarioAnterior(HorarioItinerarioNome horario){
-        binding.textViewHorarioAnterior.setText(DateTimeFormat.forPattern("HH:mm").print(horario.getNomeHorario()));
+//        binding.textViewHorarioAnterior.setText(DateTimeFormat.forPattern("HH:mm").print(horario.getNomeHorario()));
     }
 
     public void exibeHorarioSeguinte(HorarioItinerarioNome horario){
-        binding.textViewHorarioSeguinte.setText(DateTimeFormat.forPattern("HH:mm").print(horario.getNomeHorario()));
-        binding.executePendingBindings();
+//        binding.textViewHorarioSeguinte.setText(DateTimeFormat.forPattern("HH:mm").print(horario.getNomeHorario()));
     }
 
     @BindingAdapter("app:horario")
@@ -461,13 +479,13 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     public void exibeDadosResultado(){
 
-        if(viewModel.itinerario.getValue().getHorarioItinerario().getObservacao() == null){
-            binding.textViewObservacao.setVisibility(View.GONE);
-        }
-
-        if(!viewModel.itinerarioResultado.getValue().getItinerario().getAcessivel()){
-            binding.imageView8.setVisibility(View.GONE);
-        }
+//        if(viewModel.itinerario.getValue().getHorarioItinerario().getObservacao() == null){
+//            binding.textViewObservacao.setVisibility(View.GONE);
+//        }
+//
+//        if(!viewModel.itinerarioResultado.getValue().getItinerario().getAcessivel()){
+//            binding.imageView8.setVisibility(View.GONE);
+//        }
 
         binding.btnInverter.setVisibility(View.VISIBLE);
         binding.cardViewResultadoVazio.setVisibility(View.GONE);

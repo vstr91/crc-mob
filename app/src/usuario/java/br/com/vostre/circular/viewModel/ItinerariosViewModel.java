@@ -16,8 +16,11 @@ import com.google.android.gms.location.LocationServices;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -182,13 +185,29 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                             String hora = "";
 
+                            PeriodFormatter parser =
+                                    new PeriodFormatterBuilder()
+                                            .appendHours().appendLiteral(":")
+                                            .appendMinutes().toFormatter();
+
+                            PeriodFormatter printer =
+                                    new PeriodFormatterBuilder()
+                                            .printZeroAlways().minimumPrintedDigits(2)
+                                            //.appendDays().appendLiteral(" dia(s) ")
+                                            .appendHours().appendLiteral(":")
+                                            .appendMinutes().toFormatter();
+
+                            Period period = Period.ZERO;
+
                             if(itinerarioAnterior != null){
                                 String proximoHorario = itinerarioAnterior.getProximoHorario();
                                 String tempo = DateTimeFormat.forPattern("HH:mm").print(itinerarioAnterior.getItinerario().getTempo().getMillis());
 
-                                String soma = DateTimeFormat.forPattern("HH:mm").print(DateTime.parse(proximoHorario));
+                                period = period.plus(parser.parsePeriod(proximoHorario));
+                                period = period.plus(parser.parsePeriod(tempo));
 
-                                System.out.println("AAA");
+                                hora = printer.print(period);
+
                             } else{
                                 hora = "00:00";//DateTimeFormat.forPattern("HH:mm:00").print(DateTime.now());
                             }

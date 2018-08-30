@@ -7,20 +7,25 @@ import android.view.View;
 import br.com.vostre.circular.databinding.LinhaItinerariosResultadoBinding;
 
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
+import br.com.vostre.circular.utils.DataHoraUtils;
+import br.com.vostre.circular.view.BaseActivity;
 import br.com.vostre.circular.view.DetalheItinerarioActivity;
+import br.com.vostre.circular.view.form.FormCalendario;
 
 public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
 
     private final LinhaItinerariosResultadoBinding binding;
     AppCompatActivity ctx;
+    BaseActivity parent;
 
-    public ItinerarioResultadoViewHolder(LinhaItinerariosResultadoBinding binding, AppCompatActivity context) {
+    public ItinerarioResultadoViewHolder(LinhaItinerariosResultadoBinding binding, AppCompatActivity context, BaseActivity parent) {
         super(binding.getRoot());
         this.binding = binding;
         this.ctx = context;
+        this.parent = parent;
     }
 
-    public void bind(final ItinerarioPartidaDestino itinerario, int ordem, boolean ocultaSeta) {
+    public void bind(final ItinerarioPartidaDestino itinerario, int ordem, boolean ocultaSeta, String dia, String hora) {
         binding.setItinerario(itinerario);
 
 //        if(!itinerario.getItinerario().getAcessivel()){
@@ -34,8 +39,18 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
 
         binding.textViewOrdem.setText(String.valueOf(ordem));
 
+        if(dia.equals("") || hora.equals("")){
+            dia = DataHoraUtils.getDiaAtualFormatado();
+            hora = DataHoraUtils.getHoraAtual();
+        }
+
+        binding.setDia(dia);
+        binding.setHora(hora);
+
         if(ocultaSeta){
             binding.imageView12.setVisibility(View.GONE);
+        } else{
+            binding.imageView12.setVisibility(View.VISIBLE);
         }
 
         //binding.circleView2.setImagem(null);
@@ -60,6 +75,19 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
 //
         binding.btnVerTodos.setOnClickListener(listener);
 //        binding.textViewNome.setOnClickListener(listener);
+
+        if(ordem == 1){
+            final View.OnClickListener listenerHora = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    FormCalendario formCalendario = new FormCalendario();
+                    formCalendario.setListener(parent);
+                    formCalendario.show(ctx.getSupportFragmentManager(), "formCalendario");
+                }
+            };
+
+            binding.linearLayoutHora.setOnClickListener(listenerHora);
+        }
 
         binding.executePendingBindings();
     }

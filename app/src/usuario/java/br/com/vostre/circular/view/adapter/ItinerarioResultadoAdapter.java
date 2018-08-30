@@ -10,6 +10,7 @@ import java.util.List;
 import br.com.vostre.circular.databinding.LinhaItinerariosBinding;
 import br.com.vostre.circular.databinding.LinhaItinerariosResultadoBinding;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
+import br.com.vostre.circular.view.BaseActivity;
 import br.com.vostre.circular.view.viewHolder.ItinerarioResultadoViewHolder;
 import br.com.vostre.circular.view.viewHolder.ItinerarioViewHolder;
 
@@ -17,10 +18,30 @@ public class ItinerarioResultadoAdapter extends RecyclerView.Adapter<ItinerarioR
 
     public List<ItinerarioPartidaDestino> itinerarios;
     AppCompatActivity ctx;
+    String dia;
+    String hora;
 
-    public ItinerarioResultadoAdapter(List<ItinerarioPartidaDestino> itinerarios, AppCompatActivity context){
+    public String getDia() {
+        return dia;
+    }
+
+    public void setDia(String dia) {
+        this.dia = dia;
+    }
+
+    public String getHora() {
+        return hora;
+    }
+
+    public void setHora(String hora) {
+        this.hora = hora;
+    }
+
+    public ItinerarioResultadoAdapter(List<ItinerarioPartidaDestino> itinerarios, AppCompatActivity context, String dia, String hora){
         this.itinerarios = itinerarios;
         ctx = context;
+        this.dia = dia;
+        this.hora = hora;
     }
 
     @Override
@@ -29,7 +50,7 @@ public class ItinerarioResultadoAdapter extends RecyclerView.Adapter<ItinerarioR
                 LayoutInflater.from(parent.getContext());
         LinhaItinerariosResultadoBinding itemBinding =
                 LinhaItinerariosResultadoBinding.inflate(layoutInflater, parent, false);
-        return new ItinerarioResultadoViewHolder(itemBinding, ctx);
+        return new ItinerarioResultadoViewHolder(itemBinding, ctx, (BaseActivity) ctx);
     }
 
     @Override
@@ -38,7 +59,7 @@ public class ItinerarioResultadoAdapter extends RecyclerView.Adapter<ItinerarioR
 
         boolean ocultaSeta = position+1 == itinerarios.size();
 
-        holder.bind(itinerario, position+1, ocultaSeta);
+        holder.bind(itinerario, position+1, ocultaSeta, dia, hora);
 
 
     }

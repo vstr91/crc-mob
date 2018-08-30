@@ -22,8 +22,12 @@ public interface CidadeDAO {
     @Query("SELECT * FROM cidade WHERE ativo = 1 ORDER BY nome")
     LiveData<List<Cidade>> listarTodosAtivos();
 
-    @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado FROM cidade c INNER JOIN estado e ON e.id = c.estado ORDER BY c.nome")
+    @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado FROM cidade c INNER JOIN estado e ON e.id = c.estado WHERE (SELECT COUNT(b.id) FROM bairro b WHERE b.cidade = c.id) > 0 ORDER BY c.nome")
     LiveData<List<CidadeEstado>> listarTodosAtivasComEstado();
+
+    @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado FROM cidade c INNER JOIN estado e ON e.id = c.estado WHERE (SELECT COUNT(b.id) FROM bairro b WHERE b.cidade = c.id AND b.id != :bairro) > 0 " +
+            "ORDER BY c.nome")
+    LiveData<List<CidadeEstado>> listarTodosAtivasComEstadoFiltro(String bairro);
 
     @Query("SELECT * FROM cidade WHERE enviado = 0")
     List<Cidade> listarTodosAEnviar();

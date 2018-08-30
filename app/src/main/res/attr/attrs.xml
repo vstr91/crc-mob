@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="DialView">
+        <attr name="fanOnColor" format="reference|color" />
+        <attr name="fanOffColor" format="reference|color" />
+        <attr name="indicatorColor" format="reference|color" />
+        <attr name="textColor" format="reference|color" />
+    </declare-styleable>
+    <declare-styleable name="CircleView">
+        <attr name="corArcoMaior" format="reference|color" />
+        <attr name="corArcoMenor" format="reference|color" />
+        <attr name="espessuraArcoMaior" format="reference|integer" />
+        <attr name="espessuraArcoMenor" format="reference|integer" />
+        <attr name="imagem" format="reference|integer" />
+    </declare-styleable>
+</resources>

@@ -18,6 +18,7 @@ import org.joda.time.DateTimeFieldType;
 import org.joda.time.format.DateTimeFormat;
 
 import java.io.File;
+import java.util.Calendar;
 import java.util.List;
 
 import br.com.vostre.circleview.CircleView;
@@ -27,14 +28,16 @@ import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
+import br.com.vostre.circular.utils.DataHoraUtils;
 import br.com.vostre.circular.view.adapter.CidadeAdapter;
 import br.com.vostre.circular.view.adapter.ItinerarioResultadoAdapter;
 import br.com.vostre.circular.view.form.FormBairro;
+import br.com.vostre.circular.view.listener.HoraListener;
 import br.com.vostre.circular.view.listener.ItemListener;
 import br.com.vostre.circular.view.listener.SelectListener;
 import br.com.vostre.circular.viewModel.ItinerariosViewModel;
 
-public class ItinerariosActivity extends BaseActivity implements SelectListener, ItemListener {
+public class ItinerariosActivity extends BaseActivity implements SelectListener, ItemListener, HoraListener {
 
     ActivityItinerariosBinding binding;
 
@@ -90,7 +93,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         listCidadesDestino.setAdapter(adapterDestino);
 
         listResultados = binding.listResultados;
-        adapterResultado = new ItinerarioResultadoAdapter(viewModel.resultadosItinerarios.getValue(), this);
+        adapterResultado = new ItinerarioResultadoAdapter(viewModel.resultadosItinerarios.getValue(), this, "", "");
         listResultados.setAdapter(adapterResultado);
 
     }
@@ -142,6 +145,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         binding.listResultados.setVisibility(View.GONE);
         binding.btnInverter.setVisibility(View.GONE);
         binding.cardViewResultadoVazio.setVisibility(View.GONE);
+        binding.textViewResultado.setVisibility(View.GONE);
+        binding.textViewSubResultado.setVisibility(View.GONE);
         viewModel.escolhaAtual = 0;
         consultaDiaSeguinte = false;
     }
@@ -152,6 +157,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         binding.listResultados.setVisibility(View.GONE);
         binding.btnInverter.setVisibility(View.GONE);
         binding.cardViewResultadoVazio.setVisibility(View.GONE);
+        binding.textViewResultado.setVisibility(View.GONE);
+        binding.textViewSubResultado.setVisibility(View.GONE);
         viewModel.escolhaAtual = 1;
         consultaDiaSeguinte = false;
     }
@@ -180,18 +187,31 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         @Override
         public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
 
-            if(itinerarios != null){
+            if(itinerarios != null && itinerarios.size() > 0 && itinerarios.get(itinerarios.size()-1).getIdBairroDestino().equals(bairroDestino.getBairro().getId())){
                 binding.cardViewListDestino.setVisibility(View.GONE);
                 binding.listResultados.setVisibility(View.VISIBLE);
                 binding.cardViewResultadoVazio.setVisibility(View.GONE);
                 binding.btnInverter.setVisibility(View.VISIBLE);
+                binding.textViewResultado.setVisibility(View.VISIBLE);
+
+                if(itinerarios.size() == 1){
+                    binding.textViewSubResultado.setVisibility(View.GONE);
+                } else{
+                    binding.textViewSubResultado.setVisibility(View.VISIBLE);
+                }
+
+                adapterResultado.itinerarios = itinerarios;
+
             } else{
                 binding.listResultados.setVisibility(View.GONE);
                 binding.cardViewResultadoVazio.setVisibility(View.VISIBLE);
                 binding.btnInverter.setVisibility(View.GONE);
+                binding.textViewResultado.setVisibility(View.GONE);
+                binding.textViewSubResultado.setVisibility(View.GONE);
+
+                adapterResultado.itinerarios = null;
             }
 
-            adapterResultado.itinerarios = itinerarios;
             adapterResultado.notifyDataSetChanged();
         }
     };
@@ -373,47 +393,10 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         return null;
     }
 
-    private String getDiaAtual(){
-        DateTime dateTime = new DateTime();
-
-        switch(dateTime.get(DateTimeFieldType.dayOfWeek())){
-            case 0:
-                dia = "domingo";
-                diaSeguinte = "segunda";
-                break;
-            case 1:
-                dia = "segunda";
-                diaSeguinte = "terca";
-                break;
-            case 2:
-                dia = "terca";
-                diaSeguinte = "quarta";
-                break;
-            case 3:
-                dia = "quarta";
-                diaSeguinte = "quinta";
-                break;
-            case 4:
-                dia = "quinta";
-                diaSeguinte = "sexta";
-                break;
-            case 5:
-                dia = "sexta";
-                diaSeguinte = "sabado";
-                break;
-            case 6:
-                dia = "sabado";
-                diaSeguinte = "domingo";
-                break;
-        }
-
-        return dia;
-    }
-
     private void mostraResultado(){
 
         DateTime dateTime = new DateTime();
-        String dia = getDiaAtual();
+        String dia = DataHoraUtils.getDiaAtual();
 
         viewModel.escolhaAtual = 0;
 
@@ -492,4 +475,16 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     }
 
+    @Override
+    public void onDataHoraSelected(Calendar data) {
+        String dia = DataHoraUtils.getDiaAtual();
+
+        viewModel.escolhaAtual = 0;
+
+        String hora = DateTimeFormat.forPattern("HH:mm:00").print(data.getTimeInMillis());
+
+        viewModel.carregaResultado(hora, dia);
+        adapterResultado.setDia(DataHoraUtils.getDiaSelecionadoFormatado(data));
+        adapterResultado.setHora(DateTimeFormat.forPattern("HH:mm").print(data.getTimeInMillis()));
+    }
 }

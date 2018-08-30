@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import br.com.vostre.circular.R;
@@ -46,13 +47,14 @@ import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.utils.ToolbarUtils;
+import br.com.vostre.circular.view.listener.HoraListener;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
 import br.com.vostre.circular.databinding.DrawerHeaderBinding;
 
 import static br.com.vostre.circular.utils.ToolbarUtils.PICK_FILE;
 
-public class BaseActivity extends AppCompatActivity implements View.OnClickListener {
+public class BaseActivity extends AppCompatActivity implements View.OnClickListener, HoraListener {
 
     public Toolbar toolbar;
     Menu menu;
@@ -515,4 +517,8 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    public void onDataHoraSelected(Calendar data) {
+
+    }
 }

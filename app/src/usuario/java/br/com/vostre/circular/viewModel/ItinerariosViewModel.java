@@ -84,7 +84,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
     public void setCidadeDestino(CidadeEstado cidadeDestino) {
         this.cidadeDestino = cidadeDestino;
-        bairros = appDatabase.bairroDAO().listarTodosComCidadePorCidade(cidadeDestino.getCidade().getId());
+        bairros = appDatabase.bairroDAO().listarTodosComCidadePorCidadeFiltro(cidadeDestino.getCidade().getId(), bairroPartida.getValue().getBairro().getId());
     }
 
     public LiveData<BairroCidade> getBairroDestino() {
@@ -101,7 +101,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
     public void setBairroPartida(BairroCidade umBairroPartida) {
         this.bairroPartida = appDatabase.bairroDAO().carregar(umBairroPartida.getBairro().getId());
-        //this.cidadesDestino = appDatabase.cidadeDAO().listarTodosAtivasComEstado();//appDatabase.itinerarioDAO().carregarDestinosPorPartida(umBairroPartida.getBairro().getId());
+        this.cidadesDestino = appDatabase.cidadeDAO().listarTodosAtivasComEstadoFiltro(umBairroPartida.getBairro().getId());
     }
 
     public LiveData<HorarioItinerarioNome> getItinerario() {
@@ -134,7 +134,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
         resultadosItinerarios = new MutableLiveData<>();
     }
 
-    public void carregaResultado(String hora, String dia){
+    public void carregaResultado(final String horaEscolhida, String dia){
 
         final BairroCidade partida = bairroPartida.getValue();
         final BairroCidade destino = bairroDestino.getValue();
@@ -159,8 +159,6 @@ public class ItinerariosViewModel extends AndroidViewModel {
                         .build();
 
                 Algorithm.SearchResult result = Hipster.createDijkstra(p).search(destino.getBairro().getId());
-
-                System.out.println("DIJ >>> "+result);
 
                 List<List> caminhos = result.getOptimalPaths();
 
@@ -209,14 +207,19 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                 hora = printer.print(period);
 
                             } else{
-                                hora = "00:00";//DateTimeFormat.forPattern("HH:mm:00").print(DateTime.now());
+                                hora = horaEscolhida;//"00:00";//DateTimeFormat.forPattern("HH:mm:00").print(DateTime.now());
                             }
 
                             ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO().carregarPorPartidaEDestinoComHorarioSync(bairroAnterior.getBairro().getId(), b.getBairro().getId(), hora);
-                            itinerarioAnterior = itinerario;
 
-                            itinerarios.add(itinerario);
-                            bairroAnterior = b;
+                            if(itinerario.getProximoHorario() != null){
+                                itinerarioAnterior = itinerario;
+
+                                itinerarios.add(itinerario);
+                                bairroAnterior = b;
+                            }
+
+
                         } else{
                             bairroAnterior = b;
                         }

@@ -167,7 +167,6 @@
                     android:id="@+id/linearLayoutOrdem"
                     android:layout_width="80dp"
                     android:layout_height="0dp"
-                    android:layout_marginBottom="8dp"
                     android:layout_marginLeft="16dp"
                     android:layout_marginStart="16dp"
                     android:background="@drawable/dia_rounded_corner"

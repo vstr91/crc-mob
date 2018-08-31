@@ -21,6 +21,9 @@ public class ItinerarioPartidaDestino {
     @ColumnInfo(name = "idBairroPartida")
     String idBairroPartida;
 
+    @ColumnInfo(name = "idPartida")
+    String idPartida;
+
     @ColumnInfo(name = "nomePartida")
     String nomePartida;
 
@@ -47,6 +50,14 @@ public class ItinerarioPartidaDestino {
 
     @ColumnInfo(name = "proximoHorario")
     String proximoHorario;
+
+    public String getIdPartida() {
+        return idPartida;
+    }
+
+    public void setIdPartida(String idPartida) {
+        this.idPartida = idPartida;
+    }
 
     public String getIdBairroPartida() {
         return idBairroPartida;

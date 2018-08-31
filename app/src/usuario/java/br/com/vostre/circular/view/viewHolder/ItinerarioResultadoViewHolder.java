@@ -10,6 +10,7 @@ import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.utils.DataHoraUtils;
 import br.com.vostre.circular.view.BaseActivity;
 import br.com.vostre.circular.view.DetalheItinerarioActivity;
+import br.com.vostre.circular.view.DetalheParadaActivity;
 import br.com.vostre.circular.view.form.FormCalendario;
 
 public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
@@ -88,6 +89,17 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
 
             binding.linearLayoutHora.setOnClickListener(listenerHora);
         }
+
+        final View.OnClickListener listenerParada = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(ctx, DetalheParadaActivity.class);
+                i.putExtra("parada", itinerario.getIdPartida());
+                ctx.startActivity(i);
+            }
+        };
+//
+        binding.textViewParada.setOnClickListener(listenerParada);
 
         binding.executePendingBindings();
     }

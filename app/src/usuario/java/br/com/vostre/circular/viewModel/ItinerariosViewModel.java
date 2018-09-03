@@ -134,7 +134,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
         resultadosItinerarios = new MutableLiveData<>();
     }
 
-    public void carregaResultado(final String horaEscolhida, String dia){
+    public void carregaResultado(final String horaEscolhida, final String dia){
 
         final BairroCidade partida = bairroPartida.getValue();
         final BairroCidade destino = bairroDestino.getValue();
@@ -210,9 +210,30 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                 hora = horaEscolhida;//"00:00";//DateTimeFormat.forPattern("HH:mm:00").print(DateTime.now());
                             }
 
-                            ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO().carregarPorPartidaEDestinoComHorarioSync(bairroAnterior.getBairro().getId(), b.getBairro().getId(), hora);
+                            ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO()
+                                    .carregarPorPartidaEDestinoComHorarioSync(bairroAnterior.getBairro().getId(),
+                                            b.getBairro().getId(), hora, dia);
 
                             if(itinerario.getProximoHorario() != null){
+
+                                if(itinerario.getIdHorarioAnterior() != null){
+                                    String obsHorarioAnterior = appDatabase.horarioItinerarioDAO()
+                                            .carregarObservacaoPorHorario(itinerario.getIdHorarioAnterior(), itinerario.getItinerario().getId());
+                                    itinerario.setObservacaoHorarioAnterior(obsHorarioAnterior);
+                                }
+
+                                if(itinerario.getIdHorarioSeguinte() != null){
+                                    String obsHorarioSeguinte = appDatabase.horarioItinerarioDAO()
+                                            .carregarObservacaoPorHorario(itinerario.getIdHorarioSeguinte(), itinerario.getItinerario().getId());
+                                    itinerario.setObservacaoHorarioSeguinte(obsHorarioSeguinte);
+                                }
+
+                                if(itinerario.getIdProximoHorario() != null){
+                                    String obsProximoHorario = appDatabase.horarioItinerarioDAO()
+                                            .carregarObservacaoPorHorario(itinerario.getIdProximoHorario(), itinerario.getItinerario().getId());
+                                    itinerario.setObservacaoProximoHorario(obsProximoHorario);
+                                }
+
                                 itinerarioAnterior = itinerario;
 
                                 itinerarios.add(itinerario);

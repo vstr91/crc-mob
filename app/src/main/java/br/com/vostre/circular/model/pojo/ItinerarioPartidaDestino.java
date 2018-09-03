@@ -51,6 +51,94 @@ public class ItinerarioPartidaDestino {
     @ColumnInfo(name = "proximoHorario")
     String proximoHorario;
 
+    @ColumnInfo(name = "idProximoHorario")
+    String idProximoHorario;
+
+    @ColumnInfo(name = "observacaoProximoHorario")
+    String observacaoProximoHorario;
+
+    @ColumnInfo(name = "horarioAnterior")
+    String horarioAnterior;
+
+    @ColumnInfo(name = "idHorarioAnterior")
+    String idHorarioAnterior;
+
+    @ColumnInfo(name = "observacaoHorarioAnterior")
+    String observacaoHorarioAnterior;
+
+    @ColumnInfo(name = "horarioSeguinte")
+    String horarioSeguinte;
+
+    @ColumnInfo(name = "idHorarioSeguinte")
+    String idHorarioSeguinte;
+
+    @ColumnInfo(name = "observacaoHorarioSeguinte")
+    String observacaoHorarioSeguinte;
+
+    public String getObservacaoProximoHorario() {
+        return observacaoProximoHorario;
+    }
+
+    public void setObservacaoProximoHorario(String observacaoProximoHorario) {
+        this.observacaoProximoHorario = observacaoProximoHorario;
+    }
+
+    public String getObservacaoHorarioAnterior() {
+        return observacaoHorarioAnterior;
+    }
+
+    public void setObservacaoHorarioAnterior(String observacaoHorarioAnterior) {
+        this.observacaoHorarioAnterior = observacaoHorarioAnterior;
+    }
+
+    public String getObservacaoHorarioSeguinte() {
+        return observacaoHorarioSeguinte;
+    }
+
+    public void setObservacaoHorarioSeguinte(String observacaoHorarioSeguinte) {
+        this.observacaoHorarioSeguinte = observacaoHorarioSeguinte;
+    }
+
+    public String getIdProximoHorario() {
+        return idProximoHorario;
+    }
+
+    public void setIdProximoHorario(String idProximoHorario) {
+        this.idProximoHorario = idProximoHorario;
+    }
+
+    public String getHorarioAnterior() {
+        return horarioAnterior;
+    }
+
+    public void setHorarioAnterior(String horarioAnterior) {
+        this.horarioAnterior = horarioAnterior;
+    }
+
+    public String getIdHorarioAnterior() {
+        return idHorarioAnterior;
+    }
+
+    public void setIdHorarioAnterior(String idHorarioAnterior) {
+        this.idHorarioAnterior = idHorarioAnterior;
+    }
+
+    public String getHorarioSeguinte() {
+        return horarioSeguinte;
+    }
+
+    public void setHorarioSeguinte(String horarioSeguinte) {
+        this.horarioSeguinte = horarioSeguinte;
+    }
+
+    public String getIdHorarioSeguinte() {
+        return idHorarioSeguinte;
+    }
+
+    public void setIdHorarioSeguinte(String idHorarioSeguinte) {
+        this.idHorarioSeguinte = idHorarioSeguinte;
+    }
+
     public String getIdPartida() {
         return idPartida;
     }

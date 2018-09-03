@@ -13,7 +13,38 @@ public class DataHoraUtils {
         String dia = "";
 
         switch(dateTime.get(DateTimeFieldType.dayOfWeek())){
-            case 0:
+            case 7:
+                dia = "domingo";
+                break;
+            case 1:
+                dia = "segunda";
+                break;
+            case 2:
+                dia = "terca";
+                break;
+            case 3:
+                dia = "quarta";
+                break;
+            case 4:
+                dia = "quinta";
+                break;
+            case 5:
+                dia = "sexta";
+                break;
+            case 6:
+                dia = "sabado";
+                break;
+        }
+
+        return dia;
+    }
+
+    public static String getDiaSelecionado(Calendar data){
+        DateTime dateTime = new DateTime(data);
+        String dia = "";
+
+        switch(dateTime.get(DateTimeFieldType.dayOfWeek())){
+            case 7:
                 dia = "domingo";
                 break;
             case 1:
@@ -44,7 +75,7 @@ public class DataHoraUtils {
         String diaSeguinte = "";
 
         switch(dateTime.get(DateTimeFieldType.dayOfWeek())){
-            case 0:
+            case 7:
                 diaSeguinte = "segunda";
                 break;
             case 1:
@@ -73,9 +104,10 @@ public class DataHoraUtils {
     public static String getDiaAtualFormatado(){
         DateTime dateTime = new DateTime();
         String dia = "";
+        int a = dateTime.get(DateTimeFieldType.dayOfWeek());
 
         switch(dateTime.get(DateTimeFieldType.dayOfWeek())){
-            case 0:
+            case 7:
                 dia = "Domingo";
                 break;
             case 1:
@@ -106,7 +138,7 @@ public class DataHoraUtils {
         String dia = "";
 
         switch(dateTime.get(DateTimeFieldType.dayOfWeek())){
-            case 0:
+            case 7:
                 dia = "Domingo";
                 break;
             case 1:

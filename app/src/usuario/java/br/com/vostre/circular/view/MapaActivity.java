@@ -12,6 +12,7 @@ import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.DrawableWrapper;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -256,6 +257,7 @@ public class MapaActivity extends BaseActivity {
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                 m.setTitle(p.getParada().getNome());
                 m.setDraggable(true);
+                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker_default));
                 m.setId(p.getParada().getId());
                 m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                     @Override

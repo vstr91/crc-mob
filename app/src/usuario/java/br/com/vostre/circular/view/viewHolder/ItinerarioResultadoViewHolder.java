@@ -33,9 +33,30 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
 //            binding.imageView12.setVisibility(View.GONE);
 //        }
 
-        if(itinerario.getItinerario().getObservacao() == null || (itinerario.getItinerario().getObservacao().isEmpty() ||
-                itinerario.getItinerario().getObservacao().equals("null") || itinerario.getItinerario().getObservacao().equals(""))){
+//        if(itinerario.getItinerario().getObservacao() == null || (itinerario.getItinerario().getObservacao().isEmpty() ||
+//                itinerario.getItinerario().getObservacao().equals("null") || itinerario.getItinerario().getObservacao().equals(""))){
+//            binding.textViewObservacao.setVisibility(View.GONE);
+//        }
+
+        if(itinerario.getObservacaoProximoHorario() == null || (itinerario.getObservacaoProximoHorario().isEmpty() ||
+                itinerario.getObservacaoProximoHorario().equals("null") || itinerario.getObservacaoProximoHorario().equals(""))){
             binding.textViewObservacao.setVisibility(View.GONE);
+        } else{
+            binding.textViewObservacao.setVisibility(View.VISIBLE);
+        }
+
+        if(itinerario.getObservacaoHorarioAnterior() == null || (itinerario.getObservacaoHorarioAnterior().isEmpty() ||
+                itinerario.getObservacaoHorarioAnterior().equals("null") || itinerario.getObservacaoHorarioAnterior().equals(""))){
+            binding.textViewObervacaoAnterior.setVisibility(View.GONE);
+        } else{
+            binding.textViewObervacaoAnterior.setVisibility(View.VISIBLE);
+        }
+
+        if(itinerario.getObservacaoHorarioSeguinte() == null || (itinerario.getObservacaoHorarioSeguinte().isEmpty() ||
+                itinerario.getObservacaoHorarioSeguinte().equals("null") || itinerario.getObservacaoHorarioSeguinte().equals(""))){
+            binding.textViewObervacaoSeguinte.setVisibility(View.GONE);
+        } else{
+            binding.textViewObervacaoSeguinte.setVisibility(View.VISIBLE);
         }
 
         binding.textViewOrdem.setText(String.valueOf(ordem));

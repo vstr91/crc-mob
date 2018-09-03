@@ -483,7 +483,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
         String hora = DateTimeFormat.forPattern("HH:mm:00").print(data.getTimeInMillis());
 
-        viewModel.carregaResultado(hora, dia);
+        viewModel.carregaResultado(hora, DataHoraUtils.getDiaSelecionado(data));
         adapterResultado.setDia(DataHoraUtils.getDiaSelecionadoFormatado(data));
         adapterResultado.setHora(DateTimeFormat.forPattern("HH:mm").print(data.getTimeInMillis()));
     }

@@ -129,7 +129,7 @@
 
                 <LinearLayout
                     android:id="@+id/linearLayoutHora"
-                    android:layout_width="80dp"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
                     android:layout_marginRight="16dp"
@@ -143,6 +143,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
+                        android:paddingLeft="2dp"
+                        android:paddingRight="2dp"
                         android:paddingTop="2dp"
                         android:text="@{dia}"
                         android:textAppearance="@style/texto_branco"
@@ -165,7 +167,7 @@
 
                 <LinearLayout
                     android:id="@+id/linearLayoutOrdem"
-                    android:layout_width="80dp"
+                    android:layout_width="100dp"
                     android:layout_height="0dp"
                     android:layout_marginLeft="16dp"
                     android:layout_marginStart="16dp"

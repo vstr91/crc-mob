@@ -1,11 +1,14 @@
 package br.com.vostre.circular.model.dao;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.persistence.db.SimpleSQLiteQuery;
+import android.arch.persistence.db.SupportSQLiteQuery;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.RawQuery;
 import android.arch.persistence.room.Transaction;
 import android.arch.persistence.room.Update;
 
@@ -160,94 +163,8 @@ public interface ItinerarioDAO {
             "AND p.bairro = :idDestino AND pi.ordem > 1) LIMIT 1")
     ItinerarioPartidaDestino carregarPorPartidaEDestinoSync(String idPartida, String idDestino);
 
-    @Query("SELECT i.*, e.nome AS 'nomeEmpresa', IFNULL(( SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-			"FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario " +
-			"WHERE hi.ativo = 1 AND itinerario = i.id AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= :hora " +
-			"ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1), " +
-			"( SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) FROM horario_itinerario hi INNER JOIN " +
-			"horario h ON h.id = hi.horario WHERE hi.ativo = 1 AND itinerario = i.id ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') " +
-            "LIMIT 1 ) ) " +
-			"AS 'proximoHorario', IFNULL( ( SELECT h.id FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario " +
-			"WHERE hi.ativo = 1 AND itinerario = i.id AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= :hora " +
-			"ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ), " +
-			"( SELECT h.id FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario " +
-            "WHERE hi.ativo = 1 AND itinerario = i.id " +
-			"ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ) ) AS 'idProximoHorario', " +
-			"IFNULL( ( SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) FROM horario_itinerario hi INNER JOIN " +
-			"horario h ON h.id = hi.horario WHERE hi.ativo = 1 AND itinerario = i.id " +
-            "AND TIME(h.nome/1000, 'unixepoch', 'localtime') AND :dia = 1 < " +
-			"( SELECT strftime('%H:%M:%S', TIME(h.nome/1000, 'unixepoch', 'localtime')) FROM horario_itinerario hi INNER JOIN " +
-			"horario h ON h.id = hi.horario WHERE hi.ativo = 1 AND itinerario = i.id " +
-            "AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= :hora AND :dia = 1 " +
-			"ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ) ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') " +
-			"DESC LIMIT 1 ), ( SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-			"FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario WHERE hi.ativo = 1 AND itinerario = i.id " +
-			"ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') DESC LIMIT 1 ) ) AS 'horarioAnterior', " +
-			"IFNULL( ( SELECT h.id FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario " +
-            "WHERE hi.ativo = 1 AND itinerario = i.id " +
-			"AND TIME(h.nome/1000, 'unixepoch', 'localtime') < " +
-            "( SELECT strftime('%H:%M:%S', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-			"FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario WHERE hi.ativo = 1 AND itinerario = i.id " +
-			"AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= :hora AND :dia = 1 ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ) " +
-			"ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') DESC LIMIT 1 ), " +
-			"( SELECT h.id FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario WHERE hi.ativo = 1 " +
-            "AND itinerario = i.id " +
-			"ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') DESC LIMIT 1 ) ) AS 'idHorarioAnterior', " +
-			"IFNULL( ( SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) FROM horario_itinerario hi INNER JOIN " +
-			"horario h ON h.id = hi.horario WHERE hi.ativo = 1 AND itinerario = i.id " +
-            "AND TIME(h.nome/1000, 'unixepoch', 'localtime') > " +
-			"( SELECT strftime('%H:%M:%S', TIME(h.nome/1000, 'unixepoch', 'localtime')) FROM horario_itinerario hi INNER JOIN " +
-			"horario h ON h.id = hi.horario WHERE hi.ativo = 1 AND  itinerario = i.id " +
-            "AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= :hora AND :dia = 1 " +
-			"ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ) " +
-			"ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ), " +
-			"( SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) FROM horario_itinerario hi INNER JOIN " +
-			"horario h ON h.id = hi.horario WHERE hi.ativo = 1 AND itinerario = i.id AND :dia = 1 " +
-			"ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ) ) AS 'horarioSeguinte', " +
-			"IFNULL( ( SELECT h.id FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario " +
-            "WHERE hi.ativo = 1 AND itinerario = i.id " +
-			"AND TIME(h.nome/1000, 'unixepoch', 'localtime') > " +
-            "( SELECT strftime('%H:%M:%S', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-			"FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario " +
-			"WHERE hi.ativo = 1 AND itinerario = i.id AND TIME(h.nome/1000, 'unixepoch', 'localtime') > :hora " +
-			"ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ) " +
-			"ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ), " +
-			"( SELECT h.id FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario WHERE hi.ativo = 1 " +
-            "AND itinerario = i.id " +
-			"AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= " +
-            "( SELECT strftime('%H:%M:%S', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-			"FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario WHERE hi.ativo = 1 AND itinerario = i.id " +
-            "AND :dia = 1 " +
-			"ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ) " +
-			"ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ) ) AS 'idHorarioSeguinte', " +
-			"( SELECT pp.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
-			"( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'idPartida', " +
-			"( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
-			"( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'nomePartida', " +
-			"( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
-			"( SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'nomeDestino', " +
-			"( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN bairro b ON b.id = pp.bairro " +
-			"WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-			"AND pi.itinerario = i.id ) AS 'idBairroPartida', " +
-			"( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN bairro b ON b.id = pp.bairro " +
-			"WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-			"AND pi.itinerario = i.id ) AS 'idBairroDestino', ( SELECT b.nome FROM parada_itinerario pi INNER JOIN " +
-			"parada pp ON pp.id = pi.parada INNER JOIN bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) " +
-			"FROM parada_itinerario WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'bairroPartida', " +
-			"( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN bairro b " +
-			"ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-			"AND pi.itinerario = i.id ) AS 'bairroDestino', ( SELECT c.nome FROM parada_itinerario pi INNER JOIN " +
-			"parada pp ON pp.id = pi.parada INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
-			"WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-			"AND pi.itinerario = i.id ) AS 'cidadePartida', ( SELECT c.nome FROM parada_itinerario pi INNER JOIN " +
-			"parada pp ON pp.id = pi.parada INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
-			"WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-			"WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'cidadeDestino' " +
-			"FROM itinerario i INNER JOIN empresa e ON e.id = i.empresa WHERE i.id IN ( SELECT pi.itinerario " +
-			"FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada WHERE itinerario IN ( SELECT pi.itinerario " +
-			"FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada " +
-			"WHERE p.bairro = :idPartida AND pi.ordem = 1 ) AND p.bairro = :idDestino AND pi.ordem > 1 ) LIMIT 1")
-    ItinerarioPartidaDestino carregarPorPartidaEDestinoComHorarioSync(String idPartida, String idDestino, String hora, String dia);
+    @RawQuery
+    ItinerarioPartidaDestino carregarPorPartidaEDestinoComHorarioSync(SupportSQLiteQuery query);
 
     @Query("SELECT DISTINCT c.*, e.id AS idEstado, e.nome AS nomeEstado " +
             "FROM itinerario i INNER JOIN parada_itinerario pit ON pit.itinerario = i.id INNER JOIN parada p ON p.id = pit.parada INNER JOIN " +

@@ -25,6 +25,9 @@ public interface ParametroInternoDAO {
     @Query("SELECT * FROM parametro_interno WHERE id = 1")
     ParametroInterno carregar();
 
+    @Query("SELECT * FROM parametro_interno WHERE id = 1")
+    LiveData<ParametroInterno> carregarInformacoes();
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserir(ParametroInterno parametro);
 

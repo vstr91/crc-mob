@@ -222,7 +222,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
         public void onChanged(List<ParadaBairro> paradas) {
             viewModel.atualizaPontoMapa();
 
-            viewModel.carregaDirections(map, paradas);
+            //viewModel.carregaDirections(map, paradas);
 
             atualizarParadasMapa(paradas);
 

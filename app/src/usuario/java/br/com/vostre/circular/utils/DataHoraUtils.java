@@ -101,6 +101,37 @@ public class DataHoraUtils {
         return diaSeguinte;
     }
 
+    public static String getDiaSeguinteSelecionado(Calendar data){
+        DateTime dateTime = new DateTime(data);
+        String diaSeguinte = "";
+
+        switch(dateTime.get(DateTimeFieldType.dayOfWeek())){
+            case 7:
+                diaSeguinte = "segunda";
+                break;
+            case 1:
+                diaSeguinte = "terca";
+                break;
+            case 2:
+                diaSeguinte = "quarta";
+                break;
+            case 3:
+                diaSeguinte = "quinta";
+                break;
+            case 4:
+                diaSeguinte = "sexta";
+                break;
+            case 5:
+                diaSeguinte = "sabado";
+                break;
+            case 6:
+                diaSeguinte = "domingo";
+                break;
+        }
+
+        return diaSeguinte;
+    }
+
     public static String getDiaAtualFormatado(){
         DateTime dateTime = new DateTime();
         String dia = "";

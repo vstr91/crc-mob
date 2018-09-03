@@ -18,6 +18,7 @@ import org.joda.time.DateTimeFieldType;
 import org.joda.time.format.DateTimeFormat;
 
 import java.io.File;
+import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.List;
 
@@ -180,6 +181,9 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
         mostraDadosBairroInversao(bairroPartida, 0);
         mostraDadosBairroInversao(bairroDestino, 1);
+
+        adapterResultado.setDia(DataHoraUtils.getDiaAtualFormatado());
+        adapterResultado.setHora(DataHoraUtils.getHoraAtual());
 
     }
 
@@ -397,10 +401,11 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
         DateTime dateTime = new DateTime();
         String dia = DataHoraUtils.getDiaAtual();
+        String diaSeguinte = DataHoraUtils.getDiaSeguinte();
 
         viewModel.escolhaAtual = 0;
 
-        viewModel.carregaResultado(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia);
+        viewModel.carregaResultado(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte);
 
         viewModel.itinerario.observe(this, itinerarioObserver);
 
@@ -446,7 +451,11 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     public static void setDistancia(TextView textView, Double d){
 
         if(d != null){
-            textView.setText(d.toString());
+
+            NumberFormat nf = NumberFormat.getNumberInstance();
+            nf.setMaximumFractionDigits(2);
+
+            textView.setText(nf.format(d)+" Km");
         }
 
     }
@@ -455,7 +464,11 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     public static void setTarifa(TextView textView, Double d){
 
         if(d != null){
-            textView.setText(d.toString());
+
+            NumberFormat nf = NumberFormat.getCurrencyInstance();
+            nf.setMaximumFractionDigits(2);
+
+            textView.setText(nf.format(d));
         }
 
     }
@@ -483,7 +496,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
         String hora = DateTimeFormat.forPattern("HH:mm:00").print(data.getTimeInMillis());
 
-        viewModel.carregaResultado(hora, DataHoraUtils.getDiaSelecionado(data));
+        viewModel.carregaResultado(hora, DataHoraUtils.getDiaSelecionado(data), DataHoraUtils.getDiaSeguinteSelecionado(data));
         adapterResultado.setDia(DataHoraUtils.getDiaSelecionadoFormatado(data));
         adapterResultado.setHora(DateTimeFormat.forPattern("HH:mm").print(data.getTimeInMillis()));
     }

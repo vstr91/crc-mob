@@ -76,6 +76,15 @@ public class HorarioItinerarioViewHolder extends RecyclerView.ViewHolder {
                         viewModel.editarHorario();
                     } else{
                         FormHorarioItinerario formHorario = new FormHorarioItinerario();
+
+                        horarioItinerario.getHorarioItinerario().setDomingo(true);
+                        horarioItinerario.getHorarioItinerario().setSegunda(true);
+                        horarioItinerario.getHorarioItinerario().setTerca(true);
+                        horarioItinerario.getHorarioItinerario().setQuarta(true);
+                        horarioItinerario.getHorarioItinerario().setQuinta(true);
+                        horarioItinerario.getHorarioItinerario().setSexta(true);
+                        horarioItinerario.getHorarioItinerario().setSabado(true);
+
                         formHorario.setHorario(horarioItinerario);
                         formHorario.setCtx(ctx.getApplication());
                         formHorario.flagInicioEdicao = true;

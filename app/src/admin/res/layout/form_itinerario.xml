@@ -17,6 +17,31 @@
         tools:context="br.com.vostre.circular.view.form.FormItinerario">
 
         <android.support.design.widget.TextInputLayout
+            android:id="@+id/textInputLayout6"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="10dp">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/editTextSigla"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Sigla"
+                android:text="@={viewModel.itinerario.sigla}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
             android:id="@+id/textInputLayout2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,18 +49,17 @@
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout6">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/editTextTarifa"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:digits="0123456789,."
                 android:ems="10"
                 android:hint="Tarifa"
-                android:digits="0123456789,."
                 android:inputType="numberDecimal|number"
                 android:text="@={viewModel.itinerario.tarifa}"
                 app:layout_constraintEnd_toEndOf="parent"

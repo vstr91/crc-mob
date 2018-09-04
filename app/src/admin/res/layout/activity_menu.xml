@@ -145,7 +145,7 @@
                     android:textAllCaps="false"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/btnEntrar"
+                    app:layout_constraintEnd_toStartOf="@+id/button6"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/button3" />
@@ -165,7 +165,7 @@
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/btnDetalhes"
+                    app:layout_constraintStart_toEndOf="@+id/button5"
                     app:layout_constraintTop_toBottomOf="@+id/button4" />
 
                 <Button
@@ -175,7 +175,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
                     android:onClick="@{view::onClickBtnPontosInteresse}"
                     android:text="Pontos Interesse"
                     android:textAllCaps="false"
@@ -184,7 +183,7 @@
                     app:layout_constraintEnd_toStartOf="@+id/button8"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/btnDetalhes" />
+                    app:layout_constraintTop_toBottomOf="@+id/button5" />
 
                 <Button
                     android:id="@+id/button8"
@@ -193,7 +192,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
                     android:onClick="@{view::onClickBtnEmpresas}"
                     android:text="Empresas"
                     android:textAllCaps="false"
@@ -202,7 +200,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/button7"
-                    app:layout_constraintTop_toBottomOf="@+id/btnEntrar" />
+                    app:layout_constraintTop_toBottomOf="@+id/button6" />
 
                 <Button
                     android:id="@+id/button9"

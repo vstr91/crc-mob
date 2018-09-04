@@ -70,6 +70,7 @@ public class HorarioItinerarioNome {
         this.getHorarioItinerario().setSabado(false);
         this.getHorarioItinerario().setObservacao(null);
         this.getHorarioItinerario().setProgramadoPara(null);
+        this.getHorarioItinerario().setAtivo(false);
     }
 
     @Override

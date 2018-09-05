@@ -42,6 +42,10 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
+    implementation('com.github.nisrulz:qreader:2.1.2') {
+        exclude module: 'com.google.android.gms:play-services-vision:11.4.2'
+    }
+
     implementation 'org.osmdroid:osmdroid-android:6.0.1'
     implementation 'com.github.MKergall:osmbonuspack:6.5.1'
     implementation 'com.karumi:dexter:4.2.0'
@@ -51,6 +55,7 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-location:15.0.1'
     implementation 'com.google.android.gms:play-services-auth:15.0.1'
+    implementation 'com.google.android.gms:play-services-vision:15.0.2'
 
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'

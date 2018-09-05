@@ -54,4 +54,14 @@ public class SobreActivity extends BaseActivity {
 
     }
 
+    @BindingAdapter("app:dataBaseDados")
+    public static void setDataBaseDados(TextView textView, DateTime l){
+
+        if(l != null){
+            textView.setText(DateTimeFormat.forPattern("MMMM/YY")
+                    .print(l));
+        }
+
+    }
+
 }

@@ -130,7 +130,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Janeiro/19"
+                    app:dataBaseDados="@{parametros.dataUltimoAcesso}"
                     android:textColor="@color/cinzaEscuro"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="@+id/textView39"

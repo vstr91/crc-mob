@@ -276,9 +276,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnQRCode(View v){
-//        Intent i = new Intent(getApplicationContext(), BairrosActivity.class);
-//        startActivity(i);
-        Toast.makeText(getApplicationContext(), "QR Code", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(getApplicationContext(), QRCodeActivity.class);
+        startActivity(i);
     }
 
     public void onClickBtnLogo(View v){

@@ -156,7 +156,7 @@ public class QRCodeActivity extends BaseActivity {
                         flag = false;
                     }
                 }, 2000);
-                
+
             }
 
         }

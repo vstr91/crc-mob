@@ -7,12 +7,14 @@ import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -27,6 +29,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Polyline;
 
+import java.net.URI;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -62,6 +65,8 @@ public class DetalheParadaActivity extends BaseActivity {
     boolean flagFavorito = false;
     String idParada;
 
+    Uri link = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_parada);
@@ -73,15 +78,31 @@ public class DetalheParadaActivity extends BaseActivity {
 
         ctx = this;
 
+        link = getIntent().getData();
+
         viewModel = ViewModelProviders.of(this).get(DetalhesParadaViewModel.class);
 
         binding.setViewModel(viewModel);
 
-        idParada = getIntent().getStringExtra("parada");
+        if(link != null){
 
-        viewModel.setParada(idParada);
+            String[] parametros = link.toString().split("\\/");
 
-        viewModel.parada.observe(this, paradaObserver);
+            String uf = parametros[5];
+            String local = parametros[6];
+            String bairro = parametros[7];
+            String slugParada = parametros[8];
+
+            viewModel.carregaParadaQRCode(uf, local, bairro, slugParada);
+
+            viewModel.parada.observe(this, paradaObserver);
+        } else{
+            idParada = getIntent().getStringExtra("parada");
+
+            viewModel.setParada(idParada);
+
+            viewModel.parada.observe(this, paradaObserver);
+        }
 
         listItinerarios = binding.listItinerarios;
         adapter = new ItinerarioAdapter(viewModel.itinerarios.getValue(), this);
@@ -110,6 +131,13 @@ public class DetalheParadaActivity extends BaseActivity {
 
         viewModel.itinerarios.observe(this, itinerariosObserver);
 
+        if(link == null){
+            checaFavorito();
+        }
+
+    }
+
+    private void checaFavorito() {
         List<String> lstParadas = PreferenceUtils.carregaParadasFavoritas(getApplicationContext());
 
         int i = lstParadas.indexOf(idParada);
@@ -121,7 +149,6 @@ public class DetalheParadaActivity extends BaseActivity {
             binding.imageButton4.setImageResource(R.drawable.ic_star_border_white_24dp);
             flagFavorito = false;
         }
-
     }
 
     public void onClickBtnMapa(View v){
@@ -227,6 +254,14 @@ public class DetalheParadaActivity extends BaseActivity {
 
                 viewModel.buscaPoisProximos(location);
                 viewModel.pois.observe(ctx, poisObserver);
+
+                if(link != null){
+                    viewModel.carregarDadosVinculadosQRCode(parada.getParada().getId());
+                    viewModel.itinerarios.observe(ctx, itinerariosObserver);
+                    idParada = parada.getParada().getId();
+                    checaFavorito();
+                }
+
                 //viewModel.carregarItinerarios(parada.getParada().getId());
                 //viewModel.itinerarios.observe(ctx, itinerariosObserver);
             }

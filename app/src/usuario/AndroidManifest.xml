@@ -64,7 +64,28 @@
         <activity android:name=".view.BaseActivity" />
         <activity android:name=".view.FavoritosActivity" />
         <activity android:name=".view.CidadesActivity" />
-        <activity android:name=".view.DetalheParadaActivity" />
+        <activity android:name=".view.DetalheParadaActivity">
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
+                <data android:scheme="http"
+                    android:host="vostre.com.br"
+                    android:pathPrefix="/circular/paradas" />
+                <!-- note that the leading "/" is required for pathPrefix-->
+            </intent-filter>
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
+                <data android:scheme="http"
+                    android:host="www.vostre.com.br"
+                    android:pathPrefix="/circular/paradas" />
+                <!-- note that the leading "/" is required for pathPrefix-->
+            </intent-filter>
+        </activity>
         <activity android:name=".view.ParadasActivity" />
         <activity android:name=".view.ItinerariosActivity" />
         <activity android:name=".view.PontosInteresseActivity" />
@@ -80,7 +101,8 @@
         <activity android:name=".view.HorariosItinerarioActivity" />
         <activity android:name=".view.SobreActivity" />
         <activity android:name=".view.OpcoesActivity" />
-        <activity android:name=".view.QRCodeActivity"></activity>
+        <activity android:name=".view.QRCodeActivity"
+            android:noHistory="true"></activity>
     </application>
 
 </manifest>

@@ -137,6 +137,16 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
 
     }
 
+    public void carregaParadaQRCode(String uf, String cidade, String bairro, String parada){
+        this.parada = appDatabase.paradaDAO().carregarComBairroPorUFCidadeEBairro(uf.toUpperCase(), cidade, bairro, parada);
+        pois = appDatabase.pontoInteresseDAO().listarTodosAtivosProximos(0, 0, 0, 0);
+    }
+
+    public void carregarDadosVinculadosQRCode(String parada){
+        itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosPorParadaComBairroEHorario(parada, DateTimeFormat.forPattern("HH:mm:ss").print(new DateTime()));
+        pois = appDatabase.pontoInteresseDAO().listarTodosAtivosProximos(0, 0, 0, 0);
+    }
+
     public void carregaDirections(MapView map, ParadaBairro parada, PontoInteresse pontoInteresse) {
 
         new directionsAsyncTask(map, parada, pontoInteresse, getApplication().getApplicationContext()).execute();

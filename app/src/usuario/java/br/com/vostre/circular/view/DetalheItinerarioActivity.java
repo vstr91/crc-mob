@@ -5,9 +5,11 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
@@ -19,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -34,6 +37,8 @@ import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -80,6 +85,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_itinerario);
+        binding.getRoot().setDrawingCacheEnabled(true);
         binding.setView(this);
         binding.setLifecycleOwner(this);
         super.onCreate(savedInstanceState);
@@ -168,6 +174,16 @@ public class DetalheItinerarioActivity extends BaseActivity {
         PreferenceUtils.gravaItinerariosFavoritos(lstItinerarios, getApplicationContext());
     }
 
+    public void onClickBtnShare(View v){
+        Bitmap b = binding.getRoot().getDrawingCache();
+        try {
+            System.out.println("LOCAL::: "+getApplication().getFilesDir()+"/image.jpg");
+            b.compress(Bitmap.CompressFormat.JPEG, 95, new FileOutputStream(getApplication().getFilesDir()+"/image.jpg"));
+            Toast.makeText(getApplicationContext(), "Exportado!", Toast.LENGTH_SHORT).show();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
     @BindingAdapter("app:textDinheiro")
     public static void setTextDinheiro(TextView view, Double val){

@@ -40,11 +40,11 @@ public class FormDetalheMensagem extends FormBase {
     DetalheMensagensViewModel viewModel;
 
     Mensagem mensagem;
-    MensagemResposta resposta;
+//    MensagemResposta resposta;
 
-    RecyclerView listRespostas;
-    List<MensagemResposta> respostas;
-    MensagemRespostaAdapter adapter;
+//    RecyclerView listRespostas;
+//    List<MensagemResposta> respostas;
+//    MensagemRespostaAdapter adapter;
 
     Application ctx;
 
@@ -56,13 +56,13 @@ public class FormDetalheMensagem extends FormBase {
         this.mensagem = mensagem;
     }
 
-    public MensagemResposta getResposta() {
-        return resposta;
-    }
-
-    public void setResposta(MensagemResposta resposta) {
-        this.resposta = resposta;
-    }
+//    public MensagemResposta getResposta() {
+//        return resposta;
+//    }
+//
+//    public void setResposta(MensagemResposta resposta) {
+//        this.resposta = resposta;
+//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -87,14 +87,14 @@ public class FormDetalheMensagem extends FormBase {
         if(mensagem != null){
             viewModel.mensagem = mensagem;
             viewModel.carregarRespostas(mensagem);
-            viewModel.respostas.observe(this, respostasObserver);
+//            viewModel.respostas.observe(this, respostasObserver);
         }
 
-        listRespostas = binding.listRespostas;
+//        listRespostas = binding.listRespostas;
 
-        adapter = new MensagemRespostaAdapter(respostas, (AppCompatActivity) getActivity());
-
-        listRespostas.setAdapter(adapter);
+//        adapter = new MensagemRespostaAdapter(respostas, (AppCompatActivity) getActivity());
+//
+//        listRespostas.setAdapter(adapter);
 
         return binding.getRoot();
 
@@ -122,12 +122,12 @@ public class FormDetalheMensagem extends FormBase {
         view.setText(formatted);
     }
 
-    Observer<List<MensagemResposta>> respostasObserver = new Observer<List<MensagemResposta>>() {
-        @Override
-        public void onChanged(List<MensagemResposta> respostas) {
-            adapter.respostas = respostas;
-            adapter.notifyDataSetChanged();
-        }
-    };
+//    Observer<List<MensagemResposta>> respostasObserver = new Observer<List<MensagemResposta>>() {
+//        @Override
+//        public void onChanged(List<MensagemResposta> respostas) {
+//            adapter.respostas = respostas;
+//            adapter.notifyDataSetChanged();
+//        }
+//    };
 
 }

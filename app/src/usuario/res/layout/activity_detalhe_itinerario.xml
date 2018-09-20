@@ -61,6 +61,19 @@
 
                 </org.osmdroid.views.MapView>
 
+                <TextView
+                    android:id="@+id/textView37"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/horario_rounded_corner_ciano"
+                    android:padding="5dp"
+                    android:text="@{`Linha `+itinerario.itinerario.sigla}"
+                    android:textColor="@color/branco"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:text="Linha 001" />
+
                 <LinearLayout
                     android:id="@+id/linearLayout4"
                     android:layout_width="0dp"
@@ -91,7 +104,8 @@
                             android:gravity="bottom|center_vertical"
                             android:text="@={itinerario.nomeBairroPartida}"
                             android:textColor="@color/branco"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            tools:text="Bairro" />
 
                         <TextView
                             android:id="@+id/textViewBairro"
@@ -100,7 +114,8 @@
                             android:layout_weight="1"
                             android:gravity="top"
                             android:text="@{itinerario.nomeCidadePartida}"
-                            android:textColor="@color/branco" />
+                            android:textColor="@color/branco"
+                            tools:text="Cidade" />
                     </LinearLayout>
 
                     <TextView
@@ -132,7 +147,8 @@
                             android:gravity="bottom|center_vertical"
                             android:text="@={itinerario.nomeBairroDestino}"
                             android:textColor="@color/branco"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            tools:text="Bairro" />
 
                         <TextView
                             android:id="@+id/textViewBairroDestino"
@@ -141,7 +157,8 @@
                             android:layout_weight="1"
                             android:gravity="top"
                             android:text="@{itinerario.nomeCidadeDestino}"
-                            android:textColor="@color/branco" />
+                            android:textColor="@color/branco"
+                            tools:text="Cidade" />
                     </LinearLayout>
 
                     <ImageButton
@@ -150,8 +167,8 @@
                         android:layout_height="match_parent"
                         android:layout_marginRight="10dp"
                         android:layout_weight=".5"
-                        android:onClick="onClickBtnFavorito"
                         android:background="@color/transparente"
+                        android:onClick="onClickBtnFavorito"
                         android:src="@drawable/ic_star_white_24dp" />
 
                 </LinearLayout>
@@ -230,10 +247,10 @@
             android:layout_marginStart="32dp"
             android:background="@color/transparente"
             android:onClick="@{view::btnSecoesClick}"
+            android:src="@drawable/ic_list_white_24dp"
             app:layout_constraintBottom_toBottomOf="@+id/textView29"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/textView28"
-            android:src="@drawable/ic_list_white_24dp" />
+            app:layout_constraintTop_toTopOf="@+id/textView28" />
 
         <ImageButton
             android:id="@+id/imageButton6"
@@ -244,10 +261,10 @@
             android:layout_marginRight="32dp"
             android:layout_marginTop="8dp"
             android:background="@color/transparente"
+            android:src="@drawable/ic_share_white_24dp"
             app:layout_constraintBottom_toBottomOf="@+id/textView29"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/textView28"
-            android:src="@drawable/ic_share_white_24dp" />
+            app:layout_constraintTop_toTopOf="@+id/textView28" />
 
     </android.support.constraint.ConstraintLayout>
 

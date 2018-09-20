@@ -316,6 +316,7 @@ public class ParadasActivity extends BaseActivity {
                 m.setPosition(new GeoPoint(p.getParada().getLatitude(), p.getParada().getLongitude()));
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                 m.setTitle(p.getParada().getNome());
+                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
                 m.setDraggable(true);
                 m.setId(p.getParada().getId());
                 m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {

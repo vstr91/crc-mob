@@ -8,6 +8,8 @@ import android.support.annotation.NonNull;
         unique = true)})
 public class Empresa extends EntidadeSlug {
 
+    private String prefixo;
+
     private String logo;
 
     private String email;
@@ -16,6 +18,14 @@ public class Empresa extends EntidadeSlug {
 
     @NonNull
     private boolean imagemEnviada = true;
+
+    public String getPrefixo() {
+        return prefixo;
+    }
+
+    public void setPrefixo(String prefixo) {
+        this.prefixo = prefixo;
+    }
 
     @NonNull
     public boolean isImagemEnviada() {

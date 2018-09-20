@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -244,6 +245,12 @@ public class DetalheParadaActivity extends BaseActivity {
 
             if(parada != null){
                 binding.setUmaParada(parada);
+
+                if(parada.getParada().getImagem() != null){
+                    binding.imageView9.setImageDrawable(Drawable.createFromPath(getApplicationContext().getFilesDir()+"/"+parada.getParada().getImagem()));
+                } else{
+                    binding.imageView9.setImageDrawable(getResources().getDrawable(R.drawable.imagem_nao_disponivel_16_9));
+                }
 
                 adapterPois = new PontosInteresseAdapter(viewModel.pois.getValue(), ctx, parada, bsd);
                 listPois.setAdapter(adapterPois);

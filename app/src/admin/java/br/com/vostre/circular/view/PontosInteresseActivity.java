@@ -323,6 +323,7 @@ public class PontosInteresseActivity extends BaseActivity {
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                 m.setTitle(p.getNome());
                 m.setDraggable(true);
+                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.poi));
                 m.setId(p.getId());
                 m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                     @Override
@@ -377,7 +378,7 @@ public class PontosInteresseActivity extends BaseActivity {
                 m.setTitle(p.getParada().getNome());
                 m.setDraggable(false);
                 m.setId(p.getParada().getId());
-                m.setIcon(getResources().getDrawable(R.mipmap.ic_onibus_azul));
+                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
                 m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker, MapView mapView) {

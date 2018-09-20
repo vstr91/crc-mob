@@ -272,7 +272,7 @@
                     android:src="@drawable/ic_edit_blue_24dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewLinha" />
+                    app:layout_constraintTop_toBottomOf="@+id/textView27" />
 
                 <TextView
                     android:id="@+id/textView27"
@@ -299,12 +299,12 @@
                     android:layout_weight="1"
                     app:corArcoMaior="@color/azul"
                     app:corArcoMenor="@color/azul"
-                    app:imagem="@{destino.brasao}"
                     app:espessuraArcoMaior="4"
                     app:espessuraArcoMenor="4"
+                    app:imagem="@{destino.brasao}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewLinha" />
+                    app:layout_constraintTop_toBottomOf="@+id/textView27" />
 
                 <TextView
                     android:id="@+id/textViewBairroDestino"

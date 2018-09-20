@@ -2,11 +2,13 @@ package br.com.vostre.circular.view.viewHolder;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
+import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.LinhaCidadesBinding;
 import br.com.vostre.circular.databinding.LinhaParadasBinding;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
@@ -28,8 +30,10 @@ public class ParadaViewHolder extends RecyclerView.ViewHolder {
     public void bind(final ParadaBairro parada, boolean mostraBairro) {
         binding.setParada(parada);
 
-        if(parada.getParada().getImagem() == null){
-            binding.circleView2.setBackgroundColor(Color.parseColor("#000088"));
+        if(parada.getParada().getImagem() != null){
+            binding.circleView2.setImageDrawable(Drawable.createFromPath(ctx.getApplicationContext().getFilesDir()+"/"+parada.getParada().getImagem()));
+        } else{
+            binding.circleView2.setImageDrawable(ctx.getResources().getDrawable(R.drawable.imagem_nao_disponivel_16_9));
         }
 
         //binding.circleView2.setImagem(null);

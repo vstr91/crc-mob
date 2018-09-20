@@ -11,6 +11,10 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.annotation.MainThread;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -113,7 +117,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
     List<? extends EntidadeBase> paradaSugestoes;
 
-    Crypt crypt;
+    br.com.vostre.circular.utils.Crypt crypt;
 
     /**
      * Set up the sync adapter
@@ -349,7 +353,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
-                    Toast.makeText(ctx, "Recebimento de dados efetuado com sucesso! Iniciando processamento...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctx, "Comunicação com o servidor efetuada com sucesso! Iniciando processamento...", Toast.LENGTH_SHORT).show();
                     try {
                         requisitaToken(parametroInterno.getIdentificadorUnico(), 1);
                         processaJson(response);
@@ -375,6 +379,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     private void processaJson(Response<String> response) throws JSONException {
 
         String dados = response.body();
+
+        System.out.println("DADOS::: "+dados);
 
         if(dados != null){
 
@@ -703,8 +709,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 if(mensagens.length() > 0){
 
-                    System.out.println("TEST:::: ENTROU MENSAGEM > "+mensagens.length());
-
                     int total = mensagens.length();
                     List<Mensagem> lstMensagens = new ArrayList<>();
 
@@ -827,12 +831,28 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     add(lstParadas, "parada_sugestao");
 
-                } else{
-                    Toast.makeText(ctx, "Nenhum registro para ser recebido. Seu sistema está atualizado!",
-                            Toast.LENGTH_SHORT).show();
                 }
+
+                Handler mainHandler = new Handler(Looper.getMainLooper());
+
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getContext(), "Atualização finalizada!", Toast.LENGTH_SHORT).show();
+                    }
+                };
+
+
+                mainHandler.post(runnable);
+
+            } else{
+                Toast.makeText(ctx, "Nenhum registro para ser recebido. Seu sistema está atualizado!",
+                        Toast.LENGTH_SHORT).show();
             }
 
+        } else{
+            Toast.makeText(ctx, "Erro ao receber registros... Por favor tente novamente!",
+                    Toast.LENGTH_SHORT).show();
         }
 
         if(response.code() == 200){
@@ -1264,12 +1284,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
-                        Toast.makeText(ctx, "Erro ("+e.getMessage()+") ao receber imagem.", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(ctx, "Erro ("+e.getMessage()+") ao receber imagem.", Toast.LENGTH_SHORT).show();
                     } finally {
                         try {
                             if (fos != null) {
                                 fos.close();
-                                Toast.makeText(ctx, "Imagem "+imagem+" recebida.", Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(ctx, "Imagem "+imagem+" recebida.", Toast.LENGTH_SHORT).show();
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -1314,7 +1334,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         try {
                             if (fos != null) {
                                 fos.close();
-                                Toast.makeText(ctx, "Imagem "+imagem+" recebida.", Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(ctx, "Imagem "+imagem+" recebida.", Toast.LENGTH_SHORT).show();
                             }
                         } catch (IOException e) {
                             e.printStackTrace();

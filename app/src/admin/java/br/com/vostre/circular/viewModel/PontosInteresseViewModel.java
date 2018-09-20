@@ -187,6 +187,10 @@ public class PontosInteresseViewModel extends AndroidViewModel {
         pontoInteresse.setEnviado(false);
         pontoInteresse.setSlug(StringUtils.toSlug(pontoInteresse.getNome()));
 
+        if(pontoInteresse.getDataFinal().isBefore(pontoInteresse.getDataInicial()) || pontoInteresse.getDataFinal().isBeforeNow()){
+            pontoInteresse.setDataFinal(null);
+        }
+
         new addAsyncTask(appDatabase).execute(pontoInteresse);
     }
 
@@ -214,6 +218,10 @@ public class PontosInteresseViewModel extends AndroidViewModel {
 
         if(appDatabase == null){
             appDatabase = AppDatabase.getAppDatabase(context.getApplicationContext());
+        }
+
+        if(pontoInteresse.getDataFinal().isBefore(pontoInteresse.getDataInicial()) || pontoInteresse.getDataFinal().isBeforeNow()){
+            pontoInteresse.setDataFinal(null);
         }
 
         new editAsyncTask(appDatabase).execute(pontoInteresse);

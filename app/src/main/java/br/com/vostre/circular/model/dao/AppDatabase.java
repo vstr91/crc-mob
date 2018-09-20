@@ -30,7 +30,8 @@ import br.com.vostre.circular.utils.Converters;
 @Database(entities = {Pais.class, Estado.class, Cidade.class, Bairro.class,
         Empresa.class, Parametro.class, Usuario.class, Mensagem.class, MensagemResposta.class,
         Parada.class, PontoInteresse.class, Itinerario.class, ParadaItinerario.class,
-        Horario.class, HorarioItinerario.class, SecaoItinerario.class, Onibus.class, ParametroInterno.class, ParadaSugestao.class}, version = 1)
+        Horario.class, HorarioItinerario.class, SecaoItinerario.class, Onibus.class, ParametroInterno.class, ParadaSugestao.class},
+        version = 1)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 

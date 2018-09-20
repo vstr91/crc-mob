@@ -9,6 +9,8 @@ public class Mensagem extends EntidadeBase {
     @NonNull
     private String titulo;
 
+    private String email;
+
     private String resumo;
 
     @NonNull
@@ -16,6 +18,14 @@ public class Mensagem extends EntidadeBase {
 
     @NonNull
     private Boolean servidor;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     @NonNull
     public Boolean getServidor() {

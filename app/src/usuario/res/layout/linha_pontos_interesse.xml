@@ -79,7 +79,7 @@
             android:layout_marginRight="24dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
-            android:text="Venha participar da festa do bairro. Diversas atrações todos os dias!"
+            android:text="@{pontoInteresse.descricao}"
             android:textAppearance="@style/texto_azul"
             android:textColor="@color/cinzaEscuro"
             android:textSize="14sp"

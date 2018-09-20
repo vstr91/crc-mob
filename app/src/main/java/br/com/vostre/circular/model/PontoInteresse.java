@@ -11,6 +11,8 @@ import org.joda.time.format.DateTimeFormatter;
 @Entity(tableName = "ponto_interesse")
 public class PontoInteresse extends EntidadeSlug {
 
+    private String descricao;
+
     @NonNull
     private Double latitude;
 
@@ -22,11 +24,18 @@ public class PontoInteresse extends EntidadeSlug {
     @NonNull
     private DateTime dataInicial;
 
-    @NonNull
     private DateTime dataFinal;
 
     @NonNull
     private boolean imagemEnviada = true;
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
 
     @NonNull
     public boolean isImagemEnviada() {
@@ -72,12 +81,11 @@ public class PontoInteresse extends EntidadeSlug {
         this.dataInicial = dataInicial;
     }
 
-    @NonNull
     public DateTime getDataFinal() {
         return dataFinal;
     }
 
-    public void setDataFinal(@NonNull DateTime dataFinal) {
+    public void setDataFinal(DateTime dataFinal) {
         this.dataFinal = dataFinal;
     }
 

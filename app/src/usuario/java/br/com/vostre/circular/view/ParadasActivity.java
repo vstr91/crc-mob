@@ -99,7 +99,8 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
                 view.setImageDrawable(drawable);
             }
         } else{
-            view.setImageDrawable(null);
+
+            view.setImageDrawable(view.getContext().getApplicationContext().getResources().getDrawable(R.drawable.imagem_nao_disponivel_quadrada));
         }
 
     }

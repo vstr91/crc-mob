@@ -159,7 +159,15 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
                 binding.linearLayoutHorarios.addView(b.getRoot());
             }
 
-            binding.invalidateAll();
+            Bitmap b = binding.getRoot().getDrawingCache();
+
+        try {
+            System.out.println("LOCAL::: "+getApplication().getFilesDir()+"/image.jpg");
+            b.compress(Bitmap.CompressFormat.JPEG, 95, new FileOutputStream(getApplication().getFilesDir()+"/image.jpg"));
+            Toast.makeText(getApplicationContext(), "Exportado!", Toast.LENGTH_SHORT).show();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
             //adapter.horarios = horarios;
             //adapter.notifyDataSetChanged();

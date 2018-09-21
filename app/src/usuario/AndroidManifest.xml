@@ -96,7 +96,7 @@
         <activity android:name=".view.DetalhesEmpresaActivity" />
         <activity android:name=".view.DetalhesOnibusActivity" />
         <activity android:name=".view.DetalheItinerarioActivity" />
-        <activity android:name=".view.SecoesItinerarioActivity" />
+        <activity android:name=".view.DetalheItinerarioImpressaoActivity" />
         <activity android:name=".view.MapaActivity" />
         <activity android:name=".view.HorariosItinerarioActivity" />
         <activity android:name=".view.SobreActivity" />

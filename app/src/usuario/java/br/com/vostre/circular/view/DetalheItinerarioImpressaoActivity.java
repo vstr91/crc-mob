@@ -2,39 +2,31 @@ package br.com.vostre.circular.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.content.Intent;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.osmdroid.api.IMapController;
-import org.osmdroid.bonuspack.routing.OSRMRoadManager;
-import org.osmdroid.bonuspack.routing.Road;
-import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
@@ -42,32 +34,27 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityDetalheItinerarioBinding;
-import br.com.vostre.circular.databinding.ActivityDetalheParadaBinding;
-import br.com.vostre.circular.model.HorarioItinerario;
-import br.com.vostre.circular.model.Itinerario;
+import br.com.vostre.circular.databinding.ActivityDetalheItinerarioImpressaoBinding;
+import br.com.vostre.circular.databinding.LinhaHorariosItinerariosBinding;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.SecaoItinerario;
-import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SnackbarHelper;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
-import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
-import br.com.vostre.circular.viewModel.DetalhesParadaViewModel;
 
-public class DetalheItinerarioActivity extends BaseActivity {
+public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
 
-    ActivityDetalheItinerarioBinding binding;
+    ActivityDetalheItinerarioImpressaoBinding binding;
     DetalhesItinerarioViewModel viewModel;
     HorarioItinerarioAdapter adapter;
     SecaoItinerarioAdapter adapterSecoes;
@@ -85,44 +72,19 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_itinerario);
-        binding.getRoot().setDrawingCacheEnabled(true);
-        binding.setView(this);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_itinerario_impressao);
+//        binding.getRoot().setDrawingCacheEnabled(true);
         binding.setLifecycleOwner(this);
         super.onCreate(savedInstanceState);
-        setTitle("Detalhe Itinerário");
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
 
         ctx = this;
 
         viewModel = ViewModelProviders.of(this).get(DetalhesItinerarioViewModel.class);
 
-        binding.setViewModel(viewModel);
-
         viewModel.setItinerario(getIntent().getStringExtra("itinerario"));
 
         viewModel.itinerario.observe(this, itinerarioObserver);
 
-        listHorarios = binding.listHorarios;
-        adapter = new HorarioItinerarioAdapter(viewModel.horarios.getValue(), this);
-        listHorarios.setAdapter(adapter);
-
-        bsd = new BottomSheetDialog(ctx);
-        bsd.setCanceledOnTouchOutside(true);
-
-        bsd.setContentView(R.layout.bottom_sheet_secoes);
-
-        listSecoes = bsd.findViewById(R.id.listSecoes);
-        ImageButton btnFechar = bsd.findViewById(R.id.btnFechar);
-        btnFechar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                bsd.dismiss();
-            }
-        });
-
-        adapterSecoes = new SecaoItinerarioAdapter(viewModel.secoes.getValue(), this);
-        listSecoes.setAdapter(adapterSecoes);
 
         viewModel.horarios.observe(this, horariosObserver);
         viewModel.localAtual.observe(this, localObserver);
@@ -149,46 +111,6 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
         map.setMaxZoomLevel(19d);
         map.setMinZoomLevel(8d);
-    }
-
-    public void onClickBtnFavorito(View v){
-        List<String> lstItinerarios = PreferenceUtils.carregaItinerariosFavoritos(getApplicationContext());
-
-        List<ParadaBairro> paradas = viewModel.paradas.getValue();
-
-        if(!flagFavorito){
-            SnackbarHelper.notifica(v, "Itinerário adicionado aos favoritos!", Snackbar.LENGTH_LONG);
-            binding.imageButton4.setImageResource(R.drawable.ic_star_white_24dp);
-            flagFavorito = true;
-
-            lstItinerarios.add(paradas.get(0).getIdBairro()+"|"+paradas.get(paradas.size()-1).getIdBairro());
-
-        } else{
-            SnackbarHelper.notifica(v, "Itinerário removido dos favoritos!", Snackbar.LENGTH_LONG);
-            binding.imageButton4.setImageResource(R.drawable.ic_star_border_white_24dp);
-            flagFavorito = false;
-
-            lstItinerarios.remove(paradas.get(0).getIdBairro()+"|"+paradas.get(paradas.size()-1).getIdBairro());
-
-        }
-
-        PreferenceUtils.gravaItinerariosFavoritos(lstItinerarios, getApplicationContext());
-    }
-
-    public void onClickBtnShare(View v){
-
-        Intent i = new Intent(ctx, DetalheItinerarioImpressaoActivity.class);
-        i.putExtra("itinerario", viewModel.itinerario.getValue().getItinerario().getId());
-        ctx.startActivity(i);
-
-//        Bitmap b = binding.getRoot().getDrawingCache();
-//        try {
-//            System.out.println("LOCAL::: "+getApplication().getFilesDir()+"/image.jpg");
-//            b.compress(Bitmap.CompressFormat.JPEG, 95, new FileOutputStream(getApplication().getFilesDir()+"/image.jpg"));
-//            Toast.makeText(getApplicationContext(), "Exportado!", Toast.LENGTH_SHORT).show();
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
     }
 
     @BindingAdapter("app:textDinheiro")
@@ -234,10 +156,47 @@ public class DetalheItinerarioActivity extends BaseActivity {
     Observer<List<HorarioItinerarioNome>> horariosObserver = new Observer<List<HorarioItinerarioNome>>() {
         @Override
         public void onChanged(List<HorarioItinerarioNome> horarios) {
-            adapter.horarios = horarios;
-            adapter.notifyDataSetChanged();
+
+            for(HorarioItinerarioNome horario : horarios){
+                LinhaHorariosItinerariosBinding b = DataBindingUtil.inflate(getLayoutInflater(), R.layout.linha_horarios_itinerarios, binding.linearLayoutHorarios, false);
+                b.setHorario(horario);
+                binding.linearLayoutHorarios.addView(b.getRoot());
+            }
+
+            binding.getRoot().setDrawingCacheEnabled(true);
+
+            Bitmap b = getBitmapFromView(binding.getRoot());
+            try {
+                b.compress(Bitmap.CompressFormat.JPEG, 95, new FileOutputStream(getApplication().getFilesDir()+"/image.jpg"));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
         }
     };
+
+    public void convertCertViewToImage() {
+
+        scrollView.setDrawingCacheEnabled(true);
+        scrollView.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        scrollView.layout(0, 0, scrollView.getMeasuredWidth(), scrollView.getMeasuredHeight());
+        scrollView.buildDrawingCache();
+        Bitmap bm = Bitmap.createBitmap(scrollView.getDrawingCache());
+        scrollView.setDrawingCacheEnabled(false); // clear drawing cache
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.setType("image/jpg");
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+
+        File f = new File(getExternalFilesDir(null).getAbsolutePath() + File.separator + "Certificate" + File.separator + "myCertificate.jpg");
+
+        f.createNewFile();
+        FileOutputStream fo = new FileOutputStream(f);
+        fo.write(bytes.toByteArray());
+
+    }
 
     Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {
         @Override
@@ -247,20 +206,6 @@ public class DetalheItinerarioActivity extends BaseActivity {
             //viewModel.carregaDirections(map, paradas);
 
             atualizarParadasMapa(paradas);
-
-            List<String> lstItinerarios = PreferenceUtils.carregaItinerariosFavoritos(getApplicationContext());
-
-            List<ParadaBairro> listParadas = viewModel.paradas.getValue();
-
-            int i = lstItinerarios.indexOf(paradas.get(0).getIdBairro()+"|"+paradas.get(paradas.size()-1).getIdBairro());
-
-            if(i >= 0){
-                binding.imageButton4.setImageResource(R.drawable.ic_star_white_24dp);
-                flagFavorito = true;
-            } else{
-                binding.imageButton4.setImageResource(R.drawable.ic_star_border_white_24dp);
-                flagFavorito = false;
-            }
 
         }
     };
@@ -279,19 +224,10 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 }
 
                 viewModel.paradas.observe(ctx, paradasObserver);
-                viewModel.secoes.observe(ctx, secoesObserver);
                 //viewModel.carregarItinerarios(parada.getParada().getId());
                 //viewModel.itinerarios.observe(ctx, itinerariosObserver);
             }
 
-        }
-    };
-
-    Observer<List<SecaoItinerario>> secoesObserver = new Observer<List<SecaoItinerario>>() {
-        @Override
-        public void onChanged(List<SecaoItinerario> secoes) {
-            adapterSecoes.secoes = secoes;
-            adapterSecoes.notifyDataSetChanged();
         }
     };
 

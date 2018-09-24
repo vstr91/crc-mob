@@ -188,6 +188,8 @@ public class DetalheItinerarioActivity extends BaseActivity {
         i.putExtra("itinerario", viewModel.itinerario.getValue().getItinerario().getId());
         ctx.startActivity(i);
 
+        Toast.makeText(getApplicationContext(), "Compartilhando...", Toast.LENGTH_SHORT).show();
+
 //        Bitmap b = binding.getRoot().getDrawingCache();
 //        try {
 //            System.out.println("LOCAL::: "+getApplication().getFilesDir()+"/image.jpg");

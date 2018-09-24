@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
@@ -61,19 +62,8 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
 
     ActivityDetalheItinerarioImpressaoBinding binding;
     DetalhesItinerarioViewModel viewModel;
-    HorarioItinerarioAdapter adapter;
-    SecaoItinerarioAdapter adapterSecoes;
 
-    RecyclerView listHorarios;
-    RecyclerView listSecoes;
     AppCompatActivity ctx;
-
-    MapView map;
-    IMapController mapController;
-    MyLocationNewOverlay mLocationOverlay;
-
-    BottomSheetDialog bsd;
-    boolean flagFavorito = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,30 +82,7 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
 
 
         viewModel.horarios.observe(this, horariosObserver);
-        viewModel.localAtual.observe(this, localObserver);
 
-        configuraMapa();
-
-    }
-
-    private void configuraMapa() {
-        map = binding.map;
-        map.setTileSource(TileSourceFactory.MAPNIK);
-        map.setBuiltInZoomControls(true);
-        map.setMultiTouchControls(true);
-
-        mLocationOverlay = new MyLocationNewOverlay(
-                new GpsMyLocationProvider(getApplicationContext()),map);
-        mLocationOverlay.enableMyLocation();
-        map.getOverlays().add(mLocationOverlay);
-
-        mapController = map.getController();
-        mapController.setZoom(10.5d);
-//        GeoPoint startPoint = new GeoPoint(-22.470804460339885, -43.82463455200195);
-//        mapController.setCenter(startPoint);
-
-        map.setMaxZoomLevel(19d);
-        map.setMinZoomLevel(8d);
     }
 
     @BindingAdapter("app:textDinheiro")
@@ -161,12 +128,23 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
             for(HorarioItinerarioNome horario : horarios){
                 LinhaHorariosItinerariosBinding b = DataBindingUtil.inflate(getLayoutInflater(), R.layout.linha_horarios_itinerarios, binding.linearLayoutHorarios, false);
                 b.setHorario(horario);
+
+                if(horario.getHorarioItinerario().getObservacao() == null
+                        || horario.getHorarioItinerario().getObservacao() .isEmpty()
+                        || horario.getHorarioItinerario().getObservacao().equals(null)){
+                    b.textViewObservacao.setVisibility(View.GONE);
+                } else{
+                    b.textViewObservacao.setVisibility(View.VISIBLE);
+                }
+
                 binding.linearLayoutHorarios.addView(b.getRoot());
             }
 
             if(horarios.size() > 0){
 
                 final View layout = binding.getRoot();
+
+                binding.textViewData.setText("Gerado por Vostrè Circular em "+DateTimeFormat.forPattern("dd/MM/YYYY HH:mm").print(DateTime.now()));
 
                 ViewTreeObserver vto = layout.getViewTreeObserver();
                 vto.addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -175,12 +153,19 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
                         layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
                         try {
+                            File file = new File(getApplication().getFilesDir()+"/teste.jpg");
 //                            getScreenViewBitmap(binding.getRoot()).compress(Bitmap.CompressFormat.JPEG, 100,
 //                                    new FileOutputStream(new File(getApplication().getFilesDir()+"/teste.jpg")));
                             getBitmapFromView(binding.scrollView, binding.scrollView.getChildAt(0).getHeight(),
                                     binding.scrollView.getChildAt(0).getWidth())
-                                    .compress(Bitmap.CompressFormat.JPEG, 100,
-                                    new FileOutputStream(new File(getApplication().getFilesDir()+"/teste.jpg")));;
+                                    .compress(Bitmap.CompressFormat.JPEG, 50,
+                                    new FileOutputStream(file));
+                            Intent share = new Intent(Intent.ACTION_SEND);
+
+                            share.setType("image/jpeg");
+                            share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+                            startActivity(Intent.createChooser(share, "Compartilhar Quadro de Horários"));
+                            finish();
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         }
@@ -205,27 +190,6 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
         return bitmap;
     }
 
-    private Bitmap getScreenViewBitmap(View v) {
-        v.setDrawingCacheEnabled(true);
-
-        v.buildDrawingCache();
-        Bitmap b = Bitmap.createBitmap(v.getDrawingCache());
-        v.setDrawingCacheEnabled(false); // clear drawing cache
-        return b;
-    }
-
-    Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {
-        @Override
-        public void onChanged(List<ParadaBairro> paradas) {
-            viewModel.atualizaPontoMapa();
-
-            //viewModel.carregaDirections(map, paradas);
-
-            atualizarParadasMapa(paradas);
-
-        }
-    };
-
     Observer<ItinerarioPartidaDestino> itinerarioObserver = new Observer<ItinerarioPartidaDestino>() {
         @Override
         public void onChanged(ItinerarioPartidaDestino itinerario) {
@@ -239,81 +203,17 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
                     binding.textView37.setVisibility(View.VISIBLE);
                 }
 
-                viewModel.paradas.observe(ctx, paradasObserver);
-                //viewModel.carregarItinerarios(parada.getParada().getId());
-                //viewModel.itinerarios.observe(ctx, itinerariosObserver);
+                if(itinerario.getItinerario().getObservacao() == null ||
+                        itinerario.getItinerario().getObservacao().isEmpty()
+                        || itinerario.getItinerario().getObservacao().equals(null)){
+                    binding.textViewObservacao.setVisibility(View.GONE);
+                } else{
+                    binding.textViewObservacao.setVisibility(View.VISIBLE);
+                }
+
             }
 
         }
     };
-
-    Observer<Location> localObserver = new Observer<Location>() {
-        @Override
-        public void onChanged(Location local) {
-
-            if(viewModel.centralizaMapa && local.getLatitude() != 0.0 && local.getLongitude() != 0.0){
-                setMapCenter(map, new GeoPoint(local.getLatitude(), local.getLongitude()));
-                viewModel.centralizaMapa = false;
-            }
-
-        }
-    };
-
-    @BindingAdapter("center")
-    public static void setMapCenter(MapView map, GeoPoint geoPoint){
-
-        if(geoPoint != null){
-            map.getController().setCenter(geoPoint);
-        }
-
-    }
-
-    private void atualizarParadasMapa(final List<ParadaBairro> paradas){
-
-        if(paradas != null){
-
-            for(final ParadaBairro p : paradas){
-
-                Marker m = new Marker(map);
-                m.setPosition(new GeoPoint(p.getParada().getLatitude(), p.getParada().getLongitude()));
-                m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                m.setTitle(p.getParada().getNome());
-                m.setDraggable(true);
-                m.setId(p.getParada().getId());
-                m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
-                    @Override
-                    public boolean onMarkerClick(Marker marker, MapView mapView) {
-
-                        ParadaBairro pb = getParadaFromMarker(marker, paradas);
-
-                        InfoWindow infoWindow = new InfoWindow();
-                        infoWindow.setParada(pb);
-                        infoWindow.setCtx(ctx);
-                        infoWindow.show(getSupportFragmentManager(), "infoWindow");
-                        mapController.animateTo(marker.getPosition());
-
-                        return true;
-                    }
-                });
-                map.getOverlays().add(m);
-            }
-
-        }
-
-    }
-
-    @NonNull
-    private ParadaBairro getParadaFromMarker(Marker marker, List<ParadaBairro> paradas) {
-        Parada p = new Parada();
-        p.setId(marker.getId());
-
-        ParadaBairro parada = new ParadaBairro();
-        parada.setParada(p);
-
-        ParadaBairro pb = paradas.get(paradas.indexOf(parada));
-        pb.getParada().setLatitude(marker.getPosition().getLatitude());
-        pb.getParada().setLongitude(marker.getPosition().getLongitude());
-        return pb;
-    }
 
 }

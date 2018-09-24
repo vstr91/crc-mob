@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -177,8 +176,12 @@ public class DetalheItinerarioActivity extends BaseActivity {
     }
 
     public void onClickBtnShare(View v){
+
+        Intent i = new Intent(ctx, DetalheItinerarioImpressaoActivity.class);
+        i.putExtra("itinerario", viewModel.itinerario.getValue().getItinerario().getId());
+        ctx.startActivity(i);
+
 //        Bitmap b = binding.getRoot().getDrawingCache();
-//
 //        try {
 //            System.out.println("LOCAL::: "+getApplication().getFilesDir()+"/image.jpg");
 //            b.compress(Bitmap.CompressFormat.JPEG, 95, new FileOutputStream(getApplication().getFilesDir()+"/image.jpg"));
@@ -186,11 +189,6 @@ public class DetalheItinerarioActivity extends BaseActivity {
 //        } catch (FileNotFoundException e) {
 //            e.printStackTrace();
 //        }
-
-        Intent i = new Intent(ctx, DetalheItinerarioImpressaoActivity.class);
-        i.putExtra("itinerario", viewModel.itinerario.getValue().getItinerario().getId());
-        ctx.startActivity(i);
-
     }
 
     @BindingAdapter("app:textDinheiro")

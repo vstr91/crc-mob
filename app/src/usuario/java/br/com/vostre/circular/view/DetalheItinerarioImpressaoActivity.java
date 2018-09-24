@@ -5,6 +5,9 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -70,8 +73,7 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_itinerario_impressao);
-        binding.getRoot().setDrawingCacheEnabled(true);
-        binding.setView(this);
+//        binding.getRoot().setDrawingCacheEnabled(true);
         binding.setLifecycleOwner(this);
         super.onCreate(savedInstanceState);
 
@@ -82,6 +84,7 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
         viewModel.setItinerario(getIntent().getStringExtra("itinerario"));
 
         viewModel.itinerario.observe(this, itinerarioObserver);
+
 
         viewModel.horarios.observe(this, horariosObserver);
         viewModel.localAtual.observe(this, localObserver);
@@ -146,39 +149,64 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
 
     }
 
+    public void btnSecoesClick(View v){
+        bsd.show();
+    }
+
     Observer<List<HorarioItinerarioNome>> horariosObserver = new Observer<List<HorarioItinerarioNome>>() {
         @Override
         public void onChanged(List<HorarioItinerarioNome> horarios) {
 
-            for(HorarioItinerarioNome h : horarios){
-                LinhaHorariosItinerariosBinding b = DataBindingUtil.inflate(getLayoutInflater(),
-                        R.layout.linha_horarios_itinerarios, binding.linearLayoutHorarios, false);
-
-                b.setHorario(h);
-                b.executePendingBindings();
+            for(HorarioItinerarioNome horario : horarios){
+                LinhaHorariosItinerariosBinding b = DataBindingUtil.inflate(getLayoutInflater(), R.layout.linha_horarios_itinerarios, binding.linearLayoutHorarios, false);
+                b.setHorario(horario);
                 binding.linearLayoutHorarios.addView(b.getRoot());
             }
 
-            Bitmap b = binding.getRoot().getDrawingCache();
+            binding.getRoot().setDrawingCacheEnabled(true);
 
-        try {
-            System.out.println("LOCAL::: "+getApplication().getFilesDir()+"/image.jpg");
-            b.compress(Bitmap.CompressFormat.JPEG, 95, new FileOutputStream(getApplication().getFilesDir()+"/image.jpg"));
-            Toast.makeText(getApplicationContext(), "Exportado!", Toast.LENGTH_SHORT).show();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+            Bitmap b = getBitmapFromView(binding.getRoot());
+            try {
+                b.compress(Bitmap.CompressFormat.JPEG, 95, new FileOutputStream(getApplication().getFilesDir()+"/image.jpg"));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
 
-            //adapter.horarios = horarios;
-            //adapter.notifyDataSetChanged();
         }
     };
+
+    public void convertCertViewToImage() {
+
+        scrollView.setDrawingCacheEnabled(true);
+        scrollView.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        scrollView.layout(0, 0, scrollView.getMeasuredWidth(), scrollView.getMeasuredHeight());
+        scrollView.buildDrawingCache();
+        Bitmap bm = Bitmap.createBitmap(scrollView.getDrawingCache());
+        scrollView.setDrawingCacheEnabled(false); // clear drawing cache
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.setType("image/jpg");
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+
+        File f = new File(getExternalFilesDir(null).getAbsolutePath() + File.separator + "Certificate" + File.separator + "myCertificate.jpg");
+
+        f.createNewFile();
+        FileOutputStream fo = new FileOutputStream(f);
+        fo.write(bytes.toByteArray());
+
+    }
 
     Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {
         @Override
         public void onChanged(List<ParadaBairro> paradas) {
             viewModel.atualizaPontoMapa();
+
+            //viewModel.carregaDirections(map, paradas);
+
             atualizarParadasMapa(paradas);
+
         }
     };
 
@@ -196,6 +224,8 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
                 }
 
                 viewModel.paradas.observe(ctx, paradasObserver);
+                //viewModel.carregarItinerarios(parada.getParada().getId());
+                //viewModel.itinerarios.observe(ctx, itinerariosObserver);
             }
 
         }
@@ -234,11 +264,40 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
                 m.setTitle(p.getParada().getNome());
                 m.setDraggable(true);
                 m.setId(p.getParada().getId());
+                m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker, MapView mapView) {
+
+                        ParadaBairro pb = getParadaFromMarker(marker, paradas);
+
+                        InfoWindow infoWindow = new InfoWindow();
+                        infoWindow.setParada(pb);
+                        infoWindow.setCtx(ctx);
+                        infoWindow.show(getSupportFragmentManager(), "infoWindow");
+                        mapController.animateTo(marker.getPosition());
+
+                        return true;
+                    }
+                });
                 map.getOverlays().add(m);
             }
 
         }
 
+    }
+
+    @NonNull
+    private ParadaBairro getParadaFromMarker(Marker marker, List<ParadaBairro> paradas) {
+        Parada p = new Parada();
+        p.setId(marker.getId());
+
+        ParadaBairro parada = new ParadaBairro();
+        parada.setParada(p);
+
+        ParadaBairro pb = paradas.get(paradas.indexOf(parada));
+        pb.getParada().setLatitude(marker.getPosition().getLatitude());
+        pb.getParada().setLongitude(marker.getPosition().getLongitude());
+        return pb;
     }
 
 }

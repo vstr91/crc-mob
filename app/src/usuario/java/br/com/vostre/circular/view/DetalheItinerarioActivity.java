@@ -177,6 +177,13 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
     public void onClickBtnShare(View v){
 
+//        try {
+//            getScreenViewBitmap(binding.getRoot())
+//                    .compress(Bitmap.CompressFormat.JPEG, 95, new FileOutputStream(getApplication().getFilesDir()+"/image.jpg"));
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+
         Intent i = new Intent(ctx, DetalheItinerarioImpressaoActivity.class);
         i.putExtra("itinerario", viewModel.itinerario.getValue().getItinerario().getId());
         ctx.startActivity(i);
@@ -189,6 +196,21 @@ public class DetalheItinerarioActivity extends BaseActivity {
 //        } catch (FileNotFoundException e) {
 //            e.printStackTrace();
 //        }
+    }
+
+    private Bitmap getScreenViewBitmap(View v) {
+        v.setDrawingCacheEnabled(true);
+
+        // this is the important code :)
+        // Without it the view will have a dimension of 0,0 and the bitmap will be null
+        //v.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+        //        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        //v.layout(0, 0, v.getMeasuredWidth(), v.getMeasuredHeight());
+
+        v.buildDrawingCache();
+        Bitmap b = Bitmap.createBitmap(v.getDrawingCache());
+        v.setDrawingCacheEnabled(false); // clear drawing cache
+        return b;
     }
 
     @BindingAdapter("app:textDinheiro")

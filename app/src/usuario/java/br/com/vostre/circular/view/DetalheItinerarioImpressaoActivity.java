@@ -2,6 +2,7 @@ package br.com.vostre.circular.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
@@ -16,6 +17,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,8 +32,11 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
@@ -73,7 +78,7 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_itinerario_impressao);
-//        binding.getRoot().setDrawingCacheEnabled(true);
+        binding.getRoot().setDrawingCacheEnabled(true);
         binding.setLifecycleOwner(this);
         super.onCreate(savedInstanceState);
 
@@ -149,10 +154,6 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
 
     }
 
-    public void btnSecoesClick(View v){
-        bsd.show();
-    }
-
     Observer<List<HorarioItinerarioNome>> horariosObserver = new Observer<List<HorarioItinerarioNome>>() {
         @Override
         public void onChanged(List<HorarioItinerarioNome> horarios) {
@@ -163,39 +164,54 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
                 binding.linearLayoutHorarios.addView(b.getRoot());
             }
 
-            binding.getRoot().setDrawingCacheEnabled(true);
+            if(horarios.size() > 0){
 
-            Bitmap b = getBitmapFromView(binding.getRoot());
-            try {
-                b.compress(Bitmap.CompressFormat.JPEG, 95, new FileOutputStream(getApplication().getFilesDir()+"/image.jpg"));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                final View layout = binding.getRoot();
+
+                ViewTreeObserver vto = layout.getViewTreeObserver();
+                vto.addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                        try {
+//                            getScreenViewBitmap(binding.getRoot()).compress(Bitmap.CompressFormat.JPEG, 100,
+//                                    new FileOutputStream(new File(getApplication().getFilesDir()+"/teste.jpg")));
+                            getBitmapFromView(binding.scrollView, binding.scrollView.getChildAt(0).getHeight(),
+                                    binding.scrollView.getChildAt(0).getWidth())
+                                    .compress(Bitmap.CompressFormat.JPEG, 100,
+                                    new FileOutputStream(new File(getApplication().getFilesDir()+"/teste.jpg")));;
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                });
+
             }
 
         }
     };
 
-    public void convertCertViewToImage() {
+    private Bitmap getBitmapFromView(View view, int height, int width) {
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Drawable bgDrawable = view.getBackground();
+        if (bgDrawable != null)
+            bgDrawable.draw(canvas);
+        else
+            canvas.drawColor(Color.WHITE);
+        view.draw(canvas);
+        return bitmap;
+    }
 
-        scrollView.setDrawingCacheEnabled(true);
-        scrollView.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-        scrollView.layout(0, 0, scrollView.getMeasuredWidth(), scrollView.getMeasuredHeight());
-        scrollView.buildDrawingCache();
-        Bitmap bm = Bitmap.createBitmap(scrollView.getDrawingCache());
-        scrollView.setDrawingCacheEnabled(false); // clear drawing cache
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.setType("image/jpg");
+    private Bitmap getScreenViewBitmap(View v) {
+        v.setDrawingCacheEnabled(true);
 
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        bm.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-
-        File f = new File(getExternalFilesDir(null).getAbsolutePath() + File.separator + "Certificate" + File.separator + "myCertificate.jpg");
-
-        f.createNewFile();
-        FileOutputStream fo = new FileOutputStream(f);
-        fo.write(bytes.toByteArray());
-
+        v.buildDrawingCache();
+        Bitmap b = Bitmap.createBitmap(v.getDrawingCache());
+        v.setDrawingCacheEnabled(false); // clear drawing cache
+        return b;
     }
 
     Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {

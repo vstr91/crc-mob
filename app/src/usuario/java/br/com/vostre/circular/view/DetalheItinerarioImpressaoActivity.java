@@ -23,6 +23,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.glxn.qrgen.android.QRCode;
+
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.osmdroid.api.IMapController;
@@ -82,6 +84,9 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
 
 
         viewModel.horarios.observe(this, horariosObserver);
+
+        Bitmap myBitmap = QRCode.from("https://play.google.com/store/apps/details?id=br.com.vostre.circular").bitmap();
+        binding.imageViewQR.setImageBitmap(myBitmap);
 
     }
 
@@ -144,7 +149,8 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
 
                 final View layout = binding.getRoot();
 
-                binding.textViewData.setText("Gerado por Vostrè Circular em "+DateTimeFormat.forPattern("dd/MM/YYYY HH:mm").print(DateTime.now()));
+                binding.textViewData.setText("Quadro de horários gerado no Vostrè Circular " +
+                        "em "+DateTimeFormat.forPattern("dd/MM/YYYY HH:mm").print(DateTime.now()));
 
                 ViewTreeObserver vto = layout.getViewTreeObserver();
                 vto.addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -153,12 +159,12 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
                         layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
                         try {
-                            File file = new File(getApplication().getFilesDir()+"/teste.jpg");
+                            File file = new File(getApplication().getExternalCacheDir()+"/quadro-horarios.jpg");
 //                            getScreenViewBitmap(binding.getRoot()).compress(Bitmap.CompressFormat.JPEG, 100,
 //                                    new FileOutputStream(new File(getApplication().getFilesDir()+"/teste.jpg")));
                             getBitmapFromView(binding.scrollView, binding.scrollView.getChildAt(0).getHeight(),
                                     binding.scrollView.getChildAt(0).getWidth())
-                                    .compress(Bitmap.CompressFormat.JPEG, 50,
+                                    .compress(Bitmap.CompressFormat.JPEG, 70,
                                     new FileOutputStream(file));
                             Intent share = new Intent(Intent.ACTION_SEND);
 

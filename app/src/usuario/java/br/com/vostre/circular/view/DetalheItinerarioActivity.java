@@ -184,11 +184,11 @@ public class DetalheItinerarioActivity extends BaseActivity {
 //            e.printStackTrace();
 //        }
 
+        Toast.makeText(getApplicationContext(), "Preparando imagem para compartilhamento.", Toast.LENGTH_SHORT).show();
+
         Intent i = new Intent(ctx, DetalheItinerarioImpressaoActivity.class);
         i.putExtra("itinerario", viewModel.itinerario.getValue().getItinerario().getId());
         ctx.startActivity(i);
-
-        Toast.makeText(getApplicationContext(), "Compartilhando...", Toast.LENGTH_SHORT).show();
 
 //        Bitmap b = binding.getRoot().getDrawingCache();
 //        try {

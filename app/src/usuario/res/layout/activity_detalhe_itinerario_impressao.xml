@@ -62,7 +62,7 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/linearLayout4"
+                        app:layout_constraintTop_toBottomOf="@+id/textViewBairroDestino"
                         tools:text="Observação" />
 
                     <TextView
@@ -80,93 +80,117 @@
                         app:layout_constraintTop_toTopOf="parent"
                         tools:text="Linha 001" />
 
-                    <LinearLayout
-                        android:id="@+id/linearLayout4"
+                    <TextView
+                        android:id="@+id/textViewNome"
                         android:layout_width="0dp"
-                        android:layout_height="50dp"
-                        android:orientation="horizontal"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:gravity="bottom|center_vertical"
+                        android:text="@={itinerario.nomeBairroPartida}"
+                        android:textColor="@color/cinzaEscuro"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toStartOf="@+id/guideline7"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textView37">
+                        app:layout_constraintTop_toBottomOf="@+id/textView48"
+                        tools:text="Bairro Partida" />
 
-                        <LinearLayout
-                            android:id="@+id/linearLayout2"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginRight="8dp"
-                            android:layout_weight="3"
-                            android:orientation="vertical"
-                            android:paddingLeft="10dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/imageButton3"
-                            app:layout_constraintStart_toStartOf="parent">
+                    <TextView
+                        android:id="@+id/textViewBairro"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:gravity="top"
+                        android:text="@{itinerario.nomeCidadePartida}"
+                        android:textColor="@color/cinzaMedio"
+                        android:textSize="12sp"
+                        app:layout_constraintBottom_toTopOf="@+id/guideline8"
+                        app:layout_constraintEnd_toStartOf="@+id/guideline7"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textViewNome"
+                        tools:text="Cidade Partida" />
 
-                            <TextView
-                                android:id="@+id/textViewNome"
-                                android:layout_width="match_parent"
-                                android:layout_height="0dp"
-                                android:layout_weight="1"
-                                android:gravity="bottom|center_vertical"
-                                android:text="@={itinerario.nomeBairroPartida}"
-                                android:textColor="@color/cinzaEscuro"
-                                android:textStyle="bold"
-                                tools:text="Bairro" />
+                    <TextView
+                        android:id="@+id/textViewBairroDestino"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:gravity="top"
+                        android:text="@{itinerario.nomeCidadeDestino}"
+                        android:textColor="@color/cinzaMedio"
+                        android:textSize="12sp"
+                        app:layout_constraintBottom_toTopOf="@+id/guideline8"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="@+id/guideline7"
+                        app:layout_constraintTop_toBottomOf="@+id/textViewNomeDestino"
+                        tools:text="Cidade Destino" />
 
-                            <TextView
-                                android:id="@+id/textViewBairro"
-                                android:layout_width="match_parent"
-                                android:layout_height="0dp"
-                                android:layout_weight="1"
-                                android:gravity="top"
-                                android:text="@{itinerario.nomeCidadePartida}"
-                                android:textColor="@color/cinzaMedio"
-                                tools:text="Cidade" />
-                        </LinearLayout>
+                    <TextView
+                        android:id="@+id/textViewNomeDestino"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:gravity="bottom|center_vertical"
+                        android:text="@={itinerario.nomeBairroDestino}"
+                        android:textColor="@color/cinzaEscuro"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="@+id/guideline7"
+                        app:layout_constraintTop_toBottomOf="@+id/textView49"
+                        tools:text="Bairro Destino" />
 
-                        <TextView
-                            android:id="@+id/textView25"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_weight=".3"
-                            android:gravity="center"
-                            android:text="x"
-                            android:textColor="@color/azul" />
+                    <android.support.constraint.Guideline
+                        android:id="@+id/guideline7"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_begin="176dp" />
 
-                        <LinearLayout
-                            android:id="@+id/linearLayout3"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginRight="8dp"
-                            android:layout_weight="3"
-                            android:orientation="vertical"
-                            android:paddingLeft="10dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/imageButton3"
-                            app:layout_constraintStart_toStartOf="parent">
+                    <TextView
+                        android:id="@+id/textView48"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
+                        android:text="Partida"
+                        android:textAppearance="@style/texto_azul"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textView37" />
 
-                            <TextView
-                                android:id="@+id/textViewNomeDestino"
-                                android:layout_width="match_parent"
-                                android:layout_height="0dp"
-                                android:layout_weight="1"
-                                android:gravity="bottom|center_vertical"
-                                android:text="@={itinerario.nomeBairroDestino}"
-                                android:textColor="@color/cinzaEscuro"
-                                android:textStyle="bold"
-                                tools:text="Bairro" />
+                    <TextView
+                        android:id="@+id/textView49"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
+                        android:text="Destino"
+                        android:textAppearance="@style/texto_azul"
+                        app:layout_constraintStart_toStartOf="@+id/guideline7"
+                        app:layout_constraintTop_toBottomOf="@+id/textView37" />
 
-                            <TextView
-                                android:id="@+id/textViewBairroDestino"
-                                android:layout_width="match_parent"
-                                android:layout_height="0dp"
-                                android:layout_weight="1"
-                                android:gravity="top"
-                                android:text="@{itinerario.nomeCidadeDestino}"
-                                android:textColor="@color/cinzaMedio"
-                                tools:text="Cidade" />
-                        </LinearLayout>
-
-                    </LinearLayout>
+                    <android.support.constraint.Guideline
+                        android:id="@+id/guideline8"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        app:layout_constraintGuide_begin="95dp" />
 
                 </android.support.constraint.ConstraintLayout>
 
@@ -220,16 +244,17 @@
 
             <TextView
                 android:id="@+id/textViewData"
-                android:layout_width="wrap_content"
-                android:layout_height="16dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                android:gravity="center"
                 android:text="TextView"
                 android:textColor="@color/branco"
-                android:textSize="12sp"
+                android:textSize="10sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linearLayoutHorarios"
@@ -237,17 +262,17 @@
 
             <ImageView
                 android:id="@+id/imageView13"
-                android:layout_width="50dp"
+                android:layout_width="wrap_content"
                 android:layout_height="50dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                android:src="@drawable/logo_horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:src="@drawable/icon" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/imageView14"
@@ -256,32 +281,63 @@
                 android:layout_marginBottom="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/google_play_badge"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/imageViewQR"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textViewData"
-                app:layout_constraintVertical_bias="0.0" />
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/imageViewQR"
+                app:layout_constraintTop_toTopOf="@+id/imageViewQR" />
 
             <TextView
                 android:id="@+id/textView52"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginLeft="32dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginStart="32dp"
-                android:layout_marginTop="8dp"
+                android:background="@color/branco"
+                android:gravity="center"
+                android:paddingBottom="2dp"
+                android:paddingLeft="2dp"
+                android:paddingRight="2dp"
                 android:text="Baixe o app agora mesmo. É grátis!"
-                android:textColor="@color/branco"
+                android:textColor="@color/azul"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/imageView14"
-                app:layout_constraintEnd_toStartOf="@+id/imageView14"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/imageView14" />
+                app:layout_constraintTop_toBottomOf="@+id/textView50" />
+
+            <TextView
+                android:id="@+id/textView50"
+                android:layout_width="0dp"
+                android:layout_height="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/branco"
+                android:gravity="center"
+                android:paddingLeft="2dp"
+                android:paddingRight="2dp"
+                android:paddingTop="2dp"
+                android:text="Quer saber mais ou fazer outra consulta?"
+                android:textColor="@color/azul"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageViewQR" />
+
+            <ImageView
+                android:id="@+id/imageViewQR"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toStartOf="@+id/imageView14"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewData"
+                app:srcCompat="@drawable/circle" />
 
         </android.support.constraint.ConstraintLayout>
 

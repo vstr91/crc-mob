@@ -46,6 +46,8 @@ dependencies {
         exclude module: 'com.google.android.gms:play-services-vision:11.4.2'
     }
 
+    implementation 'com.github.kenglxn.QRGen:android:2.3.0'
+
     implementation 'org.osmdroid:osmdroid-android:6.0.1'
     implementation 'com.github.MKergall:osmbonuspack:6.5.1'
     implementation 'com.karumi:dexter:4.2.0'

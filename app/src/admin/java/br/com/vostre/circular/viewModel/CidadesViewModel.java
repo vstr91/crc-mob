@@ -39,6 +39,8 @@ public class CidadesViewModel extends AndroidViewModel {
 
     public Bitmap brasao;
 
+    public static MutableLiveData<Integer> retorno;
+
     public Bitmap getBrasao() {
         return brasao;
     }
@@ -73,6 +75,9 @@ public class CidadesViewModel extends AndroidViewModel {
         estados = new MutableLiveData<>();
         estados = appDatabase.estadoDAO().listarTodos();
 
+        retorno = new MutableLiveData<>();
+        retorno.setValue(-1);
+
     }
 
     public void salvarCidade(){
@@ -86,7 +91,7 @@ public class CidadesViewModel extends AndroidViewModel {
         if(cidade.getCidade().valida(cidade.getCidade())){
             add(cidade);
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -137,7 +142,7 @@ public class CidadesViewModel extends AndroidViewModel {
         if(cidade.getCidade().valida(cidade.getCidade())){
             edit(cidade);
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -177,6 +182,11 @@ public class CidadesViewModel extends AndroidViewModel {
         protected Void doInBackground(final CidadeEstado... params) {
             db.cidadeDAO().inserir((params[0].getCidade()));
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
         }
 
     }
@@ -240,6 +250,11 @@ public class CidadesViewModel extends AndroidViewModel {
         protected Void doInBackground(final CidadeEstado... params) {
             db.cidadeDAO().editar((params[0].getCidade()));
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
         }
 
     }

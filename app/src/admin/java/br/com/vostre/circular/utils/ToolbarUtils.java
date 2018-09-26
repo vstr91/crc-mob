@@ -33,9 +33,9 @@ public class ToolbarUtils {
 
     static TextView textViewBadgeMsg;
     static ImageButton imageButtonMsg;
-    static ImageButton imageButtonHorarios;
+//    static ImageButton imageButtonHorarios;
     static ImageButton imageButtonSync;
-    static ImageButton imageButtonImportar;
+//    static ImageButton imageButtonImportar;
     static View.OnClickListener mListener;
     public static int NOVAS_MENSAGENS = 0;
 
@@ -55,14 +55,14 @@ public class ToolbarUtils {
         MenuItem itemMsg = menu.findItem(R.id.icon_msg);
         MenuItemCompat.getActionView(itemMsg).setOnClickListener(listener);
 
-        MenuItem itemHorarios = menu.findItem(R.id.icon_horarios);
-        MenuItemCompat.getActionView(itemHorarios).setOnClickListener(listener);
+//        MenuItem itemHorarios = menu.findItem(R.id.icon_horarios);
+//        MenuItemCompat.getActionView(itemHorarios).setOnClickListener(listener);
 
         MenuItem itemSync = menu.findItem(R.id.icon_sync);
         MenuItemCompat.getActionView(itemSync).setOnClickListener(listener);
 
-        MenuItem itemImport = menu.findItem(R.id.icon_import);
-        MenuItemCompat.getActionView(itemImport).setOnClickListener(listener);
+//        MenuItem itemImport = menu.findItem(R.id.icon_import);
+//        MenuItemCompat.getActionView(itemImport).setOnClickListener(listener);
 
         mListener = listener;
 
@@ -71,14 +71,14 @@ public class ToolbarUtils {
         imageButtonMsg = MenuItemCompat.getActionView(itemMsg).findViewById(R.id.imageButtonMsg);
         imageButtonMsg.setOnClickListener(mListener);
 
-        imageButtonHorarios = MenuItemCompat.getActionView(itemHorarios).findViewById(R.id.imageButtonHorarios);
-        imageButtonHorarios.setOnClickListener(mListener);
+//        imageButtonHorarios = MenuItemCompat.getActionView(itemHorarios).findViewById(R.id.imageButtonHorarios);
+//        imageButtonHorarios.setOnClickListener(mListener);
 
         imageButtonSync = MenuItemCompat.getActionView(itemSync).findViewById(R.id.imageButtonSync);
         imageButtonSync.setOnClickListener(mListener);
 
-        imageButtonImportar = MenuItemCompat.getActionView(itemImport).findViewById(R.id.imageButtonImport);
-        imageButtonImportar.setOnClickListener(mListener);
+//        imageButtonImportar = MenuItemCompat.getActionView(itemImport).findViewById(R.id.imageButtonImport);
+//        imageButtonImportar.setOnClickListener(mListener);
 
         if(NOVAS_MENSAGENS < 1){
             textViewBadgeMsg = MenuItemCompat.getActionView(itemMsg).findViewById(R.id.textViewBadgeMsg);
@@ -98,16 +98,16 @@ public class ToolbarUtils {
             case android.R.id.home:
                 activity.onBackPressed();
                 break;
-            case R.id.imageButtonImport:
-            case R.id.icon_import:
-            case R.id.importar:
-
-                Intent intentFile = new Intent();
-                intentFile.setType("text/*");
-                intentFile.setAction(Intent.ACTION_GET_CONTENT);
-                activity.startActivityForResult(Intent.createChooser(intentFile, "Escolha o arquivo de dados"), PICK_FILE);
-
-                break;
+//            case R.id.imageButtonImport:
+//            case R.id.icon_import:
+//            case R.id.importar:
+//
+//                Intent intentFile = new Intent();
+//                intentFile.setType("text/*");
+//                intentFile.setAction(Intent.ACTION_GET_CONTENT);
+//                activity.startActivityForResult(Intent.createChooser(intentFile, "Escolha o arquivo de dados"), PICK_FILE);
+//
+//                break;
             case R.id.imageButtonSync:
             case R.id.icon_sync:
             case R.id.sync:
@@ -126,12 +126,12 @@ public class ToolbarUtils {
                 Toast.makeText(activity.getApplicationContext(), "Iniciando sincronização", Toast.LENGTH_SHORT).show();
 
                 break;
-            case R.id.imageButtonHorarios:
-            case R.id.icon_horarios:
-            case R.id.horarios:
-                Intent i = new Intent(activity, HorariosActivity.class);
-                activity.startActivity(i);
-                break;
+//            case R.id.imageButtonHorarios:
+//            case R.id.icon_horarios:
+//            case R.id.horarios:
+//                Intent i = new Intent(activity, HorariosActivity.class);
+//                activity.startActivity(i);
+//                break;
             case R.id.imageButtonMsg:
             case R.id.msg:
             case R.id.icon_msg:

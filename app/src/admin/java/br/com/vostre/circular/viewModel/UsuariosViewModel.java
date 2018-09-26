@@ -3,6 +3,7 @@ package br.com.vostre.circular.viewModel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 
 import org.joda.time.DateTime;
@@ -20,6 +21,8 @@ public class UsuariosViewModel extends AndroidViewModel {
 
     public LiveData<List<Usuario>> usuarios;
     public Usuario usuario;
+
+    public static MutableLiveData<Integer> retorno;
 
     public LiveData<List<Usuario>> getUsuarios() {
         return usuarios;
@@ -42,6 +45,10 @@ public class UsuariosViewModel extends AndroidViewModel {
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         usuario = new Usuario();
         usuarios = appDatabase.usuarioDAO().listarTodos();
+
+        retorno = new MutableLiveData<>();
+        retorno.setValue(-1);
+
     }
 
     public void salvarUsuario(){
@@ -49,7 +56,7 @@ public class UsuariosViewModel extends AndroidViewModel {
         if(usuario.valida(usuario)){
             add(usuario);
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -59,7 +66,7 @@ public class UsuariosViewModel extends AndroidViewModel {
         if(usuario.valida(usuario)){
             edit(usuario);
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -89,6 +96,11 @@ public class UsuariosViewModel extends AndroidViewModel {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
+        }
+
     }
 
     // fim adicionar
@@ -115,6 +127,11 @@ public class UsuariosViewModel extends AndroidViewModel {
         protected Void doInBackground(final Usuario... params) {
             db.usuarioDAO().editar((params[0]));
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
         }
 
     }

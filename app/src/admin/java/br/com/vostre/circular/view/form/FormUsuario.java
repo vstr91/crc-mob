@@ -1,5 +1,6 @@
 package br.com.vostre.circular.view.form;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -90,7 +92,7 @@ public class FormUsuario extends FormBase {
             viewModel.salvarUsuario();
         }
 
-        dismiss();
+        viewModel.retorno.observe(this, retornoObserver);
     }
 
     public void onClickFechar(View v){
@@ -155,5 +157,23 @@ public class FormUsuario extends FormBase {
         textViewProgramado.setVisibility(View.VISIBLE);
         btnTrocar.setVisibility(View.VISIBLE);
     }
+
+    Observer<Integer> retornoObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer retorno) {
+
+            if(retorno == 1){
+                Toast.makeText(getContext().getApplicationContext(), "Usuário cadastrado!", Toast.LENGTH_SHORT).show();
+                viewModel.setUsuario(new Usuario());
+                dismiss();
+            } else if(retorno == 0){
+                Toast.makeText(getContext().getApplicationContext(),
+                        "Dados necessários não informados. Por favor preencha " +
+                                "todos os dados obrigatórios!",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    };
 
 }

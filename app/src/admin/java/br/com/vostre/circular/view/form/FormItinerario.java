@@ -19,11 +19,13 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
@@ -32,6 +34,7 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormItinerarioBinding;
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.Itinerario;
+import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 import br.com.vostre.circular.view.adapter.EmpresaAdapterSpinner;
 import br.com.vostre.circular.viewModel.ItinerariosViewModel;
 
@@ -123,7 +126,8 @@ public class FormItinerario extends FormBase {
             viewModel.salvarItinerario();
         }
 
-        dismiss();
+        viewModel.retorno.observe(this, retornoObserver);
+
     }
 
 
@@ -259,6 +263,25 @@ public class FormItinerario extends FormBase {
         @Override
         public void onChanged(List<Empresa> empresas) {
             setSpinnerEntries(binding.spinnerEmpresa, empresas);
+        }
+    };
+
+    Observer<Integer> retornoObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer retorno) {
+
+            if(retorno == 1){
+                Toast.makeText(getContext().getApplicationContext(), "Itinerário cadastrado!", Toast.LENGTH_SHORT).show();
+                viewModel.paradasItinerario.setValue(new ArrayList<ParadaItinerarioBairro>());
+                viewModel.setItinerario(new Itinerario());
+                dismiss();
+            } else if(retorno == 0){
+                Toast.makeText(getContext().getApplicationContext(),
+                        "Dados necessários não informados. Por favor preencha " +
+                                "todos os dados obrigatórios!",
+                        Toast.LENGTH_SHORT).show();
+            }
+
         }
     };
 

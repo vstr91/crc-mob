@@ -127,7 +127,6 @@ public class ItinerariosActivity extends BaseActivity {
             viewModel.itinerarios.observe(this, itinerariosObserver);
 
             viewModel.localAtual.observe(this, centroObserver);
-            viewModel.retorno.observe(this, retornoObserver);
 
             if(getIntent().getStringExtra("empresa") != null){
                 viewModel.setEmpresa(getIntent().getStringExtra("empresa"));
@@ -319,24 +318,6 @@ public class ItinerariosActivity extends BaseActivity {
             if(viewModel.centralizaMapa && centro.getLatitude() != 0.0 && centro.getLongitude() != 0.0){
                 setMapCenter(map, new GeoPoint(centro.getLatitude(), centro.getLongitude()));
                 viewModel.centralizaMapa = false;
-            }
-
-        }
-    };
-
-    Observer<Integer> retornoObserver = new Observer<Integer>() {
-        @Override
-        public void onChanged(Integer retorno) {
-
-            if(retorno == 1){
-                Toast.makeText(getApplicationContext(), "Itinerário cadastrado!", Toast.LENGTH_SHORT).show();
-                viewModel.paradasItinerario.setValue(new ArrayList<ParadaItinerarioBairro>());
-                viewModel.setItinerario(new Itinerario());
-            } else if(retorno == 0){
-                Toast.makeText(getApplicationContext(),
-                        "Dados necessários não informados. Por favor preencha " +
-                                "todos os dados obrigatórios!",
-                        Toast.LENGTH_SHORT).show();
             }
 
         }

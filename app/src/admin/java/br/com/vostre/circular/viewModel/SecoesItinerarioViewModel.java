@@ -15,6 +15,7 @@ import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.dao.PaisDAO;
 import br.com.vostre.circular.model.dao.SecaoItinerarioDAO;
+import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.StringUtils;
 
 public class SecoesItinerarioViewModel extends AndroidViewModel {
@@ -25,6 +26,9 @@ public class SecoesItinerarioViewModel extends AndroidViewModel {
     public SecaoItinerario secao;
 
     Itinerario itinerario;
+
+    public LiveData<List<ParadaBairro>> paradasIniciais;
+    public LiveData<List<ParadaBairro>> paradasFinais;
 
     public LiveData<List<SecaoItinerario>> getSecoes() {
         return secoes;
@@ -49,6 +53,18 @@ public class SecoesItinerarioViewModel extends AndroidViewModel {
     public void setItinerario(Itinerario itinerario) {
         this.itinerario = itinerario;
         secoes = appDatabase.secaoItinerarioDAO().listarTodosPorItinerario(itinerario.getId());
+
+        paradasIniciais = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro(itinerario.getId());
+        paradasFinais = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro(itinerario.getId());
+    }
+
+    public void setParadaInicial(ParadaBairro paradaInicial) {
+        this.secao.setParadaInicial(paradaInicial.getParada().getId());
+        paradasFinais = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairroSemParadaInicial(itinerario.getId(),paradaInicial.getParada().getId());
+    }
+
+    public void setParadaFinal(ParadaBairro paradaFinal) {
+        this.secao.setParadaFinal(paradaFinal.getParada().getId());
     }
 
     public SecoesItinerarioViewModel(Application app){
@@ -56,6 +72,9 @@ public class SecoesItinerarioViewModel extends AndroidViewModel {
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         secao = new SecaoItinerario();
         secoes = appDatabase.secaoItinerarioDAO().listarTodosPorItinerario("");
+
+        paradasIniciais = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro("");
+        paradasFinais = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro("");
     }
 
     public void salvarSecao(){

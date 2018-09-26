@@ -16,14 +16,16 @@ import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.dao.PaisDAO;
 import br.com.vostre.circular.utils.StringUtils;
+import br.com.vostre.circular.view.viewHolder.PaisViewHolder;
 
 public class PaisesViewModel extends AndroidViewModel {
 
     private AppDatabase appDatabase;
-    PaisDAO paisDAO;
 
     public LiveData<List<Pais>> paises;
     public Pais pais;
+
+    public static MutableLiveData<Integer> retorno;
 
     public LiveData<List<Pais>> getPaises() {
         return paises;
@@ -46,6 +48,9 @@ public class PaisesViewModel extends AndroidViewModel {
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         pais = new Pais();
         paises = appDatabase.paisDAO().listarTodos();
+
+        retorno = new MutableLiveData<>();
+        retorno.setValue(-1);
     }
 
     public void salvarPais(){
@@ -53,9 +58,8 @@ public class PaisesViewModel extends AndroidViewModel {
         if(pais.valida(pais)){
             pais.setSigla(pais.getSigla().toUpperCase());
             add(pais);
-            System.out.println(pais.getNome()+" | "+pais.getSigla()+" | "+pais.getAtivo());
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -66,7 +70,7 @@ public class PaisesViewModel extends AndroidViewModel {
             pais.setSigla(pais.getSigla().toUpperCase());
             edit(pais);
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -97,6 +101,11 @@ public class PaisesViewModel extends AndroidViewModel {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            PaisesViewModel.retorno.setValue(1);
+        }
+
     }
 
     // fim adicionar
@@ -124,6 +133,11 @@ public class PaisesViewModel extends AndroidViewModel {
         protected Void doInBackground(final Pais... params) {
             db.paisDAO().editar((params[0]));
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            PaisesViewModel.retorno.setValue(1);
         }
 
     }

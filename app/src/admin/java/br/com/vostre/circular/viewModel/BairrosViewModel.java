@@ -26,6 +26,8 @@ public class BairrosViewModel extends AndroidViewModel {
     public LiveData<List<CidadeEstado>> cidades;
     public CidadeEstado cidade;
 
+    public static MutableLiveData<Integer> retorno;
+
     public LiveData<List<BairroCidade>> getBairros() {
         return bairros;
     }
@@ -51,6 +53,9 @@ public class BairrosViewModel extends AndroidViewModel {
         cidades = new MutableLiveData<>();
         cidades = appDatabase.cidadeDAO().listarTodosComEstado();
 
+        retorno = new MutableLiveData<>();
+        retorno.setValue(-1);
+
     }
 
     public void salvarBairro(){
@@ -60,7 +65,7 @@ public class BairrosViewModel extends AndroidViewModel {
         if(bairro.getBairro().valida(bairro.getBairro())){
             add(bairro.getBairro());
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -72,7 +77,7 @@ public class BairrosViewModel extends AndroidViewModel {
         if(bairro.getBairro().valida(bairro.getBairro())){
             edit(bairro.getBairro());
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -111,6 +116,11 @@ public class BairrosViewModel extends AndroidViewModel {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
+        }
+
     }
 
     // fim adicionar
@@ -146,6 +156,11 @@ public class BairrosViewModel extends AndroidViewModel {
         protected Void doInBackground(final Bairro... params) {
             db.bairroDAO().editar((params[0]));
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
         }
 
     }

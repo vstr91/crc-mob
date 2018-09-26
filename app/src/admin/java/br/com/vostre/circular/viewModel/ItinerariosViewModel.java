@@ -101,7 +101,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         itinerario = new Itinerario();
-        itinerarios = appDatabase.itinerarioDAO().listarTodosAtivos();
+        itinerarios = appDatabase.itinerarioDAO().listarTodos();
         paradas = appDatabase.paradaDAO().listarTodosAtivosComBairro();
         empresas = appDatabase.empresaDAO().listarTodosAtivos();
 
@@ -252,6 +252,11 @@ public class ItinerariosViewModel extends AndroidViewModel {
         protected Void doInBackground(final Itinerario... params) {
             db.itinerarioDAO().editar((params[0]));
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            ItinerariosViewModel.retorno.setValue(1);
         }
 
     }

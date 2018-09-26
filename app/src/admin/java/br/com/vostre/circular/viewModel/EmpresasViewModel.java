@@ -3,6 +3,7 @@ package br.com.vostre.circular.viewModel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -30,6 +31,8 @@ public class EmpresasViewModel extends AndroidViewModel {
     public Empresa empresa;
 
     public Bitmap logo;
+
+    public static MutableLiveData<Integer> retorno;
 
     public LiveData<List<Empresa>> getEmpresas() {
         return empresas;
@@ -60,6 +63,9 @@ public class EmpresasViewModel extends AndroidViewModel {
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         empresa = new Empresa();
         empresas = appDatabase.empresaDAO().listarTodos();
+
+        retorno = new MutableLiveData<>();
+        retorno.setValue(-1);
     }
 
     public void salvarEmpresa(){
@@ -71,7 +77,7 @@ public class EmpresasViewModel extends AndroidViewModel {
         if(empresa.valida(empresa)){
             add(empresa);
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -85,7 +91,7 @@ public class EmpresasViewModel extends AndroidViewModel {
         if(empresa.valida(empresa)){
             edit(empresa);
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -147,6 +153,11 @@ public class EmpresasViewModel extends AndroidViewModel {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
+        }
+
     }
 
     // fim adicionar
@@ -176,6 +187,11 @@ public class EmpresasViewModel extends AndroidViewModel {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
+        }
+
     }
 
     public void edit(final Empresa empresa) {
@@ -199,6 +215,11 @@ public class EmpresasViewModel extends AndroidViewModel {
         protected Void doInBackground(final Empresa... params) {
             db.empresaDAO().editar((params[0]));
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
         }
 
     }

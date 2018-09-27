@@ -18,6 +18,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import br.com.vostre.circular.model.Empresa;
@@ -118,17 +119,52 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
     }
 
-    public void salvarItinerario(){
+    public void salvarItinerario(boolean inverter){
 
         itinerario.setEmpresa(empresa.getId());
 
         if(itinerario.valida(itinerario)){
             add(itinerario);
-            addParadas(this.paradasItinerario.getValue());
-
+            addParadas(this.paradasItinerario.getValue(), itinerario);
         } else{
             retorno.setValue(0);
         }
+
+        // inversao
+/*
+        if(inverter){
+
+            Itinerario itinerarioInvertido = new Itinerario();
+            itinerarioInvertido.setAcessivel(itinerario.getAcessivel());
+            itinerarioInvertido.setAtivo(itinerario.getAtivo());
+            itinerarioInvertido.setDistancia(itinerario.getDistancia());
+            itinerarioInvertido.setEmpresa(itinerario.getEmpresa());
+            itinerarioInvertido.setObservacao(itinerario.getObservacao());
+            itinerarioInvertido.setSigla(itinerario.getSigla());
+            itinerarioInvertido.setTarifa(itinerario.getTarifa());
+            itinerarioInvertido.setTempo(itinerario.getTempo());
+            itinerarioInvertido.setDataCadastro(itinerario.getDataCadastro());
+            itinerarioInvertido.setEnviado(itinerario.getEnviado());
+            itinerarioInvertido.setProgramadoPara(itinerario.getProgramadoPara());
+            itinerarioInvertido.setUltimaAlteracao(itinerario.getUltimaAlteracao());
+            itinerarioInvertido.setUsuarioCadastro(itinerario.getUsuarioCadastro());
+            itinerarioInvertido.setUsuarioUltimaAlteracao(itinerario.getUsuarioUltimaAlteracao());
+
+            if(itinerarioInvertido.valida(itinerarioInvertido)){
+                add(itinerarioInvertido);
+
+                List<ParadaItinerarioBairro> paradasInvertidas = this.paradasItinerario.getValue();
+                Collections.reverse(paradasInvertidas);
+
+                addParadas(paradasInvertidas, itinerarioInvertido);
+
+            } else{
+                retorno.setValue(2);
+            }
+
+        }
+*/
+
 
     }
 
@@ -158,7 +194,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
     // adicionar paradas
 
-    public void addParadas(List<ParadaItinerarioBairro> pibs) {
+    public void addParadas(List<ParadaItinerarioBairro> pibs, Itinerario itinerario) {
 
         int cont = 1;
 

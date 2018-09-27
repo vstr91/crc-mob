@@ -116,7 +116,9 @@ public class FormHorarioItinerario extends FormBase {
             horario.getHorarioItinerario().setHorario(horario.getIdHorario());
 
             viewModel.editarHorario();
-            dismiss();
+
+            viewModel.retorno.observe(this, retornoObserver);
+
         } else{
             Toast.makeText(ctx, "Ao menos um dia deve ser selecionado!", Toast.LENGTH_SHORT).show();
         }
@@ -196,5 +198,22 @@ public class FormHorarioItinerario extends FormBase {
         }
 
     }
+
+    Observer<Integer> retornoObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer retorno) {
+
+            if(retorno == 1){
+                Toast.makeText(getContext().getApplicationContext(), "Horário cadastrado!", Toast.LENGTH_SHORT).show();
+                dismiss();
+            } else if(retorno == 0){
+                Toast.makeText(getContext().getApplicationContext(),
+                        "Dados necessários não informados. Por favor preencha " +
+                                "todos os dados obrigatórios!",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    };
 
 }

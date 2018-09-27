@@ -137,6 +137,7 @@ public class ParadasActivity extends BaseActivity {
                     formParada = new FormParada();
                     formParada.setLatitude(p.getLatitude());
                     formParada.setLongitude(p.getLongitude());
+                    formParada.setParada(null);
                     formParada.setCtx(getApplication());
                     formParada.show(getSupportFragmentManager(), "formParada");
 

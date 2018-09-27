@@ -123,7 +123,7 @@ public class FormItinerario extends FormBase {
         if(itinerario != null){
             viewModel.editarItinerario();
         } else{
-            viewModel.salvarItinerario();
+            viewModel.salvarItinerario(false);
         }
 
         viewModel.retorno.observe(this, retornoObserver);
@@ -279,6 +279,10 @@ public class FormItinerario extends FormBase {
                 Toast.makeText(getContext().getApplicationContext(),
                         "Dados necessários não informados. Por favor preencha " +
                                 "todos os dados obrigatórios!",
+                        Toast.LENGTH_SHORT).show();
+            } else if(retorno == 2){
+                Toast.makeText(getContext().getApplicationContext(),
+                        "Houve erro ao cadastrar o itinerário no sentido reverso. Por favor cadastre novamente de forma manual.",
                         Toast.LENGTH_SHORT).show();
             }
 

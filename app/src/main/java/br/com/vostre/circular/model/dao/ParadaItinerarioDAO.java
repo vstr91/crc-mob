@@ -58,6 +58,12 @@ public interface ParadaItinerarioDAO {
     @Query("UPDATE parada_itinerario SET ativo = 0 WHERE itinerario = :itinerario")
     void invalidaTodosPorItinerario(String itinerario);
 
+    @Query("SELECT pi.*, pi.itinerario AS idItinerario, p.id AS idParada, p.nome AS nomeParada, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade " +
+            "FROM parada_itinerario pi " +
+            "INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade " +
+            "WHERE p.ativo = 1 AND p.id = :parada AND pi.itinerario = :itinerario")
+    ParadaItinerarioBairro carregar(String parada, String itinerario);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<ParadaItinerario> paradasItinerarios);
 

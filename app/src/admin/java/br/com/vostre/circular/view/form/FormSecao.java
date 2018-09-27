@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -116,7 +117,7 @@ public class FormSecao extends FormBase {
             viewModel.salvarSecao();
         }
 
-        dismiss();
+        viewModel.retorno.observe(this, retornoObserver);
     }
 
     public void onClickFechar(View v){
@@ -194,24 +195,35 @@ public class FormSecao extends FormBase {
 
     public void setSpinnerEntries(Spinner spinner, List<ParadaBairro> paradas, int tipo){
 
-        if(paradas != null){
-            ParadaAdapterSpinner adapter = new ParadaAdapterSpinner(ctx, R.layout.linha_paradas_spinner, R.id.textViewNome, paradas);
-            spinner.setAdapter(adapter);
+        if(paradas != null && secao != null){
 
-            if(secao != null){
-                ParadaBairro parada = new ParadaBairro();
+            ParadaBairro parada = new ParadaBairro();
 
-                if(tipo == 0){
-                    parada.getParada().setId(secao.getParadaInicial());
-                    int i = viewModel.paradasIniciais.getValue().indexOf(parada);
-                    binding.spinnerInicial.setSelection(i);
-                } else{
-                    parada.getParada().setId(secao.getParadaFinal());
-                    int i = viewModel.paradasFinais.getValue().indexOf(parada);
-                    binding.spinnerFinal.setSelection(i);
+            if(tipo == 0){
+                ParadaAdapterSpinner adapter = new ParadaAdapterSpinner(ctx, R.layout.linha_paradas_spinner, R.id.textViewNome, paradas);
+                binding.spinnerInicial.setAdapter(adapter);
+
+                parada.getParada().setId(secao.getParadaInicial());
+                int i = viewModel.paradasIniciais.getValue().indexOf(parada);
+
+                if(i == -1){
+                    i = 0;
                 }
 
+                binding.spinnerInicial.setSelection(i);
 
+            } else{
+                ParadaAdapterSpinner adapter = new ParadaAdapterSpinner(ctx, R.layout.linha_paradas_spinner, R.id.textViewNome, paradas);
+                binding.spinnerFinal.setAdapter(adapter);
+
+                parada.getParada().setId(secao.getParadaFinal());
+                int i = viewModel.paradasFinais.getValue().indexOf(parada);
+
+                if(i == -1){
+                    i = 0;
+                }
+
+                binding.spinnerFinal.setSelection(i);
             }
 
         }
@@ -220,17 +232,21 @@ public class FormSecao extends FormBase {
 
     public void onItemSelectedSpinnerInicial (AdapterView<?> adapterView, View view, int i, long l){
         viewModel.setParadaInicial(viewModel.paradasIniciais.getValue().get(i));
+        viewModel.paradasFinais.observe(thiz, paradasFinaisObserver);
     }
 
     public void onItemSelectedSpinnerFinal (AdapterView<?> adapterView, View view, int i, long l){
-        viewModel.setParadaInicial(viewModel.paradasIniciais.getValue().get(i));
+
+        if(viewModel.paradasFinais.getValue() != null){
+            viewModel.setParadaFinal(viewModel.paradasFinais.getValue().get(i));
+        }
+
     }
 
     Observer<List<ParadaBairro>> paradasIniciaisObserver = new Observer<List<ParadaBairro>>() {
         @Override
         public void onChanged(List<ParadaBairro> paradas) {
             setSpinnerEntries(binding.spinnerInicial, paradas, 0);
-            viewModel.paradasFinais.observe(thiz, paradasFinaisObserver);
         }
     };
 
@@ -238,6 +254,28 @@ public class FormSecao extends FormBase {
         @Override
         public void onChanged(List<ParadaBairro> paradas) {
             setSpinnerEntries(binding.spinnerInicial, paradas, 1);
+        }
+    };
+
+    Observer<Integer> retornoObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer retorno) {
+
+            if(retorno == 1){
+                Toast.makeText(getContext().getApplicationContext(), "Seção cadastrada!", Toast.LENGTH_SHORT).show();
+                viewModel.setSecao(new SecaoItinerario());
+                dismiss();
+            } else if(retorno == 0){
+                Toast.makeText(getContext().getApplicationContext(),
+                        "Dados necessários não informados. Por favor preencha " +
+                                "todos os dados obrigatórios!",
+                        Toast.LENGTH_SHORT).show();
+            } else{
+                Toast.makeText(getContext().getApplicationContext(),
+                        "A parada inicial selecionada para a seção deve vir antes da parada final no trajeto do itinerário.",
+                        Toast.LENGTH_SHORT).show();
+            }
+
         }
     };
 

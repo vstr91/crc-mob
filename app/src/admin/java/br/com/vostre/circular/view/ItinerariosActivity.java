@@ -47,6 +47,7 @@ import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ParadaItinerarioAdapter;
 import br.com.vostre.circular.view.form.FormItinerario;
+import br.com.vostre.circular.view.form.FormParada;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.view.utils.SortListItemHelper;
 import br.com.vostre.circular.viewModel.ItinerariosViewModel;
@@ -146,14 +147,13 @@ public class ItinerariosActivity extends BaseActivity {
             MapEventsReceiver receiver = new MapEventsReceiver() {
                 @Override
                 public boolean singleTapConfirmedHelper(GeoPoint p) {
-//                    Toast.makeText(getBaseContext(),p.getLatitude() + " - "
-//                            +p.getLongitude(),Toast.LENGTH_LONG).show();
-//
-//                    FormParada formParada = new FormParada();
-//                    formParada.setLatitude(p.getLatitude());
-//                    formParada.setLongitude(p.getLongitude());
-//                    formParada.setCtx(getApplication());
-//                    formParada.show(getSupportFragmentManager(), "formParada");
+
+                    FormParada formParada = new FormParada();
+                    formParada.setLatitude(p.getLatitude());
+                    formParada.setLongitude(p.getLongitude());
+                    formParada.setParada(null);
+                    formParada.setCtx(getApplication());
+                    formParada.show(getSupportFragmentManager(), "formParada");
 
 //                    Marker m = new Marker(map);
 //                    m.setPosition(new GeoPoint(p.getLatitude(), p.getLongitude()));
@@ -346,6 +346,7 @@ public class ItinerariosActivity extends BaseActivity {
                 Marker m = new Marker(map);
                 m.setPosition(new GeoPoint(p.getParada().getLatitude(), p.getParada().getLongitude()));
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
                 m.setTitle(p.getParada().getNome());
                 m.setDraggable(true);
                 m.setId(p.getParada().getId());

@@ -134,6 +134,9 @@ public interface ItinerarioDAO {
             " ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 )")
     LiveData<List<ItinerarioPartidaDestino>> listarTodosAtivosPorParadaComBairroEHorario(String parada, String hora);
 
+    @RawQuery
+    LiveData<List<ItinerarioPartidaDestino>> listarTodosAtivosPorParadaComBairroEHorarioCompleto(String query);
+
     @Query("SELECT * FROM itinerario WHERE enviado = 0")
     List<Itinerario> listarTodosAEnviar();
 

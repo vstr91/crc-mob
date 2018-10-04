@@ -47,6 +47,7 @@
                         android:gravity="center_vertical|center_horizontal"
                         android:padding="10dp"
                         android:textStyle="bold"
+                        android:textSize="14dp"
                         app:text="@{horario.nomeHorario}"
                         tools:text="00:00" />
 
@@ -59,7 +60,7 @@
 
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="60dp"
+                            android:layout_height="45dp"
                             android:layout_weight="1"
                             android:orientation="vertical">
 
@@ -70,12 +71,13 @@
                                 android:gravity="center"
                                 android:text="DO"
                                 android:textAppearance="@style/texto_azul"
+                                android:textSize="14sp"
                                 android:textStyle="bold" />
 
                             <ToggleButton
                                 android:id="@+id/toggleButtonDomingo"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
                                 android:layout_gravity="center"
                                 android:background="@drawable/radio_dia"
                                 android:checked="@{horario.horarioItinerario.domingo}"
@@ -86,7 +88,7 @@
 
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="60dp"
+                            android:layout_height="45dp"
                             android:layout_weight="1"
                             android:orientation="vertical">
 
@@ -97,12 +99,13 @@
                                 android:gravity="center"
                                 android:text="SG"
                                 android:textAppearance="@style/texto_azul"
+                                android:textSize="14sp"
                                 android:textStyle="bold" />
 
                             <ToggleButton
                                 android:id="@+id/toggleButtonSegunda"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
                                 android:layout_gravity="center"
                                 android:background="@drawable/radio_dia"
                                 android:checked="@{horario.horarioItinerario.segunda}"
@@ -113,7 +116,7 @@
 
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="60dp"
+                            android:layout_height="45dp"
                             android:layout_weight="1"
                             android:orientation="vertical">
 
@@ -124,12 +127,13 @@
                                 android:gravity="center"
                                 android:text="TE"
                                 android:textAppearance="@style/texto_azul"
+                                android:textSize="14sp"
                                 android:textStyle="bold" />
 
                             <ToggleButton
                                 android:id="@+id/toggleButtonTerca"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
                                 android:layout_gravity="center"
                                 android:background="@drawable/radio_dia"
                                 android:checked="@{horario.horarioItinerario.terca}"
@@ -140,7 +144,7 @@
 
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="60dp"
+                            android:layout_height="45dp"
                             android:layout_weight="1"
                             android:orientation="vertical">
 
@@ -151,12 +155,13 @@
                                 android:gravity="center"
                                 android:text="QA"
                                 android:textAppearance="@style/texto_azul"
+                                android:textSize="14sp"
                                 android:textStyle="bold" />
 
                             <ToggleButton
                                 android:id="@+id/toggleButtonQuarta"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
                                 android:layout_gravity="center"
                                 android:background="@drawable/radio_dia"
                                 android:checked="@{horario.horarioItinerario.quarta}"
@@ -167,7 +172,7 @@
 
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="60dp"
+                            android:layout_height="45dp"
                             android:layout_weight="1"
                             android:orientation="vertical">
 
@@ -178,12 +183,13 @@
                                 android:gravity="center"
                                 android:text="QI"
                                 android:textAppearance="@style/texto_azul"
+                                android:textSize="14sp"
                                 android:textStyle="bold" />
 
                             <ToggleButton
                                 android:id="@+id/toggleButtonQuinta"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
                                 android:layout_gravity="center"
                                 android:background="@drawable/radio_dia"
                                 android:checked="@{horario.horarioItinerario.quinta}"
@@ -194,7 +200,7 @@
 
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="60dp"
+                            android:layout_height="45dp"
                             android:layout_weight="1"
                             android:orientation="vertical">
 
@@ -205,12 +211,13 @@
                                 android:gravity="center"
                                 android:text="SX"
                                 android:textAppearance="@style/texto_azul"
+                                android:textSize="14sp"
                                 android:textStyle="bold" />
 
                             <ToggleButton
                                 android:id="@+id/toggleButtonSexta"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
                                 android:layout_gravity="center"
                                 android:background="@drawable/radio_dia"
                                 android:checked="@{horario.horarioItinerario.sexta}"
@@ -221,7 +228,7 @@
 
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="60dp"
+                            android:layout_height="45dp"
                             android:layout_weight="1"
                             android:orientation="vertical">
 
@@ -232,12 +239,13 @@
                                 android:gravity="center"
                                 android:text="SB"
                                 android:textAppearance="@style/texto_azul"
+                                android:textSize="14sp"
                                 android:textStyle="bold" />
 
                             <ToggleButton
                                 android:id="@+id/toggleButtonSabado"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
                                 android:layout_gravity="center"
                                 android:background="@drawable/radio_dia"
                                 android:checked="@{horario.horarioItinerario.sabado}"
@@ -258,6 +266,7 @@
                     android:paddingBottom="10dp"
                     android:text="@{horario.horarioItinerario.observacao}"
                     android:textAppearance="@style/texto_azul"
+                    android:textSize="12sp"
                     android:textStyle="bold" />
             </LinearLayout>
 

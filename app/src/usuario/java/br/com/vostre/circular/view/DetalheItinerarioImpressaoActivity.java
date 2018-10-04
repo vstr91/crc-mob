@@ -48,6 +48,7 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityDetalheItinerarioBinding;
 import br.com.vostre.circular.databinding.ActivityDetalheItinerarioImpressaoBinding;
 import br.com.vostre.circular.databinding.LinhaHorariosItinerariosBinding;
+import br.com.vostre.circular.databinding.LinhaHorariosItinerariosCompactoBinding;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
@@ -131,7 +132,7 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
         public void onChanged(List<HorarioItinerarioNome> horarios) {
 
             for(HorarioItinerarioNome horario : horarios){
-                LinhaHorariosItinerariosBinding b = DataBindingUtil.inflate(getLayoutInflater(), R.layout.linha_horarios_itinerarios, binding.linearLayoutHorarios, false);
+                LinhaHorariosItinerariosCompactoBinding b = DataBindingUtil.inflate(getLayoutInflater(), R.layout.linha_horarios_itinerarios_compacto, binding.linearLayoutHorarios, false);
                 b.setHorario(horario);
 
                 if(horario.getHorarioItinerario().getObservacao() == null

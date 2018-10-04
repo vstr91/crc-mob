@@ -316,7 +316,6 @@ public class ItinerariosViewModel extends AndroidViewModel {
                     }
 
                     resultadosItinerarios.postValue(itinerarios);
-                    System.out.println("ITI >>> "+itinerarios.size());
 
                 }
             }

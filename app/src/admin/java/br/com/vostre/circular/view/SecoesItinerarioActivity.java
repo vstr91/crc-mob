@@ -56,6 +56,8 @@ public class SecoesItinerarioActivity extends BaseActivity {
     public void onFabClick(View v){
         FormSecao formSecao = new FormSecao();
         formSecao.flagInicioEdicao = false;
+        formSecao.setCtx(getApplication());
+        viewModel.setSecao(new SecaoItinerario());
         formSecao.show(getSupportFragmentManager(), "formSecao");
     }
 

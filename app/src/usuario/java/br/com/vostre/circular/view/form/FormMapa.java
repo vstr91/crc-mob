@@ -163,13 +163,14 @@ public class FormMapa extends FormBase {
 //        GeoPoint startPoint = new GeoPoint(-22.470804460339885, -43.82463455200195);
 //        mapController.setCenter(startPoint);
 
-        map.setMaxZoomLevel(19d);
-        map.setMinZoomLevel(16d);
+        map.setMaxZoomLevel(21d);
+        map.setMinZoomLevel(14d);
 
         if(parada != null){
             Marker m = new Marker(map);
             m.setPosition(new GeoPoint(parada.getParada().getLatitude(), parada.getParada().getLongitude()));
             m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            m.setIcon(getCtx().getResources().getDrawable(R.drawable.marker));
             m.setTitle(parada.getParada().getNome());
             m.setDraggable(false);
             m.setId(parada.getParada().getId());
@@ -180,6 +181,7 @@ public class FormMapa extends FormBase {
             Marker m = new Marker(map);
             m.setPosition(new GeoPoint(pontoInteresse.getLatitude(), pontoInteresse.getLongitude()));
             m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            m.setIcon(getCtx().getResources().getDrawable(R.drawable.poi));
             m.setTitle(pontoInteresse.getNome());
             m.setDraggable(false);
             m.setId(pontoInteresse.getId());

@@ -3,6 +3,7 @@ package br.com.vostre.circular.viewModel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.databinding.ObservableField;
 import android.os.AsyncTask;
 
@@ -30,6 +31,8 @@ public class HorariosItinerarioViewModel extends AndroidViewModel {
 
     public LiveData<ItinerarioPartidaDestino> itinerario;
     public ObservableField<ItinerarioPartidaDestino> iti;
+
+    public static MutableLiveData<Integer> retorno;
 
     public LiveData<List<HorarioItinerarioNome>> getHorariosCadastrados() {
         return horariosCadastrados;
@@ -83,6 +86,9 @@ public class HorariosItinerarioViewModel extends AndroidViewModel {
         horarios = appDatabase.horarioItinerarioDAO().listarTodosAtivosPorItinerario("");
         horariosCadastrados = appDatabase.horarioItinerarioDAO().listarTodosAtivosPorItinerario("");
         iti = new ObservableField<>(new ItinerarioPartidaDestino());
+
+        retorno = new MutableLiveData<>();
+        retorno.setValue(-1);
     }
 
     public void editarHorario(){
@@ -90,7 +96,7 @@ public class HorariosItinerarioViewModel extends AndroidViewModel {
         if(horario.getHorarioItinerario().valida(horario.getHorarioItinerario())){
             edit(horario.getHorarioItinerario());
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -125,6 +131,11 @@ public class HorariosItinerarioViewModel extends AndroidViewModel {
             db.horarioItinerarioDAO().invalidaTodosPorItinerario(params[0].getId());
 
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
         }
 
     }
@@ -164,6 +175,11 @@ public class HorariosItinerarioViewModel extends AndroidViewModel {
             }
 
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
         }
 
     }

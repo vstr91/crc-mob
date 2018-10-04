@@ -6,7 +6,9 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.R;
@@ -50,6 +52,7 @@ public class PaisesActivity extends BaseActivity {
         FormPais formPais = new FormPais();
         formPais.flagInicioEdicao = false;
         formPais.show(getSupportFragmentManager(), "formPais");
+//        viewModel.retorno.observe(this, retornoObserver);
     }
 
     Observer<List<Pais>> paisesObserver = new Observer<List<Pais>>() {

@@ -3,6 +3,7 @@ package br.com.vostre.circular.viewModel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 
 import org.joda.time.DateTime;
@@ -11,10 +12,13 @@ import java.util.List;
 
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Pais;
+import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.dao.PaisDAO;
 import br.com.vostre.circular.model.dao.SecaoItinerarioDAO;
+import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 import br.com.vostre.circular.utils.StringUtils;
 
 public class SecoesItinerarioViewModel extends AndroidViewModel {
@@ -25,6 +29,11 @@ public class SecoesItinerarioViewModel extends AndroidViewModel {
     public SecaoItinerario secao;
 
     Itinerario itinerario;
+
+    public LiveData<List<ParadaBairro>> paradasIniciais;
+    public LiveData<List<ParadaBairro>> paradasFinais;
+
+    public static MutableLiveData<Integer> retorno;
 
     public LiveData<List<SecaoItinerario>> getSecoes() {
         return secoes;
@@ -49,6 +58,17 @@ public class SecoesItinerarioViewModel extends AndroidViewModel {
     public void setItinerario(Itinerario itinerario) {
         this.itinerario = itinerario;
         secoes = appDatabase.secaoItinerarioDAO().listarTodosPorItinerario(itinerario.getId());
+
+        paradasIniciais = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro(itinerario.getId());
+    }
+
+    public void setParadaInicial(ParadaBairro paradaInicial) {
+        this.secao.setParadaInicial(paradaInicial.getParada().getId());
+        paradasFinais = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairroSemParadaInicial(itinerario.getId(), paradaInicial.getParada().getId());
+    }
+
+    public void setParadaFinal(ParadaBairro paradaFinal) {
+        this.secao.setParadaFinal(paradaFinal.getParada().getId());
     }
 
     public SecoesItinerarioViewModel(Application app){
@@ -56,6 +76,12 @@ public class SecoesItinerarioViewModel extends AndroidViewModel {
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         secao = new SecaoItinerario();
         secoes = appDatabase.secaoItinerarioDAO().listarTodosPorItinerario("");
+
+        paradasIniciais = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro("");
+        paradasFinais = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro("");
+
+        retorno = new MutableLiveData<>();
+        retorno.setValue(-1);
     }
 
     public void salvarSecao(){
@@ -65,7 +91,7 @@ public class SecoesItinerarioViewModel extends AndroidViewModel {
         if(secao.valida(secao)){
             add(secao);
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -76,7 +102,7 @@ public class SecoesItinerarioViewModel extends AndroidViewModel {
             secao.setItinerario(itinerario.getId());
             edit(secao);
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -95,6 +121,7 @@ public class SecoesItinerarioViewModel extends AndroidViewModel {
     private static class addAsyncTask extends AsyncTask<SecaoItinerario, Void, Void> {
 
         private AppDatabase db;
+        private boolean valido = false;
 
         addAsyncTask(AppDatabase appDatabase) {
             db = appDatabase;
@@ -102,8 +129,29 @@ public class SecoesItinerarioViewModel extends AndroidViewModel {
 
         @Override
         protected Void doInBackground(final SecaoItinerario... params) {
-            db.secaoItinerarioDAO().inserir((params[0]));
+
+            SecaoItinerario secao = params[0];
+
+            ParadaItinerarioBairro paradaInicial = db.paradaItinerarioDAO().carregar(secao.getParadaInicial(), secao.getItinerario());
+            ParadaItinerarioBairro paradaFinal = db.paradaItinerarioDAO().carregar(secao.getParadaFinal(), secao.getItinerario());
+
+            if(paradaInicial.getParadaItinerario().getOrdem() < paradaFinal.getParadaItinerario().getOrdem()){
+                db.secaoItinerarioDAO().inserir((params[0]));
+                valido = true;
+            }
+
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            if(valido){
+                retorno.setValue(1);
+            } else{
+                retorno.setValue(2);
+            }
+
         }
 
     }
@@ -123,6 +171,7 @@ public class SecoesItinerarioViewModel extends AndroidViewModel {
     private static class editAsyncTask extends AsyncTask<SecaoItinerario, Void, Void> {
 
         private AppDatabase db;
+        private boolean valido = false;
 
         editAsyncTask(AppDatabase appDatabase) {
             db = appDatabase;
@@ -130,8 +179,29 @@ public class SecoesItinerarioViewModel extends AndroidViewModel {
 
         @Override
         protected Void doInBackground(final SecaoItinerario... params) {
-            db.secaoItinerarioDAO().editar((params[0]));
+
+            SecaoItinerario secao = params[0];
+
+            ParadaItinerarioBairro paradaInicial = db.paradaItinerarioDAO().carregar(secao.getParadaInicial(), secao.getItinerario());
+            ParadaItinerarioBairro paradaFinal = db.paradaItinerarioDAO().carregar(secao.getParadaFinal(), secao.getItinerario());
+
+            if(paradaInicial.getParadaItinerario().getOrdem() < paradaFinal.getParadaItinerario().getOrdem()){
+                db.secaoItinerarioDAO().editar((params[0]));
+                valido = true;
+            }
+
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            if(valido){
+                retorno.setValue(1);
+            } else{
+                retorno.setValue(2);
+            }
+
         }
 
     }

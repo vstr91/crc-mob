@@ -3,6 +3,7 @@ package br.com.vostre.circular.viewModel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 
 import org.joda.time.DateTime;
@@ -21,6 +22,8 @@ public class ParametrosViewModel extends AndroidViewModel {
 
     public LiveData<List<Parametro>> parametros;
     public Parametro parametro;
+
+    public static MutableLiveData<Integer> retorno;
 
     public LiveData<List<Parametro>> getParametros() {
         return parametros;
@@ -43,6 +46,9 @@ public class ParametrosViewModel extends AndroidViewModel {
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         parametro = new Parametro();
         parametros = appDatabase.parametroDAO().listarTodos();
+
+        retorno = new MutableLiveData<>();
+        retorno.setValue(-1);
     }
 
     public void salvarParametro(){
@@ -50,7 +56,7 @@ public class ParametrosViewModel extends AndroidViewModel {
         if(parametro.valida(parametro)){
             add(parametro);
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -60,7 +66,7 @@ public class ParametrosViewModel extends AndroidViewModel {
         if(parametro.valida(parametro)){
             edit(parametro);
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -91,6 +97,11 @@ public class ParametrosViewModel extends AndroidViewModel {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
+        }
+
     }
 
     // fim adicionar
@@ -118,6 +129,11 @@ public class ParametrosViewModel extends AndroidViewModel {
         protected Void doInBackground(final Parametro... params) {
             db.parametroDAO().editar((params[0]));
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
         }
 
     }

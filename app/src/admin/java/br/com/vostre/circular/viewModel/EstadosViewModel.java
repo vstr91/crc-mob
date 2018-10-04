@@ -31,6 +31,8 @@ public class EstadosViewModel extends AndroidViewModel {
     public LiveData<List<Pais>> paises;
     public Pais pais;
 
+    public static MutableLiveData<Integer> retorno;
+
     public LiveData<List<Estado>> getEstados() {
         return estados;
     }
@@ -56,6 +58,9 @@ public class EstadosViewModel extends AndroidViewModel {
         paises = new MutableLiveData<>();
         paises = appDatabase.paisDAO().listarTodos();
 
+        retorno = new MutableLiveData<>();
+        retorno.setValue(-1);
+
     }
 
     public void salvarEstado(){
@@ -66,7 +71,7 @@ public class EstadosViewModel extends AndroidViewModel {
             estado.setSigla(estado.getSigla().toUpperCase());
             add(estado);
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -79,7 +84,7 @@ public class EstadosViewModel extends AndroidViewModel {
             estado.setSigla(estado.getSigla().toUpperCase());
             edit(estado);
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -120,6 +125,11 @@ public class EstadosViewModel extends AndroidViewModel {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
+        }
+
     }
 
     // fim adicionar
@@ -155,6 +165,11 @@ public class EstadosViewModel extends AndroidViewModel {
         protected Void doInBackground(final Estado... params) {
             db.estadoDAO().editar((params[0]));
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
         }
 
     }

@@ -47,6 +47,7 @@ import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ParadaItinerarioAdapter;
 import br.com.vostre.circular.view.form.FormItinerario;
+import br.com.vostre.circular.view.form.FormParada;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.view.utils.SortListItemHelper;
 import br.com.vostre.circular.viewModel.ItinerariosViewModel;
@@ -127,7 +128,6 @@ public class ItinerariosActivity extends BaseActivity {
             viewModel.itinerarios.observe(this, itinerariosObserver);
 
             viewModel.localAtual.observe(this, centroObserver);
-            viewModel.retorno.observe(this, retornoObserver);
 
             if(getIntent().getStringExtra("empresa") != null){
                 viewModel.setEmpresa(getIntent().getStringExtra("empresa"));
@@ -147,14 +147,13 @@ public class ItinerariosActivity extends BaseActivity {
             MapEventsReceiver receiver = new MapEventsReceiver() {
                 @Override
                 public boolean singleTapConfirmedHelper(GeoPoint p) {
-//                    Toast.makeText(getBaseContext(),p.getLatitude() + " - "
-//                            +p.getLongitude(),Toast.LENGTH_LONG).show();
-//
-//                    FormParada formParada = new FormParada();
-//                    formParada.setLatitude(p.getLatitude());
-//                    formParada.setLongitude(p.getLongitude());
-//                    formParada.setCtx(getApplication());
-//                    formParada.show(getSupportFragmentManager(), "formParada");
+
+                    FormParada formParada = new FormParada();
+                    formParada.setLatitude(p.getLatitude());
+                    formParada.setLongitude(p.getLongitude());
+                    formParada.setParada(null);
+                    formParada.setCtx(getApplication());
+                    formParada.show(getSupportFragmentManager(), "formParada");
 
 //                    Marker m = new Marker(map);
 //                    m.setPosition(new GeoPoint(p.getLatitude(), p.getLongitude()));
@@ -324,24 +323,6 @@ public class ItinerariosActivity extends BaseActivity {
         }
     };
 
-    Observer<Integer> retornoObserver = new Observer<Integer>() {
-        @Override
-        public void onChanged(Integer retorno) {
-
-            if(retorno == 1){
-                Toast.makeText(getApplicationContext(), "Itinerário cadastrado!", Toast.LENGTH_SHORT).show();
-                viewModel.paradasItinerario.setValue(new ArrayList<ParadaItinerarioBairro>());
-                viewModel.setItinerario(new Itinerario());
-            } else if(retorno == 0){
-                Toast.makeText(getApplicationContext(),
-                        "Dados necessários não informados. Por favor preencha " +
-                                "todos os dados obrigatórios!",
-                        Toast.LENGTH_SHORT).show();
-            }
-
-        }
-    };
-
     private boolean checarPermissoes(){
 
         permissionGPS = ContextCompat.checkSelfPermission(getApplicationContext(),
@@ -365,6 +346,7 @@ public class ItinerariosActivity extends BaseActivity {
                 Marker m = new Marker(map);
                 m.setPosition(new GeoPoint(p.getParada().getLatitude(), p.getParada().getLongitude()));
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
                 m.setTitle(p.getParada().getNome());
                 m.setDraggable(true);
                 m.setId(p.getParada().getId());

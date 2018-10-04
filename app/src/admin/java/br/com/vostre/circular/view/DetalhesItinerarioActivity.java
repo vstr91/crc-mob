@@ -298,6 +298,7 @@ public class DetalhesItinerarioActivity extends BaseActivity {
                 Marker m = new Marker(map);
                 m.setPosition(new GeoPoint(p.getParada().getLatitude(), p.getParada().getLongitude()));
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
                 m.setTitle(p.getParada().getNome());
                 m.setDraggable(true);
                 m.setId(p.getParada().getId());

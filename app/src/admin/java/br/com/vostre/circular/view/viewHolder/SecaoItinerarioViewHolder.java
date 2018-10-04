@@ -45,6 +45,7 @@ public class SecaoItinerarioViewHolder extends RecyclerView.ViewHolder {
             public boolean onLongClick(View v) {
                 FormSecao formSecao = new FormSecao();
                 formSecao.setSecao(secao);
+                formSecao.setCtx(ctx.getApplication());
                 formSecao.flagInicioEdicao = true;
                 formSecao.show(ctx.getSupportFragmentManager(), "formSecao");
                 return false;

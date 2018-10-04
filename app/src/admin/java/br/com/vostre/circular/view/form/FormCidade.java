@@ -21,6 +21,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -154,7 +155,7 @@ public class FormCidade extends FormBase {
             viewModel.salvarCidade();
         }
 
-        dismiss();
+        viewModel.retorno.observe(this, retornoObserver);
     }
 
     public void onClickFechar(View v){
@@ -291,6 +292,24 @@ public class FormCidade extends FormBase {
         @Override
         public void onChanged(List<Estado> estados) {
             setSpinnerEntries(binding.spinnerEstado, estados);
+        }
+    };
+
+    Observer<Integer> retornoObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer retorno) {
+
+            if(retorno == 1){
+                Toast.makeText(getContext().getApplicationContext(), "Cidade cadastrada!", Toast.LENGTH_SHORT).show();
+                viewModel.setCidade(new CidadeEstado());
+                dismiss();
+            } else if(retorno == 0){
+                Toast.makeText(getContext().getApplicationContext(),
+                        "Dados necessários não informados. Por favor preencha " +
+                                "todos os dados obrigatórios!",
+                        Toast.LENGTH_SHORT).show();
+            }
+
         }
     };
 

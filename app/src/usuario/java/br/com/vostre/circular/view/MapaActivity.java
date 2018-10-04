@@ -257,7 +257,7 @@ public class MapaActivity extends BaseActivity {
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                 m.setTitle(p.getParada().getNome());
                 m.setDraggable(true);
-                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker_default));
+                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
                 m.setId(p.getParada().getId());
                 m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                     @Override
@@ -336,7 +336,7 @@ public class MapaActivity extends BaseActivity {
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                 m.setTitle(p.getNome());
                 m.setDraggable(true);
-                m.setIcon(getResources().getDrawable(R.mipmap.ic_launcher));
+                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.poi));
                 m.setId(p.getId());
                 m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                     @Override
@@ -502,6 +502,7 @@ public class MapaActivity extends BaseActivity {
             formParada = new FormParada();
             formParada.setLatitude(viewModel.localAtual.getValue().getLatitude());
             formParada.setLongitude(viewModel.localAtual.getValue().getLongitude());
+            formParada.setParada(new ParadaSugestao());
             formParada.setCtx(getApplication());
             formParada.show(getSupportFragmentManager(), "formParada");
         }

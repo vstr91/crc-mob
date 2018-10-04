@@ -32,7 +32,7 @@ public class EntidadeSlug extends EntidadeBase {
 
     public boolean valida(EntidadeSlug entidade){
 
-        if(super.valida(entidade) && entidade.getNome() != null){
+        if(super.valida(entidade) && entidade.getNome() != null && !entidade.getNome().isEmpty()){
             return true;
         } else{
             return false;

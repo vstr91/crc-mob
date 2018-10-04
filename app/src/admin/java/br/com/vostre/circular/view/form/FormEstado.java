@@ -125,7 +125,7 @@ public class FormEstado extends FormBase {
             viewModel.salvarEstado();
         }
 
-        dismiss();
+        viewModel.retorno.observe(this, retornoObserver);
     }
 
     public void onClickFechar(View v){
@@ -226,6 +226,24 @@ public class FormEstado extends FormBase {
         @Override
         public void onChanged(List<Pais> paises) {
             setSpinnerEntries(binding.spinnerPais, paises);
+        }
+    };
+
+    Observer<Integer> retornoObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer retorno) {
+
+            if(retorno == 1){
+                Toast.makeText(getContext().getApplicationContext(), "Estado cadastrado!", Toast.LENGTH_SHORT).show();
+                viewModel.setEstado(new Estado());
+                dismiss();
+            } else if(retorno == 0){
+                Toast.makeText(getContext().getApplicationContext(),
+                        "Dados necessários não informados. Por favor preencha " +
+                                "todos os dados obrigatórios!",
+                        Toast.LENGTH_SHORT).show();
+            }
+
         }
     };
 

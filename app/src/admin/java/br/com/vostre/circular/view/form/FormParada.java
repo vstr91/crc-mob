@@ -47,7 +47,7 @@ import br.com.vostre.circular.viewModel.ParadasViewModel;
 
 public class FormParada extends FormBase {
 
-    FormParadaBinding binding;
+    static FormParadaBinding binding;
     Calendar data;
 
     TextView textViewProgramado;
@@ -59,10 +59,10 @@ public class FormParada extends FormBase {
     Double latitude;
     Double longitude;
 
-    ParadaBairro parada;
+    static ParadaBairro parada;
     public Boolean flagInicioEdicao;
     static Application ctx;
-    ParadasViewModel viewModel;
+    static ParadasViewModel viewModel;
 
     BairroAdapterSpinner adapter;
 
@@ -180,6 +180,7 @@ public class FormParada extends FormBase {
     }
 
     public void onClickFechar(View v){
+        viewModel.bairro = null;
         dismiss();
     }
 
@@ -265,6 +266,14 @@ public class FormParada extends FormBase {
             BairroAdapterSpinner adapter = new BairroAdapterSpinner(ctx, R.layout.linha_bairros_spinner,
                     R.id.textViewNome, bairros.getValue());
             spinner.setAdapter(adapter);
+
+            if(parada != null){
+                BairroCidade bairro = new BairroCidade();
+                bairro.getBairro().setId(parada.getParada().getBairro());
+                int i = viewModel.bairros.getValue().indexOf(bairro);
+                binding.spinnerBairro.setSelection(i);
+            }
+
         }
 
     }

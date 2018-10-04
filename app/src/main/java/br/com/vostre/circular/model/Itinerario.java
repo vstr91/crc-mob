@@ -92,7 +92,7 @@ public class Itinerario extends EntidadeBase {
 
     public boolean valida(Itinerario itinerario) {
 
-        if(super.valida(itinerario) && itinerario.getAcessivel() != null && itinerario.getTarifa() != null
+        if(super.valida(itinerario) && itinerario.getAcessivel() != null && itinerario.getTarifa() != null && itinerario.getTarifa() > 0
                 && itinerario.getEmpresa() != null){
             return true;
         } else{

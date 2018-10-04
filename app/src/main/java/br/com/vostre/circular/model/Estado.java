@@ -37,7 +37,7 @@ public class Estado extends EntidadeSlug {
 
     public boolean valida(Estado estado) {
 
-        if(super.valida(estado) && estado.getSigla() != null && estado.getPais() != null){
+        if(super.valida(estado) && estado.getSigla() != null && !estado.getSigla().isEmpty() && estado.getPais() != null){
             return true;
         } else{
             return false;

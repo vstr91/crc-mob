@@ -30,6 +30,8 @@ public class ItinerarioViewHolder extends RecyclerView.ViewHolder {
 
         if(itinerario.getItinerario().getObservacao() == null || itinerario.getItinerario().getObservacao().isEmpty()){
             binding.textViewObservacao.setVisibility(View.GONE);
+        } else{
+            binding.textViewObservacao.setVisibility(View.VISIBLE);
         }
 
         if(itinerario.getItinerario().getProgramadoPara() != null && itinerario.getItinerario().getProgramadoPara().isAfterNow()){

@@ -45,7 +45,7 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
     public LiveData<ItinerarioPartidaDestino> itinerario;
 
     public LiveData<List<ParadaBairro>> paradas;
-    public LiveData<List<HorarioItinerarioNome>> horarios;
+    public static MutableLiveData<List<HorarioItinerarioNome>> horarios;
     public LiveData<List<SecaoItinerario>> secoes;
     public MutableLiveData<Location> localAtual;
     public boolean centralizaMapa = true;
@@ -54,12 +54,17 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
     public LocationCallback mLocationCallback;
 
     public static MutableLiveData<Integer> retorno;
+    public static int qtdItinerarios;
+
     Location l;
 
     public void setItinerario(String itinerario) {
         this.itinerario = appDatabase.itinerarioDAO().carregar(itinerario);
         this.paradas = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro(itinerario);
-        this.horarios = appDatabase.horarioItinerarioDAO().listarApenasAtivosPorItinerario(itinerario);
+
+        new carregaHorariosAsyncTask(appDatabase, itinerario).execute();
+
+        //this.horarios = appDatabase.horarioItinerarioDAO().listarApenasAtivosPorItinerario(itinerario);
         this.secoes = appDatabase.secaoItinerarioDAO().listarTodosPorItinerario(itinerario);
     }
 
@@ -76,7 +81,8 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         itinerario = appDatabase.itinerarioDAO().carregar("");
         paradas = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro("");
-        horarios = appDatabase.horarioItinerarioDAO().listarApenasAtivosPorItinerario("");
+        //horarios = appDatabase.horarioItinerarioDAO().listarApenasAtivosPorItinerario("");
+        horarios = new MutableLiveData<>();
         secoes = appDatabase.secaoItinerarioDAO().listarTodosPorItinerario("");
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplication());
@@ -91,6 +97,35 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
         retorno = new MutableLiveData<>();
         retorno.setValue(-1);
+    }
+
+    private static class carregaHorariosAsyncTask extends AsyncTask<List<ItinerarioPartidaDestino>, Void, Void> {
+
+        private AppDatabase db;
+        private String itinerario;
+
+        carregaHorariosAsyncTask(AppDatabase appDatabase, String itinerario) {
+            db = appDatabase;
+            this.itinerario = itinerario;
+        }
+
+        @Override
+        protected Void doInBackground(final List<ItinerarioPartidaDestino>... params) {
+
+            List<ParadaBairro> paradas = db.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairroSync(itinerario);
+
+            if(paradas.size() > 0){
+                qtdItinerarios = db.horarioItinerarioDAO()
+                        .contaItinerariosPorPartidaEDestinoSync(paradas.get(0).getParada().getId(), paradas.get(paradas.size()-1).getParada().getId());
+
+                horarios.postValue(db.horarioItinerarioDAO().listarApenasAtivosPorPartidaEDestinoSync(paradas.get(0).getParada().getId(), paradas.get(paradas.size()-1).getParada().getId()));
+            }
+
+
+
+            return null;
+        }
+
     }
 
     public void iniciarAtualizacoesPosicao(){

@@ -54,7 +54,7 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
     public LocationCallback mLocationCallback;
 
     public static MutableLiveData<Integer> retorno;
-    public static int qtdItinerarios;
+    public static List<ItinerarioPartidaDestino> qtdItinerarios;
 
     Location l;
 

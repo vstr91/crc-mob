@@ -26,229 +26,39 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <LinearLayout
+            <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="10dp">
+                android:layout_height="match_parent">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                <ImageView
+                    android:id="@+id/imageViewCor"
+                    android:layout_width="15dp"
+                    android:layout_height="0dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                    <TextView
-                        android:id="@+id/textViewNome"
-                        style="@style/texto_lista"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_weight="1.5"
-                        android:gravity="center_vertical|center_horizontal"
-                        android:padding="10dp"
-                        android:textStyle="bold"
-                        app:text="@{horario.nomeHorario}"
-                        tools:text="00:00" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="5"
-                        android:orientation="horizontal"
-                        android:paddingRight="10dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="60dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/textView18"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:text="DO"
-                                android:textAppearance="@style/texto_azul"
-                                android:textStyle="bold" />
-
-                            <ToggleButton
-                                android:id="@+id/toggleButtonDomingo"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:layout_gravity="center"
-                                android:background="@drawable/radio_dia"
-                                android:checked="@{horario.horarioItinerario.domingo}"
-                                android:clickable="false"
-                                android:textOff=" "
-                                android:textOn=" " />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="60dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/textView19"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:text="SG"
-                                android:textAppearance="@style/texto_azul"
-                                android:textStyle="bold" />
-
-                            <ToggleButton
-                                android:id="@+id/toggleButtonSegunda"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:layout_gravity="center"
-                                android:background="@drawable/radio_dia"
-                                android:checked="@{horario.horarioItinerario.segunda}"
-                                android:clickable="false"
-                                android:textOff=" "
-                                android:textOn=" " />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="60dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/textView20"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:text="TE"
-                                android:textAppearance="@style/texto_azul"
-                                android:textStyle="bold" />
-
-                            <ToggleButton
-                                android:id="@+id/toggleButtonTerca"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:layout_gravity="center"
-                                android:background="@drawable/radio_dia"
-                                android:checked="@{horario.horarioItinerario.terca}"
-                                android:clickable="false"
-                                android:textOff=" "
-                                android:textOn=" " />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="60dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/textView21"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:text="QA"
-                                android:textAppearance="@style/texto_azul"
-                                android:textStyle="bold" />
-
-                            <ToggleButton
-                                android:id="@+id/toggleButtonQuarta"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:layout_gravity="center"
-                                android:background="@drawable/radio_dia"
-                                android:checked="@{horario.horarioItinerario.quarta}"
-                                android:clickable="false"
-                                android:textOff=" "
-                                android:textOn=" " />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="60dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/textView22"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:text="QI"
-                                android:textAppearance="@style/texto_azul"
-                                android:textStyle="bold" />
-
-                            <ToggleButton
-                                android:id="@+id/toggleButtonQuinta"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:layout_gravity="center"
-                                android:background="@drawable/radio_dia"
-                                android:checked="@{horario.horarioItinerario.quinta}"
-                                android:clickable="false"
-                                android:textOff=" "
-                                android:textOn=" " />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="60dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/textView23"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:text="SX"
-                                android:textAppearance="@style/texto_azul"
-                                android:textStyle="bold" />
-
-                            <ToggleButton
-                                android:id="@+id/toggleButtonSexta"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:layout_gravity="center"
-                                android:background="@drawable/radio_dia"
-                                android:checked="@{horario.horarioItinerario.sexta}"
-                                android:clickable="false"
-                                android:textOff=" "
-                                android:textOn=" " />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="60dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/textView24"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:text="SB"
-                                android:textAppearance="@style/texto_azul"
-                                android:textStyle="bold" />
-
-                            <ToggleButton
-                                android:id="@+id/toggleButtonSabado"
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:layout_gravity="center"
-                                android:background="@drawable/radio_dia"
-                                android:checked="@{horario.horarioItinerario.sabado}"
-                                android:clickable="false"
-                                android:textOff=" "
-                                android:textOn=" " />
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/textViewNome"
+                    style="@style/texto_lista"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_weight="1.5"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:padding="10dp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@+id/textViewObservacao"
+                    app:layout_constraintStart_toEndOf="@+id/imageViewCor"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:text="@{horario.nomeHorario}"
+                    tools:text="00:00" />
 
                 <TextView
                     android:id="@+id/textViewObservacao"
@@ -258,8 +68,218 @@
                     android:paddingBottom="10dp"
                     android:text="@{horario.horarioItinerario.observacao}"
                     android:textAppearance="@style/texto_azul"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/linearLayout5" />
+
+                <LinearLayout
+                    android:id="@+id/linearLayout5"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_weight="5"
+                    android:orientation="horizontal"
+                    android:paddingRight="10dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/textViewNome"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textView18"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="DO"
+                            android:textAppearance="@style/texto_azul"
+                            android:textStyle="bold" />
+
+                        <ToggleButton
+                            android:id="@+id/toggleButtonDomingo"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/radio_dia"
+                            android:checked="@{horario.horarioItinerario.domingo}"
+                            android:clickable="false"
+                            android:textOff=" "
+                            android:textOn=" " />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textView19"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="SG"
+                            android:textAppearance="@style/texto_azul"
+                            android:textStyle="bold" />
+
+                        <ToggleButton
+                            android:id="@+id/toggleButtonSegunda"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/radio_dia"
+                            android:checked="@{horario.horarioItinerario.segunda}"
+                            android:clickable="false"
+                            android:textOff=" "
+                            android:textOn=" " />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textView20"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="TE"
+                            android:textAppearance="@style/texto_azul"
+                            android:textStyle="bold" />
+
+                        <ToggleButton
+                            android:id="@+id/toggleButtonTerca"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/radio_dia"
+                            android:checked="@{horario.horarioItinerario.terca}"
+                            android:clickable="false"
+                            android:textOff=" "
+                            android:textOn=" " />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textView21"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="QA"
+                            android:textAppearance="@style/texto_azul"
+                            android:textStyle="bold" />
+
+                        <ToggleButton
+                            android:id="@+id/toggleButtonQuarta"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/radio_dia"
+                            android:checked="@{horario.horarioItinerario.quarta}"
+                            android:clickable="false"
+                            android:textOff=" "
+                            android:textOn=" " />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textView22"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="QI"
+                            android:textAppearance="@style/texto_azul"
+                            android:textStyle="bold" />
+
+                        <ToggleButton
+                            android:id="@+id/toggleButtonQuinta"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/radio_dia"
+                            android:checked="@{horario.horarioItinerario.quinta}"
+                            android:clickable="false"
+                            android:textOff=" "
+                            android:textOn=" " />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textView23"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="SX"
+                            android:textAppearance="@style/texto_azul"
+                            android:textStyle="bold" />
+
+                        <ToggleButton
+                            android:id="@+id/toggleButtonSexta"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/radio_dia"
+                            android:checked="@{horario.horarioItinerario.sexta}"
+                            android:clickable="false"
+                            android:textOff=" "
+                            android:textOn=" " />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textView24"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="SB"
+                            android:textAppearance="@style/texto_azul"
+                            android:textStyle="bold" />
+
+                        <ToggleButton
+                            android:id="@+id/toggleButtonSabado"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/radio_dia"
+                            android:checked="@{horario.horarioItinerario.sabado}"
+                            android:clickable="false"
+                            android:textOff=" "
+                            android:textOn=" " />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </android.support.constraint.ConstraintLayout>
 
         </android.support.v7.widget.CardView>
     </android.support.constraint.ConstraintLayout>

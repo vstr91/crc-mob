@@ -4,9 +4,11 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -48,6 +50,8 @@ import java.util.List;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityDetalheItinerarioBinding;
 import br.com.vostre.circular.databinding.ActivityDetalheParadaBinding;
+import br.com.vostre.circular.databinding.LinhaBairrosBinding;
+import br.com.vostre.circular.databinding.LinhaLegendaBinding;
 import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Parada;
@@ -55,11 +59,13 @@ import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
+import br.com.vostre.circular.model.pojo.Legenda;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SnackbarHelper;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
+import br.com.vostre.circular.view.adapter.LegendaAdapter;
 import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
@@ -82,6 +88,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
     BottomSheetDialog bsd;
     boolean flagFavorito = false;
+    RecyclerView listLegenda;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +99,8 @@ public class DetalheItinerarioActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setTitle("Detalhe Itinerário");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
+
+        listLegenda = binding.listLegenda;
 
         ctx = this;
 
@@ -258,7 +267,41 @@ public class DetalheItinerarioActivity extends BaseActivity {
     Observer<List<HorarioItinerarioNome>> horariosObserver = new Observer<List<HorarioItinerarioNome>>() {
         @Override
         public void onChanged(List<HorarioItinerarioNome> horarios) {
+
+            List<Legenda> dados = null;
+
+            if(viewModel.qtdItinerarios.size() > 1){
+                binding.textView37.setVisibility(View.GONE);
+                binding.textViewLegenda.setVisibility(View.VISIBLE);
+                binding.listLegenda.setVisibility(View.VISIBLE);
+
+                List<ItinerarioPartidaDestino> itinerarios = viewModel.qtdItinerarios;
+                dados = new ArrayList<>();
+
+                int[] cores = ctx.getResources().getIntArray(R.array.cores_legenda);
+
+                int cont = 0;
+
+                for(ItinerarioPartidaDestino itinerario : itinerarios){
+                    Legenda legenda = new Legenda();
+                    legenda.setItinerario(itinerario.getItinerario().getId());
+                    legenda.setTexto(itinerario.getItinerario().getObservacao());
+                    legenda.setCor(cores[cont]);
+                    dados.add(legenda);
+                    cont++;
+                }
+
+                LegendaAdapter adapter = new LegendaAdapter(dados, ctx);
+                binding.listLegenda.setAdapter(adapter);
+
+            } else{
+                binding.textView37.setVisibility(View.VISIBLE);
+                binding.textViewLegenda.setVisibility(View.GONE);
+                binding.listLegenda.setVisibility(View.GONE);
+            }
+
             adapter.horarios = horarios;
+            adapter.legenda = dados;
             adapter.notifyDataSetChanged();
         }
     };

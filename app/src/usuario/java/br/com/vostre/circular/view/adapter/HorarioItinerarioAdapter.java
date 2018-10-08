@@ -11,11 +11,13 @@ import br.com.vostre.circular.databinding.LinhaHorariosItinerariosBinding;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
+import br.com.vostre.circular.model.pojo.Legenda;
 import br.com.vostre.circular.view.viewHolder.HorarioItinerarioViewHolder;
 
 public class HorarioItinerarioAdapter extends RecyclerView.Adapter<HorarioItinerarioViewHolder> {
 
     public List<HorarioItinerarioNome> horarios;
+    public List<Legenda> legenda;
     AppCompatActivity ctx;
 
     public HorarioItinerarioAdapter(List<HorarioItinerarioNome> horarios, AppCompatActivity context){
@@ -35,7 +37,19 @@ public class HorarioItinerarioAdapter extends RecyclerView.Adapter<HorarioItiner
     @Override
     public void onBindViewHolder(HorarioItinerarioViewHolder holder, int position) {
         HorarioItinerarioNome horario = horarios.get(position);
-        holder.bind(horario);
+
+        Legenda l = null;
+
+        if(legenda != null && legenda.size() > 0){
+            l = new Legenda();
+            l.setItinerario(horario.getHorarioItinerario().getItinerario());
+            l = legenda.get(legenda.indexOf(l));
+            holder.bind(horario, l);
+        } else{
+            holder.bind(horario);
+        }
+
+
     }
 
     @Override

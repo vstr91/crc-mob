@@ -11,7 +11,9 @@ import android.arch.persistence.room.Update;
 import java.util.List;
 
 import br.com.vostre.circular.model.HorarioItinerario;
+import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
+import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 
 @Dao
 public interface HorarioItinerarioDAO {
@@ -47,15 +49,32 @@ public interface HorarioItinerarioDAO {
             "ORDER BY h.nome")
     List<HorarioItinerarioNome> listarApenasAtivosPorPartidaEDestinoSync(String partida, String destino);
 
-    @Query("SELECT COUNT(DISTINCT hi.itinerario) " +
-            "FROM horario h INNER JOIN horario_itinerario hi ON hi.horario = h.id " +
+    @Query("SELECT DISTINCT i.*, " +
+            "(SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'nomePartida', " +
+            "(SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'nomeDestino', " +
+            "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'bairroPartida', " +
+            "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'bairroDestino', " +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'cidadePartida', " +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'cidadeDestino', " +
+            "'' AS nomeEmpresa " +
+            "FROM horario h INNER JOIN horario_itinerario hi ON hi.horario = h.id INNER JOIN itinerario i ON i.id = hi.itinerario " +
             "WHERE h.ativo = 1 AND (domingo = 1 OR segunda = 1 OR terca = 1 OR quarta = 1 OR quinta = 1 OR sexta = 1 OR sabado = 1) " +
             "AND hi.ativo = 1 AND hi.itinerario IN (SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada WHERE itinerario IN " +
             "(SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada " +
             "WHERE p.bairro = (SELECT b.id FROM parada p INNER JOIN bairro b ON b.id = p.bairro WHERE p.id = :partida) AND pi.ordem = 1)" +
             " AND p.bairro = (SELECT b.id FROM parada p INNER JOIN bairro b ON b.id = p.bairro WHERE p.id = :destino) AND pi.ordem > 1) " +
             "ORDER BY h.nome")
-    Integer contaItinerariosPorPartidaEDestinoSync(String partida, String destino);
+    List<ItinerarioPartidaDestino> contaItinerariosPorPartidaEDestinoSync(String partida, String destino);
 
     @Query("SELECT hi.* FROM horario_itinerario hi WHERE hi.horario = :horario AND hi.itinerario = :itinerario")
     HorarioItinerario checaDuplicidade(String horario, String itinerario);

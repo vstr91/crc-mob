@@ -11,4 +11,9 @@
     <color name="cinzaClaro">#EEEEEE</color>
     <color name="cinzaMedio">#AAAAAA</color>
     <color name="cinzaInativo">#E3E3E3</color>
+    <array name="cores_legenda">
+        <item>@color/azul</item>
+        <item>@color/ciano</item>
+        <item>@color/cinzaEscuro</item>
+    </array>
 </resources>

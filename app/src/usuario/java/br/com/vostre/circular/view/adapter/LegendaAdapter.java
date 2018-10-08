@@ -11,6 +11,7 @@ import br.com.vostre.circular.databinding.LinhaBairrosBinding;
 import br.com.vostre.circular.databinding.LinhaLegendaBinding;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.Legenda;
+import br.com.vostre.circular.view.listener.LegendaListener;
 import br.com.vostre.circular.view.listener.SelectListener;
 import br.com.vostre.circular.view.viewHolder.BairroViewHolder;
 import br.com.vostre.circular.view.viewHolder.LegendaViewHolder;
@@ -19,6 +20,15 @@ public class LegendaAdapter extends RecyclerView.Adapter<LegendaViewHolder> {
 
     public List<Legenda> dados;
     Context ctx;
+    LegendaListener listener;
+
+    public LegendaListener getListener() {
+        return listener;
+    }
+
+    public void setListener(LegendaListener listener) {
+        this.listener = listener;
+    }
 
     public LegendaAdapter(List<Legenda> dados, Context context){
         this.dados = dados;
@@ -31,7 +41,7 @@ public class LegendaAdapter extends RecyclerView.Adapter<LegendaViewHolder> {
                 LayoutInflater.from(parent.getContext());
         LinhaLegendaBinding itemBinding =
                 LinhaLegendaBinding.inflate(layoutInflater, parent, false);
-        return new LegendaViewHolder(itemBinding, ctx);
+        return new LegendaViewHolder(itemBinding, ctx, listener);
     }
 
     @Override

@@ -49,6 +49,16 @@ public interface HorarioItinerarioDAO {
             "ORDER BY h.nome")
     List<HorarioItinerarioNome> listarApenasAtivosPorPartidaEDestinoSync(String partida, String destino);
 
+    @Query("SELECT hi.*, h.id AS idHorario, h.nome AS nomeHorario " +
+            "FROM horario h INNER JOIN horario_itinerario hi ON hi.horario = h.id " +
+            "WHERE h.ativo = 1 AND (domingo = 1 OR segunda = 1 OR terca = 1 OR quarta = 1 OR quinta = 1 OR sexta = 1 OR sabado = 1) " +
+            "AND hi.ativo = 1 AND hi.itinerario IN (SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada WHERE itinerario IN " +
+            "(SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada " +
+            "WHERE p.bairro = (SELECT b.id FROM parada p INNER JOIN bairro b ON b.id = p.bairro WHERE p.id = :partida) AND pi.ordem = 1)" +
+            " AND p.bairro = (SELECT b.id FROM parada p INNER JOIN bairro b ON b.id = p.bairro WHERE p.id = :destino) AND pi.ordem > 1) AND hi.itinerario <> :itinerarioARemover " +
+            "ORDER BY h.nome")
+    List<HorarioItinerarioNome> listarApenasAtivosPorPartidaEDestinoFiltradoSync(String partida, String destino, String itinerarioARemover);
+
     @Query("SELECT DISTINCT i.*, " +
             "(SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
             "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'nomePartida', " +

@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaHorariosItinerariosBinding;
@@ -17,6 +18,7 @@ import br.com.vostre.circular.view.viewHolder.HorarioItinerarioViewHolder;
 public class HorarioItinerarioAdapter extends RecyclerView.Adapter<HorarioItinerarioViewHolder> {
 
     public List<HorarioItinerarioNome> horarios;
+    public List<HorarioItinerarioNome> horariosFiltrados = null;
     public List<Legenda> legenda;
     AppCompatActivity ctx;
 
@@ -34,9 +36,53 @@ public class HorarioItinerarioAdapter extends RecyclerView.Adapter<HorarioItiner
         return new HorarioItinerarioViewHolder(itemBinding, ctx);
     }
 
+    public void filtrarHorarios(String itinerario){
+
+        horariosFiltrados = new ArrayList<>();
+
+        for(HorarioItinerarioNome horario : horarios){
+
+            if(!horario.getHorarioItinerario().getItinerario().equals(itinerario)){
+                horariosFiltrados.add(horario);
+            }
+
+        }
+
+        notifyDataSetChanged();
+
+    }
+
+    public void usarDadosOriginais(){
+
+        horariosFiltrados = null;
+
+        notifyDataSetChanged();
+
+    }
+
+    public HorarioItinerarioNome buscaPosicaoHorario(String horario, String itinerario){
+
+        for(HorarioItinerarioNome h : horarios){
+
+            if(h.getHorarioItinerario().getHorario().equals(horario)){
+                return h;
+            }
+
+        }
+
+        return null;
+    }
+
     @Override
     public void onBindViewHolder(HorarioItinerarioViewHolder holder, int position) {
-        HorarioItinerarioNome horario = horarios.get(position);
+
+        HorarioItinerarioNome horario;
+
+        if(horariosFiltrados != null){
+            horario = horariosFiltrados.get(position);
+        } else{
+            horario = horarios.get(position);
+        }
 
         Legenda l = null;
 
@@ -55,11 +101,17 @@ public class HorarioItinerarioAdapter extends RecyclerView.Adapter<HorarioItiner
     @Override
     public int getItemCount() {
 
-        if(horarios == null){
-            return 0;
+        if(horariosFiltrados != null){
+            return horariosFiltrados.size();
         } else{
-            return horarios.size();
+            if(horarios == null){
+                return 0;
+            } else{
+                return horarios.size();
+            }
         }
+
+
 
 
     }

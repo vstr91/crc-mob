@@ -52,6 +52,7 @@ public class ItinerarioViewHolder extends RecyclerView.ViewHolder {
             public void onClick(View view) {
                 Intent i = new Intent(ctx, DetalheItinerarioActivity.class);
                 i.putExtra("itinerario", itinerario.getItinerario().getId());
+                i.putExtra("horario", itinerario.getIdProximoHorario());
                 ctx.startActivity(i);
             }
         };

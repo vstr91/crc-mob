@@ -21,6 +21,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -67,7 +68,9 @@ import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.LegendaAdapter;
 import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
+import br.com.vostre.circular.view.listener.LegendaListener;
 import br.com.vostre.circular.view.utils.InfoWindow;
+import br.com.vostre.circular.view.viewHolder.LegendaViewHolder;
 import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
 import br.com.vostre.circular.viewModel.DetalhesParadaViewModel;
 
@@ -75,7 +78,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
     ActivityDetalheItinerarioBinding binding;
     DetalhesItinerarioViewModel viewModel;
-    HorarioItinerarioAdapter adapter;
+    HorarioItinerarioAdapter adapterHorarios;
     SecaoItinerarioAdapter adapterSecoes;
 
     RecyclerView listHorarios;
@@ -89,6 +92,9 @@ public class DetalheItinerarioActivity extends BaseActivity {
     BottomSheetDialog bsd;
     boolean flagFavorito = false;
     RecyclerView listLegenda;
+
+    String horario;
+    boolean mapaOculto = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,12 +115,13 @@ public class DetalheItinerarioActivity extends BaseActivity {
         binding.setViewModel(viewModel);
 
         viewModel.setItinerario(getIntent().getStringExtra("itinerario"));
+        horario = getIntent().getStringExtra("horario");
 
         viewModel.itinerario.observe(this, itinerarioObserver);
 
         listHorarios = binding.listHorarios;
-        adapter = new HorarioItinerarioAdapter(viewModel.horarios.getValue(), this);
-        listHorarios.setAdapter(adapter);
+        adapterHorarios = new HorarioItinerarioAdapter(viewModel.horarios.getValue(), this);
+        listHorarios.setAdapter(adapterHorarios);
 
         bsd = new BottomSheetDialog(ctx);
         bsd.setCanceledOnTouchOutside(true);
@@ -260,6 +267,18 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
     }
 
+    public void ocultarMapa(View v){
+
+        if(mapaOculto){
+            binding.map.setVisibility(View.VISIBLE);
+            mapaOculto = false;
+        } else{
+            binding.map.setVisibility(View.GONE);
+            mapaOculto = true;
+        }
+
+    }
+
     public void btnSecoesClick(View v){
         bsd.show();
     }
@@ -291,7 +310,31 @@ public class DetalheItinerarioActivity extends BaseActivity {
                     cont++;
                 }
 
-                LegendaAdapter adapter = new LegendaAdapter(dados, ctx);
+                final LegendaAdapter adapter = new LegendaAdapter(dados, ctx);
+                adapter.setListener(new LegendaListener() {
+                    @Override
+                    public void onLegendaSelected(boolean ativa, String itinerario) {
+
+                        if(!ativa){
+                            adapterHorarios.filtrarHorarios(itinerario);
+                        } else{
+                            RecyclerView lista = binding.listLegenda;
+
+                            int registros = lista.getChildCount();
+
+                            for(int i = 0; i < registros; i++){
+                                LegendaViewHolder b = (LegendaViewHolder) lista.getChildViewHolder(lista.getChildAt(i));
+
+                                if(!b.ativa){
+                                    b.ativa = true;
+                                }
+                            }
+
+                            adapterHorarios.usarDadosOriginais();
+                        }
+
+                    }
+                });
                 binding.listLegenda.setAdapter(adapter);
 
             } else{
@@ -300,9 +343,18 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 binding.listLegenda.setVisibility(View.GONE);
             }
 
-            adapter.horarios = horarios;
-            adapter.legenda = dados;
-            adapter.notifyDataSetChanged();
+            adapterHorarios.horarios = horarios;
+            adapterHorarios.legenda = dados;
+            adapterHorarios.notifyDataSetChanged();
+
+            HorarioItinerarioNome h = adapterHorarios.buscaPosicaoHorario(horario, viewModel.itinerario.getValue().getItinerario().getId());
+            int posicao = -1;
+
+            if(h != null){
+                posicao = adapterHorarios.horarios.indexOf(h);
+            }
+
+            //binding.listHorarios.smoothScrollToPosition(15);
         }
     };
 

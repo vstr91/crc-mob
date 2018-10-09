@@ -80,6 +80,7 @@ public class FormMapa extends FormBase {
 
     int permissionGPS;
     AppCompatActivity act;
+    MyLocationNewOverlay mLocationOverlay;
 
     public ParadaBairro getParada() {
         return parada;
@@ -173,6 +174,11 @@ public class FormMapa extends FormBase {
 
         map.setMaxZoomLevel(21d);
         map.setMinZoomLevel(14d);
+
+        mLocationOverlay = new MyLocationNewOverlay(
+                new GpsMyLocationProvider(ctx.getApplicationContext()),map);
+        mLocationOverlay.enableMyLocation();
+        map.getOverlays().add(mLocationOverlay);
 
         if(parada != null){
             Marker m = new Marker(map);

@@ -17,9 +17,21 @@ public class PreferenceUtils {
         editor.apply();
     }
 
+    public static void salvarPreferencia(Context ctx, String chave, int valor){
+        SharedPreferences sharedPreferences = ctx.getSharedPreferences(ctx.getPackageName(), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(chave, valor);
+        editor.apply();
+    }
+
     public static String carregarPreferencia(Context ctx, String chave){
         SharedPreferences sharedPreferences = ctx.getSharedPreferences(ctx.getPackageName(), Context.MODE_PRIVATE);
         return sharedPreferences.getString(chave, "");
+    }
+
+    public static int carregarPreferenciaInt(Context ctx, String chave){
+        SharedPreferences sharedPreferences = ctx.getSharedPreferences(ctx.getPackageName(), Context.MODE_PRIVATE);
+        return sharedPreferences.getInt(chave, -1);
     }
 
     public static void salvarUsuarioLogado(Context ctx, String id){

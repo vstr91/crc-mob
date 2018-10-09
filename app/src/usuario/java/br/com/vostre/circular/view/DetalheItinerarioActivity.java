@@ -2,47 +2,32 @@ package br.com.vostre.circular.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.TypedArray;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.osmdroid.api.IMapController;
-import org.osmdroid.bonuspack.routing.OSRMRoadManager;
-import org.osmdroid.bonuspack.routing.Road;
-import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -50,14 +35,8 @@ import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityDetalheItinerarioBinding;
-import br.com.vostre.circular.databinding.ActivityDetalheParadaBinding;
-import br.com.vostre.circular.databinding.LinhaBairrosBinding;
-import br.com.vostre.circular.databinding.LinhaLegendaBinding;
-import br.com.vostre.circular.model.HorarioItinerario;
-import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.SecaoItinerario;
-import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.Legenda;
@@ -65,14 +44,14 @@ import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SnackbarHelper;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
-import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.LegendaAdapter;
 import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
 import br.com.vostre.circular.view.listener.LegendaListener;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.view.viewHolder.LegendaViewHolder;
 import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
-import br.com.vostre.circular.viewModel.DetalhesParadaViewModel;
+
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 public class DetalheItinerarioActivity extends BaseActivity {
 
@@ -95,6 +74,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
     String horario;
     boolean mapaOculto = false;
+    int tamanhoOriginalMapa = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,6 +145,16 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
         map.setMaxZoomLevel(19d);
         map.setMinZoomLevel(8d);
+
+        int preferenciaMapa = PreferenceUtils.carregarPreferenciaInt(ctx, "mapa");
+
+        if(preferenciaMapa == 0){
+            tamanhoOriginalMapa = binding.cardViewItinerario.getLayoutParams().height;
+            binding.map.setVisibility(View.GONE);
+            binding.cardViewItinerario.getLayoutParams().height = WRAP_CONTENT;
+            mapaOculto = true;
+        }
+
     }
 
     public void onClickBtnFavorito(View v){
@@ -271,9 +261,14 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
         if(mapaOculto){
             binding.map.setVisibility(View.VISIBLE);
+            binding.cardViewItinerario.getLayoutParams().height = tamanhoOriginalMapa;
+            PreferenceUtils.salvarPreferencia(ctx, "mapa", 1);
             mapaOculto = false;
         } else{
+            tamanhoOriginalMapa = binding.cardViewItinerario.getLayoutParams().height;
             binding.map.setVisibility(View.GONE);
+            binding.cardViewItinerario.getLayoutParams().height = WRAP_CONTENT;
+            PreferenceUtils.salvarPreferencia(ctx, "mapa", 0);
             mapaOculto = true;
         }
 

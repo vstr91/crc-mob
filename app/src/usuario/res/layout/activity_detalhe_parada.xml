@@ -65,7 +65,7 @@
                     android:background="@drawable/dia_rounded_corner_azul"
                     android:gravity="center"
                     android:padding="5dp"
-                    android:text="@{umaParada.parada.taxaDeEmbarque == null || umaParada.parada.taxaDeEmbarque &lt; 0.01 ? `Não há taxa de embarque`: `Taxa de embarque: R$ `+umaParada.parada.taxaDeEmbarque}"
+                    app:textTaxa="@{umaParada.parada.taxaDeEmbarque}"
                     android:textColor="@color/branco"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

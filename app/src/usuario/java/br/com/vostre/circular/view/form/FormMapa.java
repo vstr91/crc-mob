@@ -11,8 +11,10 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,6 +48,7 @@ import br.com.vostre.circular.databinding.FormBairroBinding;
 import br.com.vostre.circular.databinding.FormMapaBinding;
 import br.com.vostre.circular.databinding.FormParadaBinding;
 import br.com.vostre.circular.model.Cidade;
+import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaSugestao;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.pojo.BairroCidade;
@@ -56,6 +59,8 @@ import br.com.vostre.circular.view.adapter.BairroAdapter;
 import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
 import br.com.vostre.circular.view.listener.ItemListener;
 import br.com.vostre.circular.view.listener.SelectListener;
+import br.com.vostre.circular.view.utils.InfoWindow;
+import br.com.vostre.circular.view.utils.InfoWindowPOI;
 import br.com.vostre.circular.viewModel.DetalhesParadaViewModel;
 import br.com.vostre.circular.viewModel.ItinerariosViewModel;
 
@@ -74,6 +79,7 @@ public class FormMapa extends FormBase {
     static Application ctx;
 
     int permissionGPS;
+    AppCompatActivity act;
 
     public ParadaBairro getParada() {
         return parada;
@@ -112,6 +118,8 @@ public class FormMapa extends FormBase {
         binding = DataBindingUtil.inflate(
                 inflater, R.layout.form_mapa, container, false);
         super.onCreate(savedInstanceState);
+
+        act = (AppCompatActivity) this.getActivity().getParent();
 
         Dexter.withActivity(this.getActivity())
                 .withPermissions(
@@ -174,6 +182,19 @@ public class FormMapa extends FormBase {
             m.setTitle(parada.getParada().getNome());
             m.setDraggable(false);
             m.setId(parada.getParada().getId());
+            m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker, MapView mapView) {
+
+                    InfoWindow infoWindow = new InfoWindow();
+                    infoWindow.setParada(parada);
+                    infoWindow.setCtx(act);
+                    infoWindow.show(getActivity().getSupportFragmentManager(), "infoWindow");
+                    mapController.animateTo(marker.getPosition());
+
+                    return true;
+                }
+            });
             map.getOverlays().add(m);
         }
 
@@ -185,6 +206,19 @@ public class FormMapa extends FormBase {
             m.setTitle(pontoInteresse.getNome());
             m.setDraggable(false);
             m.setId(pontoInteresse.getId());
+            m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker, MapView mapView) {
+
+                    InfoWindowPOI infoWindow = new InfoWindowPOI();
+                    infoWindow.setPontoInteresse(pontoInteresse);
+                    infoWindow.setCtx(act);
+                    infoWindow.show(getActivity().getSupportFragmentManager(), "infoWindowPOI");
+                    mapController.animateTo(marker.getPosition());
+
+                    return true;
+                }
+            });
             map.getOverlays().add(m);
         }
 

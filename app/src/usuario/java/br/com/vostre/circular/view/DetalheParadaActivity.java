@@ -195,6 +195,17 @@ public class DetalheParadaActivity extends BaseActivity {
 
     }
 
+    @BindingAdapter("app:textTaxa")
+    public static void setTextTaxa(TextView view, Double val){
+
+        if(val != null && val > 0.01){
+            view.setText("Taxa de Embarque no valor de "+NumberFormat.getCurrencyInstance().format(val));
+        } else{
+            view.setText("Não há taxa de embarque");
+        }
+
+    }
+
     @BindingAdapter("app:text")
     public static void setText(TextView view, Double val){
 

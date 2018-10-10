@@ -58,6 +58,8 @@ public class MensagensViewModel extends AndroidViewModel {
 
     public void salvarMensagem(){
 
+        mensagem.setServidor(false);
+
         if(mensagem.valida(mensagem)){
             add(mensagem);
         } else{
@@ -67,6 +69,8 @@ public class MensagensViewModel extends AndroidViewModel {
     }
 
     public void editarMensagem(){
+
+        mensagem.setServidor(false);
 
         if(mensagem.valida(mensagem)){
             edit(mensagem);

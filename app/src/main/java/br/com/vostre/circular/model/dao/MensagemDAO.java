@@ -20,7 +20,13 @@ public interface MensagemDAO {
     LiveData<List<Mensagem>> listarTodos();
 
     @Query("SELECT * FROM mensagem WHERE servidor = 1")
+    LiveData<List<Mensagem>> listarTodosServidor();
+
+    @Query("SELECT * FROM mensagem WHERE servidor = 1")
     LiveData<List<Mensagem>> listarTodosRecebidos();
+
+    @Query("SELECT * FROM mensagem WHERE servidor = 1 AND lida = 0")
+    LiveData<List<Mensagem>> listarTodosNaoLidos();
 
     @Query("SELECT * FROM mensagem WHERE ativo = 1")
     List<Mensagem> listarTodosAtivos();

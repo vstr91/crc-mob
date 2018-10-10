@@ -87,6 +87,11 @@ public class FormDetalheMensagem extends FormBase {
         if(mensagem != null){
             viewModel.mensagem = mensagem;
             viewModel.carregarRespostas(mensagem);
+
+            if(mensagem.getServidor()){
+                viewModel.marcarComoLida(mensagem);
+            }
+
 //            viewModel.respostas.observe(this, respostasObserver);
         }
 

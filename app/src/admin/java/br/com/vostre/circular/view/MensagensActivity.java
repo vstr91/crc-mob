@@ -23,8 +23,11 @@ public class MensagensActivity extends BaseActivity {
     MensagensViewModel viewModel;
 
     RecyclerView listMensagens;
+    RecyclerView listMensagensRecebidas;
     List<Mensagem> mensagens;
+    List<Mensagem> mensagensRecebidas;
     MensagemAdapter adapter;
+    MensagemAdapter adapterRecebidas;
 
     TabHost tabHost;
 
@@ -35,6 +38,7 @@ public class MensagensActivity extends BaseActivity {
 
         viewModel = ViewModelProviders.of(this).get(MensagensViewModel.class);
         viewModel.mensagens.observe(this, mensagensObserver);
+        viewModel.mensagensRecebidas.observe(this, mensagensRecebidasObserver);
 
         binding.setView(this);
         setTitle("Mensagens");
@@ -45,6 +49,12 @@ public class MensagensActivity extends BaseActivity {
         adapter = new MensagemAdapter(mensagens, this);
 
         listMensagens.setAdapter(adapter);
+
+        listMensagensRecebidas = binding.listMensagensRecebidas;
+
+        adapterRecebidas = new MensagemAdapter(mensagensRecebidas, this);
+
+        listMensagensRecebidas.setAdapter(adapterRecebidas);
 
         tabHost = binding.tabs;
         tabHost.setup();
@@ -72,6 +82,14 @@ public class MensagensActivity extends BaseActivity {
         public void onChanged(List<Mensagem> mensagens) {
             adapter.mensagens = mensagens;
             adapter.notifyDataSetChanged();
+        }
+    };
+
+    Observer<List<Mensagem>> mensagensRecebidasObserver = new Observer<List<Mensagem>>() {
+        @Override
+        public void onChanged(List<Mensagem> mensagens) {
+            adapterRecebidas.mensagens = mensagens;
+            adapterRecebidas.notifyDataSetChanged();
         }
     };
 

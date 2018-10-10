@@ -60,15 +60,15 @@ public class MensagensActivity extends BaseActivity {
         tabHost = binding.tabs;
         tabHost.setup();
 
-        TabHost.TabSpec spec = tabHost.newTabSpec("Enviadas");
-        spec.setContent(R.id.tab1);
-        spec.setIndicator("Enviadas");
-        tabHost.addTab(spec);
-
         TabHost.TabSpec spec2 = tabHost.newTabSpec("Recebidas");
         spec2.setContent(R.id.tab2);
         spec2.setIndicator("Recebidas");
         tabHost.addTab(spec2);
+
+        TabHost.TabSpec spec = tabHost.newTabSpec("Enviadas");
+        spec.setContent(R.id.tab1);
+        spec.setIndicator("Enviadas");
+        tabHost.addTab(spec);
 
     }
 

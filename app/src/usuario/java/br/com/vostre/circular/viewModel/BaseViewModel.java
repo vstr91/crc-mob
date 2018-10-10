@@ -74,6 +74,7 @@ public class BaseViewModel extends AndroidViewModel {
     public MutableLiveData usuarioValidado;
 
     String baseUrl;
+    public LiveData<List<Mensagem>> mensagensNaoLidas;
 
     public ObservableField<String> getId() {
         return id;
@@ -96,6 +97,7 @@ public class BaseViewModel extends AndroidViewModel {
         usuarioValidado = new MutableLiveData<>();
         usuarioValidado.postValue(false);
         new baseUrlAsyncTask(appDatabase).execute();
+        mensagensNaoLidas = appDatabase.mensagemDAO().listarTodosNaoLidos();
     }
 
     public void iniciarAtualizacoesPosicao(){

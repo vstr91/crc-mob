@@ -2,10 +2,13 @@ package br.com.vostre.circular.utils;
 
 import android.accounts.Account;
 import android.app.Activity;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,9 +16,14 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.List;
+
 import br.com.vostre.circular.R;
+import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.view.FavoritosActivity;
 import br.com.vostre.circular.view.MensagensActivity;
+import br.com.vostre.circular.viewModel.BaseViewModel;
+import br.com.vostre.circular.viewModel.ToolbarViewModel;
 
 /**
  * Created by Almir on 16/12/2015.
@@ -27,9 +35,10 @@ public class ToolbarUtils {
     static ImageButton imageButtonFavoritos;
     static ImageButton imageButtonSync;
     static View.OnClickListener mListener;
-    public static int NOVAS_MENSAGENS = 0;
 
     public static final Integer PICK_FILE = 310;
+
+    static MenuItem itemMsg;
 
     // The authority for the sync adapter's content provider
     public static final String AUTHORITY = "br.com.vostre.circular.datasync.provider";
@@ -42,7 +51,7 @@ public class ToolbarUtils {
 
         activity.getMenuInflater().inflate(R.menu.main, menu);
 
-        MenuItem itemMsg = menu.findItem(R.id.icon_msg);
+        itemMsg = menu.findItem(R.id.icon_msg);
         MenuItemCompat.getActionView(itemMsg).setOnClickListener(listener);
 
         MenuItem itemFavoritos = menu.findItem(R.id.icon_favoritos);
@@ -53,8 +62,6 @@ public class ToolbarUtils {
 
         mListener = listener;
 
-        NOVAS_MENSAGENS = 0;
-
         imageButtonMsg = MenuItemCompat.getActionView(itemMsg).findViewById(R.id.imageButtonMsg);
         imageButtonMsg.setOnClickListener(mListener);
 
@@ -64,16 +71,10 @@ public class ToolbarUtils {
         imageButtonSync = MenuItemCompat.getActionView(itemSync).findViewById(R.id.imageButtonSync);
         imageButtonSync.setOnClickListener(mListener);
 
-        if(NOVAS_MENSAGENS < 1){
-            textViewBadgeMsg = MenuItemCompat.getActionView(itemMsg).findViewById(R.id.textViewBadgeMsg);
-            textViewBadgeMsg.setVisibility(View.INVISIBLE);
-        }
-//
-//        int qtdMensagensNaoLidas = MessageUtils.getQuantidadeMensagensNaoLidas(activity);
-//
-
-//
-//        atualizaBadge(qtdMensagensNaoLidas);
+//        if(mensagensNaoLidas < 1){
+//            textViewBadgeMsg = MenuItemCompat.getActionView(itemMsg).findViewById(R.id.textViewBadgeMsg);
+//            textViewBadgeMsg.setVisibility(View.INVISIBLE);
+//        }
 
     }
 
@@ -113,24 +114,6 @@ public class ToolbarUtils {
 
                 break;
         }
-    }
-
-    public static void atualizaBadge(int qtdMensagensNaoLidas){
-
-            if(textViewBadgeMsg != null){
-
-                if(qtdMensagensNaoLidas > 0){
-                textViewBadgeMsg.setText(String.valueOf(qtdMensagensNaoLidas));
-
-                textViewBadgeMsg.setOnClickListener(mListener);
-                textViewBadgeMsg.invalidate();
-            } else{
-                textViewBadgeMsg.setVisibility(View.GONE);
-            }
-
-
-        }
-
     }
 
 }

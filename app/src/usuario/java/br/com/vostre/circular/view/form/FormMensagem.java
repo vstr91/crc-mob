@@ -77,8 +77,6 @@ public class FormMensagem extends FormBase {
             mensagem.setUsuarioUltimaAlteracao(id);
         }
 
-        mensagem.setServidor(false);
-
         if(mensagem != null){
             viewModel.editarMensagem();
         } else{

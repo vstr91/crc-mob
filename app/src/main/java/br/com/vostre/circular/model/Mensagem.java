@@ -19,6 +19,18 @@ public class Mensagem extends EntidadeBase {
     @NonNull
     private Boolean servidor;
 
+    @NonNull
+    private Boolean lida = false;
+
+    @NonNull
+    public Boolean getLida() {
+        return lida;
+    }
+
+    public void setLida(@NonNull Boolean lida) {
+        this.lida = lida;
+    }
+
     public String getEmail() {
         return email;
     }

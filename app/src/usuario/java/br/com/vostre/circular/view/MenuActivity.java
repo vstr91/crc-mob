@@ -25,10 +25,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -69,9 +71,11 @@ import java.util.TimeZone;
 import br.com.vostre.circular.App;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityMenuBinding;
+import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.PreferenceUtils;
+import br.com.vostre.circular.utils.ToolbarUtils;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 import es.usc.citius.hipster.algorithm.Hipster;
 import es.usc.citius.hipster.graph.GraphBuilder;
@@ -233,31 +237,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         startLocationUpdates();
-
-        // ************** TESTE DIJKSTRA ************************
-
-//        HipsterDirectedGraph<String,Double> graph =
-//                GraphBuilder.<String,Double>create()
-//                        .connect("A").to("B").withEdge(4d)
-//                        .connect("A").to("C").withEdge(2d)
-//                        .connect("B").to("C").withEdge(5d)
-//                        .connect("B").to("D").withEdge(10d)
-//                        .connect("C").to("E").withEdge(3d)
-//                        .connect("D").to("F").withEdge(11d)
-//                        .connect("E").to("D").withEdge(4d)
-//                        .createDirectedGraph();
-//
-//// Create the search problem. For graph problems, just use
-//// the GraphSearchProblem util class to generate the problem with ease.
-//        SearchProblem p = GraphSearchProblem
-//                .startingFrom("A")
-//                .in(graph)
-//                .takeCostsFromEdges()
-//                .build();
-//
-//// Search the shortest path from "A" to "F"
-//        System.out.println(Hipster.createDijkstra(p).search("D"));
-
     }
 
     public void onClickBtnItinerarios(View v){
@@ -513,6 +492,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
             }
 
+            viewModel.mensagensNaoLidas.observe(ctx, mensagensObserver);
+
         }
     };
 
@@ -593,8 +574,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
                         paradaAtual = p;
 
-                        System.out.println("HORA::: "+DateTimeFormat.forPattern("HH:mm:ss").print(DateTime.now()));
-
 //                System.out.println("PARADA PROXIMA:: "+p.getParada().getNome()+" - "+p.getParada().getLatitude()+" | "
 //                        +p.getParada().getLongitude()+" || Distancia: "+l.distanceTo(localAtual));
                     }
@@ -624,5 +603,22 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
 
     }
+
+    Observer<List<Mensagem>> mensagensObserver = new Observer<List<Mensagem>>() {
+        @Override
+        public void onChanged(List<Mensagem> mensagens) {
+
+            if(menu != null){
+
+                if(mensagens.size() > 0){
+                    menu.getItem(2).getActionView().findViewById(R.id.textViewBadgeMsg).setVisibility(View.VISIBLE);
+                } else{
+                    menu.getItem(2).getActionView().findViewById(R.id.textViewBadgeMsg).setVisibility(View.GONE);
+                }
+
+            }
+
+        }
+    };
 
 }

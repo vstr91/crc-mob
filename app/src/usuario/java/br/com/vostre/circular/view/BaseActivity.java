@@ -1,5 +1,6 @@
 package br.com.vostre.circular.view;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -521,4 +522,5 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     public void onDataHoraSelected(Calendar data) {
 
     }
+
 }

@@ -5,6 +5,10 @@
     <data>
 
         <variable
+            name="mensagem"
+            type="br.com.vostre.circular.model.Mensagem" />
+
+        <variable
             name="view"
             type="br.com.vostre.circular.view.form.FormDetalheMensagem" />
 
@@ -20,35 +24,38 @@
         tools:context="br.com.vostre.circular.view.form.FormDetalheMensagem">
 
 
-        <Button
-            android:id="@+id/btnCadastrar"
-            style="@style/botao_principal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop="8dp"
-            android:onClick="@{view::onClickResponder}"
-            android:text="Responder"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout5" />
+        <!--<Button-->
+        <!--android:id="@+id/btnCadastrar"-->
+        <!--style="@style/botao_principal"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginBottom="16dp"-->
+        <!--android:layout_marginEnd="16dp"-->
+        <!--android:layout_marginRight="16dp"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:onClick="@{view::onClickResponder}"-->
+        <!--android:text="Responder"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintHorizontal_bias="0.5"-->
+        <!--app:layout_constraintStart_toEndOf="@+id/btnFechar"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/textInputLayout5" />-->
 
         <Button
             android:id="@+id/btnFechar"
             style="@style/botao_fechar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:onClick="@{view::onClickFechar}"
             android:text="Fechar"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout5" />
+            app:layout_constraintTop_toBottomOf="@+id/scrollView2" />
 
         <TextView
             android:id="@+id/textViewTitulo"
@@ -61,11 +68,12 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:gravity="center_vertical"
-            android:text="@{viewModel.mensagem.titulo}"
+            android:text="@{mensagem.titulo}"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Titulo" />
 
         <TextView
             android:id="@+id/textViewResumo"
@@ -75,11 +83,11 @@
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:text="@{viewModel.mensagem.resumo}"
+            android:text="@{mensagem.resumo}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewTitulo" />
+            app:layout_constraintTop_toBottomOf="@+id/textViewTitulo"
+            tools:text="Resumo" />
 
         <TextView
             android:id="@+id/textViewDataEnvio"
@@ -90,32 +98,31 @@
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="@{viewModel.mensagem.ultimaAlteracao}"
+            android:layout_marginTop="8dp"
+            android:text="@{mensagem.ultimaAlteracao}"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewResumo" />
+            app:layout_constraintTop_toBottomOf="@+id/textViewResumo"
+            tools:text="01/01/2000" />
 
         <TextView
-            android:id="@+id/textViewDescricao"
-            android:layout_width="match_parent"
-            android:layout_height="16dp"
+            android:id="@+id/textViewEmail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:singleLine="false"
-            android:text="@{viewModel.mensagem.descricao}"
-            android:textAlignment="textStart"
-            android:textColor="@color/cinzaEscuro"
+            android:layout_marginTop="8dp"
+            android:text="@{mensagem.email}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewDataEnvio" />
+            app:layout_constraintTop_toBottomOf="@+id/textViewDataEnvio"
+            tools:text="Email" />
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/textInputLayout5"
+        <ScrollView
+            android:id="@+id/scrollView2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -123,65 +130,115 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:maxHeight="200dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/divider">
+            app:layout_constraintTop_toBottomOf="@+id/textViewEmail">
 
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/editTextResposta"
+            <TextView
+                android:id="@+id/textViewDescricao"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Resposta"
-                android:maxLines="5"
-                android:singleLine="false"
-                android:text="@={viewModel.resposta.resposta}" />
-        </android.support.design.widget.TextInputLayout>
+                android:layout_marginEnd="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:gravity="left"
+                android:text="@{mensagem.descricao}"
+                android:textColor="@color/cinzaEscuro"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewDataEnvio"
+                tools:text="teste sdççmn çdhfsdfl libdfdfll ldfdfn" />
 
-        <View
-            android:id="@+id/divider2"
-            android:layout_width="0dp"
-            android:layout_height="2dp"
-            android:layout_marginBottom="436dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            android:background="@color/azul"
-            app:layout_constraintTop_toBottomOf="@id/textViewDescricao"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent" />
+        </ScrollView>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/listRespostas"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/divider2"
-            tools:listitem="@layout/linha_respostas" />
+        <!--<android.support.design.widget.TextInputLayout-->
+        <!--android:id="@+id/textInputLayout5"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginLeft="8dp"-->
+        <!--android:layout_marginRight="8dp"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/divider">-->
 
-        <View
-            android:id="@+id/divider"
-            android:layout_width="0dp"
-            android:layout_height="2dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:background="@color/azul"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/listRespostas" />
+        <!--<android.support.design.widget.TextInputEditText-->
+        <!--android:id="@+id/editTextResposta"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:hint="Enviar Resposta"-->
+        <!--android:maxLines="5"-->
+        <!--android:singleLine="false"-->
+        <!--android:text="@={viewModel.resposta.resposta}" />-->
+        <!--</android.support.design.widget.TextInputLayout>-->
+
+        <!--<View-->
+        <!--android:id="@+id/divider2"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="2dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginLeft="8dp"-->
+        <!--android:layout_marginRight="8dp"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:background="@color/azul"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintHorizontal_bias="0.0"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/scrollView2" />-->
+
+        <!--<View-->
+        <!--android:id="@+id/divider"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="2dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginLeft="8dp"-->
+        <!--android:layout_marginRight="8dp"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:layout_marginTop="16dp"-->
+        <!--android:background="@color/azul"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintHorizontal_bias="0.0"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/listRespostas" />-->
+
+        <!--<TextView-->
+        <!--android:id="@+id/textView37"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginLeft="8dp"-->
+        <!--android:layout_marginRight="8dp"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:text="Respostas"-->
+        <!--android:textAppearance="@style/texto_azul"-->
+        <!--android:textStyle="bold"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/scrollView2" />-->
+
+        <!--<android.support.v7.widget.RecyclerView-->
+        <!--android:id="@+id/listRespostas"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:layout_marginBottom="8dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginLeft="8dp"-->
+        <!--android:layout_marginRight="8dp"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:maxHeight="120dp"-->
+        <!--app:layoutManager="android.support.v7.widget.LinearLayoutManager"-->
+        <!--app:layout_constraintBottom_toTopOf="@+id/btnFechar"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintHorizontal_bias="0.0"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/textView37"-->
+        <!--tools:listitem="@layout/linha_respostas" />-->
 
     </android.support.constraint.ConstraintLayout>
 

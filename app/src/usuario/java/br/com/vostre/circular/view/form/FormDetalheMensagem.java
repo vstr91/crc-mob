@@ -88,6 +88,12 @@ public class FormDetalheMensagem extends FormBase {
             viewModel.mensagem = mensagem;
             viewModel.carregarRespostas(mensagem);
 
+            if(mensagem.getResumo() == null || mensagem.getResumo().isEmpty()){
+                binding.textViewResumo.setVisibility(View.GONE);
+            } else{
+                binding.textViewResumo.setVisibility(View.VISIBLE);
+            }
+
             if(mensagem.getServidor()){
                 viewModel.marcarComoLida(mensagem);
             }

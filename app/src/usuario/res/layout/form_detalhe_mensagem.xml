@@ -46,7 +46,6 @@
             style="@style/botao_fechar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
             android:layout_marginEnd="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
@@ -54,10 +53,9 @@
             android:layout_marginTop="8dp"
             android:onClick="@{view::onClickFechar}"
             android:text="Fechar"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout5" />
+            app:layout_constraintTop_toBottomOf="@+id/scrollView2" />
 
         <TextView
             android:id="@+id/textViewTitulo"
@@ -111,40 +109,33 @@
         <ScrollView
             android:id="@+id/scrollView2"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="8dp"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:maxHeight="200dp"
-            app:layout_constraintBottom_toTopOf="@+id/btnFechar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textViewDataEnvio">
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/textViewDescricao"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:layout_marginEnd="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:gravity="left"
+                android:text="@{mensagem.descricao}"
+                android:textColor="@color/cinzaEscuro"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewDataEnvio"
+                tools:text="teste sdççmn çdhfsdfl libdfdfll ldfdfn" />
 
-                <TextView
-                    android:id="@+id/textViewDescricao"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:gravity="left"
-                    android:text="@{mensagem.descricao}"
-                    android:textColor="@color/cinzaEscuro"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewDataEnvio"
-                    tools:text="teste sdççmn çdhfsdfl libdfdfll ldfdfn" />
-            </LinearLayout>
         </ScrollView>
 
         <!--<android.support.design.widget.TextInputLayout-->

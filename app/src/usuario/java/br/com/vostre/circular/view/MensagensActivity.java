@@ -72,6 +72,18 @@ public class MensagensActivity extends BaseActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(viewModel != null){
+            viewModel.atualizarMensagens();
+            viewModel.mensagens.observe(this, mensagensObserver);
+            viewModel.mensagensRecebidas.observe(this, mensagensRecebidasObserver);
+        }
+
+    }
+
     public void onFabClick(View v){
         FormMensagem formMensagem = new FormMensagem();
         formMensagem.flagInicioEdicao = false;

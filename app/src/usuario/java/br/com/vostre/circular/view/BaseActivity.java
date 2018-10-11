@@ -2,6 +2,8 @@ package br.com.vostre.circular.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
@@ -61,6 +63,7 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     Menu menu;
 
     BaseViewModel viewModel;
+    BroadcastReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +78,27 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
 //        DrawerHeaderBinding binding = DataBindingUtil.setContentView(this, R.layout.drawer_header);
 //        binding.setViewModel(viewModel);
+
+        viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
+//        viewModel.mensagensNaoLidas.observe(this, mensagensObserver);
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Bundle extras = intent.getExtras();
+
+                Integer mensagens = extras.getInt("mensagens");
+
+                if(mensagens != null){
+
+                    if(menu != null){
+                        invalidateOptionsMenu();
+                    }
+
+                }
+
+            }
+        };
 
     }
 
@@ -92,6 +116,9 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
         this.menu = menu;
 
         ToolbarUtils.preparaMenu(menu, this, this);
+        viewModel.mensagensNaoLidas.observe(this, mensagensObserver);
+        viewModel.atualizarMensagens();
+
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -120,6 +147,12 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.supportInvalidateOptionsMenu();
     }
 
     @Override
@@ -522,5 +555,28 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     public void onDataHoraSelected(Calendar data) {
 
     }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        this.supportInvalidateOptionsMenu();
+    }
+
+    Observer<List<Mensagem>> mensagensObserver = new Observer<List<Mensagem>>() {
+        @Override
+        public void onChanged(List<Mensagem> mensagens) {
+
+            if(menu != null){
+
+                if(mensagens.size() > 0){
+                    menu.getItem(2).getActionView().findViewById(R.id.textViewBadgeMsg).setVisibility(View.VISIBLE);
+                } else{
+                    menu.getItem(2).getActionView().findViewById(R.id.textViewBadgeMsg).setVisibility(View.GONE);
+                }
+
+            }
+
+        }
+    };
 
 }

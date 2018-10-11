@@ -100,6 +100,10 @@ public class BaseViewModel extends AndroidViewModel {
         mensagensNaoLidas = appDatabase.mensagemDAO().listarTodosNaoLidos();
     }
 
+    public void atualizarMensagens(){
+        mensagensNaoLidas = appDatabase.mensagemDAO().listarTodosNaoLidos();
+    }
+
     public void iniciarAtualizacoesPosicao(){
         mLocationCallback = new LocationCallback() {
             @Override

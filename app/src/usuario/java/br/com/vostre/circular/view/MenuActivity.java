@@ -408,7 +408,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     protected void onResume() {
         super.onResume();
-
         configuraActivity();
 
     }
@@ -491,8 +490,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                 }
 
             }
-
-            viewModel.mensagensNaoLidas.observe(ctx, mensagensObserver);
 
         }
     };
@@ -603,22 +600,5 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
 
     }
-
-    Observer<List<Mensagem>> mensagensObserver = new Observer<List<Mensagem>>() {
-        @Override
-        public void onChanged(List<Mensagem> mensagens) {
-
-            if(menu != null){
-
-                if(mensagens.size() > 0){
-                    menu.getItem(2).getActionView().findViewById(R.id.textViewBadgeMsg).setVisibility(View.VISIBLE);
-                } else{
-                    menu.getItem(2).getActionView().findViewById(R.id.textViewBadgeMsg).setVisibility(View.GONE);
-                }
-
-            }
-
-        }
-    };
 
 }

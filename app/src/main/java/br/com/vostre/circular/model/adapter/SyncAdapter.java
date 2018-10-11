@@ -5,6 +5,7 @@ import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SyncResult;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,6 +16,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.MainThread;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -404,7 +406,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 JSONArray secoesItinerarios = arrayObject.getJSONArray("secoes_itinerarios");
                 JSONArray horariosItinerarios = arrayObject.getJSONArray("horarios_itinerarios");
                 JSONArray pontosInteresse = arrayObject.getJSONArray("pontos_interesse");
-                JSONArray mensagens = arrayObject.getJSONArray("mensagens");
+                final JSONArray mensagens = arrayObject.getJSONArray("mensagens");
                 JSONArray parametros = arrayObject.getJSONArray("parametros");
                 JSONArray usuarios = arrayObject.getJSONArray("usuarios");
 
@@ -839,6 +841,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     @Override
                     public void run() {
                         Toast.makeText(getContext(), "Atualização finalizada!", Toast.LENGTH_SHORT).show();
+                        LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(getContext().getApplicationContext());
+                        Intent intent = new Intent("MensagensService");
+                        intent.putExtra("mensagens", mensagens.length());
+                        broadcaster.sendBroadcast(intent);
                     }
                 };
 

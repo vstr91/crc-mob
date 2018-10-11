@@ -42,7 +42,7 @@ public class FormDetalheMensagem extends FormBase {
     Mensagem mensagem;
     MensagemResposta resposta;
 
-    RecyclerView listRespostas;
+    //RecyclerView listRespostas;
     List<MensagemResposta> respostas;
     MensagemRespostaAdapter adapter;
 
@@ -86,14 +86,27 @@ public class FormDetalheMensagem extends FormBase {
 
         if(mensagem != null){
             viewModel.mensagem = mensagem;
-            viewModel.carregarRespostas(mensagem);
+            binding.setMensagem(mensagem);
+
+            if(mensagem.getResumo() == null || mensagem.getResumo().isEmpty()){
+                binding.textViewResumo.setVisibility(View.GONE);
+            } else{
+                binding.textViewResumo.setVisibility(View.VISIBLE);
+            }
+
+            if(mensagem.getEmail() == null || mensagem.getEmail().isEmpty()){
+                binding.textViewEmail.setVisibility(View.GONE);
+            } else{
+                binding.textViewEmail.setVisibility(View.VISIBLE);
+            }
+//            viewModel.carregarRespostas(mensagem);
         }
 
-        listRespostas = binding.listRespostas;
+        //listRespostas = binding.listRespostas;
 
         adapter = new MensagemRespostaAdapter(respostas, (AppCompatActivity) getActivity());
 
-        listRespostas.setAdapter(adapter);
+        //listRespostas.setAdapter(adapter);
 
         return binding.getRoot();
 

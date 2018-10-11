@@ -56,6 +56,11 @@ public class MensagensViewModel extends AndroidViewModel {
         mensagensRecebidas = appDatabase.mensagemDAO().listarTodosRecebidos();
     }
 
+    public void atualizarMensagens(){
+        mensagens = appDatabase.mensagemDAO().listarTodos();
+        mensagensRecebidas = appDatabase.mensagemDAO().listarTodosRecebidos();
+    }
+
     public void salvarMensagem(){
 
         mensagem.setServidor(false);

@@ -841,10 +841,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     @Override
                     public void run() {
                         Toast.makeText(getContext(), "Atualização finalizada!", Toast.LENGTH_SHORT).show();
-                        LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(getContext().getApplicationContext());
-                        Intent intent = new Intent("MensagensService");
-                        intent.putExtra("mensagens", mensagens.length());
-                        broadcaster.sendBroadcast(intent);
+                        Intent broadcast = new Intent();
+                        broadcast.setAction("MensagensService");
+                        broadcast.putExtra("mensagens", mensagens.length());
+                        broadcast.addCategory(Intent.CATEGORY_DEFAULT);
+                        ctx.sendBroadcast(broadcast);
                     }
                 };
 

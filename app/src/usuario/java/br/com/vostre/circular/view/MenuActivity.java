@@ -21,6 +21,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.os.Bundle;
@@ -237,6 +238,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         startLocationUpdates();
+
     }
 
     public void onClickBtnItinerarios(View v){

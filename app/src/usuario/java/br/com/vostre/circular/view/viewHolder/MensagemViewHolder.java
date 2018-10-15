@@ -37,15 +37,15 @@ public class MensagemViewHolder extends RecyclerView.ViewHolder {
             }
         });
 
-        if(!mensagem.getLida() && mensagem.getServidor()){
-            binding.textViewTitulo.setTypeface(binding.textViewTitulo.getTypeface(), Typeface.BOLD);
-            binding.textViewResumo.setTypeface(binding.textViewResumo.getTypeface(), Typeface.BOLD);
-            binding.textViewResumo.setTextColor(ctx.getResources().getColor(R.color.cinzaEscuro));
-        } else{
-            binding.textViewTitulo.setTypeface(binding.textViewTitulo.getTypeface(), Typeface.NORMAL);
-            binding.textViewResumo.setTypeface(binding.textViewResumo.getTypeface(), Typeface.NORMAL);
-            binding.textViewResumo.setTextColor(ctx.getResources().getColor(R.color.cinzaMedio));
-        }
+//        if(!mensagem.getLida() && mensagem.getServidor()){
+//            binding.textViewTitulo.setTypeface(binding.textViewTitulo.getTypeface(), Typeface.BOLD);
+//            binding.textViewResumo.setTypeface(binding.textViewResumo.getTypeface(), Typeface.BOLD);
+//            binding.textViewResumo.setTextColor(ctx.getResources().getColor(R.color.cinzaEscuro));
+//        } else{
+//            binding.textViewTitulo.setTypeface(binding.textViewTitulo.getTypeface(), Typeface.NORMAL);
+//            binding.textViewResumo.setTypeface(binding.textViewResumo.getTypeface(), Typeface.NORMAL);
+//            binding.textViewResumo.setTextColor(ctx.getResources().getColor(R.color.cinzaMedio));
+//        }
 
         // EDICAO DE MENSAGEM ENVIADA PELO USUARIO DESABILITADA
 

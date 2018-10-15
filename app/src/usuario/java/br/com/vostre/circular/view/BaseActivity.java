@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -64,6 +65,7 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
     BaseViewModel viewModel;
     BroadcastReceiver receiver;
+    IntentFilter filter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +88,7 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onReceive(Context context, Intent intent) {
                 Bundle extras = intent.getExtras();
+                System.out.println("Entrou receiver!!!");
 
                 Integer mensagens = extras.getInt("mensagens");
 
@@ -99,6 +102,11 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         };
+
+        filter = new IntentFilter();
+        filter.addAction("MensagensService");
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(receiver, filter);
 
     }
 
@@ -153,6 +161,13 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         this.supportInvalidateOptionsMenu();
+        registerReceiver(receiver, filter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
     }
 
     @Override

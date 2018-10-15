@@ -34,6 +34,8 @@ import java.net.URI;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import br.com.vostre.circular.BR;
@@ -245,6 +247,13 @@ public class DetalheParadaActivity extends BaseActivity {
     Observer<List<ItinerarioPartidaDestino>> itinerariosObserver = new Observer<List<ItinerarioPartidaDestino>>() {
         @Override
         public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
+            Collections.sort(itinerarios, new Comparator<ItinerarioPartidaDestino>() {
+                @Override
+                public int compare(ItinerarioPartidaDestino o1, ItinerarioPartidaDestino o2) {
+                    return DateTimeFormat.forPattern("HH:mm").parseLocalTime(o1.getProximoHorario())
+                            .compareTo(DateTimeFormat.forPattern("HH:mm").parseLocalTime(o2.getProximoHorario()));
+                }
+            });
             adapter.itinerarios = itinerarios;
             adapter.notifyDataSetChanged();
         }

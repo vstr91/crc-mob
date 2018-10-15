@@ -84,6 +84,11 @@ public class MensagensActivity extends BaseActivity {
 
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
     public void onFabClick(View v){
         FormMensagem formMensagem = new FormMensagem();
         formMensagem.flagInicioEdicao = false;

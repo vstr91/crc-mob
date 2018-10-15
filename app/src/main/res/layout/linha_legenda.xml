@@ -25,6 +25,7 @@
             android:text="@{legenda.texto}"
             android:textColor="@color/branco"
             android:textSize="10sp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageView15"
@@ -37,10 +38,12 @@
             android:layout_height="15dp"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
+            android:background="@color/branco"
+            android:padding="2dp"
+            android:src="@{legenda.cor}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:src="@{legenda.cor}" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 

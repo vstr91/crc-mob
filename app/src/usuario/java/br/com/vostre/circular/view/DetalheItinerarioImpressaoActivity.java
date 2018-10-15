@@ -2,6 +2,7 @@ package br.com.vostre.circular.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
@@ -15,11 +16,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +45,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.R;
@@ -53,12 +57,16 @@ import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
+import br.com.vostre.circular.model.pojo.Legenda;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SnackbarHelper;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
+import br.com.vostre.circular.view.adapter.LegendaAdapter;
 import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
+import br.com.vostre.circular.view.listener.LegendaListener;
 import br.com.vostre.circular.view.utils.InfoWindow;
+import br.com.vostre.circular.view.viewHolder.LegendaViewHolder;
 import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
 
 public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
@@ -131,9 +139,62 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
         @Override
         public void onChanged(List<HorarioItinerarioNome> horarios) {
 
+            List<Legenda> dados = null;
+
+            if(viewModel.qtdItinerarios.size() > 1){
+                binding.listLegenda.setVisibility(View.VISIBLE);
+
+                List<ItinerarioPartidaDestino> itinerarios = viewModel.qtdItinerarios;
+                dados = new ArrayList<>();
+
+                int[] cores = ctx.getResources().getIntArray(R.array.cores_legenda);
+
+                int cont = 0;
+
+                for(ItinerarioPartidaDestino itinerario : itinerarios){
+                    Legenda legenda = new Legenda();
+                    legenda.setItinerario(itinerario.getItinerario().getId());
+                    legenda.setTexto(itinerario.getItinerario().getObservacao());
+                    legenda.setCor(cores[cont]);
+                    dados.add(legenda);
+                    cont++;
+                }
+
+                final LegendaAdapter adapter = new LegendaAdapter(dados, ctx);
+                adapter.setListener(new LegendaListener() {
+                    @Override
+                    public void onLegendaSelected(boolean ativa, String itinerario) {
+                        //vazio
+                    }
+                });
+                binding.listLegenda.setAdapter(adapter);
+                binding.textView37.setVisibility(View.GONE);
+                binding.textViewObservacao.setVisibility(View.GONE);
+
+            } else{
+                binding.listLegenda.setVisibility(View.GONE);
+                binding.textView37.setVisibility(View.VISIBLE);
+                binding.textViewObservacao.setVisibility(View.VISIBLE);
+            }
+
+            int cont = 1;
+            LinearLayout ll = new LinearLayout(ctx);
+            ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+            ll.setOrientation(LinearLayout.VERTICAL);
+
             for(HorarioItinerarioNome horario : horarios){
                 LinhaHorariosItinerariosCompactoBinding b = DataBindingUtil.inflate(getLayoutInflater(), R.layout.linha_horarios_itinerarios_compacto, binding.linearLayoutHorarios, false);
                 b.setHorario(horario);
+
+                if(dados != null && dados.size() > 0){
+                    Legenda l = new Legenda();
+                    l.setItinerario(horario.getHorarioItinerario().getItinerario());
+                    l = dados.get(dados.indexOf(l));
+                    b.imageViewCor.setBackgroundColor(l.getCor());
+                    b.imageViewCor.setVisibility(View.VISIBLE);
+                } else{
+                    b.imageViewCor.setVisibility(View.GONE);
+                }
 
                 if(horario.getHorarioItinerario().getObservacao() == null
                         || horario.getHorarioItinerario().getObservacao() .isEmpty()
@@ -143,7 +204,20 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
                     b.textViewObservacao.setVisibility(View.VISIBLE);
                 }
 
-                binding.linearLayoutHorarios.addView(b.getRoot());
+                if((cont > 1 && cont % 15 == 0) || cont == horarios.size()){
+                    ll.addView(b.getRoot());
+                    binding.linearLayoutHorarios.addView(ll);
+
+                    ll = new LinearLayout(ctx);
+                    ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+                    ll.setOrientation(LinearLayout.VERTICAL);
+                } else{
+                    ll.addView(b.getRoot());
+                }
+
+                cont++;
+
+                //binding.linearLayoutHorarios.addView(b.getRoot());
             }
 
             if(horarios.size() > 0){
@@ -170,7 +244,7 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
                             Intent share = new Intent(Intent.ACTION_SEND);
 
                             share.setType("image/jpeg");
-                            share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+                            share.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(ctx, "br.com.vostre.circular.fileprovider", file));
                             startActivity(Intent.createChooser(share, "Compartilhar Quadro de Horários"));
                             finish();
                         } catch (FileNotFoundException e) {
@@ -222,5 +296,12 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
 
         }
     };
+
+    public int dpToPx(int dp) {
+        float density = ctx.getResources()
+                .getDisplayMetrics()
+                .density;
+        return Math.round((float) dp * density);
+    }
 
 }

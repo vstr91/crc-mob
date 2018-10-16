@@ -244,12 +244,14 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
                 if(bairro != null){
                     mostraDadosBairro(bairro, 0);
                     bairroPartida = bairro;
+                    viewModel.escolhaAtual = 1;
                 }
             } else{
                 if(bairro != null){
                     mostraDadosBairro(bairro, 1);
                     bairroDestino = bairro;
                     mostraResultado();
+                    viewModel.escolhaAtual = 0;
                 }
             }
 

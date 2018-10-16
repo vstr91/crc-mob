@@ -40,6 +40,7 @@ public class BaseViewModel extends AndroidViewModel {
 
     private AppDatabase appDatabase;
     ObservableField<String> id;
+    public LiveData<List<Mensagem>> mensagensNaoLidas;
 
     public ObservableField<String> getId() {
         return id;
@@ -54,6 +55,11 @@ public class BaseViewModel extends AndroidViewModel {
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         id = new ObservableField<>();
         new paramAsyncTask(appDatabase).execute();
+        mensagensNaoLidas = appDatabase.mensagemDAO().listarTodosNaoLidosServidor();
+    }
+
+    public void atualizarMensagens(){
+        mensagensNaoLidas = appDatabase.mensagemDAO().listarTodosNaoLidosServidor();
     }
 
     public void salvar(List<? extends EntidadeBase> dados, String entidade){

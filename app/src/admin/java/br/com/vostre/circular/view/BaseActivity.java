@@ -1,8 +1,15 @@
 package br.com.vostre.circular.view;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.databinding.DataBindingUtil;
+import android.location.GpsStatus;
+import android.location.LocationManager;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -58,6 +65,8 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     Menu menu;
 
     BaseViewModel viewModel;
+    BroadcastReceiver receiver;
+    IntentFilter filter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,10 +77,42 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        //viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
 
 //        DrawerHeaderBinding binding = DataBindingUtil.setContentView(this, R.layout.drawer_header);
 //        binding.setViewModel(viewModel);
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                if (intent.getAction().matches("android.location.PROVIDERS_CHANGED")) {
+//                    Toast.makeText(context, "in android.location.PROVIDERS_CHANGED",
+//                            Toast.LENGTH_SHORT).show();
+                } else{
+                    Bundle extras = intent.getExtras();
+
+                    Integer mensagens = extras.getInt("mensagens");
+
+                    if(mensagens != null){
+
+                        if(menu != null){
+                            invalidateOptionsMenu();
+                        }
+
+                    }
+                }
+
+
+
+            }
+        };
+
+        filter = new IntentFilter();
+        filter.addAction("MensagensService");
+        filter.addAction(LocationManager.PROVIDERS_CHANGED_ACTION);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(receiver, filter);
 
     }
 
@@ -89,6 +130,9 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
         this.menu = menu;
 
         ToolbarUtils.preparaMenu(menu, this, this);
+
+        viewModel.mensagensNaoLidas.observe(this, mensagensObserver);
+        viewModel.atualizarMensagens();
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -117,6 +161,18 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(receiver, filter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
     }
 
     @Override
@@ -514,5 +570,28 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        this.supportInvalidateOptionsMenu();
+    }
+
+    Observer<List<Mensagem>> mensagensObserver = new Observer<List<Mensagem>>() {
+        @Override
+        public void onChanged(List<Mensagem> mensagens) {
+
+            if(menu != null){
+
+                if(mensagens.size() > 0){
+                    menu.getItem(1).getActionView().findViewById(R.id.textViewBadgeMsg).setVisibility(View.VISIBLE);
+                } else{
+                    menu.getItem(1).getActionView().findViewById(R.id.textViewBadgeMsg).setVisibility(View.GONE);
+                }
+
+            }
+
+        }
+    };
 
 }

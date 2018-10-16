@@ -169,12 +169,10 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
                 });
                 binding.listLegenda.setAdapter(adapter);
                 binding.textView37.setVisibility(View.GONE);
-                binding.textViewObservacao.setVisibility(View.GONE);
 
             } else{
                 binding.listLegenda.setVisibility(View.GONE);
                 binding.textView37.setVisibility(View.VISIBLE);
-                binding.textViewObservacao.setVisibility(View.VISIBLE);
             }
 
             int cont = 1;
@@ -282,14 +280,6 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
                     binding.textView37.setVisibility(View.GONE);
                 } else{
                     binding.textView37.setVisibility(View.VISIBLE);
-                }
-
-                if(itinerario.getItinerario().getObservacao() == null ||
-                        itinerario.getItinerario().getObservacao().isEmpty()
-                        || itinerario.getItinerario().getObservacao().equals(null)){
-                    binding.textViewObservacao.setVisibility(View.GONE);
-                } else{
-                    binding.textViewObservacao.setVisibility(View.VISIBLE);
                 }
 
             }

@@ -60,7 +60,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="50dp"
+                    android:layout_marginTop="45dp"
                     android:text="Partida"
                     android:textAppearance="@style/texto_azul"
                     app:layout_constraintStart_toStartOf="parent"
@@ -367,7 +367,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:textAppearance="@style/texto_branco"
-                        android:textSize="28sp"
+                        android:textSize="24sp"
                         android:textStyle="bold"
                         app:horario="@{itinerario.proximoHorario}"
                         tools:text="20:00" />
@@ -380,6 +380,15 @@
                         android:text="@{itinerario.observacaoProximoHorario}"
                         android:textAppearance="@style/texto_branco"
                         android:textSize="10sp" />
+
+                    <TextView
+                        android:id="@+id/textViewObservacaoItinerario"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@{itinerario.itinerario.observacao}"
+                        android:textColor="@color/branco"
+                        android:textSize="8sp" />
 
                     <Button
                         android:id="@+id/btnVerTodos"
@@ -470,6 +479,24 @@
                     app:layout_constraintEnd_toEndOf="@+id/textViewHorarioSeguinte"
                     app:layout_constraintStart_toStartOf="@+id/textViewHorarioSeguinte"
                     app:layout_constraintTop_toBottomOf="@+id/textViewHorarioSeguinte" />
+
+                <TextView
+                    android:id="@+id/textViewObsItinerarioAnterior"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="10sp"
+                    app:layout_constraintEnd_toEndOf="@+id/textViewHorarioAnterior"
+                    app:layout_constraintStart_toStartOf="@+id/textViewHorarioAnterior"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewObervacaoAnterior" />
+
+                <TextView
+                    android:id="@+id/textViewObsItinerarioSeguinte"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="10sp"
+                    app:layout_constraintEnd_toEndOf="@+id/textViewHorarioSeguinte"
+                    app:layout_constraintStart_toStartOf="@+id/textViewHorarioSeguinte"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewObervacaoSeguinte" />
 
             </android.support.constraint.ConstraintLayout>
 

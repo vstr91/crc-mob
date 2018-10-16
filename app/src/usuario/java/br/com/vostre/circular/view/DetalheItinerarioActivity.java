@@ -342,12 +342,12 @@ public class DetalheItinerarioActivity extends BaseActivity {
             adapterHorarios.legenda = dados;
             adapterHorarios.notifyDataSetChanged();
 
-            HorarioItinerarioNome h = adapterHorarios.buscaPosicaoHorario(horario, viewModel.itinerario.getValue().getItinerario().getId());
-            int posicao = -1;
-
-            if(h != null){
-                posicao = adapterHorarios.horarios.indexOf(h);
-            }
+//            HorarioItinerarioNome h = adapterHorarios.buscaPosicaoHorario(horario, viewModel.itinerario.getValue().getItinerario().getId());
+//            int posicao = -1;
+//
+//            if(h != null){
+//                posicao = adapterHorarios.horarios.indexOf(h);
+//            }
 
             //binding.listHorarios.smoothScrollToPosition(15);
         }

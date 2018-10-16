@@ -28,6 +28,9 @@ public interface MensagemDAO {
     @Query("SELECT * FROM mensagem WHERE servidor = 1 AND lida = 0")
     LiveData<List<Mensagem>> listarTodosNaoLidos();
 
+    @Query("SELECT * FROM mensagem WHERE servidor = 0 AND lida = 0")
+    LiveData<List<Mensagem>> listarTodosNaoLidosServidor();
+
     @Query("SELECT * FROM mensagem WHERE ativo = 1")
     List<Mensagem> listarTodosAtivos();
 

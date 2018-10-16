@@ -100,6 +100,11 @@ public class FormDetalheMensagem extends FormBase {
                 binding.textViewEmail.setVisibility(View.VISIBLE);
             }
 //            viewModel.carregarRespostas(mensagem);
+
+            if(!mensagem.getServidor()){
+                viewModel.marcarComoLida(mensagem);
+            }
+
         }
 
         //listRespostas = binding.listRespostas;

@@ -61,6 +61,12 @@ public class DetalheMensagensViewModel extends AndroidViewModel {
 
     }
 
+    public void marcarComoLida(Mensagem mensagem){
+        mensagem.setLida(true);
+        mensagem.setUltimaAlteracao(DateTime.now());
+        new marcarLidaAsyncTask(appDatabase).execute(mensagem);
+    }
+
     // adicionar
 
     public void add(final MensagemResposta resposta) {
@@ -89,5 +95,21 @@ public class DetalheMensagensViewModel extends AndroidViewModel {
     }
 
     // fim adicionar
+
+    private static class marcarLidaAsyncTask extends AsyncTask<Mensagem, Void, Void> {
+
+        private AppDatabase db;
+
+        marcarLidaAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final Mensagem... params) {
+            db.mensagemDAO().editar((params[0]));
+            return null;
+        }
+
+    }
 
 }

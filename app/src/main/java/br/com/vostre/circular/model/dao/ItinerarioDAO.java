@@ -46,7 +46,16 @@ public interface ItinerarioDAO {
             "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
             "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
             ") AS 'cidadeDestino' " +
-            "FROM parada_itinerario pit INNER JOIN itinerario i ON i.id = pit.itinerario ORDER BY i.ativo DESC")
+            "FROM parada_itinerario pit INNER JOIN itinerario i ON i.id = pit.itinerario " +
+            "ORDER BY i.ativo DESC, " +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
+            "), " +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
+            ")")
     LiveData<List<ItinerarioPartidaDestino>> listarTodos();
 
     @Query("SELECT DISTINCT i.*, " +
@@ -73,7 +82,16 @@ public interface ItinerarioDAO {
             "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
             ") AS 'cidadeDestino' " +
             "FROM parada_itinerario pit INNER JOIN itinerario i ON i.id = pit.itinerario " +
-            "WHERE i.ativo = 1")
+            "WHERE i.ativo = 1 " +
+            "ORDER BY i.ativo DESC, " +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
+            "), " +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
+            ")")
     LiveData<List<ItinerarioPartidaDestino>> listarTodosAtivos();
 
     @Query("SELECT DISTINCT i.*, " +
@@ -162,7 +180,16 @@ public interface ItinerarioDAO {
             "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
             ") AS 'cidadeDestino', e.nome AS nomeEmpresa FROM parada_itinerario pit INNER JOIN " +
             "itinerario i ON i.id = pit.itinerario INNER JOIN empresa e ON e.id = i.empresa " +
-            "WHERE i.ativo = 1 AND i.empresa = :empresa")
+            "WHERE i.ativo = 1 AND i.empresa = :empresa " +
+            "ORDER BY i.ativo DESC, " +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
+            "), " +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
+            ")")
     LiveData<List<ItinerarioPartidaDestino>> listarTodosAtivosPorEmpresa(String empresa);
 
     @Query("SELECT i.*, " +

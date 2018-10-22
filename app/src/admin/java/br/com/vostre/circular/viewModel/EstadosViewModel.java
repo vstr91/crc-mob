@@ -56,7 +56,7 @@ public class EstadosViewModel extends AndroidViewModel {
         estados = appDatabase.estadoDAO().listarTodos();
 
         paises = new MutableLiveData<>();
-        paises = appDatabase.paisDAO().listarTodos();
+        paises = appDatabase.paisDAO().listarTodosAtivos();
 
         retorno = new MutableLiveData<>();
         retorno.setValue(-1);

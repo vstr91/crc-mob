@@ -8,6 +8,8 @@ import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 
 import java.io.FileNotFoundException;
@@ -50,6 +52,24 @@ public class EmpresasActivity extends BaseActivity {
         adapter = new EmpresaAdapter(empresas, this);
 
         listEmpresas.setAdapter(adapter);
+        binding.editTextFiltro.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //if(s.length() > 0){
+                    adapter.getFilter().filter(s);
+                //}
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
     }
 
@@ -64,6 +84,7 @@ public class EmpresasActivity extends BaseActivity {
         @Override
         public void onChanged(List<Empresa> empresas) {
             adapter.empresas = empresas;
+            adapter.empresasOriginal = empresas;
             adapter.notifyDataSetChanged();
         }
     };

@@ -4,20 +4,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaEmpresasBinding;
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.view.viewHolder.EmpresaViewHolder;
 
-public class EmpresaAdapter extends RecyclerView.Adapter<EmpresaViewHolder> {
+public class EmpresaAdapter extends RecyclerView.Adapter<EmpresaViewHolder> implements Filterable {
 
     public List<Empresa> empresas;
+    public List<Empresa> empresasOriginal;
+    public List<Empresa> listaFiltrada;
     AppCompatActivity ctx;
 
     public EmpresaAdapter(List<Empresa> empresas, AppCompatActivity context){
         this.empresas = empresas;
+        this.empresasOriginal = empresas;
         ctx = context;
     }
 
@@ -46,5 +52,49 @@ public class EmpresaAdapter extends RecyclerView.Adapter<EmpresaViewHolder> {
         }
 
 
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                String charString = constraint.toString();
+
+                if(charString.isEmpty()){
+                    listaFiltrada = empresasOriginal;
+                } else{
+                    listaFiltrada = new ArrayList<>();
+
+                    for(Empresa e : empresasOriginal){
+
+                        if(e.getNome().toLowerCase().contains(charString.toLowerCase())){
+                            listaFiltrada.add(e);
+                        }
+
+                    }
+
+                }
+
+                FilterResults results = new FilterResults();
+                results.values = listaFiltrada;
+                return results;
+
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+
+                List emp = (ArrayList<Empresa>) results.values;
+
+//                if(emp.size() > 0){
+                    empresas = emp;
+//                } else{
+//                    empresas = empresasOriginal;
+//                }
+
+                notifyDataSetChanged();
+            }
+        };
     }
 }

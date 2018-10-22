@@ -6,6 +6,8 @@ import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 
 import java.util.List;
@@ -43,6 +45,24 @@ public class BairrosActivity extends BaseActivity {
         adapter = new BairroAdapter(bairros, this);
 
         listBairros.setAdapter(adapter);
+        binding.editTextFiltro.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //if(s.length() > 0){
+                adapter.getFilter().filter(s);
+                //}
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     public void onFabClick(View v){
@@ -56,6 +76,7 @@ public class BairrosActivity extends BaseActivity {
         @Override
         public void onChanged(List<BairroCidade> bairros) {
             adapter.bairros = bairros;
+            adapter.bairrosOriginal = bairros;
             adapter.notifyDataSetChanged();
         }
     };

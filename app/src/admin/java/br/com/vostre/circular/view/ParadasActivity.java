@@ -186,9 +186,11 @@ public class ParadasActivity extends BaseActivity {
     public void onFabClick(View v){
 
         if(viewModel.localAtual != null){
+            viewModel.parada = new ParadaBairro();
             formParada = new FormParada();
             formParada.setLatitude(viewModel.localAtual.getValue().getLatitude());
             formParada.setLongitude(viewModel.localAtual.getValue().getLongitude());
+            formParada.setParada(null);
             formParada.setCtx(getApplication());
             formParada.show(getSupportFragmentManager(), "formParada");
         }

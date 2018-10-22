@@ -15,11 +15,11 @@ import br.com.vostre.circular.model.Pais;
 @Dao
 public interface PaisDAO {
 
-    @Query("SELECT * FROM pais")
+    @Query("SELECT * FROM pais ORDER BY nome")
     LiveData<List<Pais>> listarTodos();
 
-    @Query("SELECT * FROM pais WHERE ativo = 1")
-    List<Pais> listarTodosAtivos();
+    @Query("SELECT * FROM pais WHERE ativo = 1 ORDER BY nome")
+    LiveData<List<Pais>> listarTodosAtivos();
 
     @Query("SELECT * FROM pais WHERE enviado = 0")
     List<Pais> listarTodosAEnviar();

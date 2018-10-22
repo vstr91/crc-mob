@@ -18,10 +18,10 @@ import br.com.vostre.circular.model.pojo.CidadeEstado;
 @Dao
 public interface EmpresaDAO {
 
-    @Query("SELECT * FROM empresa")
+    @Query("SELECT * FROM empresa ORDER BY nome")
     LiveData<List<Empresa>> listarTodos();
 
-    @Query("SELECT * FROM empresa WHERE ativo = 1")
+    @Query("SELECT * FROM empresa WHERE ativo = 1 ORDER BY nome")
     LiveData<List<Empresa>> listarTodosAtivos();
 
     @Query("SELECT * FROM empresa WHERE enviado = 0")

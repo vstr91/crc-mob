@@ -73,7 +73,7 @@ public class CidadesViewModel extends AndroidViewModel {
         cidades = appDatabase.cidadeDAO().listarTodosComEstado();
 
         estados = new MutableLiveData<>();
-        estados = appDatabase.estadoDAO().listarTodos();
+        estados = appDatabase.estadoDAO().listarTodosAtivos();
 
         retorno = new MutableLiveData<>();
         retorno.setValue(-1);

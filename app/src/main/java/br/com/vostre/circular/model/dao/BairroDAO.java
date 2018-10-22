@@ -19,17 +19,17 @@ import br.com.vostre.circular.model.pojo.CidadeEstado;
 @Dao
 public interface BairroDAO {
 
-    @Query("SELECT * FROM bairro")
+    @Query("SELECT * FROM bairro ORDER BY nome")
     LiveData<List<Bairro>> listarTodos();
 
-    @Query("SELECT * FROM bairro WHERE ativo = 1")
+    @Query("SELECT * FROM bairro WHERE ativo = 1 ORDER BY nome")
     List<Bairro> listarTodosAtivos();
 
     @Query("SELECT * FROM bairro WHERE enviado = 0")
     List<Bairro> listarTodosAEnviar();
 
     @Query("SELECT b.*, c.id AS idCidade, c.nome AS nomeCidade, c.brasao AS brasao, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado FROM bairro b " +
-            "INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado")
+            "INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado ORDER BY b.nome, c.nome")
     LiveData<List<BairroCidade>> listarTodosComCidade();
 
     @Query("SELECT b.*, c.id AS idCidade, c.nome AS nomeCidade, c.brasao AS brasao, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado FROM bairro b " +

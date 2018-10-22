@@ -187,7 +187,15 @@ public class PontosInteresseViewModel extends AndroidViewModel {
         pontoInteresse.setEnviado(false);
         pontoInteresse.setSlug(StringUtils.toSlug(pontoInteresse.getNome()));
 
-        if(pontoInteresse.getDataFinal().isBefore(pontoInteresse.getDataInicial()) || pontoInteresse.getDataFinal().isBeforeNow()){
+        if(pontoInteresse.getDataInicial() != null && pontoInteresse.getDataFinal() != null){
+
+            if(pontoInteresse.getDataFinal().isBefore(pontoInteresse.getDataInicial()) || pontoInteresse.getDataFinal().isBeforeNow()){
+                pontoInteresse.setDataFinal(null);
+            }
+
+        } else if(pontoInteresse.getDataInicial() == null){
+            pontoInteresse.setDataInicial(DateTime.now());
+        } else{
             pontoInteresse.setDataFinal(null);
         }
 
@@ -220,7 +228,15 @@ public class PontosInteresseViewModel extends AndroidViewModel {
             appDatabase = AppDatabase.getAppDatabase(context.getApplicationContext());
         }
 
-        if(pontoInteresse.getDataFinal().isBefore(pontoInteresse.getDataInicial()) || pontoInteresse.getDataFinal().isBeforeNow()){
+        if(pontoInteresse.getDataInicial() != null && pontoInteresse.getDataFinal() != null){
+
+            if(pontoInteresse.getDataFinal().isBefore(pontoInteresse.getDataInicial()) || pontoInteresse.getDataFinal().isBeforeNow()){
+                pontoInteresse.setDataFinal(null);
+            }
+
+        } else if(pontoInteresse.getDataInicial() == null){
+            pontoInteresse.setDataInicial(DateTime.now());
+        } else{
             pontoInteresse.setDataFinal(null);
         }
 

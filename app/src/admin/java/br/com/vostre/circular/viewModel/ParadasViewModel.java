@@ -58,6 +58,8 @@ public class ParadasViewModel extends AndroidViewModel {
 
     public Bitmap foto;
 
+    public static MutableLiveData<Integer> retorno;
+
     public Bitmap getFoto() {
         return foto;
     }
@@ -123,6 +125,9 @@ public class ParadasViewModel extends AndroidViewModel {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplication());
         localAtual = new MutableLiveData<>();
         localAtual.setValue(new Location(LocationManager.GPS_PROVIDER));
+
+        retorno = new MutableLiveData<>();
+        retorno.setValue(-1);
     }
 
     public void salvarParada(){
@@ -136,7 +141,7 @@ public class ParadasViewModel extends AndroidViewModel {
         if(parada.getParada().valida(parada.getParada())){
             add(parada.getParada());
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -154,7 +159,7 @@ public class ParadasViewModel extends AndroidViewModel {
         if(parada.getParada().valida(parada.getParada())){
             edit(parada.getParada());
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -238,6 +243,11 @@ public class ParadasViewModel extends AndroidViewModel {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
+        }
+
     }
 
     // fim adicionar
@@ -283,6 +293,11 @@ public class ParadasViewModel extends AndroidViewModel {
         protected Void doInBackground(final Parada... params) {
             db.paradaDAO().editar((params[0]));
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
         }
 
     }

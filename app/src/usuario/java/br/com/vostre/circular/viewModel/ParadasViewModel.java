@@ -81,7 +81,7 @@ public class ParadasViewModel extends AndroidViewModel {
 
     public void setCidade(String cidade) {
         this.cidade = appDatabase.cidadeDAO().carregar(cidade);
-        paradas = appDatabase.paradaDAO().listarTodosComBairroPorCidade(cidade);
+        paradas = appDatabase.paradaDAO().listarTodosAtivosComBairroPorCidade(cidade);
     }
 
     public ParadasViewModel(Application app){
@@ -89,7 +89,7 @@ public class ParadasViewModel extends AndroidViewModel {
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         cidades = appDatabase.cidadeDAO().listarTodosAtivasComEstado();
         cidade = appDatabase.cidadeDAO().carregar("");
-        paradas = appDatabase.paradaDAO().listarTodosComBairroPorCidade("");
+        paradas = appDatabase.paradaDAO().listarTodosAtivosComBairroPorCidade("");
     }
 
     public void salvarParada(){

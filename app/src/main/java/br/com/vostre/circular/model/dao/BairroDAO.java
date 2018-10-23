@@ -36,9 +36,19 @@ public interface BairroDAO {
             "INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado WHERE b.cidade = :cidade")
     LiveData<List<BairroCidade>> listarTodosComCidadePorCidade(String cidade);
 
+    @Query("SELECT DISTINCT b.*, c.id AS idCidade, c.nome AS nomeCidade, c.brasao AS brasao, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado FROM bairro b " +
+            "INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado INNER JOIN parada p ON p.bairro = b.id INNER JOIN parada_itinerario pi ON pi.parada = p.id WHERE b.cidade = :cidade " +
+            "ORDER BY b.nome")
+    LiveData<List<BairroCidade>> listarTodosAtivosComCidadePorCidade(String cidade);
+
     @Query("SELECT b.*, c.id AS idCidade, c.nome AS nomeCidade, c.brasao AS brasao, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado FROM bairro b " +
             "INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado WHERE b.cidade = :cidade AND b.id != :bairro")
     LiveData<List<BairroCidade>> listarTodosComCidadePorCidadeFiltro(String cidade, String bairro);
+
+    @Query("SELECT DISTINCT b.*, c.id AS idCidade, c.nome AS nomeCidade, c.brasao AS brasao, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado FROM bairro b " +
+            "INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado INNER JOIN parada p ON p.bairro = b.id INNER JOIN parada_itinerario pi ON pi.parada = p.id " +
+            "WHERE b.cidade = :cidade AND b.id != :bairro ORDER BY b.nome")
+    LiveData<List<BairroCidade>> listarTodosAtivosComCidadePorCidadeFiltro(String cidade, String bairro);
 
     @Query("SELECT * FROM bairro WHERE id IN (:ids)")
     List<Bairro> carregarTodosPorIds(int[] ids);

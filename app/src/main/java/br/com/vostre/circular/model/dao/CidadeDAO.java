@@ -22,11 +22,28 @@ public interface CidadeDAO {
     @Query("SELECT * FROM cidade WHERE ativo = 1 ORDER BY nome")
     LiveData<List<Cidade>> listarTodosAtivos();
 
-    @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado FROM cidade c INNER JOIN estado e ON e.id = c.estado WHERE (SELECT COUNT(b.id) FROM bairro b WHERE b.cidade = c.id) > 0 ORDER BY c.nome")
+    @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado FROM cidade c INNER JOIN estado e ON e.id = c.estado " +
+            "            WHERE (SELECT COUNT(b.id) FROM bairro b WHERE b.cidade = c.id) > 0 \n" +
+            "            AND (SELECT COUNT(pi.id) FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro " +
+            "            WHERE c.id = b.cidade AND pi.ativo = 1) > 0 " +
+            "AND (" +
+            "    SELECT COUNT(DISTINCT hi.id) FROM horario_itinerario hi INNER JOIN itinerario i ON i.id = hi.itinerario INNER JOIN parada_itinerario pi ON pi.itinerario = i.id " +
+            "INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro " +
+            "    WHERE b.cidade = c.id " +
+            "    AND (hi.domingo = 1 OR hi.segunda = 1 OR hi.terca = 1 OR hi.quarta = 1 OR hi.quinta = 1 OR hi.sexta = 1 OR hi.sabado = 1) " +
+            ") > 0 " +
+            "AND c.ativo = 1 ORDER BY c.nome")
     LiveData<List<CidadeEstado>> listarTodosAtivasComEstado();
 
-    @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado FROM cidade c INNER JOIN estado e ON e.id = c.estado WHERE (SELECT COUNT(b.id) FROM bairro b WHERE b.cidade = c.id AND b.id != :bairro) > 0 " +
-            "ORDER BY c.nome")
+    @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado FROM cidade c INNER JOIN estado e ON e.id = c.estado " +
+            "WHERE (SELECT COUNT(b.id) FROM bairro b WHERE b.cidade = c.id AND b.id != :bairro) > 0 " +
+            "AND (SELECT COUNT(pi.id) FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro " +
+            "WHERE c.id = b.cidade AND pi.ativo = 1 AND b.id != :bairro) > 0 AND ( " +
+            "    SELECT COUNT(DISTINCT hi.id) FROM horario_itinerario hi INNER JOIN itinerario i ON i.id = hi.itinerario INNER JOIN parada_itinerario pi ON pi.itinerario = i.id " +
+            "INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro " +
+            "    WHERE b.cidade = c.id " +
+            "    AND (hi.domingo = 1 OR hi.segunda = 1 OR hi.terca = 1 OR hi.quarta = 1 OR hi.quinta = 1 OR hi.sexta = 1 OR hi.sabado = 1) " +
+            ") > 0  AND c.ativo = 1 ORDER BY c.nome")
     LiveData<List<CidadeEstado>> listarTodosAtivasComEstadoFiltro(String bairro);
 
     @Query("SELECT * FROM cidade WHERE enviado = 0")

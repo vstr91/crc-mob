@@ -104,6 +104,9 @@ public class FormBairro extends FormBase implements SelectListener {
 
         viewModel = ViewModelProviders.of(this.getActivity()).get(ItinerariosViewModel.class);
 
+        binding.setView(this);
+        binding.setViewModel(viewModel);
+
         if(getArguments() != null){
             Cidade umaCidade = new Cidade();
             umaCidade.setId(getArguments().getString("cidade"));
@@ -112,20 +115,19 @@ public class FormBairro extends FormBase implements SelectListener {
 
             if(viewModel.escolhaAtual == 0){
                 viewModel.setCidadePartida(cidade);
+                viewModel.bairros.observe(this, bairrosObserver);
+                adapter = new BairroAdapter(viewModel.bairros.getValue(), ctx.getApplicationContext());
                 //viewModel.escolhaAtual = 1;
             } else{
                 viewModel.setCidadeDestino(cidade);
+                viewModel.bairrosDestino.observe(this, bairrosObserver);
+                adapter = new BairroAdapter(viewModel.bairrosDestino.getValue(), ctx.getApplicationContext());
             }
 
         }
 
-        binding.setView(this);
-        binding.setViewModel(viewModel);
-
-        viewModel.bairros.observe(this, bairrosObserver);
-
         listBairros = binding.listBairros;
-        adapter = new BairroAdapter(viewModel.bairros.getValue(), ctx.getApplicationContext());
+
         adapter.setListener(this);
 
         listBairros.setAdapter(adapter);

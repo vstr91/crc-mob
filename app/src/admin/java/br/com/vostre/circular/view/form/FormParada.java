@@ -21,6 +21,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -175,7 +176,7 @@ public class FormParada extends FormBase {
             viewModel.salvarParada();
         }
 
-        dismiss();
+        viewModel.retorno.observe(this, retornoObserver);
 
     }
 
@@ -352,6 +353,24 @@ public class FormParada extends FormBase {
         @Override
         public void onChanged(List<BairroCidade> bairros) {
             setSpinnerEntries(binding.spinnerBairro, bairros);
+        }
+    };
+
+    Observer<Integer> retornoObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer retorno) {
+
+            if(retorno == 1){
+                Toast.makeText(getContext().getApplicationContext(), "Parada cadastrada!", Toast.LENGTH_SHORT).show();
+                viewModel.setParada(new ParadaBairro());
+                dismiss();
+            } else if(retorno == 0){
+                Toast.makeText(getContext().getApplicationContext(),
+                        "Dados necessários não informados. Por favor preencha " +
+                                "todos os dados obrigatórios!",
+                        Toast.LENGTH_SHORT).show();
+            }
+
         }
     };
 

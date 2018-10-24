@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
@@ -222,6 +223,11 @@ public class ItinerariosActivity extends BaseActivity {
             Toast.makeText(getApplicationContext(), "Ao menos duas paradas devem ser selecionadas!", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    public void onClickTarifas(View v){
+        Intent i = new Intent(getApplicationContext(), TarifasActivity.class);
+        startActivity(i);
     }
 
     @Override

@@ -14,6 +14,8 @@ import br.com.vostre.circular.databinding.ActivityPaisesBinding;
 import br.com.vostre.circular.databinding.ActivityTarifasBinding;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
+import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
+import br.com.vostre.circular.view.adapter.ItinerarioTarifaAdapter;
 import br.com.vostre.circular.view.adapter.PaisAdapter;
 import br.com.vostre.circular.view.form.FormPais;
 import br.com.vostre.circular.viewModel.ItinerariosViewModel;
@@ -26,8 +28,8 @@ public class TarifasActivity extends BaseActivity {
     TarifasViewModel viewModel;
 
     RecyclerView listItinerarios;
-    List<Pais> itinerarios;
-    PaisAdapter adapter;
+    List<ItinerarioPartidaDestino> itinerarios;
+    ItinerarioTarifaAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +46,7 @@ public class TarifasActivity extends BaseActivity {
 
         listItinerarios = binding.listItinerarios;
 
-        //adapter = new ItinerariosAdapter(itinerarios, this);
+        adapter = new ItinerarioTarifaAdapter(itinerarios, this);
 
         listItinerarios.setAdapter(adapter);
 
@@ -53,9 +55,27 @@ public class TarifasActivity extends BaseActivity {
     Observer<List<ItinerarioPartidaDestino>> itinerariosObserver = new Observer<List<ItinerarioPartidaDestino>>() {
         @Override
         public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
-            //adapter.itinerarios = itinerarios;
+            adapter.itinerarios = itinerarios;
             adapter.notifyDataSetChanged();
         }
     };
+
+    public void onBtnSalvarClick(View v){
+
+        itinerarios = viewModel.itinerarios.getValue();
+
+        for(ItinerarioPartidaDestino i : itinerarios){
+
+            if(i.isSelecionado()){
+                System.out.println("ITI > "+i.getNomeCidadePartida()+" x "+i.getNomeCidadeDestino());
+                i.setSelecionado(false);
+            }
+
+        }
+
+        binding.editTextTarifa.setText("");
+
+
+    }
 
 }

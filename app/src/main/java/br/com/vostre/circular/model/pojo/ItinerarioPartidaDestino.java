@@ -75,6 +75,17 @@ public class ItinerarioPartidaDestino {
     @ColumnInfo(name = "observacaoHorarioSeguinte")
     String observacaoHorarioSeguinte;
 
+    @Ignore
+    public boolean selecionado;
+
+    public boolean isSelecionado() {
+        return selecionado;
+    }
+
+    public void setSelecionado(boolean selecionado) {
+        this.selecionado = selecionado;
+    }
+
     public String getObservacaoProximoHorario() {
         return observacaoProximoHorario;
     }

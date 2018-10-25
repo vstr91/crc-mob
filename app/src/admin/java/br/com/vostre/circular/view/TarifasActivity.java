@@ -6,7 +6,9 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.R;
@@ -63,17 +65,33 @@ public class TarifasActivity extends BaseActivity {
     public void onBtnSalvarClick(View v){
 
         itinerarios = viewModel.itinerarios.getValue();
+        List<ItinerarioPartidaDestino> itis = new ArrayList<>();
 
         for(ItinerarioPartidaDestino i : itinerarios){
 
             if(i.isSelecionado()){
-                System.out.println("ITI > "+i.getNomeCidadePartida()+" x "+i.getNomeCidadeDestino());
-                i.setSelecionado(false);
+                itis.add(i);
             }
 
         }
 
-        binding.editTextTarifa.setText("");
+        if(itis.size() > 0 || !binding.editTextTarifa.getText().toString().isEmpty()){
+            Double tarifa = Double.parseDouble(binding.editTextTarifa.getText().toString().replace(".", "").replace(",", "."));
+            viewModel.edit(itis, tarifa);
+
+            for(ItinerarioPartidaDestino i : itinerarios){
+                i.setSelecionado(false);
+            }
+
+            binding.editTextTarifa.setText("");
+            adapter.itinerarios = itinerarios;
+            adapter.notifyDataSetChanged();
+
+            Toast.makeText(getApplicationContext(), "Tarifas alteradas!", Toast.LENGTH_SHORT).show();
+
+        } else{
+            Toast.makeText(getApplicationContext(), "Ao menos um itinerário deve ser selecionado e a tarifa deve ser informada.", Toast.LENGTH_SHORT).show();
+        }
 
 
     }

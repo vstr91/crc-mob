@@ -24,6 +24,16 @@ public class Parada extends EntidadeSlug {
     @NonNull
     private boolean imagemEnviada = true;
 
+    private int direcao = -1; // 0 = esquerda | 1 = direita | -1 = nao mostra / ambas
+
+    public int getDirecao() {
+        return direcao;
+    }
+
+    public void setDirecao(int direcao) {
+        this.direcao = direcao;
+    }
+
     @NonNull
     public Double getLatitude() {
         return latitude;

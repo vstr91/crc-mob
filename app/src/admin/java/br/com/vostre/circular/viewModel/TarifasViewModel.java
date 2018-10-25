@@ -10,9 +10,11 @@ import org.joda.time.DateTime;
 
 import java.util.List;
 
+import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
+import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.StringUtils;
 
 public class TarifasViewModel extends AndroidViewModel {
@@ -41,26 +43,36 @@ public class TarifasViewModel extends AndroidViewModel {
 
     // editar
 
-    public void edit(final List<ItinerarioPartidaDestino> itinerarios) {
+    public void edit(final List<ItinerarioPartidaDestino> itinerarios, Double tarifa) {
 
-//        pais.setUltimaAlteracao(new DateTime());
-//        pais.setEnviado(false);
-//        pais.setSlug(StringUtils.toSlug(pais.getNome()));
-//
-//        new editAsyncTask(appDatabase).execute(pais);
+        for(ItinerarioPartidaDestino i : itinerarios){
+            i.getItinerario().setTarifa(tarifa);
+            i.getItinerario().setUltimaAlteracao(DateTime.now());
+            i.getItinerario().setEnviado(false);
+            i.getItinerario().setUsuarioUltimaAlteracao(PreferenceUtils.carregarUsuarioLogado(getApplication()));
+        }
+
+        new editAsyncTask(appDatabase, itinerarios).execute();
+
     }
 
     private static class editAsyncTask extends AsyncTask<Pais, Void, Void> {
 
         private AppDatabase db;
+        private List<ItinerarioPartidaDestino> itinerarios;
 
-        editAsyncTask(AppDatabase appDatabase) {
+        editAsyncTask(AppDatabase appDatabase, List<ItinerarioPartidaDestino> itinerarios) {
             db = appDatabase;
+            this.itinerarios = itinerarios;
         }
 
         @Override
         protected Void doInBackground(final Pais... params) {
-            db.paisDAO().editar((params[0]));
+
+            for(ItinerarioPartidaDestino i : itinerarios){
+                db.itinerarioDAO().editar(i.getItinerario());
+            }
+
             return null;
         }
 

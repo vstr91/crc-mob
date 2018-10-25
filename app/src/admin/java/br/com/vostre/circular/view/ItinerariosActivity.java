@@ -8,14 +8,27 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.DrawableContainer;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.RotateDrawable;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DrawableUtils;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationRequest;
@@ -347,12 +360,20 @@ public class ItinerariosActivity extends BaseActivity {
 
         if(paradas != null){
 
+//            Bitmap b = Bitmap.createBitmap(47, 68, Bitmap.Config.ARGB_8888);
+//            Canvas c = new Canvas(b);
+//
+//            View v = getLayoutInflater().inflate(R.layout.marker,null,false); // inflate view here
+//            v.layout(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
+//            v.draw(c);
+
             for(final ParadaBairro p : paradas){
 
                 Marker m = new Marker(map);
                 m.setPosition(new GeoPoint(p.getParada().getLatitude(), p.getParada().getLongitude()));
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
+//                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
+                m.setIcon(mergeDrawable(R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
                 m.setTitle(p.getParada().getNome());
                 m.setDraggable(true);
                 m.setId(p.getParada().getId());
@@ -391,11 +412,28 @@ public class ItinerariosActivity extends BaseActivity {
                         return true;
                     }
                 });
+
+                m.getPosition();
+
                 map.getOverlays().add(m);
             }
 
         }
 
+    }
+
+    public Drawable mergeDrawable(int drawable1, int drawable2){
+
+        // 47x68
+
+        Drawable marker = ContextCompat.getDrawable(this, drawable1);
+        Drawable seta = ContextCompat.getDrawable(this, drawable2);
+
+        LayerDrawable finalDrawable = new LayerDrawable(new Drawable[] {marker, seta});
+        finalDrawable.setLayerInset(0, 0, 0, 0, 0);
+        finalDrawable.setLayerInset(1, 1, 0, 1, 120);
+
+        return finalDrawable;
     }
 
     @NonNull

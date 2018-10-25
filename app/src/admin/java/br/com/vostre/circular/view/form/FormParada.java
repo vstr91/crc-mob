@@ -137,6 +137,23 @@ public class FormParada extends FormBase {
         if(parada != null){
             viewModel.parada = parada;
 
+            int sentido = parada.getParada().getDirecao();
+
+            switch(sentido){
+                case 0:
+                    binding.spinnerSentido.setSelection(2);
+                    break;
+                case 1:
+                    binding.spinnerSentido.setSelection(1);
+                    break;
+                case -1:
+                    binding.spinnerSentido.setSelection(0);
+                    break;
+                default:
+                    binding.spinnerSentido.setSelection(0);
+                    break;
+            }
+
             if(parada.getParada().getImagem() != null){
                 File foto = new File(ctx.getFilesDir(), parada.getParada().getImagem());
 
@@ -347,6 +364,22 @@ public class FormParada extends FormBase {
 
     public void onItemSelectedSpinnerBairro (AdapterView<?> adapterView, View view, int i, long l){
         viewModel.bairro = viewModel.bairros.getValue().get(i);
+    }
+
+    public void onItemSelectedSpinnerSentido (AdapterView<?> adapterView, View view, int i, long l){
+
+        switch(i){
+            case 0: // ambos
+                viewModel.getParada().getParada().setDirecao(-1);
+                break;
+            case 1: // direita
+                viewModel.getParada().getParada().setDirecao(1);
+                break;
+            case 2: // esquerda
+                viewModel.getParada().getParada().setDirecao(0);
+                break;
+        }
+
     }
 
     Observer<List<BairroCidade>> bairrosObserver = new Observer<List<BairroCidade>>() {

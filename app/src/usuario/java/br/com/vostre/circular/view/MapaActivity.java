@@ -10,7 +10,9 @@ import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.DrawableWrapper;
 import android.location.Location;
@@ -38,6 +40,7 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -250,6 +253,15 @@ public class MapaActivity extends BaseActivity {
 
         if(paradas != null){
 
+            RadiusMarkerClusterer poiMarkers = new RadiusMarkerClusterer(this);
+            poiMarkers.setRadius(200);
+
+            Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_cluster);
+            Bitmap clusterIcon = ((BitmapDrawable)clusterIconD).getBitmap();
+
+            map.getOverlays().add(poiMarkers);
+            poiMarkers.setIcon(clusterIcon);
+
             for(final ParadaBairro p : paradas){
 
                 Marker m = new Marker(map);
@@ -257,7 +269,22 @@ public class MapaActivity extends BaseActivity {
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                 m.setTitle(p.getParada().getNome());
                 m.setDraggable(true);
-                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
+
+                switch(p.getParada().getSentido()){
+                    case 0:
+                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_backspace_black_24dp));
+                        break;
+                    case 1:
+                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
+                        break;
+                    case 2:
+                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
+                        break;
+                    default:
+                        m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
+                        break;
+                }
+
                 m.setId(p.getParada().getId());
                 m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                     @Override
@@ -318,7 +345,8 @@ public class MapaActivity extends BaseActivity {
                         return true;
                     }
                 });
-                map.getOverlays().add(m);
+//                map.getOverlays().add(m);
+                poiMarkers.add(m);
             }
 
         }
@@ -328,6 +356,15 @@ public class MapaActivity extends BaseActivity {
     private void atualizarPoisMapa(final List<PontoInteresse> pois){
 
         if(pois != null){
+
+            RadiusMarkerClusterer poiMarkers = new RadiusMarkerClusterer(this);
+            poiMarkers.setRadius(200);
+
+            Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_cluster);
+            Bitmap clusterIcon = ((BitmapDrawable)clusterIconD).getBitmap();
+
+            map.getOverlays().add(poiMarkers);
+            poiMarkers.setIcon(clusterIcon);
 
             for(final PontoInteresse p : pois){
 
@@ -366,7 +403,8 @@ public class MapaActivity extends BaseActivity {
                         return true;
                     }
                 });
-                map.getOverlays().add(m);
+//                map.getOverlays().add(m);
+                poiMarkers.add(m);
             }
 
         }
@@ -376,6 +414,15 @@ public class MapaActivity extends BaseActivity {
     private void atualizarSugestoessMapa(final List<ParadaSugestao> paradasSugeridas){
 
         if(paradasSugeridas != null){
+
+            RadiusMarkerClusterer poiMarkers = new RadiusMarkerClusterer(this);
+            poiMarkers.setRadius(200);
+
+            Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_cluster);
+            Bitmap clusterIcon = ((BitmapDrawable)clusterIconD).getBitmap();
+
+            map.getOverlays().add(poiMarkers);
+            poiMarkers.setIcon(clusterIcon);
 
             for(final ParadaSugestao p : paradasSugeridas){
 
@@ -453,7 +500,8 @@ public class MapaActivity extends BaseActivity {
 
                     }
                 });
-                map.getOverlays().add(m);
+//                map.getOverlays().add(m);
+                poiMarkers.add(m);
             }
 
         }

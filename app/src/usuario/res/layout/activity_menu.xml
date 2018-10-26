@@ -232,9 +232,10 @@
                         android:layout_marginRight="8dp"
                         android:layout_marginStart="8dp"
                         android:background="@color/transparente"
-                        android:text="Outras Opções"
                         android:onClick="@{view::onClickBtnOpcoes}"
+                        android:text="Outras Opções"
                         android:textAppearance="@style/botao_principal"
+                        android:visibility="gone"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/btnLogin" />

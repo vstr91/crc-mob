@@ -24,14 +24,14 @@ public class Parada extends EntidadeSlug {
     @NonNull
     private boolean imagemEnviada = true;
 
-    private int direcao = -1; // 0 = esquerda | 1 = direita | -1 = nao mostra / ambas
+    private int sentido = -1; // 0 = esquerda | 1 = direita | 2 = ambas | -1 = nao mostra
 
-    public int getDirecao() {
-        return direcao;
+    public int getSentido() {
+        return sentido;
     }
 
-    public void setDirecao(int direcao) {
-        this.direcao = direcao;
+    public void setSentido(int sentido) {
+        this.sentido = sentido;
     }
 
     @NonNull

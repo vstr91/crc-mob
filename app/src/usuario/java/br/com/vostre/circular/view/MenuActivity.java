@@ -106,7 +106,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
     // Sync interval constants
     public static final long SECONDS_PER_MINUTE = 60L;
-    public static final long SYNC_INTERVAL_IN_MINUTES = 60*5L;
+    public static final long SYNC_INTERVAL_IN_MINUTES = 60*1L;
     public static final long SYNC_INTERVAL =
             SYNC_INTERVAL_IN_MINUTES *
                     SECONDS_PER_MINUTE;
@@ -216,6 +216,10 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     private void configuraActivity(){
+
+//        if(PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), "tela_inicial")){
+//            onClickBtnMapa(null);
+//        }
 
         progressBar = binding.progressBar;
         btnLogin = binding.btnLogin;

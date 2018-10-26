@@ -51,6 +51,7 @@
                     android:layout_marginRight="16dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
+                    android:onCheckedChanged="@{view::onSwitchMapaChange}"
                     android:text="Iniciar na tela de mapa"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

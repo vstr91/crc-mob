@@ -28,14 +28,9 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 
 import br.com.vostre.circular.R;
@@ -43,7 +38,6 @@ import br.com.vostre.circular.databinding.FormParadaBinding;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.view.adapter.BairroAdapterSpinner;
-import br.com.vostre.circular.viewModel.BairrosViewModel;
 import br.com.vostre.circular.viewModel.ParadasViewModel;
 
 public class FormParada extends FormBase {
@@ -137,17 +131,20 @@ public class FormParada extends FormBase {
         if(parada != null){
             viewModel.parada = parada;
 
-            int sentido = parada.getParada().getDirecao();
+            int sentido = parada.getParada().getSentido();
 
             switch(sentido){
                 case 0:
-                    binding.spinnerSentido.setSelection(2);
+                    binding.spinnerSentido.setSelection(3);
                     break;
                 case 1:
-                    binding.spinnerSentido.setSelection(1);
+                    binding.spinnerSentido.setSelection(2);
                     break;
                 case -1:
                     binding.spinnerSentido.setSelection(0);
+                    break;
+                case 2:
+                    binding.spinnerSentido.setSelection(1);
                     break;
                 default:
                     binding.spinnerSentido.setSelection(0);
@@ -369,14 +366,17 @@ public class FormParada extends FormBase {
     public void onItemSelectedSpinnerSentido (AdapterView<?> adapterView, View view, int i, long l){
 
         switch(i){
-            case 0: // ambos
-                viewModel.getParada().getParada().setDirecao(-1);
+            case 0: // nao mostrar
+                viewModel.getParada().getParada().setSentido(-1);
                 break;
-            case 1: // direita
-                viewModel.getParada().getParada().setDirecao(1);
+            case 1: // ambos
+                viewModel.getParada().getParada().setSentido(2);
                 break;
-            case 2: // esquerda
-                viewModel.getParada().getParada().setDirecao(0);
+            case 2: // direita
+                viewModel.getParada().getParada().setSentido(1);
+                break;
+            case 3: // esquerda
+                viewModel.getParada().getParada().setSentido(0);
                 break;
         }
 

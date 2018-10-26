@@ -149,7 +149,6 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.textViewBadgeMsg:
             case R.id.msg:
             case R.id.icon_msg:
-                System.out.println("AAAAAAA");
                 break;
         }
 
@@ -584,9 +583,9 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
             if(menu != null){
 
                 if(mensagens.size() > 0){
-                    menu.getItem(2).getActionView().findViewById(R.id.textViewBadgeMsg).setVisibility(View.VISIBLE);
+                    menu.getItem(3).getActionView().findViewById(R.id.textViewBadgeMsg).setVisibility(View.VISIBLE);
                 } else{
-                    menu.getItem(2).getActionView().findViewById(R.id.textViewBadgeMsg).setVisibility(View.GONE);
+                    menu.getItem(3).getActionView().findViewById(R.id.textViewBadgeMsg).setVisibility(View.GONE);
                 }
 
             }

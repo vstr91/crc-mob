@@ -32,6 +32,7 @@ public class ToolbarUtils {
 
     static TextView textViewBadgeMsg;
     static ImageButton imageButtonMsg;
+    static ImageButton imageButtonAlerta;
     static ImageButton imageButtonFavoritos;
     static ImageButton imageButtonSync;
     static View.OnClickListener mListener;
@@ -54,6 +55,9 @@ public class ToolbarUtils {
         itemMsg = menu.findItem(R.id.icon_msg);
         MenuItemCompat.getActionView(itemMsg).setOnClickListener(listener);
 
+        MenuItem itemAlerta = menu.findItem(R.id.icon_alerta);
+        MenuItemCompat.getActionView(itemAlerta).setOnClickListener(listener);
+
         MenuItem itemFavoritos = menu.findItem(R.id.icon_favoritos);
         MenuItemCompat.getActionView(itemFavoritos).setOnClickListener(listener);
 
@@ -64,6 +68,9 @@ public class ToolbarUtils {
 
         imageButtonMsg = MenuItemCompat.getActionView(itemMsg).findViewById(R.id.imageButtonMsg);
         imageButtonMsg.setOnClickListener(mListener);
+
+        imageButtonAlerta = MenuItemCompat.getActionView(itemAlerta).findViewById(R.id.imageButtonAlerta);
+        imageButtonAlerta.setOnClickListener(mListener);
 
         imageButtonFavoritos = MenuItemCompat.getActionView(itemFavoritos).findViewById(R.id.imageButtonFavoritos);
         imageButtonFavoritos.setOnClickListener(mListener);
@@ -88,6 +95,11 @@ public class ToolbarUtils {
             case R.id.icon_msg:
                 Intent intent = new Intent(activity, MensagensActivity.class);
                 activity.startActivity(intent);
+                break;
+            case R.id.imageButtonAlerta:
+            case R.id.alerta:
+            case R.id.icon_alerta:
+                Toast.makeText(activity, "Alerta!!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.imageButtonFavoritos:
             case R.id.favoritos:

@@ -16,6 +16,12 @@
         app:actionLayout="@layout/toolbar_sync_icon"
         app:showAsAction="always" />
 
+    <item android:id="@+id/icon_alerta"
+        android:title="Alerta"
+        android:visible="false"
+        app:actionLayout="@layout/toolbar_alerta_icon"
+        app:showAsAction="always" />
+
     <item android:id="@+id/icon_favoritos"
         android:title="Favoritos"
         app:actionLayout="@layout/toolbar_favoritos_icon"

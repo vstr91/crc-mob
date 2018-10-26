@@ -37,6 +37,7 @@ import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsList
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -367,13 +368,37 @@ public class ItinerariosActivity extends BaseActivity {
 //            v.layout(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
 //            v.draw(c);
 
+            RadiusMarkerClusterer poiMarkers = new RadiusMarkerClusterer(this);
+            poiMarkers.setRadius(200);
+
+            Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_cluster);
+            Bitmap clusterIcon = ((BitmapDrawable)clusterIconD).getBitmap();
+
+            map.getOverlays().add(poiMarkers);
+            poiMarkers.setIcon(clusterIcon);
+
             for(final ParadaBairro p : paradas){
 
                 Marker m = new Marker(map);
                 m.setPosition(new GeoPoint(p.getParada().getLatitude(), p.getParada().getLongitude()));
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
 //                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
-                m.setIcon(mergeDrawable(R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
+
+                switch(p.getParada().getSentido()){
+                    case 0:
+                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_backspace_black_24dp));
+                        break;
+                    case 1:
+                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
+                        break;
+                    case 2:
+                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
+                        break;
+                    default:
+                        m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
+                        break;
+                }
+
                 m.setTitle(p.getParada().getNome());
                 m.setDraggable(true);
                 m.setId(p.getParada().getId());
@@ -413,27 +438,12 @@ public class ItinerariosActivity extends BaseActivity {
                     }
                 });
 
-                m.getPosition();
-
-                map.getOverlays().add(m);
+//                map.getOverlays().add(m);
+                poiMarkers.add(m);
             }
 
         }
 
-    }
-
-    public Drawable mergeDrawable(int drawable1, int drawable2){
-
-        // 47x68
-
-        Drawable marker = ContextCompat.getDrawable(this, drawable1);
-        Drawable seta = ContextCompat.getDrawable(this, drawable2);
-
-        LayerDrawable finalDrawable = new LayerDrawable(new Drawable[] {marker, seta});
-        finalDrawable.setLayerInset(0, 0, 0, 0, 0);
-        finalDrawable.setLayerInset(1, 1, 0, 1, 120);
-
-        return finalDrawable;
     }
 
     @NonNull

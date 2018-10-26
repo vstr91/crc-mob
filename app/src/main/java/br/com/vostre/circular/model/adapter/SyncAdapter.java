@@ -240,8 +240,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
 
-                    System.out.println("RESPONSE: "+response.code());
-
                     if(response.code() == 200){
 
                         token = response.body();
@@ -381,8 +379,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     private void processaJson(Response<String> response) throws JSONException {
 
         String dados = response.body();
-
-        System.out.println("DADOS::: "+dados);
 
         if(dados != null){
 
@@ -947,8 +943,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     +strBairros+","+strParadas+","+strItinerarios+","+strHorarios+","+strParadasItinerarios+","
                     +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
                     +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+"}";
-
-            System.out.println("PAR::: "+strParadasSugestoes);
 
             // EXPORTA ARQUIVO DE DADOS
             ///*

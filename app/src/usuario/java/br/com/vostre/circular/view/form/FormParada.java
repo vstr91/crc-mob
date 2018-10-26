@@ -168,6 +168,7 @@ public class FormParada extends FormBase {
             viewModel.paradaNova.setTaxaDeEmbarque(paradaRelativa.getParada().getTaxaDeEmbarque());
             viewModel.paradaNova.setSlug(paradaRelativa.getParada().getSlug());
             viewModel.paradaNova.setBairro(paradaRelativa.getParada().getBairro());
+            viewModel.paradaNova.setSentido(paradaRelativa.getParada().getSentido());
         }
 
         return binding.getRoot();

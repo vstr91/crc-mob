@@ -9,8 +9,11 @@ import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -32,11 +35,13 @@ import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsList
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
@@ -54,6 +59,7 @@ import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.DialogUtils;
+import br.com.vostre.circular.utils.DrawableUtils;
 import br.com.vostre.circular.view.form.FormParada;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.viewModel.ParadasViewModel;
@@ -313,13 +319,37 @@ public class ParadasActivity extends BaseActivity {
 
         if(paradas != null){
 
+            RadiusMarkerClusterer poiMarkers = new RadiusMarkerClusterer(this);
+            poiMarkers.setRadius(200);
+
+            Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_cluster);
+            Bitmap clusterIcon = ((BitmapDrawable)clusterIconD).getBitmap();
+
+            map.getOverlays().add(poiMarkers);
+            poiMarkers.setIcon(clusterIcon);
+
             for(ParadaBairro p : paradas){
 
                 Marker m = new Marker(map);
                 m.setPosition(new GeoPoint(p.getParada().getLatitude(), p.getParada().getLongitude()));
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                 m.setTitle(p.getParada().getNome());
-                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
+
+                switch(p.getParada().getSentido()){
+                    case 0:
+                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_backspace_black_24dp));
+                        break;
+                    case 1:
+                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
+                        break;
+                    case 2:
+                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
+                        break;
+                    default:
+                        m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
+                        break;
+                }
+
                 m.setDraggable(true);
                 m.setId(p.getParada().getId());
                 m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
@@ -356,7 +386,8 @@ public class ParadasActivity extends BaseActivity {
 
                     }
                 });
-                map.getOverlays().add(m);
+                poiMarkers.add(m);
+                //map.getOverlays().add(m);
             }
 
         }

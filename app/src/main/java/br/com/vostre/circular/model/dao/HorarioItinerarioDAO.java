@@ -1,11 +1,13 @@
 package br.com.vostre.circular.model.dao;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.persistence.db.SupportSQLiteQuery;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.RawQuery;
 import android.arch.persistence.room.Update;
 
 import java.util.List;
@@ -31,6 +33,12 @@ public interface HorarioItinerarioDAO {
             "FROM horario h LEFT JOIN horario_itinerario hi ON hi.horario = h.id AND hi.itinerario = :itinerario " +
             "WHERE h.ativo = 1 AND (hi.ativo = 1 OR hi.ativo IS NULL) AND (hi.itinerario = :itinerario OR hi.itinerario IS NULL) ORDER BY h.nome")
     LiveData<List<HorarioItinerarioNome>> listarTodosAtivosPorItinerario(String itinerario);
+
+    @RawQuery
+    String carregarProximoHorarioPorItinerario(SupportSQLiteQuery query);
+
+    @RawQuery
+    String carregarHorarioAnteriorPorItinerario(SupportSQLiteQuery query);
 
     @Query("SELECT hi.*, h.id AS idHorario, h.nome AS nomeHorario " +
             "FROM horario h INNER JOIN horario_itinerario hi ON hi.horario = h.id AND hi.itinerario = :itinerario " +
@@ -97,6 +105,11 @@ public interface HorarioItinerarioDAO {
 
     @Query("SELECT * FROM horario_itinerario WHERE id = :id")
     LiveData<HorarioItinerario> carregarPorId(String id);
+
+    @Query("SELECT hi.*, h.id AS idHorario, h.nome AS nomeHorario  " +
+            "FROM horario h INNER JOIN horario_itinerario hi ON hi.horario = h.id " +
+            "WHERE hi.id = :id")
+    HorarioItinerarioNome carregarPorIdSync(String id);
 
     @Query("SELECT observacao FROM horario_itinerario WHERE horario = :id AND itinerario = :itinerario")
     String carregarObservacaoPorHorario(String id, String itinerario);

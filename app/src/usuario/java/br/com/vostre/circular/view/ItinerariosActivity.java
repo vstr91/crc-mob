@@ -180,8 +180,9 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         DateTime dateTime = new DateTime();
         String dia = DataHoraUtils.getDiaAtual();
         String diaSeguinte = DataHoraUtils.getDiaSeguinte();
+        String diaAnterior = DataHoraUtils.getDiaAnterior();
 
-        viewModel.carregaResultadoInvertido(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte);
+        viewModel.carregaResultadoInvertido(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte, diaAnterior);
 
 //        BairroCidade bairro = bairroPartida;
 //        bairroPartida = bairroDestino;
@@ -205,7 +206,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         @Override
         public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
 
-            if(itinerarios != null && itinerarios.size() > 0 && itinerarios.get(itinerarios.size()-1).getIdBairroDestino().equals(bairroDestino.getBairro().getId())){
+            if(itinerarios != null && itinerarios.size() > 0){
                 binding.cardViewListDestino.setVisibility(View.GONE);
                 binding.listResultados.setVisibility(View.VISIBLE);
                 binding.cardViewResultadoVazio.setVisibility(View.GONE);
@@ -426,10 +427,11 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         DateTime dateTime = new DateTime();
         String dia = DataHoraUtils.getDiaAtual();
         String diaSeguinte = DataHoraUtils.getDiaSeguinte();
+        String diaAnterior = DataHoraUtils.getDiaAnterior();
 
         viewModel.escolhaAtual = 0;
 
-        viewModel.carregaResultado(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte);
+        viewModel.carregaResultado(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte, diaAnterior);
 
         viewModel.itinerario.observe(this, itinerarioObserver);
 
@@ -520,7 +522,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
         String hora = DateTimeFormat.forPattern("HH:mm:00").print(data.getTimeInMillis());
 
-        viewModel.carregaResultado(hora, DataHoraUtils.getDiaSelecionado(data), DataHoraUtils.getDiaSeguinteSelecionado(data));
+        viewModel.carregaResultado(hora, DataHoraUtils.getDiaSelecionado(data), DataHoraUtils.getDiaSeguinteSelecionado(data),
+                DataHoraUtils.getDiaAnteriorSelecionado(data));
         adapterResultado.setDia(DataHoraUtils.getDiaSelecionadoFormatado(data));
         adapterResultado.setHora(DateTimeFormat.forPattern("HH:mm").print(data.getTimeInMillis()));
     }

@@ -101,6 +101,99 @@ public class DataHoraUtils {
         return diaSeguinte;
     }
 
+    public static String getDiaSeguinte(String dia){
+        DateTime dateTime = new DateTime();
+        String diaSeguinte = "";
+
+        switch(dia){
+            case "domingo":
+                diaSeguinte = "segunda";
+                break;
+            case "segunda":
+                diaSeguinte = "terca";
+                break;
+            case "terca":
+                diaSeguinte = "quarta";
+                break;
+            case "quarta":
+                diaSeguinte = "quinta";
+                break;
+            case "quinta":
+                diaSeguinte = "sexta";
+                break;
+            case "sexta":
+                diaSeguinte = "sabado";
+                break;
+            case "sabado":
+                diaSeguinte = "domingo";
+                break;
+        }
+
+        return diaSeguinte;
+    }
+
+    public static String getDiaAnterior(){
+        DateTime dateTime = new DateTime();
+        String diaSeguinte = "";
+
+        switch(dateTime.get(DateTimeFieldType.dayOfWeek())){
+            case 7:
+                diaSeguinte = "sabado";
+                break;
+            case 1:
+                diaSeguinte = "domingo";
+                break;
+            case 2:
+                diaSeguinte = "segunda";
+                break;
+            case 3:
+                diaSeguinte = "terca";
+                break;
+            case 4:
+                diaSeguinte = "quarta";
+                break;
+            case 5:
+                diaSeguinte = "quinta";
+                break;
+            case 6:
+                diaSeguinte = "sexta";
+                break;
+        }
+
+        return diaSeguinte;
+    }
+
+    public static String getDiaAnteriorSelecionado(Calendar data){
+        DateTime dateTime = new DateTime(data);
+        String diaSeguinte = "";
+
+        switch(dateTime.get(DateTimeFieldType.dayOfWeek())){
+            case 7:
+                diaSeguinte = "sabado";
+                break;
+            case 1:
+                diaSeguinte = "domingo";
+                break;
+            case 2:
+                diaSeguinte = "segunda";
+                break;
+            case 3:
+                diaSeguinte = "terca";
+                break;
+            case 4:
+                diaSeguinte = "quarta";
+                break;
+            case 5:
+                diaSeguinte = "quinta";
+                break;
+            case 6:
+                diaSeguinte = "sexta";
+                break;
+        }
+
+        return diaSeguinte;
+    }
+
     public static String getDiaSeguinteSelecionado(Calendar data){
         DateTime dateTime = new DateTime(data);
         String diaSeguinte = "";

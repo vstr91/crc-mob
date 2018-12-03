@@ -374,7 +374,7 @@
                     android:layout_marginStart="32dp"
                     android:layout_marginTop="8dp"
                     android:gravity="center"
-                    android:text="Infelizmente ocorreu algum problema na consulta ou não foi possível criar uma rota entre os locais selecionados. Por favor tente novamente."
+                    android:text="Infelizmente não foi possível criar uma rota entre os locais selecionados. Por favor tente novamente."
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

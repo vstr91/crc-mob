@@ -45,7 +45,6 @@
                     android:layout_marginStart="8dp"
                     android:background="@drawable/horario_rounded_corner_azul_top"
                     android:padding="10dp"
-                    android:text="TextView"
                     android:textAppearance="@style/texto_branco"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="@+id/map"

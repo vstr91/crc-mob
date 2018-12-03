@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.databinding.DataBindingUtil;
+import android.location.LocationManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -15,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.util.JsonUtils;
 
 import org.joda.time.DateTime;
@@ -51,6 +53,7 @@ import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.utils.ToolbarUtils;
+import br.com.vostre.circular.view.listener.GpsListener;
 import br.com.vostre.circular.view.listener.HoraListener;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
@@ -58,7 +61,7 @@ import br.com.vostre.circular.databinding.DrawerHeaderBinding;
 
 import static br.com.vostre.circular.utils.ToolbarUtils.PICK_FILE;
 
-public class BaseActivity extends AppCompatActivity implements View.OnClickListener, HoraListener {
+public class BaseActivity extends AppCompatActivity implements View.OnClickListener, HoraListener, GpsListener {
 
     public Toolbar toolbar;
     Menu menu;
@@ -67,14 +70,32 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     BroadcastReceiver receiver;
     IntentFilter filter;
 
+    LocationManager locationManager;
+    boolean gpsAtivo = false;
+    public GoogleSignInAccount account;
+
+    private BroadcastReceiver mGpsSwitchStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (LocationManager.PROVIDERS_CHANGED_ACTION.equals(intent.getAction())) {
+                gpsAtivo = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                onGpsChanged(gpsAtivo);
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        if(toolbar != null){
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
 
         //viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
 
@@ -107,6 +128,9 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
         filter.addAction("MensagensService");
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(receiver, filter);
+
+        locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        gpsAtivo = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
     }
 
@@ -161,12 +185,14 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
         this.supportInvalidateOptionsMenu();
         registerReceiver(receiver, filter);
+        registerReceiver(mGpsSwitchStateReceiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         unregisterReceiver(receiver);
+        unregisterReceiver(mGpsSwitchStateReceiver);
     }
 
     @Override
@@ -593,4 +619,8 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
+    @Override
+    public void onGpsChanged(boolean ativo) {
+
+    }
 }

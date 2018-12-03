@@ -141,6 +141,12 @@ public class FormBairro extends FormBase implements SelectListener {
         public void onChanged(List<BairroCidade> bairros) {
             adapter.bairros = bairros;
             adapter.notifyDataSetChanged();
+
+            if(bairros.size() == 1){
+                listener.onItemSelected(bairros.get(0).getBairro().getId());
+                dismiss();
+            }
+
         }
     };
 

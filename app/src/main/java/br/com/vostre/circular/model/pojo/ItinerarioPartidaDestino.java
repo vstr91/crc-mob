@@ -66,6 +66,9 @@ public class ItinerarioPartidaDestino {
     @ColumnInfo(name = "observacaoHorarioAnterior")
     String observacaoHorarioAnterior;
 
+    @ColumnInfo(name = "obsHorarioAnterior")
+    String obsHorarioAnterior;
+
     @ColumnInfo(name = "horarioSeguinte")
     String horarioSeguinte;
 
@@ -74,6 +77,9 @@ public class ItinerarioPartidaDestino {
 
     @ColumnInfo(name = "observacaoHorarioSeguinte")
     String observacaoHorarioSeguinte;
+
+    @ColumnInfo(name = "obsHorarioSeguinte")
+    String obsHorarioSeguinte;
 
     @Ignore
     public boolean selecionado;
@@ -257,6 +263,22 @@ public class ItinerarioPartidaDestino {
 
     public void setNomeCidadeDestino(String nomeCidadeDestino) {
         this.nomeCidadeDestino = nomeCidadeDestino;
+    }
+
+    public String getObsHorarioAnterior() {
+        return obsHorarioAnterior;
+    }
+
+    public void setObsHorarioAnterior(String obsHorarioAnterior) {
+        this.obsHorarioAnterior = obsHorarioAnterior;
+    }
+
+    public String getObsHorarioSeguinte() {
+        return obsHorarioSeguinte;
+    }
+
+    public void setObsHorarioSeguinte(String obsHorarioSeguinte) {
+        this.obsHorarioSeguinte = obsHorarioSeguinte;
     }
 
     @Override

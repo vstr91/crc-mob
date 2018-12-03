@@ -139,7 +139,7 @@ public class BaseViewModel extends AndroidViewModel {
         //double latitude = -22.470612;
         //double longitude = -43.8263613;
 
-        int raioEmMetros = 100;
+        int raioEmMetros = 200;
 
 // 6378000 Size of the Earth (in meters)
         double longitudeD = (Math.asin(raioEmMetros / (6378000 * Math.cos(Math.PI*latitude/180))))*180/Math.PI;
@@ -192,7 +192,8 @@ public class BaseViewModel extends AndroidViewModel {
 
                         } else{
                             usuarioValidado.postValue(false);
-                            Toast.makeText(getApplication().getApplicationContext(), "Erro ao processar a validação do usuário.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplication().getApplicationContext(), "Erro ao processar a validação do usuário. " +
+                                    "Falha ao se comunicar com os servidores do Google", Toast.LENGTH_SHORT).show();
                         }
 
 
@@ -201,6 +202,7 @@ public class BaseViewModel extends AndroidViewModel {
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
                         usuarioValidado.postValue(false);
+                        System.out.println("ERR1: "+t.getMessage());
                         Toast.makeText(getApplication().getApplicationContext(), "Erro ao validar usuário.", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -208,6 +210,7 @@ public class BaseViewModel extends AndroidViewModel {
 
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("ERR: "+e.getMessage());
         }
 
     }

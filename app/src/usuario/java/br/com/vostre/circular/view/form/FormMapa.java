@@ -133,6 +133,7 @@ public class FormMapa extends FormBase {
                     configuraActivity();
                 } else{
                     Toast.makeText(ctx, "Acesso ao GPS é necessário para o mapa funcionar corretamente!", Toast.LENGTH_LONG).show();
+                    dismiss();
                 }
 
             }

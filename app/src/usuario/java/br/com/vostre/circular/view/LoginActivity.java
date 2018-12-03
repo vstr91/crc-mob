@@ -19,6 +19,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.drive.Drive;
 import com.google.android.gms.tasks.Task;
 
 import br.com.vostre.circular.R;
@@ -75,6 +76,7 @@ public class LoginActivity extends BaseActivity {
 
     public void onClickBtnLogin(View v){
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestScopes(Drive.SCOPE_FILE)
                 .requestIdToken(getString(R.string.server_client_id))
                 .requestEmail()
                 .build();

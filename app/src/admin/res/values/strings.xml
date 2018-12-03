@@ -9,4 +9,7 @@
         <item>Direita</item>
         <item>Esquerda</item>
     </string-array>
+    <string name="server_client_id">301375921468-s9146rmd1ih7vto7ujtqotp1v92rgacr.apps.googleusercontent.com</string>
+    <string name="text_gps">Ative o GPS para que o mapa funcione corretamente</string>
+    <string name="text_procurando_gps">Buscando a localização atual...</string>
 </resources>

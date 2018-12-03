@@ -22,6 +22,8 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -43,6 +45,7 @@ import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaSugestao;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.view.adapter.BairroAdapterSpinner;
 import br.com.vostre.circular.viewModel.BairrosViewModel;
 import br.com.vostre.circular.viewModel.MapaViewModel;

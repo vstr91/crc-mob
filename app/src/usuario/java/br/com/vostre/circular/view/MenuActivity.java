@@ -42,6 +42,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.drive.Drive;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -114,7 +115,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     // A content resolver for accessing the provider
     ContentResolver mResolver;
 
-    int permissionStorage;
     Location localAnterior;
 
     AppCompatActivity ctx;
@@ -138,8 +138,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         Dexter.withActivity(this)
                 .withPermissions(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        Manifest.permission.ACCESS_FINE_LOCATION
                 ).withListener(new MultiplePermissionsListener() {
             @Override
             public void onPermissionsChecked(MultiplePermissionsReport report) {
@@ -147,7 +146,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                 if(report.areAllPermissionsGranted()){
                     configuraActivity();
                 } else{
-                    Toast.makeText(getApplicationContext(), "Acesso ao GPS e armazenamento interno é necessário para aproveitar ao máximo o Circular!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Acesso ao GPS é necessário para aproveitar ao máximo as funções do Circular!", Toast.LENGTH_LONG).show();
                 }
 
             }
@@ -158,9 +157,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             }
         })
                 .check();
-
-        permissionStorage = ContextCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         // Create the dummy account
         mAccount = CreateSyncAccount(this);
@@ -236,12 +232,17 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         }
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestScopes(Drive.SCOPE_FILE)
                 .requestIdToken(getString(R.string.server_client_id))
                 .requestEmail()
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        startLocationUpdates();
+
+        if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED){
+            startLocationUpdates();
+        }
 
     }
 
@@ -256,8 +257,32 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnMapa(View v){
-        Intent i = new Intent(getApplicationContext(), MapaActivity.class);
-        startActivity(i);
+
+        Dexter.withActivity(this)
+                .withPermissions(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ).withListener(new MultiplePermissionsListener() {
+            @Override
+            public void onPermissionsChecked(MultiplePermissionsReport report) {
+
+                if(report.areAllPermissionsGranted()){
+                    Intent i = new Intent(getApplicationContext(), MapaActivity.class);
+                    startActivity(i);
+                } else{
+                    Toast.makeText(getApplicationContext(), "Acesso ao GPS é necessário para o " +
+                            "mapa funcionar corretamente! Acesso ao armazenamento externo é utilizado para fazer " +
+                            "cache de partes do mapa e permitir o acesso offline.", Toast.LENGTH_LONG).show();
+                }
+
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                token.continuePermissionRequest();
+            }
+        }).check();
+
     }
 
     public void onClickBtnQRCode(View v){
@@ -313,7 +338,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             String id = PreferenceUtils.carregarUsuarioLogado(getApplicationContext());
 
             binding.btnLogin.setVisibility(View.GONE);
-            binding.textViewEmail.setText(account.getEmail()+" | "+id);
+            binding.textViewEmail.setText(account.getEmail());
             binding.textViewEmail.setVisibility(View.VISIBLE);
             binding.textView34.setVisibility(View.VISIBLE);
             binding.btnSair.setVisibility(View.VISIBLE);
@@ -513,7 +538,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             //l0.setLatitude(latitude);
             //l0.setLongitude(longitude);
 
-            adicionaListaALogo(paradas, l0);
+            adicionaListaALogo(paradas, localAnterior);
 
         }
     };
@@ -526,7 +551,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         final NumberFormat nf = NumberFormat.getNumberInstance();
         nf.setMaximumFractionDigits(0);
 
-        if(paradas != null && paradas.size() > 0){
+        if(paradas != null && paradas.size() > 0 && (localAtual.getLatitude() != 0 && localAtual.getLongitude() != 0) ){
 
             handler = new Handler();
 
@@ -550,15 +575,19 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                             if(foto.exists() && foto.canRead()){
                                 final Drawable drawable = Drawable.createFromPath(foto.getAbsolutePath());
                                 binding.circleView.setImagem(drawable);
+                                binding.circleView.invalidate();
 
                             } else{
                                 binding.circleView.setImagem(null);
                                 binding.circleView.invalidate();
                             }
 
+                        } else{
+                            binding.circleView.setImagem(null);
+                            binding.circleView.invalidate();
                         }
 
-                        String distancia = nf.format(l.distanceTo(localAtual));
+                        String distancia = nf.format(l.distanceTo(myLocation));
 
                         binding.textViewParada.setText(p.getParada().getNome());
                         binding.textViewDistancia.setText("~"+distancia+" m");
@@ -604,6 +633,15 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         }
 
 
+
+    }
+
+    @Override
+    public void onGpsChanged(boolean ativo) {
+
+        if(!ativo){
+            adicionaListaALogo(null, null);
+        }
 
     }
 

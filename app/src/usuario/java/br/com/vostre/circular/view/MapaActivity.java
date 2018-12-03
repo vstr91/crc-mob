@@ -1,6 +1,7 @@
 package br.com.vostre.circular.view;
 
 import android.Manifest;
+import android.accounts.Account;
 import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.arch.lifecycle.Observer;
@@ -17,19 +18,34 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.DrawableWrapper;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DrawableUtils;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.drive.Drive;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -41,13 +57,17 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.util.StorageUtils;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
@@ -62,6 +82,9 @@ import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.PreferenceUtils;
+import br.com.vostre.circular.utils.SessionUtils;
+import br.com.vostre.circular.utils.SignInActivity;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ParadaAdapter;
@@ -69,6 +92,7 @@ import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
 import br.com.vostre.circular.view.form.FormParada;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.view.utils.InfoWindowParada;
+import br.com.vostre.circular.viewModel.BaseViewModel;
 import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
 import br.com.vostre.circular.viewModel.MapaViewModel;
 
@@ -76,6 +100,7 @@ public class MapaActivity extends BaseActivity {
 
     ActivityMapaBinding binding;
     MapaViewModel viewModel;
+    BaseViewModel baseViewModel;
     ParadaAdapter adapter;
     ItinerarioAdapter adapterItinerarios;
 
@@ -94,6 +119,11 @@ public class MapaActivity extends BaseActivity {
 
     FormParada formParada;
 
+    GoogleSignInClient mGoogleSignInClient;
+
+    static int RC_SIGN_IN = 481;
+    boolean flag = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_mapa);
@@ -104,17 +134,10 @@ public class MapaActivity extends BaseActivity {
 
         ctx = this;
 
-        MultiplePermissionsListener listener = DialogOnAnyDeniedMultiplePermissionsListener.Builder
-                .withContext(this)
-                .withTitle("Permissões Negadas")
-                .withMessage("Permita o acesso ao GPS para acessar esta página")
-                .build();
-
-        ctx = this;
-
         Dexter.withActivity(this)
                 .withPermissions(
-                        Manifest.permission.ACCESS_FINE_LOCATION
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
                 ).withListener(new MultiplePermissionsListener() {
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
@@ -122,7 +145,10 @@ public class MapaActivity extends BaseActivity {
                         if(report.areAllPermissionsGranted()){
                             configuraActivity();
                         } else{
-                            Toast.makeText(getApplicationContext(), "Acesso ao GPS é necessário para o mapa funcionar corretamente!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "Acesso ao GPS é necessário para o " +
+                                    "mapa funcionar corretamente! Acesso ao armazenamento externo é utilizado para fazer " +
+                                    "cache de partes do mapa e permitir o acesso offline.", Toast.LENGTH_LONG).show();
+                            finish();
                         }
 
                     }
@@ -136,8 +162,6 @@ public class MapaActivity extends BaseActivity {
 
         permissionGPS = ContextCompat.checkSelfPermission(getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION);
-        permissionStorage = ContextCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
         permissionInternet = ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.INTERNET);
 
@@ -148,8 +172,59 @@ public class MapaActivity extends BaseActivity {
 
     }
 
+    public void onClickBtnLogin(View v){
+        Intent i = new Intent(getApplicationContext(), SignInActivity.class);
+        startActivityForResult(i, RC_SIGN_IN);
+        binding.btnLogin.setEnabled(false);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(requestCode == RC_SIGN_IN){
+
+            boolean logado = data.getExtras().getBoolean("logado");
+
+            if(!logado){
+
+                String e = data.getExtras().getString("mensagemErro");
+
+                System.out.println("Erro: "+e);
+                signOut();
+                binding.btnLogin.setEnabled(true);
+            } else{
+                account = (GoogleSignInAccount) data.getExtras().get("account");
+                updateUI(account);
+            }
+
+        }
+
+    }
+
+    Observer<Boolean> loginObserver = new Observer<Boolean>() {
+        @Override
+        public void onChanged(Boolean logado) {
+
+            if(logado){
+                updateUI(account);
+            } else{
+                updateUI(null);
+                signOut();
+            }
+
+            if(flag){
+                binding.btnLogin.setEnabled(true);
+            }
+
+            flag = true;
+
+        }
+    };
+
     private void configuraActivity(){
         viewModel = ViewModelProviders.of(this).get(MapaViewModel.class);
+        baseViewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
 
         binding.setViewModel(viewModel);
 
@@ -169,7 +244,29 @@ public class MapaActivity extends BaseActivity {
 
         bsdPoi.setContentView(R.layout.infowindow_poi);
 
+        if(!gpsAtivo){
+            binding.textViewGps.setVisibility(View.VISIBLE);
+            binding.fabParada.setEnabled(false);
+            binding.fabMeuLocal.setEnabled(false);
+        } else{
+            binding.textViewGps.setVisibility(View.GONE);
+            binding.fabParada.setEnabled(true);
+            binding.fabMeuLocal.setEnabled(true);
+        }
+
+        checaLogin();
+
         configuraMapa();
+    }
+
+    private void checaLogin() {
+        if(SessionUtils.estaLogado(getApplicationContext())){
+            binding.fabParada.setEnabled(true);
+            binding.btnLogin.setVisibility(View.GONE);
+        } else{
+            binding.fabParada.setEnabled(false);
+            binding.btnLogin.setVisibility(View.VISIBLE);
+        }
     }
 
     private void configuraMapa() {
@@ -190,6 +287,18 @@ public class MapaActivity extends BaseActivity {
 
         map.setMaxZoomLevel(19d);
         map.setMinZoomLevel(8d);
+        map.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                if(gpsAtivo){
+                    return false;
+                } else{
+                    return true;
+                }
+
+            }
+        });
 
         startLocationUpdates();
     }
@@ -221,6 +330,7 @@ public class MapaActivity extends BaseActivity {
 
             if(viewModel.centralizaMapa && local.getLatitude() != 0.0 && local.getLongitude() != 0.0){
                 setMapCenter(map, new GeoPoint(local.getLatitude(), local.getLongitude()));
+                binding.textViewGps.setVisibility(View.GONE);
                 //viewModel.centralizaMapa = false;
             }
 
@@ -268,7 +378,7 @@ public class MapaActivity extends BaseActivity {
                 m.setPosition(new GeoPoint(p.getParada().getLatitude(), p.getParada().getLongitude()));
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                 m.setTitle(p.getParada().getNome());
-                m.setDraggable(true);
+                m.setDraggable(false);
 
                 switch(p.getParada().getSentido()){
                     case 0:
@@ -278,7 +388,7 @@ public class MapaActivity extends BaseActivity {
                         m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
                         break;
                     case 2:
-                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
+                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_swap_horiz_black_24dp));
                         break;
                     default:
                         m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
@@ -290,57 +400,68 @@ public class MapaActivity extends BaseActivity {
                     @Override
                     public boolean onMarkerClick(Marker marker, MapView mapView) {
 
-                        final ParadaBairro pb = getParadaFromMarker(marker, paradas);
+                        if(gpsAtivo){
+                            final ParadaBairro pb = getParadaFromMarker(marker, paradas);
 
-                        viewModel.setParada(pb);
-                        viewModel.itinerarios.observe(ctx, itinerariosObserver);
+                            viewModel.setParada(pb);
+                            viewModel.itinerarios.observe(ctx, itinerariosObserver);
 
-                        RecyclerView listItinerarios = bsd.findViewById(R.id.listItinerarios);
+                            RecyclerView listItinerarios = bsd.findViewById(R.id.listItinerarios);
 
-                        adapterItinerarios = new ItinerarioAdapter(viewModel.itinerarios.getValue(), ctx);
-                        listItinerarios.setAdapter(adapterItinerarios);
+                            adapterItinerarios = new ItinerarioAdapter(viewModel.itinerarios.getValue(), ctx);
+                            listItinerarios.setAdapter(adapterItinerarios);
 
-                        // bottom menu
+                            // bottom menu
 
-                        TextView textViewReferencia = bsd.findViewById(R.id.textViewReferencia);
-                        TextView textViewBairro = bsd.findViewById(R.id.textViewBairro);
+                            TextView textViewReferencia = bsd.findViewById(R.id.textViewReferencia);
+                            TextView textViewBairro = bsd.findViewById(R.id.textViewBairro);
 
-                        textViewReferencia.setText(pb.getParada().getNome());
-                        textViewBairro.setText(pb.getNomeBairroComCidade());
+                            textViewReferencia.setText(pb.getParada().getNome());
+                            textViewBairro.setText(pb.getNomeBairroComCidade());
 
-                        Button btnDetalhes = bsd.findViewById(R.id.btnDetalhes);
-                        btnDetalhes.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Intent i = new Intent(ctx, DetalheParadaActivity.class);
-                                i.putExtra("parada", pb.getParada().getId());
-                                ctx.startActivity(i);
+                            Button btnDetalhes = bsd.findViewById(R.id.btnDetalhes);
+                            btnDetalhes.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent i = new Intent(ctx, DetalheParadaActivity.class);
+                                    i.putExtra("parada", pb.getParada().getId());
+                                    ctx.startActivity(i);
+                                }
+                            });
+
+                            Button btnFechar = bsd.findViewById(R.id.btnFechar);
+                            btnFechar.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    bsd.dismiss();
+                                }
+                            });
+
+                            Button btnEdicao = bsd.findViewById(R.id.btnEdicao);
+                            btnEdicao.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    viewModel.paradaNova = new ParadaSugestao();
+                                    formParada = new FormParada();
+                                    formParada.setParadaRelativa(pb);
+                                    formParada.setCtx(getApplication());
+                                    formParada.show(getSupportFragmentManager(), "formParada");
+                                }
+                            });
+
+                            ImageView img = bsd.findViewById(R.id.imageView3);
+
+                            if(pb.getParada().getImagem() != null){
+                                img.setImageDrawable(Drawable.createFromPath(getApplicationContext().getFilesDir()
+                                        +"/"+pb.getParada().getImagem()));
+                            } else{
+                                img.setImageDrawable(getResources().getDrawable(R.drawable.imagem_nao_disponivel_16_9));
                             }
-                        });
 
-                        Button btnFechar = bsd.findViewById(R.id.btnFechar);
-                        btnFechar.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                bsd.dismiss();
-                            }
-                        });
+                            // fim bottom menu
 
-                        Button btnEdicao = bsd.findViewById(R.id.btnEdicao);
-                        btnEdicao.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                viewModel.paradaNova = new ParadaSugestao();
-                                formParada = new FormParada();
-                                formParada.setParadaRelativa(pb);
-                                formParada.setCtx(getApplication());
-                                formParada.show(getSupportFragmentManager(), "formParada");
-                            }
-                        });
-
-                        // fim bottom menu
-
-                        mapController.animateTo(marker.getPosition());
+                            mapController.animateTo(marker.getPosition());
+                        }
 
                         return true;
                     }
@@ -372,33 +493,35 @@ public class MapaActivity extends BaseActivity {
                 m.setPosition(new GeoPoint(p.getLatitude(), p.getLongitude()));
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                 m.setTitle(p.getNome());
-                m.setDraggable(true);
+                m.setDraggable(false);
                 m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.poi));
                 m.setId(p.getId());
                 m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker, MapView mapView) {
 
-                        final PontoInteresse poi = getPoiFromMarker(marker, pois);
+                        if(gpsAtivo){
+                            final PontoInteresse poi = getPoiFromMarker(marker, pois);
 
-                        // bottom menu
+                            // bottom menu
 
-                        TextView textViewReferencia = bsdPoi.findViewById(R.id.textViewReferencia);
+                            TextView textViewReferencia = bsdPoi.findViewById(R.id.textViewReferencia);
 
-                        textViewReferencia.setText(poi.getNome());
+                            textViewReferencia.setText(poi.getNome());
 
-                        Button btnFechar = bsdPoi.findViewById(R.id.btnFechar);
-                        btnFechar.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                bsdPoi.dismiss();
-                            }
-                        });
+                            Button btnFechar = bsdPoi.findViewById(R.id.btnFechar);
+                            btnFechar.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    bsdPoi.dismiss();
+                                }
+                            });
 
-                        // fim bottom menu
+                            // fim bottom menu
 
-                        mapController.animateTo(marker.getPosition());
-                        bsdPoi.show();
+                            mapController.animateTo(marker.getPosition());
+                            bsdPoi.show();
+                        }
 
                         return true;
                     }
@@ -431,52 +554,55 @@ public class MapaActivity extends BaseActivity {
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                 m.setTitle(p.getNome());
                 m.setDraggable(true);
+                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.sugestao));
                 m.setId(p.getId());
                 m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker, MapView mapView) {
 
-                        final ParadaSugestao p = getSugestaoFromMarker(marker, paradasSugeridas);
+                        if(gpsAtivo){
+                            final ParadaSugestao p = getSugestaoFromMarker(marker, paradasSugeridas);
 
-                        viewModel.setParadaNova(p);
+                            viewModel.setParadaNova(p);
 
-                        // bottom menu
+                            // bottom menu
 
-                        TextView textViewReferencia = bsd.findViewById(R.id.textViewReferencia);
-                        TextView textViewBairro = bsd.findViewById(R.id.textViewBairro);
+                            TextView textViewReferencia = bsd.findViewById(R.id.textViewReferencia);
+                            TextView textViewBairro = bsd.findViewById(R.id.textViewBairro);
 
-                        bsd.findViewById(R.id.textView32).setVisibility(View.GONE);
-                        bsd.findViewById(R.id.textView33).setVisibility(View.GONE);
+                            bsd.findViewById(R.id.textView32).setVisibility(View.GONE);
+                            bsd.findViewById(R.id.textView33).setVisibility(View.GONE);
 
-                        textViewReferencia.setText(p.getNome());
-                        //textViewBairro.setText(p.getNomeBairroComCidade());
+                            textViewReferencia.setText(p.getNome());
+                            //textViewBairro.setText(p.getNomeBairroComCidade());
 
-                        Button btnDetalhes = bsd.findViewById(R.id.btnDetalhes);
-                        btnDetalhes.setVisibility(View.GONE);
+                            Button btnDetalhes = bsd.findViewById(R.id.btnDetalhes);
+                            btnDetalhes.setVisibility(View.GONE);
 
-                        Button btnEdicao = bsd.findViewById(R.id.btnEdicao);
-                        btnEdicao.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                formParada = new FormParada();
-                                formParada.setParada(p);
-                                formParada.setCtx(getApplication());
-                                formParada.show(getSupportFragmentManager(), "formParada");
-                            }
-                        });
+                            Button btnEdicao = bsd.findViewById(R.id.btnEdicao);
+                            btnEdicao.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    formParada = new FormParada();
+                                    formParada.setParada(p);
+                                    formParada.setCtx(getApplication());
+                                    formParada.show(getSupportFragmentManager(), "formParada");
+                                }
+                            });
 
-                        Button btnFechar = bsd.findViewById(R.id.btnFechar);
-                        btnFechar.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                bsd.dismiss();
-                            }
-                        });
+                            Button btnFechar = bsd.findViewById(R.id.btnFechar);
+                            btnFechar.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    bsd.dismiss();
+                                }
+                            });
 
-                        // fim bottom menu
+                            // fim bottom menu
 
-                        mapController.animateTo(marker.getPosition());
-                        bsd.show();
+                            mapController.animateTo(marker.getPosition());
+                            bsd.show();
+                        }
 
                         return true;
                     }
@@ -611,8 +737,10 @@ public class MapaActivity extends BaseActivity {
 
         permissionGPS = ContextCompat.checkSelfPermission(getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION);
+        permissionStorage = ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
-        return permissionGPS == PackageManager.PERMISSION_GRANTED;
+        return permissionGPS == PackageManager.PERMISSION_GRANTED && permissionStorage == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
@@ -637,6 +765,70 @@ public class MapaActivity extends BaseActivity {
 
         stopLocationUpdates();
 
+    }
+
+    @Override
+    public void onGpsChanged(boolean ativo) {
+
+        if(!ativo){
+            binding.textViewGps.setText(R.string.text_gps);
+            binding.textViewGps.setVisibility(View.VISIBLE);
+            binding.fabParada.setEnabled(false);
+            binding.fabMeuLocal.setEnabled(false);
+            binding.map.setEnabled(false);
+        } else{
+//            binding.textViewGps.setVisibility(View.GONE);
+            binding.textViewGps.setText(R.string.text_procurando_gps);
+
+            if(SessionUtils.estaLogado(getApplicationContext())){
+                binding.fabParada.setEnabled(true);
+            }
+
+            binding.fabMeuLocal.setEnabled(true);
+
+            binding.map.setEnabled(true);
+        }
+
+    }
+
+    private void updateUI(GoogleSignInAccount account){
+
+        if(account != null){
+            binding.btnLogin.setVisibility(View.GONE);
+
+            if(gpsAtivo){
+                binding.fabParada.setEnabled(true);
+                binding.fabMeuLocal.setEnabled(true);
+            }
+
+            Toast.makeText(getApplicationContext(), "Login realizado com sucesso! " +
+                    "Seja bem vindo, "+account.getGivenName()+"!", Toast.LENGTH_LONG).show();
+
+        } else{
+            binding.btnLogin.setVisibility(View.VISIBLE);
+            binding.fabParada.setEnabled(false);
+        }
+
+    }
+
+    private void signOut() {
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestScopes(Drive.SCOPE_FILE)
+                .requestIdToken(getString(R.string.server_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        updateUI(null);
+                    }
+                });
+        PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), "");
     }
 
 }

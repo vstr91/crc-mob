@@ -145,10 +145,13 @@ public class ItinerariosViewModel extends AndroidViewModel {
         resultadosItinerarios = new MutableLiveData<>();
     }
 
-    public void carregaResultado(final String horaEscolhida, final String dia, final String diaSeguinte, final String diaAnterior){
+    public void carregaResultado(final String horaEscolhida, final String dia, final String diaSeguinte,
+                                 final String diaAnterior, boolean inversao){
 
-        myPartida = bairroPartida.getValue();
-        myDestino = bairroDestino.getValue();
+        if(!inversao){
+            myPartida = bairroPartida.getValue();
+            myDestino = bairroDestino.getValue();
+        }
 
         AsyncTask.execute(new Runnable() {
             @Override
@@ -235,7 +238,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                             SimpleSQLiteQuery query = new SimpleSQLiteQuery("SELECT i.*, e.nome AS 'nomeEmpresa', " +
                                     "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) as 'proximoHorario', " +
-                                    "h.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
+                                    "hi.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
                                     "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                     "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                                     "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
@@ -245,14 +248,35 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                     "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                     "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                                     "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'horarioAnterior', " +
-                                    "IFNULL( (SELECT h2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                                    "IFNULL( (SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                     "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                                     "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
                                     "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
                                     "ORDER BY h2.nome DESC LIMIT 1 ) , " +
-                                    "( SELECT h2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                                    "( SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                     "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                                     "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'idHorarioAnterior', " +
+
+                                    "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                                    "itinerario i2 ON i2.id = hi2.itinerario " +
+                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
+                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                                    "ORDER BY h2.nome DESC LIMIT 1 ) , " +
+                                    "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                                    "itinerario i2 ON i2.id = hi2.itinerario " +
+                                    "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                    "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'obsHorarioAnterior', " +
+
+                                    "IFNULL( (SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
+                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                                    "ORDER BY h2.nome DESC LIMIT 1 ) , " +
+                                    "( SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                                    "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                    "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'observacaoHorarioAnterior', " +
+
                                     "IFNULL( (SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
                                     "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                     "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
@@ -271,6 +295,27 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                     "( SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                     "WHERE hi2." + diaSeguinte + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                                     "ORDER BY h2.nome LIMIT 1 ) ) AS idHorarioSeguinte, " +
+
+                                    "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                                    "itinerario i2 ON i2.id = hi2.itinerario " +
+                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
+                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                                    "ORDER BY h2.nome LIMIT 1 ) , " +
+                                    "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                                    "itinerario i2 ON i2.id = hi2.itinerario " +
+                                    "WHERE hi2." + diaSeguinte + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                    "ORDER BY h2.nome LIMIT 1 ) ) AS obsHorarioSeguinte, " +
+
+                                    "IFNULL( (SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
+                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                                    "ORDER BY h2.nome LIMIT 1 ) , " +
+                                    "( SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                                    "WHERE hi2." + diaSeguinte + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                    "ORDER BY h2.nome LIMIT 1 ) ) AS observacaoHorarioSeguinte, " +
+
                                     "( SELECT pp.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
                                     "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
                                     "AND pi.itinerario = i.id ) AS 'idPartida', " +
@@ -316,7 +361,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                                 query = new SimpleSQLiteQuery("SELECT i.*, e.nome AS 'nomeEmpresa', " +
                                         "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) as 'proximoHorario', " +
-                                        "h.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
+                                        "hi.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
                                         "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                         "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                                         "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
@@ -334,6 +379,27 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                         "( SELECT h2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                         "WHERE hi2." + diaAnt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                                         "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'idHorarioAnterior', " +
+
+                                        "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                                        "itinerario i2 ON i2.id = hi2.itinerario " +
+                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
+                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                                        "ORDER BY h2.nome DESC LIMIT 1 ) , " +
+                                        "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                                        "itinerario i2 ON i2.id = hi2.itinerario " +
+                                        "WHERE hi2." + diaAnt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                        "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'obsHorarioAnterior', " +
+
+                                        "IFNULL( (SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
+                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                                        "ORDER BY h2.nome DESC LIMIT 1 ) , " +
+                                        "( SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                                        "WHERE hi2." + diaAnt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                        "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'observacaoHorarioAnterior', " +
+
                                         "IFNULL( (SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
                                         "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                         "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
@@ -352,6 +418,27 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                         "( SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                         "WHERE hi2." + diaSeg + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                                         "ORDER BY h2.nome LIMIT 1 ) ) AS idHorarioSeguinte, " +
+
+                                        "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                                        "itinerario i2 ON i2.id = hi2.itinerario " +
+                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
+                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                                        "ORDER BY h2.nome LIMIT 1 ) , " +
+                                        "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                                        "itinerario i2 ON i2.id = hi2.itinerario " +
+                                        "WHERE hi2." + diaSeg + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                        "ORDER BY h2.nome LIMIT 1 ) ) AS obsHorarioSeguinte, " +
+
+                                        "IFNULL( (SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
+                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                                        "ORDER BY h2.nome LIMIT 1 ) , " +
+                                        "( SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                                        "WHERE hi2." + diaSeg + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                        "ORDER BY h2.nome LIMIT 1 ) ) AS observacaoHorarioSeguinte, " +
+
                                         "( SELECT pp.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
                                         "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
                                         "AND pi.itinerario = i.id ) AS 'idPartida', " +
@@ -389,23 +476,23 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                         .carregarPorPartidaEDestinoComHorarioSync(query);
                             }
 
-                            if(itinerario.getProximoHorario() != null){
+                            if(itinerario != null && itinerario.getProximoHorario() != null){
 
                                 if(itinerario.getIdHorarioAnterior() != null){
                                     String obsHorarioAnterior = appDatabase.horarioItinerarioDAO()
-                                            .carregarObservacaoPorHorario(itinerario.getIdHorarioAnterior(), itinerario.getItinerario().getId());
+                                            .carregarObservacaoPorHorario(itinerario.getIdHorarioAnterior());
                                     itinerario.setObservacaoHorarioAnterior(obsHorarioAnterior);
                                 }
 
                                 if(itinerario.getIdHorarioSeguinte() != null){
                                     String obsHorarioSeguinte = appDatabase.horarioItinerarioDAO()
-                                            .carregarObservacaoPorHorario(itinerario.getIdHorarioSeguinte(), itinerario.getItinerario().getId());
+                                            .carregarObservacaoPorHorario(itinerario.getIdHorarioSeguinte());
                                     itinerario.setObservacaoHorarioSeguinte(obsHorarioSeguinte);
                                 }
 
                                 if(itinerario.getIdProximoHorario() != null){
                                     String obsProximoHorario = appDatabase.horarioItinerarioDAO()
-                                            .carregarObservacaoPorHorario(itinerario.getIdProximoHorario(), itinerario.getItinerario().getId());
+                                            .carregarObservacaoPorHorario(itinerario.getIdProximoHorario());
                                     itinerario.setObservacaoProximoHorario(obsProximoHorario);
                                 }
 
@@ -526,7 +613,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                             SimpleSQLiteQuery query = new SimpleSQLiteQuery("SELECT i.*, e.nome AS 'nomeEmpresa', " +
                                     "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) as 'proximoHorario', " +
-                                    "h.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
+                                    "hi.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
                                     "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                     "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                                     "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
@@ -536,14 +623,26 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                     "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                     "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                                     "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'horarioAnterior', " +
-                                    "IFNULL( (SELECT h2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                                    "IFNULL( (SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                     "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                                     "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
                                     "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
                                     "ORDER BY h2.nome DESC LIMIT 1 ) , " +
-                                    "( SELECT h2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                                    "( SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                     "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                                     "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'idHorarioAnterior', " +
+
+                                    "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                                    "itinerario i2 ON i2.id = hi2.itinerario " +
+                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
+                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                                    "ORDER BY h2.nome DESC LIMIT 1 ) , " +
+                                    "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                                    "itinerario i2 ON i2.id = hi2.itinerario " +
+                                    "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                    "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'obsHorarioAnterior', " +
+
                                     "IFNULL( (SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
                                     "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                     "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
@@ -562,6 +661,18 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                     "( SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                     "WHERE hi2." + diaSeguinte + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                                     "ORDER BY h2.nome LIMIT 1 ) ) AS idHorarioSeguinte, " +
+
+                                    "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                                    "itinerario i2 ON i2.id = hi2.itinerario " +
+                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
+                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                                    "ORDER BY h2.nome LIMIT 1 ) , " +
+                                    "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                                    "itinerario i2 ON i2.id = hi2.itinerario " +
+                                    "WHERE hi2." + diaSeguinte + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                    "ORDER BY h2.nome LIMIT 1 ) ) AS obsHorarioSeguinte, " +
+
                                     "( SELECT pp.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
                                     "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
                                     "AND pi.itinerario = i.id ) AS 'idPartida', " +
@@ -607,7 +718,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                                 query = new SimpleSQLiteQuery("SELECT i.*, e.nome AS 'nomeEmpresa', " +
                                         "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) as 'proximoHorario', " +
-                                        "h.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
+                                        "hi.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
                                         "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                         "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                                         "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
@@ -617,14 +728,26 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                         "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                         "WHERE hi2." + diaAnt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                                         "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'horarioAnterior', " +
-                                        "IFNULL( (SELECT h2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                                        "IFNULL( (SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                         "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                                         "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
                                         "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
                                         "ORDER BY h2.nome DESC LIMIT 1 ) , " +
-                                        "( SELECT h2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                                        "( SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                         "WHERE hi2." + diaAnt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                                         "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'idHorarioAnterior', " +
+
+                                        "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                                        "itinerario i2 ON i2.id = hi2.itinerario " +
+                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
+                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                                        "ORDER BY h2.nome DESC LIMIT 1 ) , " +
+                                        "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                                        "itinerario i2 ON i2.id = hi2.itinerario " +
+                                        "WHERE hi2." + diaAnt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                        "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'obsHorarioAnterior', " +
+
                                         "IFNULL( (SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
                                         "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                         "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
@@ -643,6 +766,18 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                         "( SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                                         "WHERE hi2." + diaSeg + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                                         "ORDER BY h2.nome LIMIT 1 ) ) AS idHorarioSeguinte, " +
+
+                                        "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                                        "itinerario i2 ON i2.id = hi2.itinerario " +
+                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
+                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                                        "ORDER BY h2.nome LIMIT 1 ) , " +
+                                        "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                                        "itinerario i2 ON i2.id = hi2.itinerario " +
+                                        "WHERE hi2." + diaSeg + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                                        "ORDER BY h2.nome LIMIT 1 ) ) AS obsHorarioSeguinte, " +
+
                                         "( SELECT pp.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
                                         "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
                                         "AND pi.itinerario = i.id ) AS 'idPartida', " +
@@ -680,23 +815,23 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                         .carregarPorPartidaEDestinoComHorarioSync(query);
                             }
 
-                            if(itinerario.getProximoHorario() != null){
+                            if(itinerario != null && itinerario.getProximoHorario() != null){
 
                                 if(itinerario.getIdHorarioAnterior() != null){
                                     String obsHorarioAnterior = appDatabase.horarioItinerarioDAO()
-                                            .carregarObservacaoPorHorario(itinerario.getIdHorarioAnterior(), itinerario.getItinerario().getId());
+                                            .carregarObservacaoPorHorario(itinerario.getIdHorarioAnterior());
                                     itinerario.setObservacaoHorarioAnterior(obsHorarioAnterior);
                                 }
 
                                 if(itinerario.getIdHorarioSeguinte() != null){
                                     String obsHorarioSeguinte = appDatabase.horarioItinerarioDAO()
-                                            .carregarObservacaoPorHorario(itinerario.getIdHorarioSeguinte(), itinerario.getItinerario().getId());
+                                            .carregarObservacaoPorHorario(itinerario.getIdHorarioSeguinte());
                                     itinerario.setObservacaoHorarioSeguinte(obsHorarioSeguinte);
                                 }
 
                                 if(itinerario.getIdProximoHorario() != null){
                                     String obsProximoHorario = appDatabase.horarioItinerarioDAO()
-                                            .carregarObservacaoPorHorario(itinerario.getIdProximoHorario(), itinerario.getItinerario().getId());
+                                            .carregarObservacaoPorHorario(itinerario.getIdProximoHorario());
                                     itinerario.setObservacaoProximoHorario(obsProximoHorario);
                                 }
 
@@ -748,5 +883,10 @@ public class ItinerariosViewModel extends AndroidViewModel {
                         bairroDestino.getValue().getBairro().getId(),
                         DateTimeFormat.forPattern("HH:mm:00").print(horario.getNomeHorario()));
     }
+
+//    public boolean checaInversao(String partida, String destino){
+//        itinerarioResultado = appDatabase.itinerarioDAO()
+//                .carregar(itinerario.getValue().getHorarioItinerario().getItinerario());
+//    }
 
 }

@@ -287,6 +287,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
             if(viewModel.qtdItinerarios.size() > 1){
                 binding.textView37.setVisibility(View.GONE);
                 binding.textViewLegenda.setVisibility(View.VISIBLE);
+                binding.textView51.setVisibility(View.VISIBLE);
                 binding.listLegenda.setVisibility(View.VISIBLE);
 
                 List<ItinerarioPartidaDestino> itinerarios = viewModel.qtdItinerarios;
@@ -342,6 +343,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
                 binding.textViewLegenda.setVisibility(View.GONE);
                 binding.listLegenda.setVisibility(View.GONE);
+                binding.textView51.setVisibility(View.GONE);
             }
 
             adapterHorarios.horarios = horarios;
@@ -412,6 +414,13 @@ public class DetalheItinerarioActivity extends BaseActivity {
         public void onChanged(List<SecaoItinerario> secoes) {
             adapterSecoes.secoes = secoes;
             adapterSecoes.notifyDataSetChanged();
+
+            if(secoes.size() > 0){
+                binding.imageButton5.setVisibility(View.VISIBLE);
+            } else{
+                binding.imageButton5.setVisibility(View.GONE);
+            }
+
         }
     };
 

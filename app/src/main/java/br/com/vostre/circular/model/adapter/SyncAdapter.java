@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import br.com.vostre.circular.BuildConfig;
 import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Empresa;
@@ -66,6 +67,7 @@ import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.utils.Constants;
 import br.com.vostre.circular.utils.Crypt;
 import br.com.vostre.circular.utils.JsonUtils;
+import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.Unique;
 import br.com.vostre.circular.viewModel.CidadesViewModel;
 import br.com.vostre.circular.viewModel.EmpresasViewModel;
@@ -349,7 +351,15 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 data = DateTimeFormat.forPattern("yyyy-MM-dd-HH-mm-ss").print(parametroInterno.getDataUltimoAcesso());
             }
 
-            Call<String> call = api.recebeDados(token, data);
+            String id = PreferenceUtils.carregarUsuarioLogado(ctx);
+
+            if(id.isEmpty() && (BuildConfig.APPLICATION_ID.endsWith("admin") || BuildConfig.APPLICATION_ID.endsWith("admin.debug"))){
+                id = "admin";
+            }
+
+            System.out.println("IDDDD: "+id);
+
+            Call<String> call = api.recebeDados(token, data, id);
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
@@ -379,6 +389,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     private void processaJson(Response<String> response) throws JSONException {
 
         String dados = response.body();
+        System.out.println("RESPON: "+response.body());
 
         if(dados != null){
 
@@ -939,13 +950,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             String strParadasSugestoes = "\"paradas_sugestoes\": "+JsonUtils.toJson((List<EntidadeBase>) paradaSugestoes);
 
+
             String json = "{"+strPaises+","+strEmpresas+","+strOnibus+","+strEstados+","+strCidades+","
                     +strBairros+","+strParadas+","+strItinerarios+","+strHorarios+","+strParadasItinerarios+","
                     +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
                     +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+"}";
 
             // EXPORTA ARQUIVO DE DADOS
-            ///*
+            /*
             File caminho = Environment.getExternalStorageDirectory();
 
             File arquivo = new File(caminho, "data.txt");
@@ -959,11 +971,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            //*/
+            */
 
             int registros = paises.size()+empresas.size()+onibus.size()+estados.size()+cidades.size()
                     +bairros.size()+paradas.size()+itinerarios.size()+horarios.size()+paradasItinerario.size()
-                    +secoesItinerarios.size()+horariosItinerarios.size()+mensagens.size()+parametros.size()+pontosInteresse.size()+usuarios.size()+paradaSugestoes.size();
+                    +secoesItinerarios.size()+horariosItinerarios.size()+mensagens.size()+parametros.size()+pontosInteresse.size()
+                    +usuarios.size()+paradaSugestoes.size();
 
             if(registros > 0){
                 chamaAPI(registros, json, 0, baseUrl, token);

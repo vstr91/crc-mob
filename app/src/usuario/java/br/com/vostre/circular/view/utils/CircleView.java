@@ -161,14 +161,14 @@ public class CircleView extends View {
         if(imagem != null){
             b = Bitmap.createScaledBitmap(drawableToBitmap(imagem), (int) mWidth, (int) mHeight, true);
             b = getCircularBitmap(b);
-
-            int left = 0;
-            int top = 0;
-            int right = (int) mWidth;
-            int bottom = (int) mHeight;
-
-            rectImagem = new Rect(left, top, right, bottom);
         }
+
+        int left = 0;
+        int top = 0;
+        int right = (int) mWidth;
+        int bottom = (int) mHeight;
+
+        rectImagem = new Rect(left, top, right, bottom);
 
         rectF = new RectF(espessuraArcoMaior, espessuraArcoMaior, mWidth-espessuraArcoMaior, mHeight-espessuraArcoMaior);
 
@@ -179,6 +179,10 @@ public class CircleView extends View {
         super.onDraw(canvas);
 
         if(imagem != null){
+
+            b = Bitmap.createScaledBitmap(drawableToBitmap(imagem), (int) mWidth, (int) mHeight, true);
+            b = getCircularBitmap(b);
+
             canvas.drawBitmap(b, rectImagem, rectF, paint);
         }
 

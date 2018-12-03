@@ -69,25 +69,14 @@
                                           </PersistentState>
                                         </value>
                                       </entry>
-                                      <entry key="image">
-                                        <value>
-                                          <PersistentState>
-                                            <option name="values">
-                                              <map>
-                                                <entry key="trimmed" value="true" />
-                                              </map>
-                                            </option>
-                                          </PersistentState>
-                                        </value>
-                                      </entry>
                                     </map>
                                   </option>
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
                                       <entry key="iconShape" value="NONE" />
-                                      <entry key="imageAsset" value="C:\Users\Almir\Documents\Desenvolvimento\Projetos\Circular\Versão 2.x\Imagens\Logos\Logo-Completa-Azul.png" />
-                                      <entry key="outputName" value="logo_completa_azul" />
+                                      <entry key="imageAsset" value="C:\Users\Almir\Documents\Desenvolvimento\Projetos\Circular\Versão 2.x\Imagens\Icons\qr.png" />
+                                      <entry key="outputName" value="qr" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -123,7 +112,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_report_problem_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/maps/ic_add_location_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -133,8 +122,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_report_problem_white_24dp" />
+                            <entry key="color" value="000088" />
+                            <entry key="outputName" value="ic_add_location_blue_24dp" />
                             <entry key="overrideSize" value="true" />
                             <entry key="sourceFile" value="C:\Users\Almir\Documents\Desenvolvimento\Projetos\Circular\Versão 2.x\Esboços\Nova Logo - Onibus.psd" />
                           </map>

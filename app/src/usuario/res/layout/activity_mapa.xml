@@ -26,29 +26,29 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:clickable="true"
-            app:backgroundTint="@color/verde"
             android:onClick="@{view::onFabLocationClick}"
             android:onLongClick="@{view::onFabLocationLongClick}"
+            app:backgroundTint="@color/verde"
             app:fabSize="mini"
             app:layout_constraintBottom_toTopOf="@+id/fabParada"
             app:layout_constraintEnd_toEndOf="@+id/fabParada"
             app:layout_constraintStart_toStartOf="@+id/fabParada"
-            app:srcCompat="@drawable/osm_ic_center_map" />
+            app:srcCompat="@drawable/ic_gps_fixed_white_24dp" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fabParada"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
+            android:layout_marginBottom="16dp"
             android:clickable="true"
             android:onClick="@{view::onFabParadaClick}"
             app:backgroundTint="@color/ciano"
             app:fabSize="normal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/ic_place_blue_24dp" />
+            app:srcCompat="@drawable/ic_add_location_blue_24dp" />
 
         <org.osmdroid.views.MapView
             android:id="@+id/map"
@@ -61,12 +61,46 @@
 
         </org.osmdroid.views.MapView>
 
+        <TextView
+            android:id="@+id/textViewGps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@color/azul"
+            android:padding="10dp"
+            android:text="Ative o GPS para que o mapa funcione corretamente"
+            android:textColor="@color/branco"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/map"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
         <include
             android:id="@+id/toolbar"
             layout="@layout/toolbar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"></include>
+
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/azul"
+            android:text="Pressione para fazer login e sugerir novas paradas!"
+            android:textAllCaps="false"
+            android:textColor="@color/branco"
+            android:textSize="12sp"
+            android:onClick="onClickBtnLogin"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     </android.support.constraint.ConstraintLayout>
 

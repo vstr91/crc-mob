@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.util.JsonUtils;
 
 import org.joda.time.DateTime;
@@ -67,6 +68,8 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     BaseViewModel viewModel;
     BroadcastReceiver receiver;
     IntentFilter filter;
+
+    public GoogleSignInAccount account;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

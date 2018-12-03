@@ -114,6 +114,9 @@ public interface HorarioItinerarioDAO {
     @Query("SELECT observacao FROM horario_itinerario WHERE horario = :id AND itinerario = :itinerario")
     String carregarObservacaoPorHorario(String id, String itinerario);
 
+    @Query("SELECT observacao FROM horario_itinerario WHERE id = :idHorarioItinerario")
+    String carregarObservacaoPorHorario(String idHorarioItinerario);
+
     @Query("SELECT hi.*, h.id AS idHorario, h.nome AS nomeHorario FROM horario_itinerario hi " +
             "INNER JOIN horario h ON h.id = hi.horario WHERE itinerario IN (SELECT pi.itinerario " +
             "FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada WHERE itinerario IN " +

@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -168,7 +169,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     public void onClickBtnInverter(View v){
 
-        inversao = true;
+        inversao = !inversao;
         //viewModel.escolhaAtual = 0;
         BairroCidade bairro = bairroPartida;
         bairroPartida = bairroDestino;
@@ -204,7 +205,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     Observer<List<ItinerarioPartidaDestino>> resultadoItinerarioObserver = new Observer<List<ItinerarioPartidaDestino>>() {
         @Override
-        public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
+        public void onChanged(final List<ItinerarioPartidaDestino> itinerarios) {
 
             if(itinerarios != null && itinerarios.size() > 0){
                 binding.cardViewListDestino.setVisibility(View.GONE);
@@ -431,7 +432,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
         viewModel.escolhaAtual = 0;
 
-        viewModel.carregaResultado(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte, diaAnterior);
+        viewModel.carregaResultado(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte, diaAnterior, false);
 
         viewModel.itinerario.observe(this, itinerarioObserver);
 
@@ -523,7 +524,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         String hora = DateTimeFormat.forPattern("HH:mm:00").print(data.getTimeInMillis());
 
         viewModel.carregaResultado(hora, DataHoraUtils.getDiaSelecionado(data), DataHoraUtils.getDiaSeguinteSelecionado(data),
-                DataHoraUtils.getDiaAnteriorSelecionado(data));
+                DataHoraUtils.getDiaAnteriorSelecionado(data), inversao);
         adapterResultado.setDia(DataHoraUtils.getDiaSelecionadoFormatado(data));
         adapterResultado.setHora(DateTimeFormat.forPattern("HH:mm").print(data.getTimeInMillis()));
     }

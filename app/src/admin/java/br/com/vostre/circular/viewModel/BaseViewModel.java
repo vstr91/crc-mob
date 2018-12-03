@@ -3,8 +3,10 @@ package br.com.vostre.circular.viewModel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.databinding.ObservableField;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -31,16 +33,27 @@ import br.com.vostre.circular.model.ParametroInterno;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Usuario;
+import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.dao.PaisDAO;
+import br.com.vostre.circular.utils.Crypt;
+import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.StringUtils;
 import br.com.vostre.circular.utils.Unique;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class BaseViewModel extends AndroidViewModel {
 
     private AppDatabase appDatabase;
     ObservableField<String> id;
     public LiveData<List<Mensagem>> mensagensNaoLidas;
+
+    public MutableLiveData usuarioValidado;
+    String baseUrl;
 
     public ObservableField<String> getId() {
         return id;
@@ -50,19 +63,22 @@ public class BaseViewModel extends AndroidViewModel {
         this.id = id;
     }
 
-    public BaseViewModel(Application app){
+    public BaseViewModel(Application app) {
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         id = new ObservableField<>();
         new paramAsyncTask(appDatabase).execute();
         mensagensNaoLidas = appDatabase.mensagemDAO().listarTodosNaoLidosServidor();
+
+        usuarioValidado = new MutableLiveData<>();
+        usuarioValidado.postValue(false);
     }
 
-    public void atualizarMensagens(){
+    public void atualizarMensagens() {
         mensagensNaoLidas = appDatabase.mensagemDAO().listarTodosNaoLidosServidor();
     }
 
-    public void salvar(List<? extends EntidadeBase> dados, String entidade){
+    public void salvar(List<? extends EntidadeBase> dados, String entidade) {
         add(dados, entidade);
     }
 
@@ -86,7 +102,7 @@ public class BaseViewModel extends AndroidViewModel {
         @Override
         protected Void doInBackground(final List<? extends EntidadeBase>... params) {
 
-            switch(entidade){
+            switch (entidade) {
                 case "pais":
                     db.paisDAO().deletarTodos();
                     db.paisDAO().inserirTodos((List<Pais>) params[0]);
@@ -177,7 +193,7 @@ public class BaseViewModel extends AndroidViewModel {
 
             parametro = appDatabase.parametroInternoDAO().carregar();
 
-            if(parametro == null){
+            if (parametro == null) {
                 parametro = new ParametroInterno();
                 parametro.setId("1");
                 parametro.setDataCadastro(DateTime.now());
@@ -204,6 +220,66 @@ public class BaseViewModel extends AndroidViewModel {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
         }
+    }
+
+
+    public void validaUsuario(String idToken, String id) {
+        final Crypt crypt = new Crypt();
+        try {
+
+            if (baseUrl != null) {
+
+                //baseUrl = "http://192.168.42.113/crc-web/web/app_dev.php/";
+
+                idToken = crypt.bytesToHex(crypt.encrypt(idToken));
+                id = crypt.bytesToHex(crypt.encrypt(id));
+
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(baseUrl)
+                        .addConverterFactory(ScalarsConverterFactory.create())
+                        .build();
+
+                CircularAPI api = retrofit.create(CircularAPI.class);
+                Call<String> call = api.validaUsuario(idToken, id);
+                call.enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+
+                        if (response.code() == 200) {
+                            usuarioValidado.postValue(true);
+
+                            String id = response.body();
+                            try {
+                                id = new String(crypt.decrypt(id), "UTF-8");
+
+                                PreferenceUtils.salvarUsuarioLogado(getApplication().getApplicationContext(), id);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                        } else {
+                            usuarioValidado.postValue(false);
+                            Toast.makeText(getApplication().getApplicationContext(), "Erro ao processar a validação do usuário. " +
+                                    "Falha ao se comunicar com os servidores do Google", Toast.LENGTH_SHORT).show();
+                        }
+
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        usuarioValidado.postValue(false);
+                        System.out.println("ERR1: " + t.getMessage());
+                        Toast.makeText(getApplication().getApplicationContext(), "Erro ao validar usuário.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("ERR: " + e.getMessage());
+        }
+
     }
 
 }

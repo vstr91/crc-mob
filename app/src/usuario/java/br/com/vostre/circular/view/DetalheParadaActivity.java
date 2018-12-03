@@ -2,7 +2,9 @@ package br.com.vostre.circular.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.drawable.Drawable;
@@ -69,6 +71,7 @@ public class DetalheParadaActivity extends BaseActivity {
     String idParada;
 
     Uri link = null;
+    LocationManager locationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -242,6 +245,11 @@ public class DetalheParadaActivity extends BaseActivity {
             view.setText("-");
         }
 
+    }
+
+    @Override
+    public void onGpsChanged(boolean ativo) {
+        Toast.makeText(getApplicationContext(), "GPS Status: "+ativo, Toast.LENGTH_SHORT).show();
     }
 
     Observer<List<ItinerarioPartidaDestino>> itinerariosObserver = new Observer<List<ItinerarioPartidaDestino>>() {

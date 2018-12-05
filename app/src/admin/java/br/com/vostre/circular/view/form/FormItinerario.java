@@ -25,6 +25,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -254,6 +255,31 @@ public class FormItinerario extends FormBase {
             return DateTimeFormat.forPattern("HH:mm").parseDateTime(view.getText().toString());
         } catch(IllegalArgumentException e){
             return null;
+        }
+
+
+    }
+
+    @InverseBindingAdapter(attribute = "app:distancia")
+    public static Double getDistancia(TextInputEditText view){
+
+        try{
+            return Double.parseDouble(view.getText().toString());
+        } catch(IllegalArgumentException e){
+            return null;
+        }
+
+
+    }
+
+    @BindingAdapter("app:distancia")
+    public static void setDistancia(TextInputEditText view, Double distancia) {
+
+        if(distancia != null){
+            String formatted = NumberFormat.getNumberInstance().format(distancia);
+            view.setText(formatted);
+        } else{
+            view.setText("0");
         }
 
 

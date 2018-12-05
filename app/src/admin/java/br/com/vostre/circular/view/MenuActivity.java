@@ -180,6 +180,12 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         startActivity(i);
     }
 
+    public void onClickBtnSobre(View v){
+        drawer.closeDrawers();
+        Intent i = new Intent(getApplicationContext(), SobreActivity.class);
+        startActivity(i);
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false;

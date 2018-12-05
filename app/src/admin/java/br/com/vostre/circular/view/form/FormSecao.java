@@ -226,6 +226,17 @@ public class FormSecao extends FormBase {
                 binding.spinnerFinal.setSelection(i);
             }
 
+        } else if(paradas != null){
+            ParadaBairro parada = new ParadaBairro();
+
+            if(tipo == 0){
+                ParadaAdapterSpinner adapter = new ParadaAdapterSpinner(ctx, R.layout.linha_paradas_spinner, R.id.textViewNome, paradas);
+                binding.spinnerInicial.setAdapter(adapter);
+
+            } else{
+                ParadaAdapterSpinner adapter = new ParadaAdapterSpinner(ctx, R.layout.linha_paradas_spinner, R.id.textViewNome, paradas);
+                binding.spinnerFinal.setAdapter(adapter);
+            }
         }
 
     }

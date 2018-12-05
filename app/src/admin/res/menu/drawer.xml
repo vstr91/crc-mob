@@ -14,9 +14,6 @@
     <item android:title="Outras Opções">
         <menu>
             <item
-                android:id="@+id/opcoes"
-                android:title="Opcoes" />
-            <item
                 android:id="@+id/sobre"
                 android:title="Sobre" />
         </menu>

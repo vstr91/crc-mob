@@ -81,7 +81,6 @@ public class SecoesItinerarioViewModel extends AndroidViewModel {
         paradasFinais = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro("");
 
         retorno = new MutableLiveData<>();
-        retorno.setValue(-1);
     }
 
     public void salvarSecao(){
@@ -138,6 +137,8 @@ public class SecoesItinerarioViewModel extends AndroidViewModel {
             if(paradaInicial.getParadaItinerario().getOrdem() < paradaFinal.getParadaItinerario().getOrdem()){
                 db.secaoItinerarioDAO().inserir((params[0]));
                 valido = true;
+            } else{
+                valido = false;
             }
 
             return null;

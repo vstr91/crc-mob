@@ -77,6 +77,7 @@
         <activity android:name=".view.HorariosActivity" />
         <activity android:name=".view.TarifasActivity" />
         <activity android:name=".view.SobreActivity" />
+        <activity android:name=".view.ParadasSugeridasActivity" />
         <activity android:name=".view.HorariosItinerarioActivity"></activity>
     </application>
 

@@ -31,7 +31,7 @@
         app:layoutManager="android.support.v7.widget.LinearLayoutManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView30"
+        app:layout_constraintTop_toBottomOf="@+id/textViewStatus"
         tools:listitem="@layout/linha_pontos_interesse" />
 
     <ImageButton
@@ -41,8 +41,8 @@
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:background="@color/transparente"
-        app:layout_constraintBottom_toBottomOf="@+id/textView30"
-        app:layout_constraintStart_toEndOf="@+id/textView30"
-        app:layout_constraintTop_toTopOf="@+id/textView30"
+        app:layout_constraintBottom_toBottomOf="@+id/textViewStatus"
+        app:layout_constraintStart_toEndOf="@+id/textViewStatus"
+        app:layout_constraintTop_toTopOf="@+id/textViewStatus"
         app:srcCompat="@drawable/ic_close_blue_24dp" />
 </android.support.constraint.ConstraintLayout>

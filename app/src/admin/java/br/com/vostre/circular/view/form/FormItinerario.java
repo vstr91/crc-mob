@@ -54,6 +54,7 @@ public class FormItinerario extends FormBase {
     EmpresaAdapterSpinner adapter;
 
     static Application ctx;
+    int viacaoSelecionada = -1;
 
     public static Application getCtx() {
         return ctx;
@@ -216,15 +217,14 @@ public class FormItinerario extends FormBase {
             if(itinerario != null){
                 Empresa empresa = new Empresa();
                 empresa.setId(itinerario.getEmpresa());
-                int i = viewModel.empresas.getValue().indexOf(empresa);
-                binding.spinnerEmpresa.setSelection(i);
-            }
-
-            if(viewModel.empresa != null){
+                viacaoSelecionada = viewModel.empresas.getValue().indexOf(empresa);
+                binding.spinnerEmpresa.setSelection(viacaoSelecionada);
+                viewModel.empresa = viewModel.empresas.getValue().get(viacaoSelecionada);
+            } else if(viewModel.empresa != null){
                 Empresa empresa = new Empresa();
                 empresa.setId(viewModel.empresa.getId());
-                int i = viewModel.empresas.getValue().indexOf(empresa);
-                binding.spinnerEmpresa.setSelection(i);
+                viacaoSelecionada = viewModel.empresas.getValue().indexOf(empresa);
+                binding.spinnerEmpresa.setSelection(viacaoSelecionada);
             }
 
         }
@@ -232,7 +232,16 @@ public class FormItinerario extends FormBase {
     }
 
     public void onItemSelectedSpinnerEmpresa(AdapterView<?> adapterView, View view, int i, long l){
-        viewModel.empresa = viewModel.empresas.getValue().get(i);
+
+        if(((i == 0 && i != viacaoSelecionada) || (i == 0 && i != viacaoSelecionada)) && viacaoSelecionada != -1){
+            viewModel.empresa = viewModel.empresas.getValue().get(viacaoSelecionada);
+            binding.spinnerEmpresa.setSelection(viacaoSelecionada, false);
+        } else{
+            viewModel.empresa = viewModel.empresas.getValue().get(i);
+            binding.spinnerEmpresa.setSelection(i, false);
+        }
+
+
     }
 
     @BindingAdapter("android:text")
@@ -260,7 +269,7 @@ public class FormItinerario extends FormBase {
 
     }
 
-    @InverseBindingAdapter(attribute = "app:distancia")
+    @InverseBindingAdapter(attribute = "android:text")
     public static Double getDistancia(TextInputEditText view){
 
         try{
@@ -272,7 +281,7 @@ public class FormItinerario extends FormBase {
 
     }
 
-    @BindingAdapter("app:distancia")
+    @BindingAdapter("android:text")
     public static void setDistancia(TextInputEditText view, Double distancia) {
 
         if(distancia != null){

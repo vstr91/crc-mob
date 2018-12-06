@@ -203,6 +203,11 @@ public class ParadasActivity extends BaseActivity {
 
     }
 
+    public void onFabSugestaoClick(View v){
+        Intent i = new Intent(this, ParadasSugeridasActivity.class);
+        startActivity(i);
+    }
+
     public void onFabLocationClick(View v){
         mapController.animateTo(new GeoPoint(viewModel.localAtual.getValue().getLatitude(),
                 viewModel.localAtual.getValue().getLongitude()));

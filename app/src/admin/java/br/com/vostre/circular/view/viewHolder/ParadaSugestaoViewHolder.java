@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
+import org.joda.time.DateTimeUtils;
 import org.joda.time.format.DateTimeFormat;
 
 import br.com.vostre.circular.databinding.LinhaParadasBinding;
@@ -31,19 +32,36 @@ public class ParadaSugestaoViewHolder extends RecyclerView.ViewHolder {
     public void bind(final ParadaSugestaoBairro parada) {
         binding.setParada(parada);
 
-        binding.btnAceitar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.onSelected(parada.getParada().getId(), 1);
-            }
-        });
+        if(parada.getParada().getStatus() != 0){
+            binding.btnAceitar.setVisibility(View.GONE);
+            binding.btnRejeitar.setVisibility(View.GONE);
+            binding.btnVerNoMapa.setVisibility(View.GONE);
+            binding.textViewStatus.setVisibility(View.VISIBLE);
 
-        binding.btnRejeitar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.onSelected(parada.getParada().getId(), 0);
-            }
-        });
+            binding.textViewStatus.setText(DateTimeFormat.forPattern("dd/MM/YYYY HH:mm:ss").print(parada.getParada().getUltimaAlteracao()));
+        } else{
+
+            binding.btnAceitar.setVisibility(View.VISIBLE);
+            binding.btnRejeitar.setVisibility(View.VISIBLE);
+            binding.textViewStatus.setVisibility(View.GONE);
+            binding.btnVerNoMapa.setVisibility(View.VISIBLE);
+            binding.textViewStatus.setText("");
+
+            binding.btnAceitar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onSelected(parada.getParada().getId(), 1);
+                }
+            });
+
+            binding.btnRejeitar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onSelected(parada.getParada().getId(), 0);
+                }
+            });
+
+        }
 
         binding.btnVerNoMapa.setOnClickListener(new View.OnClickListener() {
             @Override

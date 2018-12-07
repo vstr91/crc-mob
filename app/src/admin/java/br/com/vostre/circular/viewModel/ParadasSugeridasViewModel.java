@@ -25,11 +25,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import br.com.vostre.circular.R;
+import br.com.vostre.circular.model.HistoricoParada;
 import br.com.vostre.circular.model.Parada;
+import br.com.vostre.circular.model.ParadaSugestao;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
@@ -46,8 +49,8 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
     public LiveData<List<ParadaSugestaoBairro>> sugeridas;
     public ParadaSugestaoBairro sugestao;
 
-    public LiveData<List<BairroCidade>> bairros;
-    public BairroCidade bairro;
+    public LiveData<List<ParadaSugestaoBairro>> aceitas;
+    public LiveData<List<ParadaSugestaoBairro>> rejeitadas;
 
     public boolean centralizaMapa = true;
 
@@ -97,22 +100,6 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
         foto = BitmapFactory.decodeFile(parada.getParada().getImagem());
     }
 
-    public LiveData<List<BairroCidade>> getBairros() {
-        return bairros;
-    }
-
-    public void setBairros(LiveData<List<BairroCidade>> bairros) {
-        this.bairros = bairros;
-    }
-
-    public BairroCidade getBairro() {
-        return bairro;
-    }
-
-    public void setBairro(BairroCidade bairro) {
-        this.bairro = bairro;
-    }
-
     public ParadasSugeridasViewModel(Application app){
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
@@ -120,10 +107,11 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
         paradas = appDatabase.paradaDAO().listarTodosComBairro();
 
         sugestao = new ParadaSugestaoBairro();
-        sugeridas = appDatabase.paradaSugestaoDAO().listarTodosComBairro();
+        sugeridas = appDatabase.paradaSugestaoDAO().listarTodosPendentesComBairro();
 
-        bairros = new MutableLiveData<>();
-        bairros = appDatabase.bairroDAO().listarTodosComCidade();
+        aceitas = appDatabase.paradaSugestaoDAO().listarTodosAceitosComBairro();
+        rejeitadas = appDatabase.paradaSugestaoDAO().listarTodosRejeitadosComBairro();
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplication());
         localAtual = new MutableLiveData<>();
         localAtual.setValue(new Location(LocationManager.GPS_PROVIDER));
@@ -132,38 +120,114 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
         retorno.setValue(-1);
     }
 
-    public void salvarParada(){
+    public void aceitaSugestao(final ParadaSugestaoBairro p){
 
-        parada.getParada().setBairro(bairro.getBairro().getId());
-
-        if(foto != null){
-            salvarFoto();
+        if(p.getParada().getImagem() != null && !p.getParada().getImagem().isEmpty()){
+            foto = BitmapFactory.decodeFile(p.getParada().getImagem());
         }
 
-        if(parada.getParada().valida(parada.getParada())){
-            add(parada.getParada());
-        } else{
-            retorno.setValue(0);
-        }
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                Parada parada;
+
+                // checa se existe parada vinculada
+                if(p.getParada().getParada() != null && !p.getParada().getParada().isEmpty()){
+                    parada = new Parada();
+                    parada.setId(p.getParada().getParada());
+                    parada = appDatabase.paradaDAO().carregarSync(parada.getId());
+                } else{
+                    parada = new Parada();
+                }
+                // fim da checagem
+
+
+                // altera apenas os dados informados para evitar nulos e inconsistencias
+                if(p.getParada().getNome() != null && !p.getParada().getNome().isEmpty()){
+                    parada.setNome(p.getParada().getNome());
+                }
+
+                if(p.getParada().getBairro() != null && !p.getParada().getBairro().isEmpty()){
+                    parada.setBairro(p.getParada().getBairro());
+                }
+
+                if(p.getParada().getLatitude() != null){
+                    parada.setLatitude(p.getParada().getLatitude());
+                }
+
+                if(p.getParada().getLongitude() != null){
+                    parada.setLongitude(p.getParada().getLongitude());
+                }
+
+                if(p.getParada().getSentido() != -1){
+                    parada.setSentido(p.getParada().getSentido());
+                }
+
+                if(p.getParada().getTaxaDeEmbarque() != null){
+                    parada.setTaxaDeEmbarque(p.getParada().getTaxaDeEmbarque());
+                }
+
+                if(foto != null){
+                    salvarFoto();
+                }
+
+                if(parada.valida(parada)){
+
+                    p.getParada().setStatus(1);
+                    p.getParada().setEnviado(false);
+                    p.getParada().setUltimaAlteracao(DateTime.now());
+                    appDatabase.paradaSugestaoDAO().editar(p.getParada());
+
+                    if(parada.getDataCadastro() != null){
+                        parada.setUsuarioUltimaAlteracao(p.getParada().getUsuarioUltimaAlteracao());
+                        edit(parada);
+                    } else{
+                        parada.setUsuarioCadastro(p.getParada().getUsuarioCadastro());
+                        add(parada);
+                    }
+
+                    gravarHistorico(p, parada);
+
+                    retorno.postValue(1);
+
+                } else{
+                    retorno.postValue(0);
+                }
+
+            }
+        });
+
 
     }
 
-    public void editarParada(){
+    public void rejeitaSugestao(final ParadaSugestaoBairro p){
 
-        if(bairro != null){
-            parada.getParada().setBairro(bairro.getBairro().getId());
-        }
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
 
-        if(foto != null){
-            salvarFoto();
-        }
+                p.getParada().setStatus(2);
+                p.getParada().setEnviado(false);
+                p.getParada().setUltimaAlteracao(DateTime.now());
+                appDatabase.paradaSugestaoDAO().editar(p.getParada());
+                retorno.postValue(1);
+            }
+        });
 
-        if(parada.getParada().valida(parada.getParada())){
-            edit(parada.getParada());
-        } else{
-            retorno.setValue(0);
-        }
 
+    }
+
+    private void gravarHistorico(ParadaSugestaoBairro sugestao, Parada parada){
+        HistoricoParada hp = new HistoricoParada();
+        hp.setParada(parada.getId());
+        hp.setSugestao(sugestao.getParada().getId());
+        hp.setAtivo(true);
+        hp.setEnviado(false);
+        hp.setDataCadastro(DateTime.now());
+        hp.setUltimaAlteracao(DateTime.now());
+
+        appDatabase.historicoParadaDAO().inserir(hp);
     }
 
     private void salvarFoto() {
@@ -217,17 +281,6 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
         parada.setEnviado(false);
         parada.setSlug(StringUtils.toSlug(parada.getNome()));
 
-        // se bairro relacionado estiver programado para data apos a programacao da parada,
-        // altera a data de programacao da parada para ficar igual e evitar erros de
-        // registro nao encontrado
-        if((parada.getProgramadoPara() != null && parada.getProgramadoPara() == null) ||
-                (bairro.getBairro().getProgramadoPara() != null && parada.getProgramadoPara() != null
-                        && bairro.getBairro().getProgramadoPara().isAfter(parada.getProgramadoPara()))){
-            parada.setProgramadoPara(bairro.getBairro().getProgramadoPara());
-        }
-
-        parada.setBairro(bairro.getBairro().getId());
-
         new addAsyncTask(appDatabase).execute(parada);
     }
 
@@ -270,15 +323,6 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
         parada.setUltimaAlteracao(new DateTime());
         parada.setEnviado(false);
         parada.setSlug(StringUtils.toSlug(parada.getNome()));
-
-        // se bairro relacionado estiver programado para data apos a programacao da parada,
-        // altera a data de programacao da parada para ficar igual e evitar erros de
-        // registro nao encontrado
-        if(bairro != null && ((bairro.getBairro().getProgramadoPara() != null && parada.getProgramadoPara() == null) ||
-                (bairro.getBairro().getProgramadoPara() != null && parada.getProgramadoPara() != null
-                        && bairro.getBairro().getProgramadoPara().isAfter(parada.getProgramadoPara())))){
-            parada.setProgramadoPara(bairro.getBairro().getProgramadoPara());
-        }
 
         new editAsyncTask(appDatabase).execute(parada);
     }

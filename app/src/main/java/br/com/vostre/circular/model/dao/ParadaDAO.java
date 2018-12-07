@@ -82,6 +82,9 @@ public interface ParadaDAO {
             "AND (longitude >= :minLng AND longitude <= :maxLng)")
     LiveData<List<ParadaBairro>> listarTodosAtivosProximos(double minLat, double maxLat, double minLng, double maxLng);
 
+    @Query("SELECT p.* FROM parada p WHERE p.id = :parada")
+    Parada carregarSync(String parada);
+
     @Query("SELECT * FROM parada WHERE nome LIKE :nome LIMIT 1")
     Parada encontrarPorNome(String nome);
 

@@ -10,6 +10,7 @@ import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.HistoricoParada;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.Itinerario;
@@ -30,7 +31,7 @@ import br.com.vostre.circular.utils.Converters;
 @Database(entities = {Pais.class, Estado.class, Cidade.class, Bairro.class,
         Empresa.class, Parametro.class, Usuario.class, Mensagem.class, MensagemResposta.class,
         Parada.class, PontoInteresse.class, Itinerario.class, ParadaItinerario.class,
-        Horario.class, HorarioItinerario.class, SecaoItinerario.class, Onibus.class, ParametroInterno.class, ParadaSugestao.class},
+        Horario.class, HorarioItinerario.class, SecaoItinerario.class, Onibus.class, ParametroInterno.class, ParadaSugestao.class, HistoricoParada.class},
         version = 1)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
@@ -57,6 +58,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract ParametroInternoDAO parametroInternoDAO();
 
     public abstract ParadaSugestaoDAO paradaSugestaoDAO();
+    public abstract HistoricoParadaDAO historicoParadaDAO();
 
     public static AppDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {

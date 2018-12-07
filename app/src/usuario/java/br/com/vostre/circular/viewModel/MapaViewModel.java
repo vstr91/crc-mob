@@ -237,6 +237,7 @@ public class MapaViewModel extends AndroidViewModel {
 
         parada.setUsuarioCadastro(id);
         parada.setUsuarioUltimaAlteracao(id);
+        parada.setStatus(0);
 
         parada.setBairro(bairro.getBairro().getId());
 
@@ -277,6 +278,7 @@ public class MapaViewModel extends AndroidViewModel {
         parada.setUltimaAlteracao(new DateTime());
         parada.setEnviado(false);
         parada.setSlug(StringUtils.toSlug(parada.getNome()));
+        parada.setStatus(0);
 
         String id = PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext());
 

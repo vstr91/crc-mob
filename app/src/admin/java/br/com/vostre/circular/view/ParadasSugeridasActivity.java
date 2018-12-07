@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -18,8 +19,12 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TabHost;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationRequest;
@@ -79,9 +84,13 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
     MapEventsOverlay overlayEvents;
 
     ParadaSugestaoAdapter adapterSugestao;
+    ParadaSugestaoAdapter adapterAceitas;
+    ParadaSugestaoAdapter adapterRejeitadas;
 
     boolean mapaOculto = false;
     int tamanhoOriginalMapa = 0;
+
+    TabHost tabHost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,12 +130,14 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
 
         } else{
             binding.setView(this);
-            setTitle("Paradas");
+            setTitle("Paradas Sugeridas");
             getSupportActionBar().setDisplayShowTitleEnabled(true);
 
             viewModel = ViewModelProviders.of(this).get(ParadasSugeridasViewModel.class);
             viewModel.paradas.observe(this, paradasObserver);
             viewModel.sugeridas.observe(this, paradasSugeridasObserver);
+            viewModel.aceitas.observe(this, paradasAceitasObserver);
+            viewModel.rejeitadas.observe(this, paradasRejeitadasObserver);
 
             viewModel.localAtual.observe(this, centroObserver);
 
@@ -134,6 +145,16 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
             adapterSugestao.setListener(this);
 
             binding.listSugestoes.setAdapter(adapterSugestao);
+
+            adapterAceitas = new ParadaSugestaoAdapter(viewModel.aceitas.getValue(), this);
+            adapterAceitas.setListener(this);
+
+            binding.listAceitas.setAdapter(adapterAceitas);
+
+            adapterRejeitadas = new ParadaSugestaoAdapter(viewModel.rejeitadas.getValue(), this);
+            adapterRejeitadas.setListener(this);
+
+            binding.listRejeitadas.setAdapter(adapterRejeitadas);
 
             configuraMapa();
 
@@ -161,6 +182,24 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
             };
 
             overlayEvents = new MapEventsOverlay(getBaseContext(), receiver);
+
+            tabHost = binding.tabs;
+            tabHost.setup();
+
+            TabHost.TabSpec spec = tabHost.newTabSpec("Pendentes");
+            spec.setContent(R.id.tab1);
+            spec.setIndicator("Pendentes");
+            tabHost.addTab(spec);
+
+            TabHost.TabSpec spec2 = tabHost.newTabSpec("Aceitas");
+            spec2.setContent(R.id.tab2);
+            spec2.setIndicator("Aceitas");
+            tabHost.addTab(spec2);
+
+            TabHost.TabSpec spec3 = tabHost.newTabSpec("Rejeitadas");
+            spec3.setContent(R.id.tab3);
+            spec3.setIndicator("Rejeitadas");
+            tabHost.addTab(spec3);
 
         }
 
@@ -272,6 +311,32 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
         public void onChanged(List<ParadaSugestaoBairro> paradas) {
             adapterSugestao.paradas = paradas;
             adapterSugestao.notifyDataSetChanged();
+
+            map.getOverlays().clear();
+            map.getOverlays().add(mLocationOverlay);
+            map.getOverlays().add(overlayEvents);
+            atualizarSugestoesMapa(paradas);
+        }
+    };
+
+    Observer<List<ParadaSugestaoBairro>> paradasAceitasObserver = new Observer<List<ParadaSugestaoBairro>>() {
+        @Override
+        public void onChanged(List<ParadaSugestaoBairro> paradas) {
+            adapterAceitas.paradas = paradas;
+            adapterAceitas.notifyDataSetChanged();
+
+            map.getOverlays().clear();
+            map.getOverlays().add(mLocationOverlay);
+            map.getOverlays().add(overlayEvents);
+            atualizarSugestoesMapa(paradas);
+        }
+    };
+
+    Observer<List<ParadaSugestaoBairro>> paradasRejeitadasObserver = new Observer<List<ParadaSugestaoBairro>>() {
+        @Override
+        public void onChanged(List<ParadaSugestaoBairro> paradas) {
+            adapterRejeitadas.paradas = paradas;
+            adapterRejeitadas.notifyDataSetChanged();
 
             map.getOverlays().clear();
             map.getOverlays().add(mLocationOverlay);
@@ -464,19 +529,78 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
     @Override
     public void onSelected(String id, int acao) {
 
+        ParadaSugestaoBairro pa = new ParadaSugestaoBairro();
+        pa.getParada().setId(id);
+
+        final ParadaSugestaoBairro p = viewModel.sugeridas.getValue().get(viewModel.sugeridas.getValue().indexOf(pa));
+
         switch(acao){
             case 0:
                 // rejeitou
+                new AlertDialog.Builder(this)
+                        .setTitle("Confirma a rejeição?")
+                        .setMessage("Deseja realmente rejeitar a sugestão para a parada "+p.getParada().getNome()+"?")
+                        .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                                final View v = ctx.getLayoutInflater().inflate(R.layout.form_obs_sugestao, null);
+
+                                new AlertDialog.Builder(ctx)
+                                        .setTitle("Adicionar observação?")
+                                        .setMessage("Digite-a no campo abaixo")
+                                        .setView(v)
+                                        .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                EditText editTextObservacao = v.findViewById(R.id.editTextObservacao);
+                                                String text = editTextObservacao.getText().toString();
+
+                                                if(!text.isEmpty()){
+
+                                                    if(p.getParada().getObservacao() != null){
+                                                        p.getParada().setObservacao(p.getParada().getObservacao().concat(System.getProperty("line.separator")).concat(text));
+                                                    } else{
+                                                        p.getParada().setObservacao(text);
+                                                    }
+
+
+                                                }
+
+                                                viewModel.rejeitaSugestao(p);
+
+                                            }
+                                        })
+                                        .setNegativeButton("Não, apenas rejeitar", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                viewModel.rejeitaSugestao(p);
+                                            }
+                                        })
+                                        .show();
+
+                            }
+                        })
+                        .setNegativeButton("Não", null)
+                        .show();
                 break;
             case 1:
                 //aceitou
+                new AlertDialog.Builder(this)
+                        .setTitle("Confirma o aceite?")
+                        .setMessage("Deseja realmente aceitar a sugestão para a parada "+p.getParada().getNome()+"?")
+                        .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                viewModel.aceitaSugestao(p);
+                            }
+                        })
+                        .setNegativeButton("Não", null)
+                        .show();
                 break;
             case 2:
                 // ver no mapa
-                ParadaSugestaoBairro p = new ParadaSugestaoBairro();
-                p.getParada().setId(id);
 
-                p = viewModel.sugeridas.getValue().get(viewModel.sugeridas.getValue().indexOf(p));
                 p.getParada();
 
                 List<Overlay> overlays = map.getOverlays();

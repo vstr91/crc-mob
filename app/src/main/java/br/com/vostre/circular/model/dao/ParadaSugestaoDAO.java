@@ -27,8 +27,29 @@ public interface ParadaSugestaoDAO {
             "estado e ON e.id = c.estado")
     LiveData<List<ParadaSugestaoBairro>> listarTodosComBairro();
 
+    @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
+            "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_sugestao p " +
+            "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
+            "estado e ON e.id = c.estado WHERE p.status = 0")
+    LiveData<List<ParadaSugestaoBairro>> listarTodosPendentesComBairro();
+
+    @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
+            "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_sugestao p " +
+            "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
+            "estado e ON e.id = c.estado WHERE p.status = 1")
+    LiveData<List<ParadaSugestaoBairro>> listarTodosAceitosComBairro();
+
+    @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
+            "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_sugestao p " +
+            "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
+            "estado e ON e.id = c.estado WHERE p.status = 2")
+    LiveData<List<ParadaSugestaoBairro>> listarTodosRejeitadosComBairro();
+
     @Query("SELECT * FROM parada_sugestao WHERE enviado = 0")
     List<ParadaSugestao> listarTodosAEnviar();
+
+    @Query("SELECT * FROM parada_sugestao WHERE imagemEnviada = 0 AND imagem IS NOT NULL")
+    List<ParadaSugestao> listarTodosImagemAEnviar();
 
     @Query("SELECT * FROM parada_sugestao WHERE ativo = 1")
     LiveData<List<ParadaSugestao>> listarTodosAtivos();

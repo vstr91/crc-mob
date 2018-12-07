@@ -12,6 +12,8 @@ public class ParadaSugestao extends Parada {
 
     private String parada;
 
+    private int status = 0;
+
     public String getParada() {
         return parada;
     }
@@ -26,6 +28,14 @@ public class ParadaSugestao extends Parada {
 
     public void setObservacao(String observacao) {
         this.observacao = observacao;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public boolean valida(ParadaSugestao parada) {

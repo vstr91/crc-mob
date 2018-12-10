@@ -91,6 +91,11 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
             public void onClick(View view) {
                 Intent i = new Intent(ctx, DetalheItinerarioActivity.class);
                 i.putExtra("itinerario", itinerario.getItinerario().getId());
+                i.putExtra("itinerarioPartida", itinerario.getBairroConsultaPartida());
+                i.putExtra("itinerarioDestino", itinerario.getBairroConsultaDestino());
+
+                i.putExtra("paradaPartida", itinerario.getParadaPartida());
+                i.putExtra("paradaDestino", itinerario.getParadaDestino());
                 ctx.startActivity(i);
             }
         };

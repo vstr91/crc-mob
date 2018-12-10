@@ -236,7 +236,40 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                             String itinerariosDisponiveis = TextUtils.join("','", itis);
 
-                            SimpleSQLiteQuery query = new SimpleSQLiteQuery("SELECT i.*, e.nome AS 'nomeEmpresa', " +
+                            SimpleSQLiteQuery query = new SimpleSQLiteQuery("SELECT i.*, " +
+                                    "(" +
+                                    "SELECT pi.valorSeguinte FROM itinerario i2 INNER JOIN " +
+                                    "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                                    "bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                                    "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                                    "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                                    "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                                    "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
+                                    "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id" +
+                                    ") AS 'tarifaTrecho', " +
+
+                                    "(SELECT pp.id FROM itinerario i2 INNER JOIN " +
+                                    "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
+                                    "parada pp ON pp.id = pi.parada INNER JOIN " +
+                                    "bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                                    "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                                    "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                                    "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                                    "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
+                                    "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id) AS 'paradaPartida', " +
+
+                                    "(SELECT pd.id FROM itinerario i2 INNER JOIN " +
+                                    "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
+                                    "parada pp ON pp.id = pi.parada INNER JOIN bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                                    "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                                    "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                                    "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                                    "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
+                                    "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id) AS 'paradaDestino', " +
+
+                                    "'"+bairroAnterior.getBairro().getId()+"' AS 'bairroConsultaPartida', " +
+                                    "'"+b.getBairro().getId()+"' AS 'bairroConsultaDestino'," +
+                                    " e.nome AS 'nomeEmpresa', " +
                                     "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) as 'proximoHorario', " +
                                     "hi.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
                                     "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
@@ -359,7 +392,40 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                 String diaAt = diaSeguinte;
                                 String diaSeg = DataHoraUtils.getDiaSeguinte(diaSeguinte);
 
-                                query = new SimpleSQLiteQuery("SELECT i.*, e.nome AS 'nomeEmpresa', " +
+                                query = new SimpleSQLiteQuery("SELECT i.*, " +
+                                        "(" +
+                                        "SELECT pi.valorSeguinte FROM itinerario i2 INNER JOIN " +
+                                        "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                                        "bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                                        "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                                        "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                                        "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                                        "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
+                                        "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id" +
+                                        ") AS 'tarifaTrecho'," +
+
+                                        "(SELECT pp.id FROM itinerario i2 INNER JOIN " +
+                                        "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
+                                        "parada pp ON pp.id = pi.parada INNER JOIN " +
+                                        "bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                                        "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                                        "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                                        "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                                        "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
+                                        "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id) AS 'paradaPartida', " +
+
+                                        "(SELECT pd.id FROM itinerario i2 INNER JOIN " +
+                                        "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
+                                        "parada pp ON pp.id = pi.parada INNER JOIN bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                                        "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                                        "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                                        "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                                        "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
+                                        "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id) AS 'paradaDestino', " +
+
+                                        "'"+bairroAnterior.getBairro().getId()+"' AS 'bairroConsultaPartida', " +
+                                        "'"+b.getBairro().getId()+"' AS 'bairroConsultaDestino', " +
+                                        "e.nome AS 'nomeEmpresa', " +
                                         "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) as 'proximoHorario', " +
                                         "hi.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
                                         "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
@@ -611,7 +677,40 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                             String itinerariosDisponiveis = TextUtils.join("','", itis);
 
-                            SimpleSQLiteQuery query = new SimpleSQLiteQuery("SELECT i.*, e.nome AS 'nomeEmpresa', " +
+                            SimpleSQLiteQuery query = new SimpleSQLiteQuery("SELECT i.*, " +
+                                    "(" +
+                                    "SELECT pi.valorSeguinte FROM itinerario i2 INNER JOIN " +
+                                    "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                                    "bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                                    "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                                    "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                                    "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                                    "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
+                                    "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id" +
+                                    ") AS 'tarifaTrecho'," +
+
+                                    "(SELECT pp.id FROM itinerario i2 INNER JOIN " +
+                                    "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
+                                    "parada pp ON pp.id = pi.parada INNER JOIN " +
+                                    "bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                                    "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                                    "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                                    "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                                    "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
+                                    "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id) AS 'paradaPartida', " +
+
+                                    "(SELECT pd.id FROM itinerario i2 INNER JOIN " +
+                                    "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
+                                    "parada pp ON pp.id = pi.parada INNER JOIN bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                                    "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                                    "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                                    "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                                    "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
+                                    "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id) AS 'paradaDestino', " +
+
+                                    "'"+bairroAnterior.getBairro().getId()+"' AS 'bairroConsultaPartida', " +
+                                    "'"+b.getBairro().getId()+"' AS 'bairroConsultaDestino', " +
+                                    "e.nome AS 'nomeEmpresa', " +
                                     "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) as 'proximoHorario', " +
                                     "hi.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
                                     "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
@@ -716,7 +815,40 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                 String diaAt = diaSeguinte;
                                 String diaSeg = DataHoraUtils.getDiaSeguinte(diaSeguinte);
 
-                                query = new SimpleSQLiteQuery("SELECT i.*, e.nome AS 'nomeEmpresa', " +
+                                query = new SimpleSQLiteQuery("SELECT i.*, " +
+                                        "(" +
+                                        "SELECT pi.valorSeguinte FROM itinerario i2 INNER JOIN " +
+                                        "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                                        "bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                                        "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                                        "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                                        "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                                        "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
+                                        "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id" +
+                                        ") AS 'tarifaTrecho'," +
+
+                                        "(SELECT pp.id FROM itinerario i2 INNER JOIN " +
+                                        "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
+                                        "parada pp ON pp.id = pi.parada INNER JOIN " +
+                                        "bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                                        "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                                        "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                                        "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                                        "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
+                                        "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id) AS 'paradaPartida', " +
+
+                                        "(SELECT pd.id FROM itinerario i2 INNER JOIN " +
+                                        "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
+                                        "parada pp ON pp.id = pi.parada INNER JOIN bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                                        "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                                        "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                                        "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                                        "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
+                                        "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id) AS 'paradaDestino', " +
+
+                                        "'"+bairroAnterior.getBairro().getId()+"' AS 'bairroConsultaPartida', " +
+                                        "'"+b.getBairro().getId()+"' AS 'bairroConsultaDestino', " +
+                                        "e.nome AS 'nomeEmpresa', " +
                                         "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) as 'proximoHorario', " +
                                         "hi.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
                                         "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +

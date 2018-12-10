@@ -81,6 +81,21 @@ public class ItinerarioPartidaDestino {
     @ColumnInfo(name = "obsHorarioSeguinte")
     String obsHorarioSeguinte;
 
+    @ColumnInfo(name = "tarifaTrecho")
+    Double tarifaTrecho;
+
+    @ColumnInfo(name = "bairroConsultaPartida")
+    String bairroConsultaPartida;
+
+    @ColumnInfo(name = "bairroConsultaDestino")
+    String bairroConsultaDestino;
+
+    @ColumnInfo(name = "paradaPartida")
+    String paradaPartida;
+
+    @ColumnInfo(name = "paradaDestino")
+    String paradaDestino;
+
     @Ignore
     public boolean selecionado;
 
@@ -279,6 +294,46 @@ public class ItinerarioPartidaDestino {
 
     public void setObsHorarioSeguinte(String obsHorarioSeguinte) {
         this.obsHorarioSeguinte = obsHorarioSeguinte;
+    }
+
+    public Double getTarifaTrecho() {
+        return tarifaTrecho;
+    }
+
+    public void setTarifaTrecho(Double tarifaTrecho) {
+        this.tarifaTrecho = tarifaTrecho;
+    }
+
+    public String getBairroConsultaPartida() {
+        return bairroConsultaPartida;
+    }
+
+    public void setBairroConsultaPartida(String bairroConsultaPartida) {
+        this.bairroConsultaPartida = bairroConsultaPartida;
+    }
+
+    public String getBairroConsultaDestino() {
+        return bairroConsultaDestino;
+    }
+
+    public void setBairroConsultaDestino(String bairroConsultaDestino) {
+        this.bairroConsultaDestino = bairroConsultaDestino;
+    }
+
+    public String getParadaPartida() {
+        return paradaPartida;
+    }
+
+    public void setParadaPartida(String paradaPartida) {
+        this.paradaPartida = paradaPartida;
+    }
+
+    public String getParadaDestino() {
+        return paradaDestino;
+    }
+
+    public void setParadaDestino(String paradaDestino) {
+        this.paradaDestino = paradaDestino;
     }
 
     @Override

@@ -76,6 +76,12 @@ public class DetalheItinerarioActivity extends BaseActivity {
     boolean mapaOculto = false;
     int tamanhoOriginalMapa = 0;
 
+    String itinerarioPartida;
+    String itinerarioDestino;
+
+    String paradaPartida;
+    String paradaDestino;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_itinerario);
@@ -94,10 +100,19 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
         binding.setViewModel(viewModel);
 
-        viewModel.setItinerario(getIntent().getStringExtra("itinerario"));
+        itinerarioPartida = getIntent().getStringExtra("itinerarioPartida");
+        itinerarioDestino = getIntent().getStringExtra("itinerarioDestino");
+
+        paradaPartida = getIntent().getStringExtra("paradaPartida");
+        paradaDestino = getIntent().getStringExtra("paradaDestino");
+
+        viewModel.setItinerario(getIntent().getStringExtra("itinerario"), paradaPartida, paradaDestino);
         horario = getIntent().getStringExtra("horario");
 
         viewModel.itinerario.observe(this, itinerarioObserver);
+
+        viewModel.partida.observe(this, partidaObserver);
+        viewModel.destino.observe(this, destinoObserver);
 
         listHorarios = binding.listHorarios;
         adapterHorarios = new HorarioItinerarioAdapter(viewModel.horarios.getValue(), this);
@@ -194,6 +209,12 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
         Intent i = new Intent(ctx, DetalheItinerarioImpressaoActivity.class);
         i.putExtra("itinerario", viewModel.itinerario.getValue().getItinerario().getId());
+
+        i.putExtra("itinerarioPartida", viewModel.itinerario.getValue().getBairroConsultaPartida());
+        i.putExtra("itinerarioDestino", viewModel.itinerario.getValue().getBairroConsultaDestino());
+
+        i.putExtra("paradaPartida", paradaPartida);
+        i.putExtra("paradaDestino", paradaDestino);
         ctx.startActivity(i);
 
 //        Bitmap b = binding.getRoot().getDrawingCache();
@@ -300,7 +321,17 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 for(ItinerarioPartidaDestino itinerario : itinerarios){
                     Legenda legenda = new Legenda();
                     legenda.setItinerario(itinerario.getItinerario().getId());
-                    legenda.setTexto(itinerario.getItinerario().getObservacao());
+
+                    if(itinerario.getItinerario().getObservacao() != null && !itinerario.getItinerario().getObservacao().isEmpty()){
+                        legenda.setTexto(itinerario.getNomeBairroPartida()+", "+itinerario.getNomeCidadePartida()+" x "
+                                +itinerario.getNomeBairroDestino()+", "+itinerario.getNomeCidadeDestino()+" ("
+                                +itinerario.getItinerario().getObservacao()+")");
+                    } else{
+                        legenda.setTexto(itinerario.getNomeBairroPartida()+", "+itinerario.getNomeCidadePartida()+" x "
+                                +itinerario.getNomeBairroDestino()+", "+itinerario.getNomeCidadeDestino());
+                    }
+
+
                     legenda.setCor(cores[cont]);
                     dados.add(legenda);
                     cont++;
@@ -431,6 +462,28 @@ public class DetalheItinerarioActivity extends BaseActivity {
             if(viewModel.centralizaMapa && local.getLatitude() != 0.0 && local.getLongitude() != 0.0){
                 setMapCenter(map, new GeoPoint(local.getLatitude(), local.getLongitude()));
                 viewModel.centralizaMapa = false;
+            }
+
+        }
+    };
+
+    Observer<ParadaBairro> partidaObserver = new Observer<ParadaBairro>() {
+        @Override
+        public void onChanged(ParadaBairro parada) {
+
+            if(parada != null){
+                binding.setPartida(parada);
+            }
+
+        }
+    };
+
+    Observer<ParadaBairro> destinoObserver = new Observer<ParadaBairro>() {
+        @Override
+        public void onChanged(ParadaBairro parada) {
+
+            if(parada != null){
+                binding.setDestino(parada);
             }
 
         }

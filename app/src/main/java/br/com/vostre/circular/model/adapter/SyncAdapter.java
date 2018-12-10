@@ -69,7 +69,6 @@ import br.com.vostre.circular.utils.Crypt;
 import br.com.vostre.circular.utils.JsonUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.Unique;
-import br.com.vostre.circular.view.viewHolder.ParadaSugestaoViewHolder;
 import br.com.vostre.circular.viewModel.CidadesViewModel;
 import br.com.vostre.circular.viewModel.EmpresasViewModel;
 import br.com.vostre.circular.viewModel.ParadasSugeridasViewModel;
@@ -357,6 +356,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             if(id.isEmpty() && (BuildConfig.APPLICATION_ID.endsWith("admin") || BuildConfig.APPLICATION_ID.endsWith("admin.debug"))){
                 id = "admin";
+            }
+
+            if(id.isEmpty()){
+                id = "-1";
             }
 
             Call<String> call = api.recebeDados(token, data, id);
@@ -949,8 +952,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             String strUsuarios = "\"usuarios\": "+JsonUtils.toJson((List<EntidadeBase>) usuarios);
 
             String strParadasSugestoes = "\"paradas_sugestoes\": "+JsonUtils.toJson((List<EntidadeBase>) paradaSugestoes);
-
-            ParadaSugestao a = (ParadaSugestao) paradaSugestoes.get(0);
 
             String json = "{"+strPaises+","+strEmpresas+","+strOnibus+","+strEstados+","+strCidades+","
                     +strBairros+","+strParadas+","+strItinerarios+","+strHorarios+","+strParadasItinerarios+","

@@ -56,13 +56,25 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
     public static MutableLiveData<Integer> retorno;
     public static List<ItinerarioPartidaDestino> qtdItinerarios;
 
+    String paradaPartida;
+    String paradaDestino;
+
+    public LiveData<ParadaBairro> partida;
+    public LiveData<ParadaBairro> destino;
+
     Location l;
 
-    public void setItinerario(String itinerario) {
+    public void setItinerario(String itinerario, String paradaPartida, String paradaDestino) {
         this.itinerario = appDatabase.itinerarioDAO().carregar(itinerario);
         this.paradas = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro(itinerario);
 
-        new carregaHorariosAsyncTask(appDatabase, itinerario, null).execute();
+        this.paradaPartida = paradaPartida;
+        this.paradaDestino = paradaDestino;
+
+        this.partida = appDatabase.paradaDAO().carregarComBairro(paradaPartida);
+        this.destino = appDatabase.paradaDAO().carregarComBairro(paradaDestino);
+
+        new carregaHorariosAsyncTask(appDatabase, itinerario, null, paradaPartida, paradaDestino).execute();
 
         //this.horarios = appDatabase.horarioItinerarioDAO().listarApenasAtivosPorItinerario(itinerario);
         this.secoes = appDatabase.secaoItinerarioDAO().listarTodosPorItinerario(itinerario);
@@ -85,6 +97,9 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
         horarios = new MutableLiveData<>();
         secoes = appDatabase.secaoItinerarioDAO().listarTodosPorItinerario("");
 
+        this.partida = appDatabase.paradaDAO().carregarComBairro("");
+        this.destino = appDatabase.paradaDAO().carregarComBairro("");
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplication());
 
         localAtual = new MutableLiveData<>();
@@ -99,8 +114,8 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
         retorno.setValue(-1);
     }
 
-    public void carregarHorariosFiltrados(String itinerario, String itinerarioARemover){
-        new carregaHorariosAsyncTask(appDatabase, itinerario, itinerarioARemover).execute();
+    public void carregarHorariosFiltrados(String itinerario, String itinerarioARemover, String paradaPartida, String paradaDestino){
+        new carregaHorariosAsyncTask(appDatabase, itinerario, itinerarioARemover, paradaPartida, paradaDestino).execute();
     }
 
     private static class carregaHorariosAsyncTask extends AsyncTask<List<ItinerarioPartidaDestino>, Void, Void> {
@@ -109,10 +124,16 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
         private String itinerario;
         private String itinerarioARemover = null;
 
-        carregaHorariosAsyncTask(AppDatabase appDatabase, String itinerario, String itinerarioARemover) {
+        private String paradaPartida;
+        private String paradaDestino;
+
+        carregaHorariosAsyncTask(AppDatabase appDatabase, String itinerario, String itinerarioARemover, String partida, String destino) {
             db = appDatabase;
             this.itinerario = itinerario;
             this.itinerarioARemover = itinerarioARemover;
+
+            this.paradaPartida = partida;
+            this.paradaDestino = destino;
         }
 
         @Override
@@ -122,13 +143,13 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
             if(paradas.size() > 0){
                 qtdItinerarios = db.horarioItinerarioDAO()
-                        .contaItinerariosPorPartidaEDestinoSync(paradas.get(0).getParada().getId(), paradas.get(paradas.size()-1).getParada().getId());
+                        .contaItinerariosPorPartidaEDestinoSync(paradaPartida, paradaDestino);
 
                 if(itinerarioARemover != null && !itinerarioARemover.isEmpty()){
-                    horarios.postValue(db.horarioItinerarioDAO().listarApenasAtivosPorPartidaEDestinoFiltradoSync(paradas.get(0).getParada().getId(),
-                            paradas.get(paradas.size()-1).getParada().getId(), itinerarioARemover));
+                    horarios.postValue(db.horarioItinerarioDAO().listarApenasAtivosPorPartidaEDestinoFiltradoSync(paradaPartida,
+                            paradaDestino, itinerarioARemover));
                 } else{
-                    horarios.postValue(db.horarioItinerarioDAO().listarApenasAtivosPorPartidaEDestinoSync(paradas.get(0).getParada().getId(), paradas.get(paradas.size()-1).getParada().getId()));
+                    horarios.postValue(db.horarioItinerarioDAO().listarApenasAtivosPorPartidaEDestinoSync(paradaPartida, paradaDestino));
                 }
 
 

@@ -7,6 +7,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
@@ -35,6 +36,7 @@ import java.util.TimeZone;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityMenuBinding;
+import br.com.vostre.circular.utils.DBUtils;
 
 public class MenuActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -184,6 +186,10 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         drawer.closeDrawers();
         Intent i = new Intent(getApplicationContext(), SobreActivity.class);
         startActivity(i);
+    }
+
+    public void onClickBtnExportar(View v){
+        DBUtils.exportDB(getApplicationContext());
     }
 
     @Override

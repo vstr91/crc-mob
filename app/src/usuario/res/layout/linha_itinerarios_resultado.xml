@@ -307,7 +307,7 @@
                     app:layout_constraintEnd_toEndOf="@+id/imageView5"
                     app:layout_constraintStart_toStartOf="@+id/imageView5"
                     app:layout_constraintTop_toBottomOf="@+id/imageView5"
-                    app:tarifa="@{itinerario.itinerario.tarifa}"
+                    app:tarifa="@{itinerario.tarifaTrecho == null ? itinerario.itinerario.tarifa : itinerario.tarifaTrecho}"
                     tools:text="R$ 0,00" />
 
                 <TextView

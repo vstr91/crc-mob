@@ -76,6 +76,12 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
 
     AppCompatActivity ctx;
 
+    String itinerarioPartida;
+    String itinerarioDestino;
+
+    String paradaPartida;
+    String paradaDestino;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_itinerario_impressao);
@@ -85,11 +91,20 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
 
         ctx = this;
 
+        itinerarioPartida = getIntent().getStringExtra("itinerarioPartida");
+        itinerarioDestino = getIntent().getStringExtra("itinerarioDestino");
+
+        paradaPartida = getIntent().getStringExtra("paradaPartida");
+        paradaDestino = getIntent().getStringExtra("paradaDestino");
+
         viewModel = ViewModelProviders.of(this).get(DetalhesItinerarioViewModel.class);
 
-        viewModel.setItinerario(getIntent().getStringExtra("itinerario"));
+        viewModel.setItinerario(getIntent().getStringExtra("itinerario"), paradaPartida, paradaDestino);
 
         viewModel.itinerario.observe(this, itinerarioObserver);
+
+        viewModel.partida.observe(this, partidaObserver);
+        viewModel.destino.observe(this, destinoObserver);
 
 
         viewModel.horarios.observe(this, horariosObserver);
@@ -154,7 +169,16 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
                 for(ItinerarioPartidaDestino itinerario : itinerarios){
                     Legenda legenda = new Legenda();
                     legenda.setItinerario(itinerario.getItinerario().getId());
-                    legenda.setTexto(itinerario.getItinerario().getObservacao());
+
+                    if(itinerario.getItinerario().getObservacao() != null && !itinerario.getItinerario().getObservacao().isEmpty()){
+                        legenda.setTexto(itinerario.getNomeBairroPartida()+", "+itinerario.getNomeCidadePartida()+" x "
+                                +itinerario.getNomeBairroDestino()+", "+itinerario.getNomeCidadeDestino()+" ("
+                                +itinerario.getItinerario().getObservacao()+")");
+                    } else{
+                        legenda.setTexto(itinerario.getNomeBairroPartida()+", "+itinerario.getNomeCidadePartida()+" x "
+                                +itinerario.getNomeBairroDestino()+", "+itinerario.getNomeCidadeDestino());
+                    }
+
                     legenda.setCor(cores[cont]);
                     dados.add(legenda);
                     cont++;
@@ -273,6 +297,28 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
 
             if(itinerario != null){
                 binding.setItinerario(itinerario);
+            }
+
+        }
+    };
+
+    Observer<ParadaBairro> partidaObserver = new Observer<ParadaBairro>() {
+        @Override
+        public void onChanged(ParadaBairro parada) {
+
+            if(parada != null){
+                binding.setPartida(parada);
+            }
+
+        }
+    };
+
+    Observer<ParadaBairro> destinoObserver = new Observer<ParadaBairro>() {
+        @Override
+        public void onChanged(ParadaBairro parada) {
+
+            if(parada != null){
+                binding.setDestino(parada);
             }
 
         }

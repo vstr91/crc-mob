@@ -8,6 +8,15 @@
         <variable
             name="itinerario"
             type="br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino" />
+
+        <variable
+            name="partida"
+            type="br.com.vostre.circular.model.pojo.ParadaBairro" />
+
+        <variable
+            name="destino"
+            type="br.com.vostre.circular.model.pojo.ParadaBairro" />
+
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -76,7 +85,7 @@
                             android:layout_marginStart="8dp"
                             android:layout_weight="1"
                             android:gravity="bottom|center_vertical"
-                            android:text="@={itinerario.nomeBairroPartida}"
+                            android:text="@={partida.nomeBairro}"
                             android:textColor="@color/cinzaEscuro"
                             android:textStyle="bold"
                             app:layout_constraintEnd_toStartOf="@+id/guideline7"
@@ -95,7 +104,7 @@
                             android:layout_marginStart="8dp"
                             android:layout_weight="1"
                             android:gravity="top"
-                            android:text="@{itinerario.nomeCidadePartida}"
+                            android:text="@{partida.nomeCidade}"
                             android:textColor="@color/cinzaMedio"
                             android:textSize="12sp"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -115,7 +124,7 @@
                             android:layout_marginStart="8dp"
                             android:layout_weight="1"
                             android:gravity="top"
-                            android:text="@{itinerario.nomeCidadeDestino}"
+                            android:text="@{destino.nomeCidade}"
                             android:textColor="@color/cinzaMedio"
                             android:textSize="12sp"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -134,7 +143,7 @@
                             android:layout_marginStart="8dp"
                             android:layout_weight="1"
                             android:gravity="bottom|center_vertical"
-                            android:text="@={itinerario.nomeBairroDestino}"
+                            android:text="@={destino.nomeBairro}"
                             android:textColor="@color/cinzaEscuro"
                             android:textStyle="bold"
                             app:layout_constraintEnd_toEndOf="parent"

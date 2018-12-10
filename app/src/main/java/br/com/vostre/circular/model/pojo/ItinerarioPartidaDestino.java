@@ -99,6 +99,12 @@ public class ItinerarioPartidaDestino {
     @Ignore
     public boolean selecionado;
 
+    @Ignore
+    public String dia;
+
+    @Ignore
+    public String hora;
+
     public boolean isSelecionado() {
         return selecionado;
     }
@@ -334,6 +340,22 @@ public class ItinerarioPartidaDestino {
 
     public void setParadaDestino(String paradaDestino) {
         this.paradaDestino = paradaDestino;
+    }
+
+    public String getDia() {
+        return dia;
+    }
+
+    public void setDia(String dia) {
+        this.dia = dia;
+    }
+
+    public String getHora() {
+        return hora;
+    }
+
+    public void setHora(String hora) {
+        this.hora = hora;
     }
 
     @Override

@@ -19,6 +19,7 @@ import com.google.android.gms.location.LocationServices;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
+import org.joda.time.PeriodType;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.PeriodFormatter;
@@ -218,7 +219,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                 period = period.plus(parser.parsePeriod(proximoHorario));
                                 period = period.plus(parser.parsePeriod(tempo));
 
-                                hora = printer.print(period);
+                                hora = printer.print(period.normalizedStandard(PeriodType.time()));
 
                             } else{
                                 hora = horaEscolhida;//"00:00";//DateTimeFormat.forPattern("HH:mm:00").print(DateTime.now());
@@ -386,6 +387,11 @@ public class ItinerariosViewModel extends AndroidViewModel {
                             ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO()
                                     .carregarPorPartidaEDestinoComHorarioSync(query);
 
+                            if(itinerario != null){
+                                itinerario.setDia(dia);
+                                itinerario.setHora(hora);
+                            }
+
                             if(itinerario == null){
 
                                 String diaAnt = dia;
@@ -540,6 +546,13 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                                 itinerario = appDatabase.itinerarioDAO()
                                         .carregarPorPartidaEDestinoComHorarioSync(query);
+
+                                if(itinerario != null){
+                                    itinerario.setDia(diaAt);
+                                    itinerario.setHora(hora);
+                                }
+
+
                             }
 
                             if(itinerario != null && itinerario.getProximoHorario() != null){
@@ -659,7 +672,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                 period = period.plus(parser.parsePeriod(proximoHorario));
                                 period = period.plus(parser.parsePeriod(tempo));
 
-                                hora = printer.print(period);
+                                hora = printer.print(period.normalizedStandard(PeriodType.time()));
 
                             } else{
                                 hora = horaEscolhida;//"00:00";//DateTimeFormat.forPattern("HH:mm:00").print(DateTime.now());
@@ -809,6 +822,11 @@ public class ItinerariosViewModel extends AndroidViewModel {
                             ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO()
                                     .carregarPorPartidaEDestinoComHorarioSync(query);
 
+                            if(itinerario != null){
+                                itinerario.setDia(dia);
+                                itinerario.setHora(hora);
+                            }
+
                             if(itinerario == null){
 
                                 String diaAnt = dia;
@@ -945,6 +963,12 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                                 itinerario = appDatabase.itinerarioDAO()
                                         .carregarPorPartidaEDestinoComHorarioSync(query);
+
+                                if(itinerario != null){
+                                    itinerario.setDia(diaAt);
+                                    itinerario.setHora(hora);
+                                }
+
                             }
 
                             if(itinerario != null && itinerario.getProximoHorario() != null){

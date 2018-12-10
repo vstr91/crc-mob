@@ -286,8 +286,29 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnQRCode(View v){
-        Intent i = new Intent(getApplicationContext(), QRCodeActivity.class);
-        startActivity(i);
+
+        Dexter.withActivity(this)
+                .withPermissions(
+                        Manifest.permission.CAMERA
+                ).withListener(new MultiplePermissionsListener() {
+            @Override
+            public void onPermissionsChecked(MultiplePermissionsReport report) {
+
+                if(report.areAllPermissionsGranted()){
+                    Intent i = new Intent(getApplicationContext(), QRCodeActivity.class);
+                    startActivity(i);
+                } else{
+                    Toast.makeText(getApplicationContext(), "Acesso à câmera é necessário para escanear o QR Code!", Toast.LENGTH_LONG).show();
+                }
+
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                token.continuePermissionRequest();
+            }
+        }).check();
+
     }
 
     public void onClickBtnLogo(View v){

@@ -47,14 +47,25 @@ public interface HorarioItinerarioDAO {
             "AND hi.ativo = 1 AND hi.itinerario = :itinerario ORDER BY h.nome")
     LiveData<List<HorarioItinerarioNome>> listarApenasAtivosPorItinerario(String itinerario);
 
+//    @Query("SELECT hi.*, h.id AS idHorario, h.nome AS nomeHorario " +
+//            "FROM horario h INNER JOIN horario_itinerario hi ON hi.horario = h.id " +
+//            "WHERE h.ativo = 1 AND (domingo = 1 OR segunda = 1 OR terca = 1 OR quarta = 1 OR quinta = 1 OR sexta = 1 OR sabado = 1) " +
+//            "AND hi.ativo = 1 AND hi.itinerario IN (SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada WHERE itinerario IN " +
+//            "(SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada " +
+//            "WHERE p.bairro = (SELECT b.id FROM parada p INNER JOIN bairro b ON b.id = p.bairro WHERE p.id = :partida) AND pi.ordem = 1)" +
+//            " AND p.bairro = (SELECT b.id FROM parada p INNER JOIN bairro b ON b.id = p.bairro WHERE p.id = :destino) AND pi.ordem > 1) " +
+//            "ORDER BY h.nome")
+//    List<HorarioItinerarioNome> listarApenasAtivosPorPartidaEDestinoSync(String partida, String destino);
+
     @Query("SELECT hi.*, h.id AS idHorario, h.nome AS nomeHorario " +
-            "FROM horario h INNER JOIN horario_itinerario hi ON hi.horario = h.id " +
-            "WHERE h.ativo = 1 AND (domingo = 1 OR segunda = 1 OR terca = 1 OR quarta = 1 OR quinta = 1 OR sexta = 1 OR sabado = 1) " +
-            "AND hi.ativo = 1 AND hi.itinerario IN (SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada WHERE itinerario IN " +
-            "(SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada " +
-            "WHERE p.bairro = (SELECT b.id FROM parada p INNER JOIN bairro b ON b.id = p.bairro WHERE p.id = :partida) AND pi.ordem = 1)" +
-            " AND p.bairro = (SELECT b.id FROM parada p INNER JOIN bairro b ON b.id = p.bairro WHERE p.id = :destino) AND pi.ordem > 1) " +
-            "ORDER BY h.nome")
+            "FROM itinerario i INNER JOIN " +
+            "parada_itinerario pi ON pi.itinerario = i.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+            "bairro bp ON bp.id = pp.bairro INNER JOIN parada_itinerario pi2 ON pi2.itinerario = i.id INNER JOIN " +
+            "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro INNER JOIN  " +
+            "horario_itinerario hi ON hi.itinerario = i.id INNER JOIN " +
+            "horario h ON h.id = hi.horario " +
+            "WHERE i.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem " +
+            "AND pp.id = :partida AND pd.id = :destino ORDER BY h.nome")
     List<HorarioItinerarioNome> listarApenasAtivosPorPartidaEDestinoSync(String partida, String destino);
 
     @Query("SELECT hi.*, h.id AS idHorario, h.nome AS nomeHorario " +

@@ -257,6 +257,38 @@ public class DataHoraUtils {
         return dia;
     }
 
+    public static String getDiaFormatado(String d){
+        DateTime dateTime = new DateTime();
+        String dia = "";
+        int a = dateTime.get(DateTimeFieldType.dayOfWeek());
+
+        switch(d){
+            case "domingo":
+                dia = "Domingo";
+                break;
+            case "segunda":
+                dia = "Segunda-Feira";
+                break;
+            case "terca":
+                dia = "Terça-Feira";
+                break;
+            case "quarta":
+                dia = "Quarta-Feira";
+                break;
+            case "quinta":
+                dia = "Quinta-Feira";
+                break;
+            case "sexta":
+                dia = "Sexta-Feira";
+                break;
+            case "sabado":
+                dia = "Sábado";
+                break;
+        }
+
+        return dia;
+    }
+
     public static String getDiaSelecionadoFormatado(Calendar data){
         DateTime dateTime = new DateTime(data);
         String dia = "";
@@ -290,6 +322,10 @@ public class DataHoraUtils {
 
     public static String getHoraAtual(){
         return DateTimeFormat.forPattern("HH:mm").print(DateTime.now());
+    }
+
+    public static String getHoraFormatada(String hora){
+        return DateTimeFormat.forPattern("HH:mm").print(DateTimeFormat.forPattern("HH:mm:ss").parseLocalTime(hora));
     }
 
 }

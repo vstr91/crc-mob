@@ -66,6 +66,16 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
             hora = DataHoraUtils.getHoraAtual();
         }
 
+        if(!dia.isEmpty()){
+            dia = DataHoraUtils.getDiaFormatado(dia);
+        }
+
+        int i = hora.length();
+
+        if(!hora.isEmpty() && hora.length() == 8){
+            hora = DataHoraUtils.getHoraFormatada(hora);
+        }
+
         binding.setDia(dia);
         binding.setHora(hora);
 

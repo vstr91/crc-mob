@@ -18,6 +18,9 @@ public interface PaisDAO {
     @Query("SELECT * FROM pais ORDER BY nome")
     LiveData<List<Pais>> listarTodos();
 
+    @Query("SELECT * FROM pais ORDER BY nome")
+    List<Pais> listarTodosSync();
+
     @Query("SELECT * FROM pais WHERE ativo = 1 ORDER BY nome")
     LiveData<List<Pais>> listarTodosAtivos();
 

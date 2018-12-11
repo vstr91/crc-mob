@@ -18,6 +18,9 @@ public interface EstadoDAO {
     @Query("SELECT * FROM estado ORDER BY nome")
     LiveData<List<Estado>> listarTodos();
 
+    @Query("SELECT * FROM estado ORDER BY nome")
+    List<Estado> listarTodosSync();
+
     @Query("SELECT * FROM estado WHERE ativo = 1 ORDER BY nome")
     LiveData<List<Estado>> listarTodosAtivos();
 

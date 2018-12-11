@@ -21,6 +21,9 @@ public interface EmpresaDAO {
     @Query("SELECT * FROM empresa ORDER BY nome")
     LiveData<List<Empresa>> listarTodos();
 
+    @Query("SELECT * FROM empresa ORDER BY nome")
+    List<Empresa> listarTodosSync();
+
     @Query("SELECT * FROM empresa WHERE ativo = 1 ORDER BY nome")
     LiveData<List<Empresa>> listarTodosAtivos();
 

@@ -19,6 +19,9 @@ public interface CidadeDAO {
     @Query("SELECT * FROM cidade ORDER BY nome")
     LiveData<List<Cidade>> listarTodos();
 
+    @Query("SELECT * FROM cidade ORDER BY nome")
+    List<Cidade> listarTodosSync();
+
     @Query("SELECT * FROM cidade WHERE ativo = 1 ORDER BY nome")
     LiveData<List<Cidade>> listarTodosAtivos();
 

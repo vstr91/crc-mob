@@ -21,6 +21,9 @@ public interface ParadaDAO {
     @Query("SELECT * FROM parada")
     LiveData<List<Parada>> listarTodos();
 
+    @Query("SELECT * FROM parada")
+    List<Parada> listarTodosSync();
+
     @Query("SELECT * FROM parada WHERE enviado = 0")
     List<Parada> listarTodosAEnviar();
 

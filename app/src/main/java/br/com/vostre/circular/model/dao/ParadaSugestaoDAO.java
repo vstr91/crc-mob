@@ -45,6 +45,24 @@ public interface ParadaSugestaoDAO {
             "estado e ON e.id = c.estado WHERE p.status = 2")
     LiveData<List<ParadaSugestaoBairro>> listarTodosRejeitadosComBairro();
 
+    @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
+            "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_sugestao p " +
+            "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
+            "estado e ON e.id = c.estado WHERE p.status = 0 AND p.usuario_cadastro = :id")
+    LiveData<List<ParadaSugestaoBairro>> listarTodosPendentesComBairroPorUsuario(String id);
+
+    @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
+            "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_sugestao p " +
+            "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
+            "estado e ON e.id = c.estado WHERE p.status = 1 AND p.usuario_cadastro = :id")
+    LiveData<List<ParadaSugestaoBairro>> listarTodosAceitosComBairroPorUsuario(String id);
+
+    @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
+            "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_sugestao p " +
+            "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
+            "estado e ON e.id = c.estado WHERE p.status = 2 AND p.usuario_cadastro = :id")
+    LiveData<List<ParadaSugestaoBairro>> listarTodosRejeitadosComBairroPorUsuario(String id);
+
     @Query("SELECT * FROM parada_sugestao WHERE enviado = 0")
     List<ParadaSugestao> listarTodosAEnviar();
 
@@ -68,5 +86,8 @@ public interface ParadaSugestaoDAO {
 
     @Query("DELETE FROM parada_sugestao")
     void deletarTodos();
+
+    @Query("DELETE FROM parada_sugestao WHERE status <> 0 AND usuario_cadastro = :id")
+    void deletarTodosNaoPendentesPorUsuarioLogado(String id);
 
 }

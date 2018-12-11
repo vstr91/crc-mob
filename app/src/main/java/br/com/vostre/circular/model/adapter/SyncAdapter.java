@@ -11,18 +11,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.MainThread;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -1294,6 +1288,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     break;
                 case "parametro":
                     db.parametroDAO().inserirTodos((List<Parametro>) params[0]);
+
+                    List<Parametro> par = (List<Parametro>) params[0];
+
+                    for(Parametro p : par){
+                        PreferenceUtils.salvarPreferencia(ctx.getApplicationContext(), "param_"+p.getNome(), p.getValor());
+                    }
+
                     break;
                 case "ponto_interesse":
                     db.pontoInteresseDAO().inserirTodos((List<PontoInteresse>) params[0]);
@@ -1302,8 +1303,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     db.usuarioDAO().inserirTodos((List<Usuario>) params[0]);
                     break;
                 case "parada_sugestao":
+                    db.paradaSugestaoDAO().deletarTodosNaoPendentesPorUsuarioLogado(PreferenceUtils.carregarUsuarioLogado(ctx.getApplicationContext()));
                     db.paradaSugestaoDAO().inserirTodos((List<ParadaSugestao>) params[0]);
                     break;
+            }
+
+            if(!PreferenceUtils.carregarPreferenciaBoolean(ctx, "init")){
+                PreferenceUtils.salvarPreferencia(ctx, "init", true);
             }
 
             return null;

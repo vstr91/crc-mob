@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -113,19 +114,31 @@ public class QRCodeActivity extends BaseActivity {
 
                 if(!flag){
 
-                    //Toast.makeText(ctx, "Leitura efetuada! Processando...", Toast.LENGTH_SHORT).show();
+                    flag = true;
+
+                    viewModel.aviso.postValue(true);
+
+                    System.out.println("Leitura efetuada! Processando...");
 
                     String[] parametros = data.split("\\/");
 
-                    String uf = parametros[5];
-                    String local = parametros[6];
-                    String bairro = parametros[7];
-                    String slugParada = parametros[8];
+                    if(parametros.length >= 8){
+                        String uf = parametros[5];
+                        String local = parametros[6];
+                        String bairro = parametros[7];
+                        String slugParada = parametros[8];
 
-                    viewModel.carregaParadaQRCode(uf, local, bairro, slugParada);
+                        viewModel.carregaParadaQRCode(uf, local, bairro, slugParada);
 
-                    viewModel.parada.observe(ctx, paradaObserver);
-                    flag = true;
+                        viewModel.parada.observe(ctx, paradaObserver);
+                    } else{
+
+                        viewModel.carregaParadaQRCode("", "", "", "");
+
+                        viewModel.parada.observe(ctx, paradaObserver);
+                    }
+
+
                 }
 
 
@@ -137,6 +150,7 @@ public class QRCodeActivity extends BaseActivity {
                 .build();
 
         qrEader.initAndStart(cameraView);
+        viewModel.aviso.observe(this, avisoObserver);
     }
 
     Observer<ParadaBairro> paradaObserver = new Observer<ParadaBairro>() {
@@ -157,6 +171,17 @@ public class QRCodeActivity extends BaseActivity {
                     }
                 }, 2000);
 
+            }
+
+        }
+    };
+
+    Observer<Boolean> avisoObserver = new Observer<Boolean>() {
+        @Override
+        public void onChanged(Boolean b) {
+
+            if(b){
+                Toast.makeText(getApplicationContext(), "Leitura efetuada! Processando...", Toast.LENGTH_SHORT).show();
             }
 
         }

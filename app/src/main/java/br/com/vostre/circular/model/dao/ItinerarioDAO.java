@@ -58,6 +58,9 @@ public interface ItinerarioDAO {
             ")")
     LiveData<List<ItinerarioPartidaDestino>> listarTodos();
 
+    @Query("SELECT * FROM itinerario")
+    List<Itinerario> listarTodosSync();
+
     @Query("SELECT DISTINCT i.*, " +
             "(SELECT pp.bairro FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
             "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'idBairroPartida', " +

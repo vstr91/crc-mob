@@ -11,9 +11,7 @@ import android.widget.Toast;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
-import java.util.Calendar;
 import java.util.List;
-import java.util.Observable;
 
 import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Cidade;
@@ -35,10 +33,8 @@ import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
-import br.com.vostre.circular.model.dao.PaisDAO;
 import br.com.vostre.circular.utils.Crypt;
 import br.com.vostre.circular.utils.PreferenceUtils;
-import br.com.vostre.circular.utils.StringUtils;
 import br.com.vostre.circular.utils.Unique;
 import retrofit2.Call;
 import retrofit2.Callback;

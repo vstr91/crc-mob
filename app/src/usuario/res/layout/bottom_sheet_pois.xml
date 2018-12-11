@@ -13,12 +13,11 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:text="Ponto de Interesse Próximos"
         android:textAppearance="@style/texto_azul"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        tools:layout_editor_absoluteY="8dp" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/listPois"
@@ -31,7 +30,7 @@
         app:layoutManager="android.support.v7.widget.LinearLayoutManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewStatus"
+        app:layout_constraintTop_toBottomOf="@+id/textView30"
         tools:listitem="@layout/linha_pontos_interesse" />
 
     <ImageButton

@@ -17,6 +17,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -74,9 +75,9 @@ import br.com.vostre.circular.App;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityMenuBinding;
 import br.com.vostre.circular.model.Mensagem;
+import br.com.vostre.circular.model.Parametro;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
-import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.ToolbarUtils;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 import es.usc.citius.hipster.algorithm.Hipster;
@@ -200,6 +201,36 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         drawer.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
+        progressBar = binding.progressBar;
+        btnLogin = binding.btnLogin;
+
+        ctx = this;
+        binding.textView36.setVisibility(View.GONE);
+
+        if(handler != null){
+            handler.removeCallbacksAndMessages(null);
+        }
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestScopes(Drive.SCOPE_FILE)
+                .requestIdToken(getString(R.string.server_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
+
+        viewModel.parametros.observe(this, parametrosObserver);
+
+        String prefQr = PreferenceUtils.carregarPreferencia(getApplicationContext(), "param_qr");
+
+        if(prefQr.equals("1")){
+            binding.btnQrCode.setVisibility(View.VISIBLE);
+        } else{
+            binding.btnQrCode.setVisibility(View.GONE);
+        }
+
 //        SignInButton btnLogin = drawer.findViewById(R.id.btnLogin);
 //
 //        btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -217,27 +248,9 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 //            onClickBtnMapa(null);
 //        }
 
-        progressBar = binding.progressBar;
-        btnLogin = binding.btnLogin;
-
-        viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
         viewModel.localAtual.observe(this, localObserver);
         viewModel.iniciarAtualizacoesPosicao();
         localAnterior = new Location(LocationManager.GPS_PROVIDER);
-        ctx = this;
-        binding.textView36.setVisibility(View.GONE);
-
-        if(handler != null){
-            handler.removeCallbacksAndMessages(null);
-        }
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestScopes(Drive.SCOPE_FILE)
-                .requestIdToken(getString(R.string.server_client_id))
-                .requestEmail()
-                .build();
-
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED){
@@ -560,6 +573,25 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             //l0.setLongitude(longitude);
 
             adicionaListaALogo(paradas, localAnterior);
+
+        }
+    };
+
+    Observer<List<Parametro>> parametrosObserver = new Observer<List<Parametro>>() {
+        @Override
+        public void onChanged(List<Parametro> parametros) {
+
+            for(Parametro p : parametros){
+                PreferenceUtils.salvarPreferencia(getApplicationContext(), "param_"+p.getNome(), p.getValor());
+            }
+
+            String prefQr = PreferenceUtils.carregarPreferencia(getApplicationContext(), "param_qr");
+
+            if(prefQr.equals("1")){
+                binding.btnQrCode.setVisibility(View.VISIBLE);
+            } else{
+                binding.btnQrCode.setVisibility(View.GONE);
+            }
 
         }
     };

@@ -19,6 +19,9 @@ public interface ParametroDAO {
     @Query("SELECT * FROM parametro")
     LiveData<List<Parametro>> listarTodos();
 
+    @Query("SELECT * FROM parametro")
+    List<Parametro> listarTodosSync();
+
     @Query("SELECT * FROM parametro WHERE ativo = 1")
     List<Parametro> listarTodosAtivos();
 

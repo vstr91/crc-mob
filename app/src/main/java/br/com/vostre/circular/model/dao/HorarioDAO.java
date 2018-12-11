@@ -18,6 +18,9 @@ public interface HorarioDAO {
     @Query("SELECT * FROM horario")
     LiveData<List<Horario>> listarTodos();
 
+    @Query("SELECT * FROM horario")
+    List<Horario> listarTodosSync();
+
     @Query("SELECT * FROM horario WHERE ativo = 1")
     List<Horario> listarTodosAtivos();
 

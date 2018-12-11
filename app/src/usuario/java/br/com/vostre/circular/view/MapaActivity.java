@@ -82,7 +82,6 @@ import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
-import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SessionUtils;
 import br.com.vostre.circular.utils.SignInActivity;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
@@ -131,6 +130,13 @@ public class MapaActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setTitle("Mapa");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
+
+        // PARA TESTES
+
+//        PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), "306f25dc-7ffa-11e8-b8e2-34238774caa8");
+//        PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), "");
+
+        // PARA TESTES
 
         ctx = this;
 
@@ -190,7 +196,6 @@ public class MapaActivity extends BaseActivity {
 
                 String e = data.getExtras().getString("mensagemErro");
 
-                System.out.println("Erro: "+e);
                 signOut();
                 binding.btnLogin.setEnabled(true);
             } else{
@@ -263,9 +268,13 @@ public class MapaActivity extends BaseActivity {
         if(SessionUtils.estaLogado(getApplicationContext())){
             binding.fabParada.setEnabled(true);
             binding.btnLogin.setVisibility(View.GONE);
+            binding.fabSugestao.setEnabled(true);
+            binding.fabSugestao.setVisibility(View.VISIBLE);
         } else{
             binding.fabParada.setEnabled(false);
             binding.btnLogin.setVisibility(View.VISIBLE);
+            binding.fabSugestao.setEnabled(false);
+            binding.fabSugestao.setVisibility(View.GONE);
         }
     }
 
@@ -456,6 +465,12 @@ public class MapaActivity extends BaseActivity {
                                         +"/"+pb.getParada().getImagem()));
                             } else{
                                 img.setImageDrawable(getResources().getDrawable(R.drawable.imagem_nao_disponivel_16_9));
+                            }
+
+                            if(!SessionUtils.estaLogado(getApplicationContext())){
+                                bsd.findViewById(R.id.btnEdicao).setVisibility(View.GONE);
+                            } else{
+                                bsd.findViewById(R.id.btnEdicao).setVisibility(View.VISIBLE);
                             }
 
                             // fim bottom menu
@@ -681,6 +696,11 @@ public class MapaActivity extends BaseActivity {
             formParada.show(getSupportFragmentManager(), "formParada");
         }
 
+    }
+
+    public void onFabSugestaoClick(View v){
+        Intent i = new Intent(this, ParadasSugeridasActivity.class);
+        startActivity(i);
     }
 
     public void onFabLocationClick(View v){

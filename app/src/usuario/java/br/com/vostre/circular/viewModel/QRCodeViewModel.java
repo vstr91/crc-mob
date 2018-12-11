@@ -3,6 +3,7 @@ package br.com.vostre.circular.viewModel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 
 import br.com.vostre.circular.model.ParametroInterno;
 import br.com.vostre.circular.model.dao.AppDatabase;
@@ -12,11 +13,13 @@ public class QRCodeViewModel extends AndroidViewModel {
 
     private AppDatabase appDatabase;
     public LiveData<ParadaBairro> parada;
+    public MutableLiveData<Boolean> aviso;
 
     public QRCodeViewModel(Application app){
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         this.parada = appDatabase.paradaDAO().carregarComBairroPorUFCidadeEBairro("", "", "", "");
+        aviso = new MutableLiveData<>();
     }
 
     public void carregaParadaQRCode(String uf, String cidade, String bairro, String parada){

@@ -21,10 +21,10 @@
         app:actionLayout="@layout/toolbar_sync_icon"
         app:showAsAction="always" />
 
-    <!--<item android:id="@+id/icon_horarios"-->
-        <!--android:title="Horários"-->
-        <!--app:actionLayout="@layout/toolbar_horarios_icon"-->
-        <!--app:showAsAction="always" />-->
+    <item android:id="@+id/icon_exportar"
+        android:title="Exportar Dados"
+        app:actionLayout="@layout/toolbar_exportar_icon"
+        app:showAsAction="always" />
 
     <item android:id="@+id/icon_msg"
         android:title="Mensagens"

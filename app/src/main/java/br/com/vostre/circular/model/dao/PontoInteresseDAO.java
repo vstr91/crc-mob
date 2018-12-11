@@ -18,6 +18,9 @@ public interface PontoInteresseDAO {
     @Query("SELECT * FROM ponto_interesse")
     LiveData<List<PontoInteresse>> listarTodos();
 
+    @Query("SELECT * FROM ponto_interesse")
+    List<PontoInteresse> listarTodosSync();
+
     @Query("SELECT * FROM ponto_interesse WHERE ativo = 1")
     LiveData<List<PontoInteresse>> listarTodosAtivos();
 

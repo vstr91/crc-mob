@@ -134,7 +134,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/button2" />
 
                 <Button
-                    android:id="@+id/button4"
+                    android:id="@+id/btnQrCode"
                     style="@style/botao_branco"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

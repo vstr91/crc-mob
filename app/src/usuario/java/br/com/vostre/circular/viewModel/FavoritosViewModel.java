@@ -17,7 +17,6 @@ import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
-import br.com.vostre.circular.utils.PreferenceUtils;
 
 public class FavoritosViewModel extends AndroidViewModel {
 

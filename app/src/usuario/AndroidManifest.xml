@@ -75,7 +75,7 @@
         <activity android:name=".view.MenuActivity" android:screenOrientation="portrait" />
         <activity android:name=".view.BaseActivity" android:screenOrientation="portrait" />
         <activity android:name=".view.FavoritosActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.CidadesActivity" android:screenOrientation="portrait" />
+        <activity android:name=".view.ParadasSugeridasActivity" android:screenOrientation="portrait" />
         <activity android:name=".view.DetalheParadaActivity" android:screenOrientation="portrait">
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.VIEW" />

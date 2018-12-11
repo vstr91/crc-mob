@@ -22,6 +22,9 @@ public interface BairroDAO {
     @Query("SELECT * FROM bairro ORDER BY nome")
     LiveData<List<Bairro>> listarTodos();
 
+    @Query("SELECT * FROM bairro ORDER BY nome")
+    List<Bairro> listarTodosSync();
+
     @Query("SELECT * FROM bairro WHERE ativo = 1 ORDER BY nome")
     List<Bairro> listarTodosAtivos();
 

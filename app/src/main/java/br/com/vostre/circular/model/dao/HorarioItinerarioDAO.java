@@ -23,6 +23,9 @@ public interface HorarioItinerarioDAO {
     @Query("SELECT * FROM horario_itinerario")
     LiveData<List<HorarioItinerario>> listarTodos();
 
+    @Query("SELECT * FROM horario_itinerario")
+    List<HorarioItinerario> listarTodosSync();
+
     @Query("SELECT * FROM horario_itinerario WHERE ativo = 1")
     List<HorarioItinerario> listarTodosAtivos();
 

@@ -24,7 +24,7 @@ import com.google.android.gms.tasks.Task;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityLoginBinding;
-import br.com.vostre.circular.utils.PreferenceUtils;
+import br.com.vostre.circular.utils.DBUtils;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
 public class LoginActivity extends BaseActivity {
@@ -50,6 +50,16 @@ public class LoginActivity extends BaseActivity {
         getSupportActionBar().setHomeButtonEnabled(false);
         binding.setView(this);
         viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
+
+        if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), "init")){
+            // caregar bd
+
+            if(DBUtils.moveBancoDeDados(getApplicationContext())){
+                PreferenceUtils.salvarPreferencia(getApplicationContext(), "init", true);
+            }
+
+        }
+
     }
 
     @Override

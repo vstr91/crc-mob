@@ -109,7 +109,6 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onReceive(Context context, Intent intent) {
                 Bundle extras = intent.getExtras();
-                System.out.println("Entrou receiver!!!");
 
                 Integer mensagens = extras.getInt("mensagens");
 

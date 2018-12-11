@@ -51,7 +51,6 @@ import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.dao.PaisDAO;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.Crypt;
-import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.StringUtils;
 import br.com.vostre.circular.utils.Unique;
 import retrofit2.Call;
@@ -69,6 +68,7 @@ public class BaseViewModel extends AndroidViewModel {
     public FusedLocationProviderClient mFusedLocationClient;
     public LocationCallback mLocationCallback;
     public LiveData<List<ParadaBairro>> paradas;
+    public LiveData<List<Parametro>> parametros;
     public boolean isRunningNearPlaces = false;
 
     public MutableLiveData usuarioValidado;
@@ -93,6 +93,7 @@ public class BaseViewModel extends AndroidViewModel {
         localAtual = new MutableLiveData<>();
         localAtual.postValue(new Location(LocationManager.GPS_PROVIDER));
         paradas = appDatabase.paradaDAO().listarTodosAtivosProximos(0,0,0,0);
+        parametros = appDatabase.parametroDAO().listarTodos();
         new paramAsyncTask(appDatabase).execute();
         usuarioValidado = new MutableLiveData<>();
         usuarioValidado.postValue(false);

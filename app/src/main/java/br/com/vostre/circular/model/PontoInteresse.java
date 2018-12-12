@@ -21,13 +21,17 @@ public class PontoInteresse extends EntidadeSlug {
 
     private String imagem;
 
-    @NonNull
     private DateTime dataInicial;
 
     private DateTime dataFinal;
 
     @NonNull
     private boolean imagemEnviada = true;
+
+    private boolean permanente;
+
+    @NonNull
+    private String bairro;
 
     public String getDescricao() {
         return descricao;
@@ -87,6 +91,23 @@ public class PontoInteresse extends EntidadeSlug {
 
     public void setDataFinal(DateTime dataFinal) {
         this.dataFinal = dataFinal;
+    }
+
+    @NonNull
+    public String getBairro() {
+        return bairro;
+    }
+
+    public void setBairro(@NonNull String bairro) {
+        this.bairro = bairro;
+    }
+
+    public boolean isPermanente() {
+        return permanente;
+    }
+
+    public void setPermanente(boolean permanente) {
+        this.permanente = permanente;
     }
 
     public String getDatas(){

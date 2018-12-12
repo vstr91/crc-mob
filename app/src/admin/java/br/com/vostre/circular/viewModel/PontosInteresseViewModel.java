@@ -45,6 +45,9 @@ public class PontosInteresseViewModel extends AndroidViewModel {
 
     public LiveData<List<ParadaBairro>> paradas;
 
+    public LiveData<List<BairroCidade>> bairros;
+    public BairroCidade bairro;
+
     public boolean centralizaMapa = true;
 
     public FusedLocationProviderClient mFusedLocationClient;
@@ -79,6 +82,22 @@ public class PontosInteresseViewModel extends AndroidViewModel {
         this.pontosInteresse = pontosInteresse;
     }
 
+    public LiveData<List<BairroCidade>> getBairros() {
+        return bairros;
+    }
+
+    public void setBairros(LiveData<List<BairroCidade>> bairros) {
+        this.bairros = bairros;
+    }
+
+    public BairroCidade getBairro() {
+        return bairro;
+    }
+
+    public void setBairro(BairroCidade bairro) {
+        this.bairro = bairro;
+    }
+
     public PontoInteresse getPontoInteresse() {
         return pontoInteresse;
     }
@@ -103,12 +122,17 @@ public class PontosInteresseViewModel extends AndroidViewModel {
         pontosInteresse = appDatabase.pontoInteresseDAO().listarTodos();
         paradas = appDatabase.paradaDAO().listarTodosAtivosComBairro();
 
+        bairros = new MutableLiveData<>();
+        bairros = appDatabase.bairroDAO().listarTodosComCidade();
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplication());
         localAtual = new MutableLiveData<>();
         localAtual.setValue(new Location(LocationManager.GPS_PROVIDER));
     }
 
     public void salvarPontoInteresse(){
+
+        pontoInteresse.setBairro(bairro.getBairro().getId());
 
         if(foto != null){
             salvarFoto();
@@ -123,6 +147,10 @@ public class PontosInteresseViewModel extends AndroidViewModel {
     }
 
     public void editarPontoInteresse(){
+
+        if(bairro != null){
+            pontoInteresse.setBairro(bairro.getBairro().getId());
+        }
 
         if(foto != null){
             salvarFoto();

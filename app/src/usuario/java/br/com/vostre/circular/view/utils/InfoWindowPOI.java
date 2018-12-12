@@ -43,6 +43,18 @@ public class InfoWindowPOI extends FormBase {
         binding.setView(this);
         binding.setViewModel(viewModel);
 
+        if(pontoInteresse.isPermanente()){
+            binding.textView54.setVisibility(View.GONE);
+            binding.textView55.setVisibility(View.GONE);
+            binding.textViewDataInicial.setVisibility(View.GONE);
+            binding.textViewDataFinal.setVisibility(View.GONE);
+        } else{
+            binding.textView54.setVisibility(View.VISIBLE);
+            binding.textView55.setVisibility(View.VISIBLE);
+            binding.textViewDataInicial.setVisibility(View.VISIBLE);
+            binding.textViewDataFinal.setVisibility(View.VISIBLE);
+        }
+
         if(!exibeBotaoEditar){
             binding.btnEditar.setVisibility(View.GONE);
         }

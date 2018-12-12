@@ -1,6 +1,8 @@
 package br.com.vostre.circular.view.form;
 
 import android.app.Application;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.BindingAdapter;
@@ -12,8 +14,10 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.joda.time.DateTime;
@@ -25,16 +29,19 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.TimeZone;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormPontoInteresseBinding;
 import br.com.vostre.circular.model.PontoInteresse;
+import br.com.vostre.circular.model.pojo.BairroCidade;
+import br.com.vostre.circular.view.adapter.BairroAdapterSpinner;
 import br.com.vostre.circular.viewModel.PontosInteresseViewModel;
 
 public class FormPontoInteresse extends FormPOIBase {
 
-    FormPontoInteresseBinding binding;
+    static FormPontoInteresseBinding binding;
     Calendar dataInicio;
     Calendar dataFim;
 
@@ -50,11 +57,11 @@ public class FormPontoInteresse extends FormPOIBase {
     Double latitude;
     Double longitude;
 
-    PontoInteresse pontoInteresse;
+    static PontoInteresse pontoInteresse;
 
     public Boolean flagInicioEdicao;
     static Application ctx;
-    PontosInteresseViewModel viewModel;
+    static PontosInteresseViewModel viewModel;
 
     public static final int PICK_IMAGE = 500;
 
@@ -127,6 +134,8 @@ public class FormPontoInteresse extends FormPOIBase {
         imageViewFoto.setVisibility(View.GONE);
         btnTrocarFoto.setVisibility(View.GONE);
 
+        viewModel.bairros.observe(this, bairrosObserver);
+
         if(pontoInteresse != null){
             viewModel.pontoInteresse = pontoInteresse;
 
@@ -147,6 +156,7 @@ public class FormPontoInteresse extends FormPOIBase {
             if(viewModel.pontoInteresse.getDataInicial() == null){
                 textViewInicio.setVisibility(View.GONE);
                 btnTrocarInicio.setVisibility(View.GONE);
+                binding.textView30.setVisibility(View.GONE);
             } else{
                 exibeDataEscolhida(0);
             }
@@ -154,6 +164,7 @@ public class FormPontoInteresse extends FormPOIBase {
             if(viewModel.pontoInteresse.getDataFinal() == null){
                 textViewFim.setVisibility(View.GONE);
                 btnTrocarFim.setVisibility(View.GONE);
+                binding.textView31.setVisibility(View.GONE);
             } else{
                 exibeDataEscolhida(1);
             }
@@ -242,11 +253,15 @@ public class FormPontoInteresse extends FormPOIBase {
             textViewInicio.setText("");
             btnTrocarInicio.setVisibility(View.GONE);
             viewModel.pontoInteresse.setDataInicial(null);
+            binding.btnDataInicio.setVisibility(View.VISIBLE);
+            binding.textView30.setVisibility(View.GONE);
         } else{
             textViewFim.setVisibility(View.GONE);
             textViewFim.setText("");
             btnTrocarFim.setVisibility(View.GONE);
             viewModel.pontoInteresse.setDataFinal(null);
+            binding.btnDataFim.setVisibility(View.VISIBLE);
+            binding.textView31.setVisibility(View.GONE);
         }
 
 
@@ -260,12 +275,16 @@ public class FormPontoInteresse extends FormPOIBase {
 
             textViewInicio.setVisibility(View.VISIBLE);
             btnTrocarInicio.setVisibility(View.VISIBLE);
+            binding.btnDataInicio.setVisibility(View.GONE);
+            binding.textView30.setVisibility(View.VISIBLE);
         } else{
             textViewFim.setText(DateTimeFormat
                     .forPattern("dd/MM/yy HH:mm").print(viewModel.pontoInteresse.getDataFinal()));
 
             textViewFim.setVisibility(View.VISIBLE);
             btnTrocarFim.setVisibility(View.VISIBLE);
+            binding.btnDataFim.setVisibility(View.GONE);
+            binding.textView31.setVisibility(View.VISIBLE);
         }
 
 
@@ -321,6 +340,54 @@ public class FormPontoInteresse extends FormPOIBase {
 
 
         }
+    }
+
+    Observer<List<BairroCidade>> bairrosObserver = new Observer<List<BairroCidade>>() {
+        @Override
+        public void onChanged(List<BairroCidade> bairros) {
+            setSpinnerEntries(binding.spinnerBairro, bairros);
+        }
+    };
+
+    public void setSpinnerEntries(Spinner spinner, List<BairroCidade> bairros){
+
+        if(bairros != null){
+            BairroAdapterSpinner adapter = new BairroAdapterSpinner(ctx, R.layout.linha_bairros_spinner,
+                    R.id.textViewNome, bairros);
+            spinner.setAdapter(adapter);
+
+            if(pontoInteresse != null){
+                BairroCidade bairro = new BairroCidade();
+                bairro.getBairro().setId(pontoInteresse.getBairro());
+                int i = viewModel.bairros.getValue().indexOf(bairro);
+                binding.spinnerBairro.setSelection(i);
+            }
+
+        }
+
+    }
+
+    public void onItemSelectedSpinnerBairro (AdapterView<?> adapterView, View view, int i, long l){
+        viewModel.bairro = viewModel.bairros.getValue().get(i);
+    }
+
+    @BindingAdapter("entries")
+    public static void setSpinnerEntries(Spinner spinner, LiveData<List<BairroCidade>> bairros){
+
+        if(bairros.getValue() != null){
+            BairroAdapterSpinner adapter = new BairroAdapterSpinner(ctx, R.layout.linha_bairros_spinner,
+                    R.id.textViewNome, bairros.getValue());
+            spinner.setAdapter(adapter);
+
+            if(pontoInteresse != null){
+                BairroCidade bairro = new BairroCidade();
+                bairro.getBairro().setId(pontoInteresse.getBairro());
+                int i = viewModel.bairros.getValue().indexOf(bairro);
+                binding.spinnerBairro.setSelection(i);
+            }
+
+        }
+
     }
 
 }

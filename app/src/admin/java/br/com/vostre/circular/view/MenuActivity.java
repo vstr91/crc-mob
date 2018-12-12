@@ -189,6 +189,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnExportar(View v){
+        Toast.makeText(getApplicationContext(), "Exportando Dados...", Toast.LENGTH_SHORT).show();
         DBUtils.exportDB(getApplicationContext());
     }
 

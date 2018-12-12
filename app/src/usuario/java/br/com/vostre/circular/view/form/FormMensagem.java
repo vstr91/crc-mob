@@ -21,6 +21,7 @@ import java.util.TimeZone;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormMensagemBinding;
 import br.com.vostre.circular.model.Mensagem;
+import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.viewModel.MensagensViewModel;
 
 public class FormMensagem extends FormBase {

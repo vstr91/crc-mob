@@ -213,6 +213,24 @@
                     app:layout_constraintEnd_toEndOf="@+id/circleView"
                     app:layout_constraintStart_toStartOf="@+id/circleView" />
 
+                <Button
+                    android:id="@+id/btnAviso"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/azul80"
+                    android:gravity="center"
+                    android:onClick="onClickBtnAviso"
+                    android:padding="10dp"
+                    android:textAllCaps="false"
+                    android:text="Esta versão do Circular não é a mais atual. Clique aqui para atualizar e tenha acesso a correções e novas funções!"
+                    android:textColor="@color/branco80"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/circleView" />
+
             </android.support.constraint.ConstraintLayout>
 
             <android.support.design.widget.NavigationView

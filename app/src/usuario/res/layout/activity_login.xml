@@ -101,13 +101,14 @@
 
         <Button
             android:id="@+id/btnEntrar"
-            style="@style/botao_branco"
+            style="@style/botao_principal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
+            android:background="@drawable/bg_rounded_corner_branco"
             android:onClick="@{view::onClickBtnEntrar}"
             android:padding="5dp"
             android:text="Usar sem fazer login"

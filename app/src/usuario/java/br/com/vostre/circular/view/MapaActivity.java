@@ -82,6 +82,7 @@ import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SessionUtils;
 import br.com.vostre.circular.utils.SignInActivity;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;

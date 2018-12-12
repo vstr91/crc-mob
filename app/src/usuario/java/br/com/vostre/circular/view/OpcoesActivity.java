@@ -8,6 +8,7 @@ import android.widget.CompoundButton;
 import br.com.vostre.circular.databinding.ActivityOpcoesBinding;
 
 import br.com.vostre.circular.R;
+import br.com.vostre.circular.utils.PreferenceUtils;
 
 public class OpcoesActivity extends BaseActivity {
 

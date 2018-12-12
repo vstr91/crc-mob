@@ -17,6 +17,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -72,12 +73,14 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import br.com.vostre.circular.App;
+import br.com.vostre.circular.BuildConfig;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityMenuBinding;
 import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.Parametro;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.ToolbarUtils;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 import es.usc.citius.hipster.algorithm.Hipster;
@@ -224,11 +227,18 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         viewModel.parametros.observe(this, parametrosObserver);
 
         String prefQr = PreferenceUtils.carregarPreferencia(getApplicationContext(), "param_qr");
+        String prefVersao = PreferenceUtils.carregarPreferencia(getApplicationContext(), "param_versao");
 
         if(prefQr.equals("1")){
             binding.btnQrCode.setVisibility(View.VISIBLE);
         } else{
             binding.btnQrCode.setVisibility(View.GONE);
+        }
+
+        if(prefVersao.equals(BuildConfig.VERSION_NAME) || prefVersao.isEmpty()){
+            binding.btnAviso.setVisibility(View.GONE);
+        } else{
+            binding.btnAviso.setVisibility(View.VISIBLE);
         }
 
 //        SignInButton btnLogin = drawer.findViewById(R.id.btnLogin);
@@ -356,6 +366,11 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         drawer.closeDrawers();
         Intent i = new Intent(getApplicationContext(), SobreActivity.class);
         startActivity(i);
+    }
+
+    public void onClickBtnAviso(View v){
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=br.com.vostre.circular"));
+        startActivity(intent);
     }
 
     @Override

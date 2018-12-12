@@ -134,6 +134,7 @@ public class PontosInteresseActivity extends BaseActivity {
                     formPontoInteresse.setLatitude(p.getLatitude());
                     formPontoInteresse.setLongitude(p.getLongitude());
                     formPontoInteresse.setCtx(getApplication());
+                    formPontoInteresse.setPontoInteresse(new PontoInteresse());
                     formPontoInteresse.show(getSupportFragmentManager(), "formPontoInteresse");
 
 //                    Marker m = new Marker(map);

@@ -13,6 +13,7 @@ import android.widget.Toast;
 import java.io.File;
 
 import br.com.vostre.circleview.CircleView;
+import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.LinhaCidadesBinding;
 import br.com.vostre.circular.model.adapter.SyncAdapter;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
@@ -51,6 +52,7 @@ public class CidadeViewHolder extends RecyclerView.ViewHolder {
                 final File brasao = new File(ctx.getApplicationContext().getFilesDir(),  cidade.getCidade().getBrasao());
 
                 if(!brasao.exists() || !brasao.canRead()){
+                    binding.circleView2.setImageDrawable(ctx.getResources().getDrawable(R.drawable.imagem_nao_disponivel_quadrada));
                     ImageDownloadAsyncTask imageDownloadAsyncTask = new ImageDownloadAsyncTask(ctx, cidade.getCidade().getBrasao());
                     imageDownloadAsyncTask.execute();
                 }

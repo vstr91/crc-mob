@@ -1390,7 +1390,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
-                        Toast.makeText(ctx, "Erro ("+e.getMessage()+") ao receber imagem.", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(ctx, "Erro ("+e.getMessage()+") ao receber imagem.", Toast.LENGTH_SHORT).show();
                     } finally {
                         try {
                             if (fos != null) {
@@ -1408,7 +1408,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Toast.makeText(ctx, "Erro ("+t.getMessage()+") ao receber imagem.", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(ctx, "Erro ("+t.getMessage()+") ao receber imagem.", Toast.LENGTH_SHORT).show();
             }
         });
     }

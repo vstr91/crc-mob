@@ -21,6 +21,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
@@ -45,6 +46,7 @@ import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaSugestao;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.model.pojo.ParadaSugestaoBairro;
 import br.com.vostre.circular.view.adapter.BairroAdapterSpinner;
 import br.com.vostre.circular.viewModel.BairrosViewModel;
 import br.com.vostre.circular.viewModel.MapaViewModel;
@@ -142,7 +144,7 @@ public class FormParada extends FormBase {
         viewModel.bairros.observe(this, bairrosObserver);
 
         if(parada != null){
-            viewModel.paradaNova = parada;
+            viewModel.paradaNova.setParada(parada);
 
             if(parada.getImagem() != null){
                 File foto = new File(ctx.getFilesDir(), parada.getImagem());
@@ -162,15 +164,15 @@ public class FormParada extends FormBase {
         }
 
         if(paradaRelativa != null){
-            viewModel.paradaNova.setParada(paradaRelativa.getParada().getId());
+            viewModel.paradaNova.getParada().setParada(paradaRelativa.getParada().getId());
 
-            viewModel.paradaNova.setNome(paradaRelativa.getParada().getNome());
-            viewModel.paradaNova.setLatitude(paradaRelativa.getParada().getLatitude());
-            viewModel.paradaNova.setLongitude(paradaRelativa.getParada().getLongitude());
-            viewModel.paradaNova.setTaxaDeEmbarque(paradaRelativa.getParada().getTaxaDeEmbarque());
-            viewModel.paradaNova.setSlug(paradaRelativa.getParada().getSlug());
-            viewModel.paradaNova.setBairro(paradaRelativa.getParada().getBairro());
-            viewModel.paradaNova.setSentido(paradaRelativa.getParada().getSentido());
+            viewModel.paradaNova.getParada().setNome(paradaRelativa.getParada().getNome());
+            viewModel.paradaNova.getParada().setLatitude(paradaRelativa.getParada().getLatitude());
+            viewModel.paradaNova.getParada().setLongitude(paradaRelativa.getParada().getLongitude());
+            viewModel.paradaNova.getParada().setTaxaDeEmbarque(paradaRelativa.getParada().getTaxaDeEmbarque());
+            viewModel.paradaNova.getParada().setSlug(paradaRelativa.getParada().getSlug());
+            viewModel.paradaNova.getParada().setBairro(paradaRelativa.getParada().getBairro());
+            viewModel.paradaNova.getParada().setSentido(paradaRelativa.getParada().getSentido());
         }
 
         return binding.getRoot();
@@ -180,8 +182,8 @@ public class FormParada extends FormBase {
     public void onClickSalvar(View v){
 
         if(latitude != null && longitude != null){
-            viewModel.paradaNova.setLatitude(latitude);
-            viewModel.paradaNova.setLongitude(longitude);
+            viewModel.paradaNova.getParada().setLatitude(latitude);
+            viewModel.paradaNova.getParada().setLongitude(longitude);
         }
 
         if(parada != null){
@@ -190,7 +192,7 @@ public class FormParada extends FormBase {
             viewModel.salvarParada();
         }
 
-        dismiss();
+        viewModel.retorno.observe(this, retornoObserver);
 
     }
 
@@ -202,7 +204,7 @@ public class FormParada extends FormBase {
         imageViewFoto.setVisibility(View.GONE);
         btnTrocarFoto.setVisibility(View.GONE);
         viewModel.foto = null;
-        viewModel.paradaNova.setImagem(null);
+        viewModel.paradaNova.getParada().setImagem(null);
         binding.btnFoto.setVisibility(View.VISIBLE);
     }
 
@@ -306,6 +308,24 @@ public class FormParada extends FormBase {
         @Override
         public void onChanged(List<BairroCidade> bairros) {
             setSpinnerEntries(binding.spinnerBairro, bairros);
+        }
+    };
+
+    Observer<Integer> retornoObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer retorno) {
+
+            if(retorno == 1){
+                Toast.makeText(getContext().getApplicationContext(), "Sugestão de parada cadastrada!", Toast.LENGTH_SHORT).show();
+                viewModel.setParadaNova(new ParadaSugestaoBairro());
+                dismiss();
+            } else if(retorno == 0){
+                Toast.makeText(getContext().getApplicationContext(),
+                        "Dados necessários não informados. Por favor preencha " +
+                                "todos os dados obrigatórios!",
+                        Toast.LENGTH_SHORT).show();
+            }
+
         }
     };
 

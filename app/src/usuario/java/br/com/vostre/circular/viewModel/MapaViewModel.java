@@ -36,6 +36,7 @@ import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.model.pojo.ParadaSugestaoBairro;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.StringUtils;
 
@@ -44,7 +45,7 @@ public class MapaViewModel extends AndroidViewModel {
     private static AppDatabase appDatabase;
 
     public LiveData<List<ParadaBairro>> paradas;
-    public LiveData<List<ParadaSugestao>> paradasSugeridas;
+    public LiveData<List<ParadaSugestaoBairro>> paradasSugeridas;
     public LiveData<List<PontoInteresse>> pois;
     public MutableLiveData<Location> localAtual;
     public boolean centralizaMapa = true;
@@ -53,7 +54,7 @@ public class MapaViewModel extends AndroidViewModel {
     public LocationCallback mLocationCallback;
 
     ParadaBairro parada;
-    public ParadaSugestao paradaNova;
+    public ParadaSugestaoBairro paradaNova;
     public Bitmap foto;
     public LiveData<List<ItinerarioPartidaDestino>> itinerarios;
     public LiveData<List<BairroCidade>> bairros;
@@ -61,15 +62,17 @@ public class MapaViewModel extends AndroidViewModel {
     public Bitmap fotoParada;
     public BairroCidade bairro;
 
-    public ParadaSugestao getParadaNova() {
+    public static MutableLiveData<Integer> retorno;
+
+    public ParadaSugestaoBairro getParadaNova() {
         return paradaNova;
     }
 
-    public void setParadaNova(ParadaSugestao paradaNova) {
+    public void setParadaNova(ParadaSugestaoBairro paradaNova) {
         this.paradaNova = paradaNova;
 
-        if(paradaNova.getImagem() != null){
-            File foto = new File(getApplication().getFilesDir(), paradaNova.getImagem());
+        if(paradaNova.getParada().getImagem() != null){
+            File foto = new File(getApplication().getFilesDir(), paradaNova.getParada().getImagem());
 
             if(foto.exists() && foto.canRead()){
                 this.fotoParada = BitmapFactory.decodeFile(foto.getAbsolutePath());
@@ -124,15 +127,19 @@ public class MapaViewModel extends AndroidViewModel {
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         paradas = appDatabase.paradaDAO().listarTodosAtivosComBairro();
-        paradasSugeridas = appDatabase.paradaSugestaoDAO().listarTodosAtivos();
+        paradasSugeridas = appDatabase.paradaSugestaoDAO().listarTodosComBairro();
         pois = appDatabase.pontoInteresseDAO().listarTodosAtivos();
         bairros = appDatabase.bairroDAO().listarTodosComCidade();
-        paradaNova = new ParadaSugestao();
+        paradaNova = new ParadaSugestaoBairro();
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplication());
 
         localAtual = new MutableLiveData<>();
         localAtual.postValue(new Location(LocationManager.GPS_PROVIDER));
+
+        retorno = new MutableLiveData<>();
+        retorno.setValue(-1);
+
     }
 
     public void iniciarAtualizacoesPosicao(){
@@ -161,16 +168,16 @@ public class MapaViewModel extends AndroidViewModel {
 
     public void salvarParada(){
 
-        paradaNova.setBairro(bairro.getBairro().getId());
+        paradaNova.getParada().setBairro(bairro.getBairro().getId());
 
         if(foto != null){
             salvarFoto();
         }
 
-        if(paradaNova.valida(paradaNova)){
-            add(paradaNova);
+        if(paradaNova.getParada().valida(paradaNova.getParada())){
+            add(paradaNova.getParada());
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -178,17 +185,17 @@ public class MapaViewModel extends AndroidViewModel {
     public void editarParada(){
 
         if(bairro != null){
-            paradaNova.setBairro(bairro.getBairro().getId());
+            paradaNova.getParada().setBairro(bairro.getBairro().getId());
         }
 
         if(foto != null){
             salvarFoto();
         }
 
-        if(paradaNova.valida(paradaNova)){
-            edit(paradaNova);
+        if(paradaNova.getParada().valida(paradaNova.getParada())){
+            edit(paradaNova.getParada());
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -258,6 +265,11 @@ public class MapaViewModel extends AndroidViewModel {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
+        }
+
     }
 
     // fim adicionar
@@ -299,6 +311,11 @@ public class MapaViewModel extends AndroidViewModel {
         protected Void doInBackground(final ParadaSugestao... params) {
             db.paradaSugestaoDAO().editar((params[0]));
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
         }
 
     }

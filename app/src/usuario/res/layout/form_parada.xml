@@ -35,7 +35,7 @@
                 android:ems="10"
                 android:hint="Referência"
                 android:inputType="textPersonName"
-                android:text="@={viewModel.paradaNova.nome}"
+                android:text="@={viewModel.paradaNova.parada.nome}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -62,7 +62,7 @@
                 android:ems="10"
                 android:hint="Taxa de Embarque"
                 android:inputType="numberDecimal | number"
-                android:text="@={viewModel.paradaNova.taxaDeEmbarque}"
+                android:text="@={viewModel.paradaNova.parada.taxaDeEmbarque}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -196,7 +196,7 @@
             <android.support.design.widget.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@={viewModel.paradaNova.observacao}"
+                android:text="@={viewModel.paradaNova.parada.observacao}"
                 android:hint="Observações" />
         </android.support.design.widget.TextInputLayout>
 

@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -56,12 +58,14 @@ import br.com.vostre.circular.model.ParametroInterno;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Usuario;
+import br.com.vostre.circular.model.UsuarioPreferencia;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.utils.Constants;
 import br.com.vostre.circular.utils.Crypt;
 import br.com.vostre.circular.utils.JsonUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
+import br.com.vostre.circular.utils.SessionUtils;
 import br.com.vostre.circular.utils.Unique;
 import br.com.vostre.circular.viewModel.CidadesViewModel;
 import br.com.vostre.circular.viewModel.EmpresasViewModel;
@@ -115,6 +119,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     List<? extends EntidadeBase> usuarios;
 
     List<? extends EntidadeBase> paradaSugestoes;
+    List<? extends EntidadeBase> preferencias;
 
     br.com.vostre.circular.utils.Crypt crypt;
 
@@ -415,9 +420,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 JSONArray usuarios = arrayObject.getJSONArray("usuarios");
 
                 JSONArray paradasSugestoes = null;
+                JSONArray preferencias = null;
 
                 if(arrayObject.optJSONArray("paradas_sugestoes") != null){
                     paradasSugestoes = arrayObject.getJSONArray("paradas_sugestoes");
+                }
+
+                if(arrayObject.optJSONArray("usuarios_preferencias") != null){
+                    preferencias = arrayObject.getJSONArray("usuarios_preferencias");
                 }
 
                 // PAISES
@@ -839,6 +849,45 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 }
 
+                // PREFERENCIAS
+
+                if(preferencias != null && preferencias.length() > 0){
+
+                    int total = preferencias.length();
+                    List<UsuarioPreferencia> lstPreferencias = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        UsuarioPreferencia preferencia;
+                        JSONObject obj = preferencias.getJSONObject(i);
+
+                        preferencia = (UsuarioPreferencia) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), UsuarioPreferencia.class, 1);
+                        preferencia.setEnviado(true);
+
+                        lstPreferencias.add(preferencia);
+
+                        String itins = obj.optString(ctx.getPackageName()+".itinerarios_favoritos");
+                        String pars = obj.optString(ctx.getPackageName()+".paradas_favoritas");
+
+                        if(!itins.isEmpty()){
+                            List<String> itis = Arrays.asList(itins.split(";"));
+
+                            PreferenceUtils.mesclaItinerariosFavoritos(itis, ctx.getApplicationContext());
+
+                        }
+
+                        if(!pars.isEmpty()){
+                            List<String> parads = Arrays.asList(pars.split(";"));
+
+                            PreferenceUtils.mesclaItinerariosFavoritos(parads, ctx.getApplicationContext());
+
+                        }
+
+                    }
+
+                    add(lstPreferencias, "usuario_preferencia");
+
+                }
+
                 Handler mainHandler = new Handler(Looper.getMainLooper());
 
                 Runnable runnable = new Runnable() {
@@ -922,6 +971,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             paradaSugestoes = appDatabase.paradaSugestaoDAO().listarTodosAEnviar();
 
+            preferencias = appDatabase.usuarioPreferenciaDAO().listarTodosAEnviar();
+
             return null;
         }
 
@@ -946,11 +997,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             String strUsuarios = "\"usuarios\": "+JsonUtils.toJson((List<EntidadeBase>) usuarios);
 
             String strParadasSugestoes = "\"paradas_sugestoes\": "+JsonUtils.toJson((List<EntidadeBase>) paradaSugestoes);
+            String strPreferencias = "\"usuarios_preferencias\": "+JsonUtils.toJson((List<EntidadeBase>) preferencias);
 
             String json = "{"+strPaises+","+strEmpresas+","+strOnibus+","+strEstados+","+strCidades+","
                     +strBairros+","+strParadas+","+strItinerarios+","+strHorarios+","+strParadasItinerarios+","
                     +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
-                    +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+"}";
+                    +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+","+strPreferencias+"}";
 
             // EXPORTA ARQUIVO DE DADOS
             /*
@@ -969,12 +1021,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             }
             */
 
-            System.out.println("JSON: "+json);
-
             int registros = paises.size()+empresas.size()+onibus.size()+estados.size()+cidades.size()
                     +bairros.size()+paradas.size()+itinerarios.size()+horarios.size()+paradasItinerario.size()
                     +secoesItinerarios.size()+horariosItinerarios.size()+mensagens.size()+parametros.size()+pontosInteresse.size()
-                    +usuarios.size()+paradaSugestoes.size();
+                    +usuarios.size()+paradaSugestoes.size()+preferencias.size();
 
             if(registros > 0){
                 chamaAPI(registros, json, 0, baseUrl, token);
@@ -1306,6 +1356,23 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     db.paradaSugestaoDAO().deletarTodosNaoPendentesPorUsuarioLogado(PreferenceUtils.carregarUsuarioLogado(ctx.getApplicationContext()));
                     db.paradaSugestaoDAO().inserirTodos((List<ParadaSugestao>) params[0]);
                     break;
+                case "usuario_preferencia":
+
+                    List<UsuarioPreferencia> pref = (List<UsuarioPreferencia>)  params[0];
+                    String usuario = pref.get(0).getUsuario();
+
+                    String a = JsonUtils.toJson(pref.get(0));
+
+                    System.out.println("PREFS AAAAA a FORA: "+a);
+
+                    if(PreferenceUtils.carregarUsuarioLogado(ctx.getApplicationContext()).equalsIgnoreCase(usuario)){
+                        a = JsonUtils.toJson(pref.get(0));
+
+                        System.out.println("PREFS AAAAA a: "+a);
+
+                    }
+
+                    break;
             }
 
             if(!PreferenceUtils.carregarPreferenciaBoolean(ctx, "init")){
@@ -1401,6 +1468,87 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                             e.printStackTrace();
                         }
                     }
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                //Toast.makeText(ctx, "Erro ("+t.getMessage()+") ao receber imagem.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public static void preferenceDownload(String baseUrl, final String id, final Context ctx){
+        Retrofit retrofit = new Retrofit.Builder()
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .baseUrl(baseUrl)
+                .build();
+
+        Crypt crypt = new Crypt();
+
+        CircularAPI api = retrofit.create(CircularAPI.class);
+        Call<ResponseBody> call = null;
+
+        try {
+            call = api.recebePreferencias(crypt.bytesToHex(crypt.encrypt(id)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                if(response.code() == 200){
+
+                    String dados = null;
+                    try {
+                        dados = response.body().string();
+
+                        if(dados != null){
+                            JSONObject arrayObject = new JSONObject(dados);
+                            JSONArray meta = arrayObject.getJSONArray("meta");
+
+                            int registros = Integer.parseInt(meta.getJSONObject(0).get("registros").toString());
+
+                            if(registros > 0) {
+                                    JSONArray preferencias = arrayObject.getJSONArray("usuarios_preferencias");
+                                    JSONObject obj = preferencias.getJSONObject(0);
+
+                                    String itins = obj.optString(ctx.getPackageName()+".itinerarios_favoritos");
+                                    String pars = obj.optString(ctx.getPackageName()+".paradas_favoritas");
+
+                                    if(!itins.isEmpty()){
+                                        List<String> itis = Arrays.asList(itins.split(";"));
+
+                                        PreferenceUtils.mesclaItinerariosFavoritos(itis, ctx.getApplicationContext());
+
+                                    }
+
+                                    PreferenceUtils.atualizaItinerariosFavoritosNoBanco(ctx);
+
+                                    if(!pars.isEmpty()){
+                                        List<String> parads = Arrays.asList(pars.split(";"));
+
+                                        PreferenceUtils.mesclaItinerariosFavoritos(parads, ctx.getApplicationContext());
+
+                                    }
+
+                                    PreferenceUtils.atualizaParadasFavoritasNoBanco(ctx);
+
+                            }
+
+                        }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }  catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+
 
                 }
 

@@ -28,6 +28,7 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityLoginBinding;
 import br.com.vostre.circular.utils.DBUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
+import br.com.vostre.circular.utils.tasks.PreferenceDownloadAsyncTask;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
 public class LoginActivity extends BaseActivity {
@@ -152,6 +153,9 @@ public class LoginActivity extends BaseActivity {
                 } else{
                     PreferenceUtils.salvarPreferencia(getApplicationContext(), "lembrar", "0");
                 }
+
+                PreferenceDownloadAsyncTask preferenceDownloadAsyncTask = new PreferenceDownloadAsyncTask(getApplicationContext(), PreferenceUtils.carregarUsuarioLogado(getApplicationContext()));
+                preferenceDownloadAsyncTask.execute();
 
                 Intent i = new Intent(getApplicationContext(), MenuActivity.class);
                 startActivity(i);

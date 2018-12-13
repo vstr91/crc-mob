@@ -48,6 +48,7 @@ import com.google.android.gms.drive.Drive;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.gson.JsonObject;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -62,10 +63,13 @@ import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.sql.SQLOutput;
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -80,6 +84,7 @@ import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.Parametro;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.JsonUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.ToolbarUtils;
 import br.com.vostre.circular.viewModel.BaseViewModel;
@@ -139,6 +144,14 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         binding = DataBindingUtil.setContentView(this, R.layout.activity_menu);
         super.onCreate(savedInstanceState);
         binding.setView(this);
+
+        // PARA TESTES
+
+        PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), "306f25dc-7ffa-11e8-b8e2-34238774caa8");
+//        PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), "");
+
+        // PARA TESTES
+
 
         Dexter.withActivity(this)
                 .withPermissions(
@@ -235,10 +248,30 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             binding.btnQrCode.setVisibility(View.GONE);
         }
 
-        if(prefVersao.equals(BuildConfig.VERSION_NAME) || prefVersao.isEmpty()){
+        if(prefVersao.equalsIgnoreCase(BuildConfig.VERSION_NAME) || prefVersao.isEmpty()){
             binding.btnAviso.setVisibility(View.GONE);
         } else{
             binding.btnAviso.setVisibility(View.VISIBLE);
+        }
+
+        Map<String, ?> map = getSharedPreferences(getPackageName(), MODE_PRIVATE).getAll();
+
+        for(Map.Entry<String,?> entry : map.entrySet()){
+            System.out.println("PREFS: "+entry.getKey() + ": " + entry.getValue().toString());
+        }
+
+        JsonObject jsonObject = new JsonObject();
+
+        for(Map.Entry<String,?> entry : map.entrySet()){
+
+            if(!entry.getKey().equalsIgnoreCase("init") && !entry.getKey().startsWith("param_") && !entry.getKey().equalsIgnoreCase("usuario")){
+
+                jsonObject.addProperty(entry.getKey(), entry.getValue().toString());
+
+                System.out.println("PREFS FILT: "+jsonObject.toString());
+            }
+
+
         }
 
 //        SignInButton btnLogin = drawer.findViewById(R.id.btnLogin);

@@ -40,4 +40,7 @@ public interface CircularAPI {
     @POST("api/valida-usuario")
     Call<String> validaUsuario(@Field("idToken") String idToken, @Field("id") String id);
 
+    @GET("api/recebe-preferencias/{id}")
+    Call<ResponseBody> recebePreferencias(@Path("id") String id);
+
 }

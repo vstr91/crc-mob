@@ -82,6 +82,7 @@ import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.model.pojo.ParadaSugestaoBairro;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SessionUtils;
 import br.com.vostre.circular.utils.SignInActivity;
@@ -320,9 +321,9 @@ public class MapaActivity extends BaseActivity {
         }
     };
 
-    Observer<List<ParadaSugestao>> paradasSugeridasObserver = new Observer<List<ParadaSugestao>>() {
+    Observer<List<ParadaSugestaoBairro>> paradasSugeridasObserver = new Observer<List<ParadaSugestaoBairro>>() {
         @Override
-        public void onChanged(List<ParadaSugestao> paradas) {
+        public void onChanged(List<ParadaSugestaoBairro> paradas) {
             atualizarSugestoessMapa(paradas);
         }
     };
@@ -451,7 +452,7 @@ public class MapaActivity extends BaseActivity {
                             btnEdicao.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    viewModel.paradaNova = new ParadaSugestao();
+                                    viewModel.paradaNova = new ParadaSugestaoBairro();
                                     formParada = new FormParada();
                                     formParada.setParadaRelativa(pb);
                                     formParada.setCtx(getApplication());
@@ -550,7 +551,7 @@ public class MapaActivity extends BaseActivity {
 
     }
 
-    private void atualizarSugestoessMapa(final List<ParadaSugestao> paradasSugeridas){
+    private void atualizarSugestoessMapa(final List<ParadaSugestaoBairro> paradasSugeridas){
 
         if(paradasSugeridas != null){
 
@@ -563,21 +564,21 @@ public class MapaActivity extends BaseActivity {
             map.getOverlays().add(poiMarkers);
             poiMarkers.setIcon(clusterIcon);
 
-            for(final ParadaSugestao p : paradasSugeridas){
+            for(final ParadaSugestaoBairro p : paradasSugeridas){
 
                 Marker m = new Marker(map);
-                m.setPosition(new GeoPoint(p.getLatitude(), p.getLongitude()));
+                m.setPosition(new GeoPoint(p.getParada().getLatitude(), p.getParada().getLongitude()));
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                m.setTitle(p.getNome());
+                m.setTitle(p.getParada().getNome());
                 m.setDraggable(true);
                 m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.sugestao));
-                m.setId(p.getId());
+                m.setId(p.getParada().getId());
                 m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker, MapView mapView) {
 
                         if(gpsAtivo){
-                            final ParadaSugestao p = getSugestaoFromMarker(marker, paradasSugeridas);
+                            final ParadaSugestaoBairro p = getSugestaoFromMarker(marker, paradasSugeridas);
 
                             viewModel.setParadaNova(p);
 
@@ -589,8 +590,8 @@ public class MapaActivity extends BaseActivity {
                             bsd.findViewById(R.id.textView32).setVisibility(View.GONE);
                             bsd.findViewById(R.id.textView33).setVisibility(View.GONE);
 
-                            textViewReferencia.setText(p.getNome());
-                            //textViewBairro.setText(p.getNomeBairroComCidade());
+                            textViewReferencia.setText(p.getParada().getNome());
+                            textViewBairro.setText(p.getNomeBairroComCidade());
 
                             Button btnDetalhes = bsd.findViewById(R.id.btnDetalhes);
                             btnDetalhes.setVisibility(View.GONE);
@@ -600,7 +601,7 @@ public class MapaActivity extends BaseActivity {
                                 @Override
                                 public void onClick(View view) {
                                     formParada = new FormParada();
-                                    formParada.setParada(p);
+                                    formParada.setParada(p.getParada());
                                     formParada.setCtx(getApplication());
                                     formParada.show(getSupportFragmentManager(), "formParada");
                                 }
@@ -631,7 +632,7 @@ public class MapaActivity extends BaseActivity {
 
                     @Override
                     public void onMarkerDragEnd(Marker marker) {
-                        ParadaSugestao p = getSugestaoFromMarker(marker, paradasSugeridas);
+                        ParadaSugestaoBairro p = getSugestaoFromMarker(marker, paradasSugeridas);
                         viewModel.setParadaNova(p);
                         viewModel.editarParada();
                         Toast.makeText(getApplicationContext(), "Sugestão alterada", Toast.LENGTH_SHORT).show();
@@ -676,13 +677,13 @@ public class MapaActivity extends BaseActivity {
     }
 
     @NonNull
-    private ParadaSugestao getSugestaoFromMarker(Marker marker, List<ParadaSugestao> sugestoes) {
-        ParadaSugestao p = new ParadaSugestao();
-        p.setId(marker.getId());
+    private ParadaSugestaoBairro getSugestaoFromMarker(Marker marker, List<ParadaSugestaoBairro> sugestoes) {
+        ParadaSugestaoBairro p = new ParadaSugestaoBairro();
+        p.getParada().setId(marker.getId());
 
         p = sugestoes.get(sugestoes.indexOf(p));
-        p.setLatitude(marker.getPosition().getLatitude());
-        p.setLongitude(marker.getPosition().getLongitude());
+        p.getParada().setLatitude(marker.getPosition().getLatitude());
+        p.getParada().setLongitude(marker.getPosition().getLongitude());
         return p;
     }
 
@@ -692,7 +693,7 @@ public class MapaActivity extends BaseActivity {
             formParada = new FormParada();
             formParada.setLatitude(viewModel.localAtual.getValue().getLatitude());
             formParada.setLongitude(viewModel.localAtual.getValue().getLongitude());
-            formParada.setParada(new ParadaSugestao());
+            //formParada.setParada(new ParadaSugestao());
             formParada.setCtx(getApplication());
             formParada.show(getSupportFragmentManager(), "formParada");
         }

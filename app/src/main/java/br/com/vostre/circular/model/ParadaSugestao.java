@@ -4,8 +4,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Index;
 import android.support.annotation.NonNull;
 
-@Entity(tableName = "parada_sugestao", indices = {@Index(value = {"nome", "bairro"},
-        unique = true)})
+@Entity(tableName = "parada_sugestao")
 public class ParadaSugestao extends Parada {
 
     private String observacao;

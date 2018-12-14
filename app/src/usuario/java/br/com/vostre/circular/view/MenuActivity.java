@@ -87,6 +87,7 @@ import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.JsonUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.ToolbarUtils;
+import br.com.vostre.circular.utils.tasks.PreferenceDownloadAsyncTask;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 import es.usc.citius.hipster.algorithm.Hipster;
 import es.usc.citius.hipster.graph.GraphBuilder;
@@ -252,26 +253,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             binding.btnAviso.setVisibility(View.GONE);
         } else{
             binding.btnAviso.setVisibility(View.VISIBLE);
-        }
-
-        Map<String, ?> map = getSharedPreferences(getPackageName(), MODE_PRIVATE).getAll();
-
-        for(Map.Entry<String,?> entry : map.entrySet()){
-            System.out.println("PREFS: "+entry.getKey() + ": " + entry.getValue().toString());
-        }
-
-        JsonObject jsonObject = new JsonObject();
-
-        for(Map.Entry<String,?> entry : map.entrySet()){
-
-            if(!entry.getKey().equalsIgnoreCase("init") && !entry.getKey().startsWith("param_") && !entry.getKey().equalsIgnoreCase("usuario")){
-
-                jsonObject.addProperty(entry.getKey(), entry.getValue().toString());
-
-                System.out.println("PREFS FILT: "+jsonObject.toString());
-            }
-
-
         }
 
 //        SignInButton btnLogin = drawer.findViewById(R.id.btnLogin);
@@ -575,6 +556,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
             if(logado){
                 updateUI(account);
+                PreferenceDownloadAsyncTask preferenceDownloadAsyncTask = new PreferenceDownloadAsyncTask(getApplicationContext(), PreferenceUtils.carregarUsuarioLogado(getApplicationContext()));
+                preferenceDownloadAsyncTask.execute();
             } else{
                 updateUI(null);
                 signOut();

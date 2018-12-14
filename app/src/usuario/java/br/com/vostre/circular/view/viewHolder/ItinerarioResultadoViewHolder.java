@@ -70,8 +70,6 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
             dia = DataHoraUtils.getDiaFormatado(dia);
         }
 
-        int i = hora.length();
-
         if(!hora.isEmpty() && hora.length() == 8){
             hora = DataHoraUtils.getHoraFormatada(hora);
         }
@@ -106,6 +104,7 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
 
                 i.putExtra("paradaPartida", itinerario.getParadaPartida());
                 i.putExtra("paradaDestino", itinerario.getParadaDestino());
+                i.putExtra("horario", itinerario.getIdProximoHorario());
                 ctx.startActivity(i);
             }
         };

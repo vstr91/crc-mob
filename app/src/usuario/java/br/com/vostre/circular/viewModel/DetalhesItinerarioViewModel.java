@@ -37,6 +37,7 @@ import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
+import br.com.vostre.circular.model.pojo.SecaoItinerarioParada;
 
 public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
@@ -47,6 +48,7 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
     public LiveData<List<ParadaBairro>> paradas;
     public static MutableLiveData<List<HorarioItinerarioNome>> horarios;
     public LiveData<List<SecaoItinerario>> secoes;
+    public LiveData<List<SecaoItinerarioParada>> secoesComNome;
     public MutableLiveData<Location> localAtual;
     public boolean centralizaMapa = true;
 
@@ -68,16 +70,31 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
         this.itinerario = appDatabase.itinerarioDAO().carregar(itinerario);
         this.paradas = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro(itinerario);
 
+        if(paradaPartida == null || paradaDestino == null){
+            new carregaHorariosAsyncTask(appDatabase, itinerario, null).execute();
+        } else{
+            this.paradaPartida = paradaPartida;
+            this.paradaDestino = paradaDestino;
+
+            this.partida = appDatabase.paradaDAO().carregarComBairro(paradaPartida);
+            this.destino = appDatabase.paradaDAO().carregarComBairro(paradaDestino);
+
+            new carregaHorariosAsyncTask(appDatabase, itinerario, null, paradaPartida, paradaDestino).execute();
+        }
+
+
+
+        //this.horarios = appDatabase.horarioItinerarioDAO().listarApenasAtivosPorItinerario(itinerario);
+        this.secoes = appDatabase.secaoItinerarioDAO().listarTodosPorItinerario(itinerario);
+        this.secoesComNome = appDatabase.secaoItinerarioDAO().listarTodosPorItinerarioComParada(itinerario);
+    }
+
+    public void setPartidaEDestino(String paradaPartida, String paradaDestino) {
         this.paradaPartida = paradaPartida;
         this.paradaDestino = paradaDestino;
 
         this.partida = appDatabase.paradaDAO().carregarComBairro(paradaPartida);
         this.destino = appDatabase.paradaDAO().carregarComBairro(paradaDestino);
-
-        new carregaHorariosAsyncTask(appDatabase, itinerario, null, paradaPartida, paradaDestino).execute();
-
-        //this.horarios = appDatabase.horarioItinerarioDAO().listarApenasAtivosPorItinerario(itinerario);
-        this.secoes = appDatabase.secaoItinerarioDAO().listarTodosPorItinerario(itinerario);
     }
 
     public LiveData<List<ParadaBairro>> getParadas() {
@@ -136,6 +153,12 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
             this.paradaDestino = destino;
         }
 
+        carregaHorariosAsyncTask(AppDatabase appDatabase, String itinerario, String itinerarioARemover) {
+            db = appDatabase;
+            this.itinerario = itinerario;
+            this.itinerarioARemover = itinerarioARemover;
+        }
+
         @Override
         protected Void doInBackground(final List<ItinerarioPartidaDestino>... params) {
 
@@ -146,10 +169,24 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
                         .contaItinerariosPorPartidaEDestinoSync(paradaPartida, paradaDestino);
 
                 if(itinerarioARemover != null && !itinerarioARemover.isEmpty()){
-                    horarios.postValue(db.horarioItinerarioDAO().listarApenasAtivosPorPartidaEDestinoFiltradoSync(paradaPartida,
-                            paradaDestino, itinerarioARemover));
+
+                    if(paradaPartida != null && paradaDestino != null){
+                        horarios.postValue(db.horarioItinerarioDAO().listarApenasAtivosPorPartidaEDestinoFiltradoSync(paradaPartida,
+                                paradaDestino, itinerarioARemover));
+                    } else{
+                        horarios.postValue(db.horarioItinerarioDAO().listarApenasAtivosPorItinerarioFiltradoSync(itinerario, itinerarioARemover));
+                    }
+
+
                 } else{
-                    horarios.postValue(db.horarioItinerarioDAO().listarApenasAtivosPorPartidaEDestinoSync(paradaPartida, paradaDestino));
+
+                    if(paradaPartida != null && paradaDestino != null){
+                        horarios.postValue(db.horarioItinerarioDAO().listarApenasAtivosPorPartidaEDestinoSync(paradaPartida, paradaDestino));
+                    } else{
+                        horarios.postValue(db.horarioItinerarioDAO().listarApenasAtivosPorItinerarioSync(itinerario));
+                    }
+
+
                 }
 
 
@@ -250,6 +287,36 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
             map.getOverlays().add(rota);
             map.invalidate();
         }
+    }
+
+    public void carregaSecoesPorItinerario(String itinerario){
+        new carregaSecoesAsyncTask(appDatabase, itinerario);
+    }
+
+    private static class carregaSecoesAsyncTask extends AsyncTask<List<SecaoItinerarioParada>, Void, Void> {
+
+        private AppDatabase db;
+        private String itinerario;
+
+        carregaSecoesAsyncTask(AppDatabase appDatabase, String itinerario) {
+            db = appDatabase;
+            this.itinerario = itinerario;
+        }
+
+        @Override
+        protected Void doInBackground(final List<SecaoItinerarioParada>... params) {
+
+            List<SecaoItinerarioParada> secoes = db.secaoItinerarioDAO().listarTodosPorItinerarioComParadaSync(itinerario);
+
+            if(secoes.size() > 0){
+
+            }
+
+
+
+            return null;
+        }
+
     }
 
 }

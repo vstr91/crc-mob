@@ -59,10 +59,12 @@ import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.Legenda;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.model.pojo.SecaoItinerarioParada;
 import br.com.vostre.circular.utils.SnackbarHelper;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.LegendaAdapter;
 import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
+import br.com.vostre.circular.view.adapter.SecaoItinerarioDetalhadoAdapter;
 import br.com.vostre.circular.view.listener.LegendaListener;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.view.viewHolder.LegendaViewHolder;
@@ -78,8 +80,13 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
     String itinerarioPartida;
     String itinerarioDestino;
 
+    String paradaPartidaOriginal;
+    String paradaDestinoOriginal;
+
     String paradaPartida;
     String paradaDestino;
+
+    boolean imprimePorPartidaEDestino = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,14 +103,33 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
         paradaPartida = getIntent().getStringExtra("paradaPartida");
         paradaDestino = getIntent().getStringExtra("paradaDestino");
 
+        imprimePorPartidaEDestino = getIntent().getBooleanExtra("imprimePorPartidaEDestino", true);
+
         viewModel = ViewModelProviders.of(this).get(DetalhesItinerarioViewModel.class);
 
-        viewModel.setItinerario(getIntent().getStringExtra("itinerario"), paradaPartida, paradaDestino);
+        if(!imprimePorPartidaEDestino){
+            paradaPartidaOriginal = paradaPartida;
+            paradaPartida = null;
+            paradaDestinoOriginal = paradaDestino;
+            paradaDestino = null;
 
-        viewModel.itinerario.observe(this, itinerarioObserver);
+            viewModel.setItinerario(getIntent().getStringExtra("itinerario"), paradaPartida, paradaDestino);
+
+            viewModel.itinerario.observe(this, itinerarioObserver);
+
+            viewModel.setPartidaEDestino(paradaPartidaOriginal, paradaDestinoOriginal);
+
+        } else{
+            viewModel.setItinerario(getIntent().getStringExtra("itinerario"), paradaPartida, paradaDestino);
+
+            viewModel.itinerario.observe(this, itinerarioObserver);
+            binding.textViewObs.setVisibility(View.GONE);
+        }
 
         viewModel.partida.observe(this, partidaObserver);
         viewModel.destino.observe(this, destinoObserver);
+
+
 
 
         viewModel.horarios.observe(this, horariosObserver);
@@ -191,6 +217,7 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
                     }
                 });
                 binding.listLegenda.setAdapter(adapter);
+                binding.textViewObs.setVisibility(View.GONE);
 
             } else{
                 binding.listLegenda.setVisibility(View.GONE);
@@ -296,6 +323,16 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
 
             if(itinerario != null){
                 binding.setItinerario(itinerario);
+
+                if(itinerario.getItinerario().getObservacao() == null || itinerario.getItinerario().getObservacao().isEmpty()){
+                    binding.textViewObs.setVisibility(View.GONE);
+                } else{
+                    binding.textViewObs.setVisibility(View.VISIBLE);
+                }
+
+                //viewModel.carregaSecoesPorItinerario(itinerario.getItinerario().getId());
+                //viewModel.secoesComNome.observe(ctx, secoesObserver);
+
             }
 
         }
@@ -320,6 +357,15 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
                 binding.setDestino(parada);
             }
 
+        }
+    };
+
+    Observer<List<SecaoItinerarioParada>> secoesObserver = new Observer<List<SecaoItinerarioParada>>() {
+        @Override
+        public void onChanged(List<SecaoItinerarioParada> secoes) {
+
+            final SecaoItinerarioDetalhadoAdapter adapter = new SecaoItinerarioDetalhadoAdapter(secoes, ctx);
+            binding.listSecoes.setAdapter(adapter);
         }
     };
 

@@ -12,6 +12,7 @@ import android.widget.Toast;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
+import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.LinhaHorariosItinerariosBinding;
 import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.Pais;
@@ -29,13 +30,19 @@ public class HorarioItinerarioViewHolder extends RecyclerView.ViewHolder {
         this.ctx = context;
     }
 
-    public void bind(final HorarioItinerarioNome horarioItinerario, Legenda l) {
+    public void bind(final HorarioItinerarioNome horarioItinerario, Legenda l, String proximoHorario) {
 
         if(horarioItinerario.getHorarioItinerario() == null){
             horarioItinerario.setHorarioItinerario(new HorarioItinerario());
         }
 
         binding.setHorario(horarioItinerario);
+
+        if(horarioItinerario.getIdHorario().equals(proximoHorario) || horarioItinerario.getHorarioItinerario().getId().equals(proximoHorario)){
+            binding.cardview.setCardBackgroundColor(ctx.getResources().getColor(R.color.azulClaro));
+        } else{
+            binding.cardview.setCardBackgroundColor(Color.WHITE);
+        }
 
         if(horarioItinerario.getHorarioItinerario() == null
                 || horarioItinerario.getHorarioItinerario().getObservacao() == null
@@ -55,13 +62,19 @@ public class HorarioItinerarioViewHolder extends RecyclerView.ViewHolder {
         binding.executePendingBindings();
     }
 
-    public void bind(final HorarioItinerarioNome horarioItinerario) {
+    public void bind(final HorarioItinerarioNome horarioItinerario, String proximoHorario) {
 
         if(horarioItinerario.getHorarioItinerario() == null){
             horarioItinerario.setHorarioItinerario(new HorarioItinerario());
         }
 
         binding.setHorario(horarioItinerario);
+
+        if(horarioItinerario.getIdHorario().equals(proximoHorario) || horarioItinerario.getHorarioItinerario().getId().equals(proximoHorario)){
+            binding.cardview.setCardBackgroundColor(ctx.getResources().getColor(R.color.azulClaro));
+        } else{
+            binding.cardview.setCardBackgroundColor(Color.WHITE);
+        }
 
         if(horarioItinerario.getHorarioItinerario() == null
                 || horarioItinerario.getHorarioItinerario().getObservacao() == null

@@ -21,6 +21,15 @@ public class HorarioItinerarioAdapter extends RecyclerView.Adapter<HorarioItiner
     public List<HorarioItinerarioNome> horariosFiltrados = null;
     public List<Legenda> legenda;
     AppCompatActivity ctx;
+    String horario;
+
+    public String getHorario() {
+        return horario;
+    }
+
+    public void setHorario(String horario) {
+        this.horario = horario;
+    }
 
     public HorarioItinerarioAdapter(List<HorarioItinerarioNome> horarios, AppCompatActivity context){
         this.horarios = horarios;
@@ -60,7 +69,7 @@ public class HorarioItinerarioAdapter extends RecyclerView.Adapter<HorarioItiner
 
     }
 
-    public HorarioItinerarioNome buscaPosicaoHorario(String horario, String itinerario){
+    public HorarioItinerarioNome buscaPosicaoHorario(String horario){
 
         for(HorarioItinerarioNome h : horarios){
 
@@ -71,6 +80,19 @@ public class HorarioItinerarioAdapter extends RecyclerView.Adapter<HorarioItiner
         }
 
         return null;
+    }
+
+    public int buscaPosicaoHorarioInt(String horario){
+
+        for(HorarioItinerarioNome h : horarios){
+
+            if(h.getHorarioItinerario().getHorario().equals(horario)){
+                return horarios.indexOf(h);
+            }
+
+        }
+
+        return -1;
     }
 
     @Override
@@ -90,9 +112,9 @@ public class HorarioItinerarioAdapter extends RecyclerView.Adapter<HorarioItiner
             l = new Legenda();
             l.setItinerario(horario.getHorarioItinerario().getItinerario());
             l = legenda.get(legenda.indexOf(l));
-            holder.bind(horario, l);
+            holder.bind(horario, l, this.horario);
         } else{
-            holder.bind(horario);
+            holder.bind(horario, this.horario);
         }
 
 

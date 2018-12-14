@@ -194,13 +194,13 @@
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="8dp"
                     android:text="Quadro de Horários"
                     android:textAppearance="@style/texto_branco"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/cardViewItinerario" />
+                    app:layout_constraintTop_toBottomOf="@+id/textViewObs" />
 
                 <TextView
                     android:id="@+id/textView29"
@@ -232,7 +232,7 @@
                     android:textSize="10sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/linearLayoutHorarios"
+                    app:layout_constraintTop_toBottomOf="@+id/listSecoes"
                     tools:text="Gerado em 24/09/2018 17:00" />
 
                 <ImageView
@@ -327,6 +327,37 @@
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/listLegenda"></LinearLayout>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/listSecoes"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginStart="8dp"
+                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/linearLayoutHorarios"
+                    tools:listitem="@layout/linha_secoes_detalhada" />
+
+                <TextView
+                    android:id="@+id/textViewObs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="8dp"
+                    android:textColor="@color/azul"
+                    android:textStyle="bold"
+                    android:text="@{itinerario.itinerario.observacao}"
+                    app:layout_constraintEnd_toEndOf="@+id/cardViewItinerario"
+                    app:layout_constraintStart_toStartOf="@+id/cardViewItinerario"
+                    app:layout_constraintTop_toBottomOf="@+id/cardViewItinerario"
+                    tools:text="Micro" />
 
             </android.support.constraint.ConstraintLayout>
 

@@ -7,7 +7,9 @@
     <color name="branco">#FFFFFF</color>
     <color name="branco80">#DDFFFFFF</color>
     <color name="ciano">#00EEE2</color>
+    <color name="cianoEscuro">#25dcd2</color>
     <color name="azul">#334BFF</color>
+    <color name="azulClaro">#52bfb8</color>
     <color name="cinzaEscuro">#333333</color>
     <color name="cinzaClaro">#EEEEEE</color>
     <color name="cinzaMedio">#AAAAAA</color>

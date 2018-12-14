@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageButton;
@@ -41,6 +42,7 @@ import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.Legenda;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.CustomLayoutManager;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SnackbarHelper;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
@@ -215,6 +217,11 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
         i.putExtra("paradaPartida", paradaPartida);
         i.putExtra("paradaDestino", paradaDestino);
+
+        if(viewModel.qtdItinerarios.size() <= 1){
+            i.putExtra("imprimePorPartidaEDestino", false);
+        }
+
         ctx.startActivity(i);
 
 //        Bitmap b = binding.getRoot().getDrawingCache();
@@ -377,9 +384,15 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 binding.textView51.setVisibility(View.GONE);
             }
 
+            adapterHorarios.setHorario(horario);
             adapterHorarios.horarios = horarios;
             adapterHorarios.legenda = dados;
             adapterHorarios.notifyDataSetChanged();
+
+//            CustomLayoutManager customLayoutManager = new CustomLayoutManager(getApplicationContext());
+//            binding.listHorarios.setLayoutManager(customLayoutManager);
+////            manager.scrollToPositionWithOffset(adapterHorarios.buscaPosicaoHorarioInt(horario), 0);
+//            customLayoutManager.smoothScrollToPosition(binding.listHorarios, null, adapterHorarios.buscaPosicaoHorarioInt(horario));
 
 //            HorarioItinerarioNome h = adapterHorarios.buscaPosicaoHorario(horario, viewModel.itinerario.getValue().getItinerario().getId());
 //            int posicao = -1;
@@ -404,6 +417,16 @@ public class DetalheItinerarioActivity extends BaseActivity {
             List<String> lstItinerarios = PreferenceUtils.carregaItinerariosFavoritos(getApplicationContext());
 
             List<ParadaBairro> listParadas = viewModel.paradas.getValue();
+
+            if(paradaPartida == null || paradaDestino == null){
+                paradaPartida = listParadas.get(0).getParada().getId();
+                paradaDestino = listParadas.get(listParadas.size()-1).getParada().getId();
+
+                viewModel.setPartidaEDestino(paradaPartida, paradaDestino);
+
+                viewModel.partida.observe(ctx, partidaObserver);
+                viewModel.destino.observe(ctx, destinoObserver);
+            }
 
             int i = lstItinerarios.indexOf(paradas.get(0).getIdBairro()+"|"+paradas.get(paradas.size()-1).getIdBairro());
 

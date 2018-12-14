@@ -32,7 +32,7 @@
             android:scaleType="centerCrop"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@mipmap/ic_onibus_azul"
+            app:srcCompat="@drawable/imagem_nao_disponivel_16_9"
             tools:layout_editor_absoluteY="8dp" />
 
         <TextView
@@ -150,11 +150,14 @@
 
         <Button
             android:id="@+id/btnEdicao"
-            style="@style/botao"
+            style="@style/botao_transparente"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/bg_rounded_corner_branco"
             android:padding="5dp"
             android:text="Sugerir Edição"
+            android:textColor="@color/azul"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/imageView3" />

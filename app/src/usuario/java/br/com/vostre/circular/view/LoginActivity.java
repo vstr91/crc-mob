@@ -1,7 +1,9 @@
 package br.com.vostre.circular.view;
 
+import android.accounts.Account;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Environment;
@@ -46,6 +48,13 @@ public class LoginActivity extends BaseActivity {
     static int RC_SIGN_IN = 480;
     boolean flag = false;
 
+    // The authority for the sync adapter's content provider
+    public static final String AUTHORITY = "br.com.vostre.circular.datasync.provider";
+    // An account type, in the form of a domain name
+    public static final String ACCOUNT_TYPE = "br.com.vostre.circular.usuario";
+    // The account name
+    public static final String ACCOUNT = "dummyaccount";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
@@ -54,6 +63,20 @@ public class LoginActivity extends BaseActivity {
         getSupportActionBar().setHomeButtonEnabled(false);
         binding.setView(this);
         viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
+
+        // Pass the settings flags by inserting them in a bundle
+        Bundle settingsBundle = new Bundle();
+        settingsBundle.putBoolean(
+                ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        settingsBundle.putBoolean(
+                ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        /*
+         * Request the sync for the default account, authority, and
+         * manual sync settings
+         */
+        ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
+
+        btnLogin = binding.btnLogin;
 
         if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), "init")){
             // caregar bd
@@ -117,7 +140,11 @@ public class LoginActivity extends BaseActivity {
         if(requestCode == RC_SIGN_IN){
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
-            progressBar.setVisibility(View.VISIBLE);
+
+            if(progressBar != null){
+                progressBar.setVisibility(View.VISIBLE);
+            }
+
         }
 
     }
@@ -165,7 +192,11 @@ public class LoginActivity extends BaseActivity {
 
             if(flag){
                 btnLogin.setEnabled(true);
-                progressBar.setVisibility(View.GONE);
+
+                if(progressBar != null){
+                    progressBar.setVisibility(View.GONE);
+                }
+
             }
 
             flag = true;

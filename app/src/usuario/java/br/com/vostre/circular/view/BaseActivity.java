@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.util.JsonUtils;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -73,6 +74,8 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     LocationManager locationManager;
     boolean gpsAtivo = false;
     public GoogleSignInAccount account;
+
+    FirebaseAnalytics mFirebaseAnalytics;
 
     private BroadcastReceiver mGpsSwitchStateReceiver = new BroadcastReceiver() {
         @Override

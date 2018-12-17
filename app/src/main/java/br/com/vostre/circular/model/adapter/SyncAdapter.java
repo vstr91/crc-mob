@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -123,6 +124,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
     br.com.vostre.circular.utils.Crypt crypt;
 
+    FirebaseAnalytics mFirebaseAnalytics;
+    Bundle bundle;
+
     /**
      * Set up the sync adapter
      */
@@ -166,6 +170,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             String authority,
             ContentProviderClient provider,
             SyncResult syncResult) {
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext().getApplicationContext());
+
+        bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.START_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
 
         appDatabase = AppDatabase.getAppDatabase(this.getContext());
 
@@ -217,6 +226,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         } else{
             Toast.makeText(ctx, "Erro ao enviar dados. Código de resposta: "+response.code()+" | Mensagem: "+response.message(),
                     Toast.LENGTH_SHORT).show();
+
+            bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
+            bundle.putBoolean("sucesso", false);
+            bundle.putString("local", "Envio de dados");
+            bundle.putString("erro", response.code()+" | "+response.message());
+            mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
+
         }
 
     }
@@ -224,6 +240,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     @Override
     public void onFailure(Call<String> call, Throwable t) {
         Toast.makeText(ctx, "Problema ao acessar para enviar dados: "+t.getMessage(), Toast.LENGTH_SHORT).show();
+        bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
+        bundle.putBoolean("sucesso", false);
+        bundle.putString("local", "Acesso para envio de dados");
+        bundle.putString("erro", t.getMessage());
+        mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
     }
 
     private void requisitaToken(String id, int tipo) throws Exception{
@@ -258,6 +279,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         Toast.makeText(getContext().getApplicationContext(),
                                 "Erro "+response.code()+" ("+response.message()+") ao requisitar token.",
                                 Toast.LENGTH_SHORT).show();
+                        bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
+                        bundle.putBoolean("sucesso", false);
+                        bundle.putString("local", "Requisição de token");
+                        bundle.putString("erro", response.code()+" | "+response.message());
+                        mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
                     }
 
                 }
@@ -267,6 +293,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     Toast.makeText(getContext().getApplicationContext(),
                             "Erro "+t.getLocalizedMessage()+" ao requisitar token.",
                             Toast.LENGTH_SHORT).show();
+                    bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
+                    bundle.putBoolean("sucesso", false);
+                    bundle.putString("local", "Requisição de token");
+                    bundle.putString("erro", t.getMessage());
+                    mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
                 }
             });
         } else{
@@ -291,6 +322,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         Toast.makeText(getContext().getApplicationContext(),
                                 "Erro "+response.code()+" ("+response.message()+") ao requisitar token de imagem.",
                                 Toast.LENGTH_SHORT).show();
+                        bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
+                        bundle.putBoolean("sucesso", false);
+                        bundle.putString("local", "Requisição de token de imagem");
+                        bundle.putString("erro", response.code()+" | "+response.message());
+                        mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
                     }
 
                 }
@@ -300,6 +336,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     Toast.makeText(getContext().getApplicationContext(),
                             "Erro "+t.getMessage()+" ao requisitar token de imagem.",
                             Toast.LENGTH_SHORT).show();
+                    bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
+                    bundle.putBoolean("sucesso", false);
+                    bundle.putString("local", "Requisição de token de imagem");
+                    bundle.putString("erro", t.getMessage());
+                    mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
                 }
             });
         }
@@ -341,6 +382,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 call.enqueue(this);
             } catch (JSONException e) {
                 e.printStackTrace();
+                bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
+                bundle.putBoolean("sucesso", false);
+                bundle.putString("local", "Processamento de JSON");
+                bundle.putString("erro", e.getMessage());
+                mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
             }
         } else{
             CircularAPI api = retrofit.create(CircularAPI.class);
@@ -371,9 +417,19 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         processaJson(response);
                     } catch (JSONException e) {
                         Toast.makeText(ctx, "Problema ao processar dados: "+e.getMessage(), Toast.LENGTH_LONG).show();
+                        bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
+                        bundle.putBoolean("sucesso", false);
+                        bundle.putString("local", "Processamento de JSON");
+                        bundle.putString("erro", e.getMessage());
+                        mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
                     } catch (Exception e) {
                         e.printStackTrace();
                         Toast.makeText(ctx, "Problema ao processar dados: "+e.getMessage(), Toast.LENGTH_LONG).show();
+                        bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
+                        bundle.putBoolean("sucesso", false);
+                        bundle.putString("local", "Processamento de JSON");
+                        bundle.putString("erro", e.getMessage());
+                        mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
                     }
 
                 }
@@ -381,6 +437,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 @Override
                 public void onFailure(Call<String> call, Throwable t) {
                     Toast.makeText(ctx, "Problema ao receber dados: "+t.getMessage(), Toast.LENGTH_SHORT).show();
+                    bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
+                    bundle.putBoolean("sucesso", false);
+                    bundle.putString("local", "Recebimento de Dados");
+                    bundle.putString("erro", t.getMessage());
+                    mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
                 }
             });
         }
@@ -894,6 +955,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     @Override
                     public void run() {
                         Toast.makeText(getContext(), "Atualização finalizada!", Toast.LENGTH_SHORT).show();
+
+                        bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
+                        bundle.putBoolean("sucesso", true);
+                        mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
+
                         Intent broadcast = new Intent();
                         broadcast.setAction("MensagensService");
                         broadcast.putExtra("mensagens", mensagens.length());
@@ -908,11 +974,20 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             } else{
                 Toast.makeText(ctx, "Nenhum registro para ser recebido. Seu sistema está atualizado!",
                         Toast.LENGTH_SHORT).show();
+                bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
+                bundle.putBoolean("sucesso", true);
+                mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
             }
 
         } else{
             Toast.makeText(ctx, "Erro ao receber registros... Por favor tente novamente!",
                     Toast.LENGTH_SHORT).show();
+            bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
+            bundle.putBoolean("sucesso", false);
+            bundle.putString("local", "Recebimento de Dados");
+            bundle.putString("erro", "Dados nulos");
+            mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
+
         }
 
         if(response.code() == 200){

@@ -19,6 +19,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.osmdroid.api.IMapController;
@@ -84,6 +86,8 @@ public class DetalheItinerarioActivity extends BaseActivity {
     String paradaPartida;
     String paradaDestino;
 
+    Bundle bundle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_itinerario);
@@ -93,6 +97,8 @@ public class DetalheItinerarioActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setTitle("Detalhe Itinerário");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
 
         listLegenda = binding.listLegenda;
 
@@ -186,12 +192,22 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
             lstItinerarios.add(paradas.get(0).getIdBairro()+"|"+paradas.get(paradas.size()-1).getIdBairro());
 
+            bundle = new Bundle();
+            bundle.putString("partida", paradas.get(0).getParada().getNome()+", "+paradas.get(0).getNomeBairroComCidade());
+            bundle.putString("destino", paradas.get(paradas.size()-1).getParada().getNome()+", "+paradas.get(paradas.size()-1).getNomeBairroComCidade());
+            mFirebaseAnalytics.logEvent("fav_itinerario_adicionado", bundle);
+
         } else{
             SnackbarHelper.notifica(v, "Itinerário removido dos favoritos!", Snackbar.LENGTH_LONG);
             binding.imageButton4.setImageResource(R.drawable.ic_star_border_white_24dp);
             flagFavorito = false;
 
             lstItinerarios.remove(paradas.get(0).getIdBairro()+"|"+paradas.get(paradas.size()-1).getIdBairro());
+
+            bundle = new Bundle();
+            bundle.putString("partida", paradas.get(0).getParada().getNome()+", "+paradas.get(0).getNomeBairroComCidade());
+            bundle.putString("destino", paradas.get(paradas.size()-1).getParada().getNome()+", "+paradas.get(paradas.size()-1).getNomeBairroComCidade());
+            mFirebaseAnalytics.logEvent("fav_itinerario_removido", bundle);
 
         }
 
@@ -221,6 +237,12 @@ public class DetalheItinerarioActivity extends BaseActivity {
         if(viewModel.qtdItinerarios.size() <= 1){
             i.putExtra("imprimePorPartidaEDestino", false);
         }
+
+        //log
+        bundle = new Bundle();
+        bundle.putString("parada_partida", paradaPartida);
+        i.putExtra("parada_destino", paradaDestino);
+        mFirebaseAnalytics.logEvent("horario_compartilhado", bundle);
 
         ctx.startActivity(i);
 
@@ -292,18 +314,32 @@ public class DetalheItinerarioActivity extends BaseActivity {
             binding.cardViewItinerario.getLayoutParams().height = tamanhoOriginalMapa;
             PreferenceUtils.salvarPreferencia(ctx, "mapa", 1);
             mapaOculto = false;
+
+            //log
+            bundle = new Bundle();
+            bundle.putBoolean("oculto", false);
+            mFirebaseAnalytics.logEvent("mapa_oculto", bundle);
         } else{
             tamanhoOriginalMapa = binding.cardViewItinerario.getLayoutParams().height;
             binding.map.setVisibility(View.GONE);
             binding.cardViewItinerario.getLayoutParams().height = WRAP_CONTENT;
             PreferenceUtils.salvarPreferencia(ctx, "mapa", 0);
             mapaOculto = true;
+
+            //log
+            bundle = new Bundle();
+            bundle.putBoolean("oculto", true);
+            mFirebaseAnalytics.logEvent("mapa_oculto", bundle);
         }
 
     }
 
     public void btnSecoesClick(View v){
         bsd.show();
+
+        //log
+        bundle = new Bundle();
+        mFirebaseAnalytics.logEvent("secoes_consulta", bundle);
     }
 
     Observer<List<HorarioItinerarioNome>> horariosObserver = new Observer<List<HorarioItinerarioNome>>() {

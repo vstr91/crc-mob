@@ -23,6 +23,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
@@ -73,6 +75,8 @@ public class DetalheParadaActivity extends BaseActivity {
     Uri link = null;
     LocationManager locationManager;
 
+    Bundle bundle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_parada);
@@ -81,6 +85,8 @@ public class DetalheParadaActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setTitle("Detalhe Parada");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
 
         ctx = this;
 
@@ -102,6 +108,12 @@ public class DetalheParadaActivity extends BaseActivity {
             viewModel.carregaParadaQRCode(uf, local, bairro, slugParada);
 
             viewModel.parada.observe(this, paradaObserver);
+
+            //log
+            bundle = new Bundle();
+            bundle.putString("parametros", uf+" | "+local+" | "+bairro+" | "+slugParada);
+            mFirebaseAnalytics.logEvent("consulta_qr_code", bundle);
+
         } else{
             idParada = getIntent().getStringExtra("parada");
 
@@ -132,6 +144,10 @@ public class DetalheParadaActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 bsd.show();
+                //log
+                bundle = new Bundle();
+                bundle.putString("parada", binding.getUmaParada().getParada().getNome()+", "+binding.getUmaParada().getNomeBairroComCidade());
+                mFirebaseAnalytics.logEvent("pois_parada_consultados", bundle);
             }
         });
 
@@ -163,6 +179,10 @@ public class DetalheParadaActivity extends BaseActivity {
         formMapa.setPontoInteresse(null);
         formMapa.setCtx(ctx.getApplication());
         formMapa.show(ctx.getSupportFragmentManager(), "formMapa");
+
+        bundle = new Bundle();
+        bundle.putString("parada", binding.getUmaParada().getParada().getNome()+", "+binding.getUmaParada().getNomeBairroComCidade());
+        mFirebaseAnalytics.logEvent("consulta_mapa_parada", bundle);
     }
 
     public void onClickBtnFavorito(View v){
@@ -176,12 +196,22 @@ public class DetalheParadaActivity extends BaseActivity {
 
             lstParadas.add(idParada);
 
+            //log
+            bundle = new Bundle();
+            bundle.putString("parada", binding.getUmaParada().getParada().getNome()+", "+binding.getUmaParada().getNomeBairroComCidade());
+            mFirebaseAnalytics.logEvent("fav_parada_adicionada", bundle);
+
         } else{
             SnackbarHelper.notifica(v, "Parada removida dos favoritos!", Snackbar.LENGTH_LONG);
             binding.imageButton4.setImageResource(R.drawable.ic_star_border_white_24dp);
             flagFavorito = false;
 
             lstParadas.remove(idParada);
+
+            //log
+            bundle = new Bundle();
+            bundle.putString("parada", binding.getUmaParada().getParada().getNome()+", "+binding.getUmaParada().getNomeBairroComCidade());
+            mFirebaseAnalytics.logEvent("fav_parada_removida", bundle);
 
         }
 

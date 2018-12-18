@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityLoginBinding;
 import br.com.vostre.circular.utils.DBUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
+import br.com.vostre.circular.utils.Unique;
 import br.com.vostre.circular.utils.tasks.PreferenceDownloadAsyncTask;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
@@ -55,6 +57,8 @@ public class LoginActivity extends BaseActivity {
     // The account name
     public static final String ACCOUNT = "dummyaccount";
 
+    Bundle bundle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
@@ -63,6 +67,20 @@ public class LoginActivity extends BaseActivity {
         getSupportActionBar().setHomeButtonEnabled(false);
         binding.setView(this);
         viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
+
+        if(PreferenceUtils.carregarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".id_unico").isEmpty()){
+
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    String identificadorUnico = Unique.geraIdentificadorUnico();
+                    PreferenceUtils.salvarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".id_unico", identificadorUnico);
+                }
+            });
+
+        }
+
+
 
         // Pass the settings flags by inserting them in a bundle
         Bundle settingsBundle = new Bundle();
@@ -183,6 +201,9 @@ public class LoginActivity extends BaseActivity {
 
                 PreferenceDownloadAsyncTask preferenceDownloadAsyncTask = new PreferenceDownloadAsyncTask(getApplicationContext(), PreferenceUtils.carregarUsuarioLogado(getApplicationContext()));
                 preferenceDownloadAsyncTask.execute();
+
+                bundle = new Bundle();
+                mFirebaseAnalytics.logEvent("login_tela_inicial", bundle);
 
                 Intent i = new Intent(getApplicationContext(), MenuActivity.class);
                 startActivity(i);

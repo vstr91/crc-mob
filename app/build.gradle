@@ -47,9 +47,7 @@ dependencies {
         exclude module: 'com.google.android.gms:play-services-vision:11.4.2'
     }
 
-    implementation('com.google.firebase:firebase-core:16.0.1') {
-        //exclude group: 'com.google.android.gms'
-    }
+    implementation 'com.google.firebase:firebase-core:16.0.6'
 
     implementation 'com.android.support:multidex:1.0.3'
 

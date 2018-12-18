@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.format.DateTimeFormat;
@@ -51,6 +53,8 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
 
     ParadasViewModel viewModel;
 
+    Bundle bundle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         ctx = this;
@@ -59,6 +63,9 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
         super.onCreate(savedInstanceState);
         setTitle("Paradas");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
+
         viewModel = ViewModelProviders.of(this).get(ParadasViewModel.class);
         viewModel.cidades.observe(this, cidadesObserver);
         viewModel.paradas.observe(this, paradasObserver);
@@ -144,6 +151,9 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
                 binding.cardViewCidade.setVisibility(View.VISIBLE);
                 //setimagem(binding.circleViewPartida, cidade.getCidade().getBrasao());
                 binding.cardViewListCidade.setVisibility(View.GONE);
+
+                bundle = new Bundle();
+                bundle.putString("cidade", cidade.getCidade().getNome());
             }
 
         }
@@ -159,6 +169,14 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
                 adapterParadas.notifyDataSetChanged();
                 binding.listParadas.scheduleLayoutAnimation();
                 binding.listParadas.setVisibility(View.VISIBLE);
+
+                if(bundle != null){
+                    bundle.putInt("qtd_paradas", paradas.size());
+
+                    mFirebaseAnalytics.logEvent("paradas_consultadas", bundle);
+                }
+
+
             }
 
         }
@@ -169,6 +187,7 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
         viewModel.setCidade(id);
         viewModel.cidade.observe(this, cidadeObserver);
         viewModel.paradas.observe(this, paradasObserver);
+
         return id;
     }
 

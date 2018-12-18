@@ -194,7 +194,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             parametroInterno.setAtivo(true);
             parametroInterno.setEnviado(true);
 
-            String identificadorUnico = Unique.geraIdentificadorUnico();
+            String identificadorUnico = PreferenceUtils.carregarPreferencia(getContext().getApplicationContext(), getContext().getApplicationContext().getPackageName()+".id_unico");
 
             parametroInterno.setIdentificadorUnico(identificadorUnico);
 
@@ -1079,6 +1079,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
                     +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+","+strPreferencias+"}";
 
+            //System.out.println("JSON: "+json);
+
             // EXPORTA ARQUIVO DE DADOS
             /*
             File caminho = Environment.getExternalStorageDirectory();
@@ -1444,7 +1446,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         a = JsonUtils.toJson(pref.get(0));
 
                         System.out.println("PREFS AAAAA a: "+a);
-
+                        //TODO: preferencias
                     }
 
                     break;
@@ -1505,7 +1507,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Toast.makeText(ctx, "Erro ("+t.getMessage()+") ao receber imagem.", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(ctx, "Erro ("+t.getMessage()+") ao receber imagem.", Toast.LENGTH_SHORT).show();
             }
         });
     }

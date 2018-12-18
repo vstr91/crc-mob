@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.format.DateTimeFormat;
@@ -65,6 +67,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     boolean inversao = false;
 
+    Bundle bundle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -74,6 +78,9 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         binding.setView(this);
         super.onCreate(savedInstanceState);
         setTitle("Itinerários");
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
+
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         viewModel = ViewModelProviders.of(this).get(ItinerariosViewModel.class);
         viewModel.cidades.observe(this, cidadesObserver);
@@ -152,6 +159,11 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         //viewModel.escolhaAtual = 0;
         consultaDiaSeguinte = false;
         viewModel.partidaEscolhida = false;
+
+        //log
+        bundle = new Bundle();
+        mFirebaseAnalytics.logEvent("edicao_partida", bundle);
+
     }
 
     public void onClickBtnEditarDestino(View v){
@@ -165,6 +177,9 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         //viewModel.escolhaAtual = 1;
         consultaDiaSeguinte = false;
         viewModel.destinoEscolhido = false;
+
+        bundle = new Bundle();
+        mFirebaseAnalytics.logEvent("edicao_destino", bundle);
     }
 
     public void onClickBtnInverter(View v){
@@ -201,6 +216,13 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         adapterResultado.setDia(DataHoraUtils.getDiaAtualFormatado());
         adapterResultado.setHora(DataHoraUtils.getHoraAtual());
 
+        //log
+        bundle = new Bundle();
+        bundle.putString("partida", bairroPartida.getBairro().getNome()+", "+bairroPartida.getNomeCidadeComEstado());
+        bundle.putString("destino", bairroDestino.getBairro().getNome()+", "+bairroDestino.getNomeCidadeComEstado());
+
+        mFirebaseAnalytics.logEvent("inversao_consulta", bundle);
+
     }
 
     Observer<List<ItinerarioPartidaDestino>> resultadoItinerarioObserver = new Observer<List<ItinerarioPartidaDestino>>() {
@@ -222,6 +244,14 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
                 adapterResultado.itinerarios = itinerarios;
 
+                bundle.putString("partida", bairroPartida.getBairro().getNome()+", "+bairroPartida.getNomeCidadeComEstado());
+                bundle.putString("destino", bairroDestino.getBairro().getNome()+", "+bairroDestino.getNomeCidadeComEstado());
+                bundle.putInt("itinerarios", itinerarios.size());
+                bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
+                bundle.putBoolean("sucesso", true);
+
+                mFirebaseAnalytics.logEvent("consulta_itinerario", bundle);
+
             } else{
                 binding.listResultados.setVisibility(View.GONE);
                 binding.cardViewResultadoVazio.setVisibility(View.VISIBLE);
@@ -230,6 +260,14 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
                 binding.textViewSubResultado.setVisibility(View.GONE);
 
                 adapterResultado.itinerarios = null;
+
+                bundle.putString("partida", bairroPartida.getBairro().getNome()+", "+bairroPartida.getNomeCidadeComEstado());
+                bundle.putString("destino", bairroDestino.getBairro().getNome()+", "+bairroDestino.getNomeCidadeComEstado());
+                bundle.putInt("itinerarios", 0);
+                bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
+                bundle.putBoolean("sucesso", false);
+
+                mFirebaseAnalytics.logEvent("consulta_itinerario", bundle);
             }
 
             adapterResultado.notifyDataSetChanged();
@@ -399,6 +437,9 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         formBairro.setListener(this);
         formBairro.show(ctx.getSupportFragmentManager(), "formBairro");
 
+        this.bundle = new Bundle();
+        this.bundle.putString(FirebaseAnalytics.Param.START_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
+
         return null;
     }
 
@@ -527,5 +568,15 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
                 DataHoraUtils.getDiaAnteriorSelecionado(data), inversao);
         adapterResultado.setDia(DataHoraUtils.getDiaSelecionadoFormatado(data));
         adapterResultado.setHora(DateTimeFormat.forPattern("HH:mm").print(data.getTimeInMillis()));
+
+        //log
+        bundle = new Bundle();
+        bundle.putString("partida", bairroPartida.getBairro().getNome()+", "+bairroPartida.getNomeCidadeComEstado());
+        bundle.putString("destino", bairroDestino.getBairro().getNome()+", "+bairroDestino.getNomeCidadeComEstado());
+        bundle.putString("data_hora", DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(new DateTime(data)));
+        bundle.putBoolean("sucesso", true);
+
+        mFirebaseAnalytics.logEvent("consulta_itinerario_data_mod", bundle);
+
     }
 }

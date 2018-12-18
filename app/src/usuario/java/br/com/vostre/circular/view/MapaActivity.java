@@ -46,6 +46,7 @@ import com.google.android.gms.drive.Drive;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -125,6 +126,8 @@ public class MapaActivity extends BaseActivity {
     static int RC_SIGN_IN = 481;
     boolean flag = false;
 
+    Bundle bundle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_mapa);
@@ -132,6 +135,8 @@ public class MapaActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setTitle("Mapa");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
 
         // PARA TESTES
 
@@ -184,6 +189,9 @@ public class MapaActivity extends BaseActivity {
         Intent i = new Intent(getApplicationContext(), SignInActivity.class);
         startActivityForResult(i, RC_SIGN_IN);
         binding.btnLogin.setEnabled(false);
+
+        bundle = new Bundle();
+        mFirebaseAnalytics.logEvent("clicou_login_mapa", bundle);
 
     }
 
@@ -636,6 +644,10 @@ public class MapaActivity extends BaseActivity {
                         viewModel.setParadaNova(p);
                         viewModel.editarParada();
                         Toast.makeText(getApplicationContext(), "Sugestão alterada", Toast.LENGTH_SHORT).show();
+
+                        bundle = new Bundle();
+                        bundle.putString("parada", p.getParada().getNome()+", "+p.getNomeBairroComCidade());
+                        mFirebaseAnalytics.logEvent("sugestao_alterada", bundle);
                     }
 
                     @Override
@@ -696,6 +708,9 @@ public class MapaActivity extends BaseActivity {
             //formParada.setParada(new ParadaSugestao());
             formParada.setCtx(getApplication());
             formParada.show(getSupportFragmentManager(), "formParada");
+
+            bundle = new Bundle();
+            mFirebaseAnalytics.logEvent("clicou_fab_parada_mapa", bundle);
         }
 
     }
@@ -703,11 +718,17 @@ public class MapaActivity extends BaseActivity {
     public void onFabSugestaoClick(View v){
         Intent i = new Intent(this, ParadasSugeridasActivity.class);
         startActivity(i);
+
+        bundle = new Bundle();
+        mFirebaseAnalytics.logEvent("clicou_fab_sugestoes_mapa", bundle);
     }
 
     public void onFabLocationClick(View v){
         mapController.animateTo(new GeoPoint(viewModel.localAtual.getValue().getLatitude(),
                 viewModel.localAtual.getValue().getLongitude()));
+
+        bundle = new Bundle();
+        mFirebaseAnalytics.logEvent("clicou_fab_local_mapa", bundle);
     }
 
     public boolean onFabLocationLongClick(View v){
@@ -722,6 +743,9 @@ public class MapaActivity extends BaseActivity {
         }
 
         v.invalidate();
+
+        bundle = new Bundle();
+        mFirebaseAnalytics.logEvent("press_fab_local_mapa", bundle);
 
         return true;
 
@@ -826,6 +850,9 @@ public class MapaActivity extends BaseActivity {
             Toast.makeText(getApplicationContext(), "Login realizado com sucesso! " +
                     "Seja bem vindo, "+account.getGivenName()+"!", Toast.LENGTH_LONG).show();
 
+            bundle = new Bundle();
+            mFirebaseAnalytics.logEvent("login_mapa", bundle);
+
         } else{
             binding.btnLogin.setVisibility(View.VISIBLE);
             binding.fabParada.setEnabled(false);
@@ -851,6 +878,9 @@ public class MapaActivity extends BaseActivity {
                     }
                 });
         PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), "");
+
+        bundle = new Bundle();
+        mFirebaseAnalytics.logEvent("logoff_mapa", bundle);
     }
 
 }

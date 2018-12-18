@@ -151,6 +151,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         Bundle bundle = new Bundle();
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, this.getClass().getCanonicalName());
+        bundle.putString("id_unico", PreferenceUtils.carregarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".id_unico"));
 
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, bundle);
 
@@ -237,7 +238,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         }
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestScopes(Drive.SCOPE_FILE)
                 .requestIdToken(getString(R.string.server_client_id))
                 .requestEmail()
                 .build();

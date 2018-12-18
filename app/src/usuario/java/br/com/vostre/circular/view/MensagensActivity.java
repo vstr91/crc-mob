@@ -8,6 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TabHost;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import java.util.List;
 
 import br.com.vostre.circular.R;
@@ -32,6 +34,8 @@ public class MensagensActivity extends BaseActivity {
 
     TabHost tabHost;
 
+    Bundle bundle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_mensagens);
@@ -44,6 +48,8 @@ public class MensagensActivity extends BaseActivity {
         binding.setView(this);
         setTitle("Mensagens");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
 
         listMensagens = binding.listMensagens;
 
@@ -93,6 +99,9 @@ public class MensagensActivity extends BaseActivity {
         FormMensagem formMensagem = new FormMensagem();
         formMensagem.flagInicioEdicao = false;
         formMensagem.show(getSupportFragmentManager(), "formMensagem");
+
+        bundle = new Bundle();
+        mFirebaseAnalytics.logEvent("clicou_fab_mensagem", bundle);
     }
 
     Observer<List<Mensagem>> mensagensObserver = new Observer<List<Mensagem>>() {

@@ -1,9 +1,20 @@
 package br.com.vostre.circular.view.viewHolder;
 
+import android.Manifest;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Toast;
+
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+
+import java.util.List;
+
 import br.com.vostre.circular.databinding.LinhaItinerariosResultadoBinding;
 
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
@@ -11,6 +22,7 @@ import br.com.vostre.circular.utils.DataHoraUtils;
 import br.com.vostre.circular.view.BaseActivity;
 import br.com.vostre.circular.view.DetalheItinerarioActivity;
 import br.com.vostre.circular.view.DetalheParadaActivity;
+import br.com.vostre.circular.view.MapaActivity;
 import br.com.vostre.circular.view.form.FormCalendario;
 
 public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
@@ -97,15 +109,45 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
         final View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(ctx, DetalheItinerarioActivity.class);
-                i.putExtra("itinerario", itinerario.getItinerario().getId());
-                i.putExtra("itinerarioPartida", itinerario.getBairroConsultaPartida());
-                i.putExtra("itinerarioDestino", itinerario.getBairroConsultaDestino());
 
-                i.putExtra("paradaPartida", itinerario.getParadaPartida());
-                i.putExtra("paradaDestino", itinerario.getParadaDestino());
-                i.putExtra("horario", itinerario.getIdProximoHorario());
-                ctx.startActivity(i);
+                Dexter.withActivity(ctx)
+                        .withPermissions(
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        ).withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+
+                        if(report.areAllPermissionsGranted()){
+                            Intent i = new Intent(ctx, DetalheItinerarioActivity.class);
+                            i.putExtra("itinerario", itinerario.getItinerario().getId());
+                            i.putExtra("itinerarioPartida", itinerario.getBairroConsultaPartida());
+                            i.putExtra("itinerarioDestino", itinerario.getBairroConsultaDestino());
+
+                            i.putExtra("paradaPartida", itinerario.getParadaPartida());
+                            i.putExtra("paradaDestino", itinerario.getParadaDestino());
+                            i.putExtra("horario", itinerario.getIdProximoHorario());
+                            ctx.startActivity(i);
+                        } else{
+                            Toast.makeText(ctx.getApplicationContext(), "Acesso ao armazenamento externo é utilizado para " +
+                                    "salvar partes do mapa e permitir o acesso offline. O mapa não funcionará corretamente sem essa permissão.", Toast.LENGTH_LONG).show();
+                            Intent i = new Intent(ctx, DetalheItinerarioActivity.class);
+                            i.putExtra("itinerario", itinerario.getItinerario().getId());
+                            i.putExtra("itinerarioPartida", itinerario.getBairroConsultaPartida());
+                            i.putExtra("itinerarioDestino", itinerario.getBairroConsultaDestino());
+
+                            i.putExtra("paradaPartida", itinerario.getParadaPartida());
+                            i.putExtra("paradaDestino", itinerario.getParadaDestino());
+                            i.putExtra("horario", itinerario.getIdProximoHorario());
+                            ctx.startActivity(i);
+                        }
+
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                }).check();
             }
         };
 //

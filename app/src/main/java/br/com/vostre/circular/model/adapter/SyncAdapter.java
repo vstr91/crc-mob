@@ -939,7 +939,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         if(!pars.isEmpty()){
                             List<String> parads = Arrays.asList(pars.split(";"));
 
-                            PreferenceUtils.mesclaItinerariosFavoritos(parads, ctx.getApplicationContext());
+                            PreferenceUtils.mesclaParadasFavoritas(parads, ctx.getApplicationContext());
 
                         }
 
@@ -1435,19 +1435,19 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     break;
                 case "usuario_preferencia":
 
-                    List<UsuarioPreferencia> pref = (List<UsuarioPreferencia>)  params[0];
-                    String usuario = pref.get(0).getUsuario();
-
-                    String a = JsonUtils.toJson(pref.get(0));
-
-                    System.out.println("PREFS AAAAA a FORA: "+a);
-
-                    if(PreferenceUtils.carregarUsuarioLogado(ctx.getApplicationContext()).equalsIgnoreCase(usuario)){
-                        a = JsonUtils.toJson(pref.get(0));
-
-                        System.out.println("PREFS AAAAA a: "+a);
-                        //TODO: preferencias
-                    }
+//                    List<UsuarioPreferencia> pref = (List<UsuarioPreferencia>)  params[0];
+//                    String usuario = pref.get(0).getUsuario();
+//
+//                    String a = JsonUtils.toJson(pref.get(0));
+//
+//                    System.out.println("PREFS AAAAA a FORA: "+a);
+//
+//                    if(PreferenceUtils.carregarUsuarioLogado(ctx.getApplicationContext()).equalsIgnoreCase(usuario)){
+//                        a = JsonUtils.toJson(pref.get(0));
+//
+//                        System.out.println("PREFS AAAAA a: "+a);
+//                        //TODO: preferencias
+//                    }
 
                     break;
             }
@@ -1590,12 +1590,24 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                             int registros = Integer.parseInt(meta.getJSONObject(0).get("registros").toString());
 
+                            System.out.println("REG: "+registros);
+                            System.out.println("DAD: "+dados);
+
                             if(registros > 0) {
-                                    JSONArray preferencias = arrayObject.getJSONArray("usuarios_preferencias");
+
+
+
+                                if(arrayObject.optJSONArray("preferencias") != null){
+                                    JSONArray preferencias = arrayObject.getJSONArray("preferencias");
                                     JSONObject obj = preferencias.getJSONObject(0);
+
+                                    System.out.println("PREFER: "+preferencias);
 
                                     String itins = obj.optString(ctx.getPackageName()+".itinerarios_favoritos");
                                     String pars = obj.optString(ctx.getPackageName()+".paradas_favoritas");
+
+                                    System.out.println("ITINS: "+itins);
+                                    System.out.println("PARS: "+pars);
 
                                     if(!itins.isEmpty()){
                                         List<String> itis = Arrays.asList(itins.split(";"));
@@ -1614,6 +1626,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                                     }
 
                                     PreferenceUtils.atualizaParadasFavoritasNoBanco(ctx);
+                                }
 
                             }
 

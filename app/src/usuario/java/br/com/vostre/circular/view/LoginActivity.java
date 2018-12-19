@@ -29,6 +29,7 @@ import com.google.android.gms.tasks.Task;
 import br.com.vostre.circular.BuildConfig;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityLoginBinding;
+import br.com.vostre.circular.utils.Constants;
 import br.com.vostre.circular.utils.DBUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.Unique;
@@ -50,12 +51,12 @@ public class LoginActivity extends BaseActivity {
     static int RC_SIGN_IN = 480;
     boolean flag = false;
 
-    // The authority for the sync adapter's content provider
-    public static final String AUTHORITY = "br.com.vostre.circular.datasync.provider";
-    // An account type, in the form of a domain name
-    public static final String ACCOUNT_TYPE = "br.com.vostre.circular.usuario";
-    // The account name
-    public static final String ACCOUNT = "dummyaccount";
+//    // The authority for the sync adapter's content provider
+//    public static final String AUTHORITY = "br.com.vostre.circular.datasync.provider";
+//    // An account type, in the form of a domain name
+//    public static final String ACCOUNT_TYPE = "br.com.vostre.circular.usuario";
+//    // The account name
+//    public static final String ACCOUNT = "dummyaccount";
 
     Bundle bundle;
 
@@ -92,7 +93,7 @@ public class LoginActivity extends BaseActivity {
          * Request the sync for the default account, authority, and
          * manual sync settings
          */
-        ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
+        ContentResolver.requestSync(new Account(Constants.ACCOUNT, Constants.ACCOUNT_TYPE), Constants.AUTHORITY, settingsBundle);
 
         btnLogin = binding.btnLogin;
 

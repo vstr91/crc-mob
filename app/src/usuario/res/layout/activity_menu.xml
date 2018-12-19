@@ -223,7 +223,6 @@
                     android:onClick="onClickBtnAviso"
                     android:padding="10dp"
                     android:textAllCaps="false"
-                    android:text="Esta versão do Circular não é a mais atual. Clique aqui para atualizar e tenha acesso a correções e novas funções!"
                     android:textColor="@color/branco80"
                     android:textSize="11sp"
                     android:textStyle="bold"

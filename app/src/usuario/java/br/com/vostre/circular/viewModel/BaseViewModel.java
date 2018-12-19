@@ -1,9 +1,11 @@
 package br.com.vostre.circular.viewModel;
 
+import android.accounts.Account;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.databinding.ObservableBoolean;
@@ -11,6 +13,7 @@ import android.databinding.ObservableField;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -21,7 +24,11 @@ import com.google.gson.JsonObject;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Observable;
@@ -60,6 +67,10 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
+
+import static br.com.vostre.circular.utils.Constants.ACCOUNT;
+import static br.com.vostre.circular.utils.Constants.ACCOUNT_TYPE;
+import static br.com.vostre.circular.utils.Constants.AUTHORITY;
 
 public class BaseViewModel extends AndroidViewModel {
 
@@ -180,10 +191,20 @@ public class BaseViewModel extends AndroidViewModel {
                     @Override
                     public void onResponse(Call<String> call, Response<String> response) {
 
+                        System.out.println("RESPONSE: "+response.body());
+
                         if(response.code() == 200){
                             usuarioValidado.postValue(true);
 
-                            String id = response.body();
+                            String[] valores = response.body().split(";");
+
+                            String id = valores[0];
+                            String preferencias = "";
+
+                            if(valores.length > 1){
+                                preferencias = valores[1];
+                            }
+
                             try {
                                 id = new String(crypt.decrypt(id), "UTF-8");
 
@@ -191,6 +212,49 @@ public class BaseViewModel extends AndroidViewModel {
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
+
+                            if(preferencias != null && !preferencias.isEmpty()){
+                                try {
+
+                                    JSONObject obj = new JSONObject(preferencias);
+
+                                    String itins = obj.optString(getApplication().getApplicationContext().getPackageName()+".itinerarios_favoritos");
+                                    String pars = obj.optString(getApplication().getApplicationContext().getPackageName()+".paradas_favoritas");
+
+                                    if(!itins.isEmpty()){
+                                        List<String> itis = Arrays.asList(itins.split(";"));
+
+                                        PreferenceUtils.mesclaItinerariosFavoritos(itis, getApplication().getApplicationContext().getApplicationContext());
+
+                                    }
+
+                                    //PreferenceUtils.atualizaItinerariosFavoritosNoBanco(getApplication().getApplicationContext());
+
+                                    if(!pars.isEmpty()){
+                                        List<String> parads = Arrays.asList(pars.split(";"));
+
+                                        PreferenceUtils.mesclaParadasFavoritas(parads, getApplication().getApplicationContext());
+
+                                    }
+
+                                    //PreferenceUtils.atualizaItinerariosFavoritosNoBanco(getApplication().getApplicationContext());
+                                    //PreferenceUtils.atualizaParadasFavoritasNoBanco(getApplication().getApplicationContext());
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            // Pass the settings flags by inserting them in a bundle
+                            Bundle settingsBundle = new Bundle();
+                            settingsBundle.putBoolean(
+                                    ContentResolver.SYNC_EXTRAS_MANUAL, true);
+                            settingsBundle.putBoolean(
+                                    ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+                            /*
+                             * Request the sync for the default account, authority, and
+                             * manual sync settings
+                             */
+                            ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
 
                         } else{
                             usuarioValidado.postValue(false);
@@ -213,7 +277,6 @@ public class BaseViewModel extends AndroidViewModel {
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("ERR: "+e.getMessage());
         }
 
     }

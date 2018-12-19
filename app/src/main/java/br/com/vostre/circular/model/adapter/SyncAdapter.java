@@ -397,7 +397,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 data = DateTimeFormat.forPattern("yyyy-MM-dd-HH-mm-ss").print(parametroInterno.getDataUltimoAcesso());
             }
 
-            String id = PreferenceUtils.carregarUsuarioLogado(ctx);
+            String id = PreferenceUtils.carregarUsuarioLogado(ctx.getApplicationContext());
 
             if(id.isEmpty() && (BuildConfig.APPLICATION_ID.endsWith("admin") || BuildConfig.APPLICATION_ID.endsWith("admin.debug"))){
                 id = "admin";
@@ -406,6 +406,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             if(id.isEmpty()){
                 id = "-1";
             }
+
+            System.out.println("ID: "+id);
 
             Call<String> call = api.recebeDados(token, data, id);
             call.enqueue(new Callback<String>() {
@@ -1446,7 +1448,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 //                        a = JsonUtils.toJson(pref.get(0));
 //
 //                        System.out.println("PREFS AAAAA a: "+a);
-//                        //TODO: preferencias
 //                    }
 
                     break;
@@ -1590,9 +1591,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                             int registros = Integer.parseInt(meta.getJSONObject(0).get("registros").toString());
 
-                            System.out.println("REG: "+registros);
-                            System.out.println("DAD: "+dados);
-
                             if(registros > 0) {
 
 
@@ -1601,13 +1599,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                                     JSONArray preferencias = arrayObject.getJSONArray("preferencias");
                                     JSONObject obj = preferencias.getJSONObject(0);
 
-                                    System.out.println("PREFER: "+preferencias);
-
                                     String itins = obj.optString(ctx.getPackageName()+".itinerarios_favoritos");
                                     String pars = obj.optString(ctx.getPackageName()+".paradas_favoritas");
-
-                                    System.out.println("ITINS: "+itins);
-                                    System.out.println("PARS: "+pars);
 
                                     if(!itins.isEmpty()){
                                         List<String> itis = Arrays.asList(itins.split(";"));

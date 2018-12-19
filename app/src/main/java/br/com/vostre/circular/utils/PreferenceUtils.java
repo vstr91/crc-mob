@@ -195,6 +195,10 @@ public class PreferenceUtils {
 
         List<String> l = new ArrayList<>(Arrays.asList(itinerariosAtuais.split(";")));
 
+        if(l.get(0).isEmpty()){
+            l = new ArrayList<>();
+        }
+
         for(String i : itinerarios){
             if(!l.contains(i)){
                 l.add(i);
@@ -211,13 +215,17 @@ public class PreferenceUtils {
 
         List<String> l = new ArrayList<>(Arrays.asList(itinerariosAtuais.split(";")));
 
+        if(l.get(0).isEmpty()){
+            l = new ArrayList<>();
+        }
+
         for(String i : paradas){
             if(!l.contains(i)){
                 l.add(i);
             }
         }
 
-        gravaItinerariosFavoritos(l, context);
+        gravaParadasFavoritas(l, context);
 
     }
 
@@ -236,7 +244,7 @@ public class PreferenceUtils {
 
         List<String> l = new ArrayList<>(Arrays.asList(paradasAtuais.split(";")));
 
-        gravaItinerariosFavoritos(l, context);
+        gravaParadasFavoritas(l, context);
     }
 
 }

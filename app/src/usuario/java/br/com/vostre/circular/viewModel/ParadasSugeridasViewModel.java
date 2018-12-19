@@ -108,6 +108,7 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
         paradas = appDatabase.paradaDAO().listarTodosComBairro();
 
         sugestao = new ParadaSugestaoBairro();
+
         sugeridas = appDatabase.paradaSugestaoDAO().listarTodosPendentesComBairroPorUsuario(PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext()));
 
         aceitas = appDatabase.paradaSugestaoDAO().listarTodosAceitosComBairroPorUsuario(PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext()));

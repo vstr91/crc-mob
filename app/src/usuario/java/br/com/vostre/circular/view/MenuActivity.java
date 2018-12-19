@@ -27,6 +27,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -70,6 +71,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.sql.SQLOutput;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -260,8 +262,13 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         if(prefVersao.equalsIgnoreCase(BuildConfig.VERSION_NAME) || prefVersao.isEmpty()){
             binding.btnAviso.setVisibility(View.GONE);
         } else{
+            binding.btnAviso.setText("Esta versão do Circular não é a mais atual. " +
+                    "Clique aqui para atualizar e tenha acesso a correções e novas funções! Versão instalada: "+BuildConfig.VERSION_NAME+", versão atual: "+prefVersao);
             binding.btnAviso.setVisibility(View.VISIBLE);
         }
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        updateUI(account);
 
 //        SignInButton btnLogin = drawer.findViewById(R.id.btnLogin);
 //
@@ -432,6 +439,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                     }
                 });
         PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), "");
+        PreferenceUtils.gravaItinerariosFavoritos(new ArrayList<String>(), getApplicationContext());
+        PreferenceUtils.gravaParadasFavoritas(new ArrayList<String>(), getApplicationContext());
     }
 
     @Override

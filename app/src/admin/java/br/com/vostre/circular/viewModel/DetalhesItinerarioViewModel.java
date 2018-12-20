@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.model.Empresa;
+import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
@@ -52,6 +53,8 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
     public ObservableField<ItinerarioPartidaDestino> iti;
 
+    public LiveData<List<HistoricoItinerario>> historicoItinerario;
+
     public ObservableField<ItinerarioPartidaDestino> getIti() {
         return iti;
     }
@@ -67,6 +70,7 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
     public void setItinerario(String itinerario) {
         this.itinerario = appDatabase.itinerarioDAO().carregar(itinerario);
         this.pits = appDatabase.paradaItinerarioDAO().listarTodosAtivosPorItinerarioComBairro(itinerario);
+        this.historicoItinerario = appDatabase.historicoItinerarioDAO().carregarPorItinerario(itinerario);
 //        paradasItinerario.setValue(appDatabase.paradaItinerarioDAO()
 //                .listarTodosAtivosPorItinerarioComBairro(itinerario).getValue());
     }

@@ -99,6 +99,7 @@ public class FormItinerario extends FormBase {
 
         if(itinerario != null){
             viewModel.itinerario = itinerario;
+            viewModel.tarifaAntiga = itinerario.getTarifa();
             flagInicioEdicao = true;
         } else{
             //viewModel.itinerario.setTempo(new DateTime(0));

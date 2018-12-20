@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import br.com.vostre.circular.model.Empresa;
+import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.ParadaItinerario;
@@ -36,6 +37,8 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
     public LiveData<List<ItinerarioPartidaDestino>> itinerarios;
     public Itinerario itinerario;
+
+    public Double tarifaAntiga;
 
     public MutableLiveData<List<ParadaItinerarioBairro>> paradasItinerario;
     public ParadaItinerarioBairro parada;
@@ -273,20 +276,36 @@ public class ItinerariosViewModel extends AndroidViewModel {
         itinerario.setUltimaAlteracao(new DateTime());
         itinerario.setEnviado(false);
 
-        new editAsyncTask(appDatabase).execute(itinerario);
+        new editAsyncTask(appDatabase, tarifaAntiga).execute(itinerario);
     }
 
     private static class editAsyncTask extends AsyncTask<Itinerario, Void, Void> {
 
         private AppDatabase db;
+        private Double tarifaAntiga;
 
-        editAsyncTask(AppDatabase appDatabase) {
+        editAsyncTask(AppDatabase appDatabase, Double tarifaAntiga) {
             db = appDatabase;
+            this.tarifaAntiga = tarifaAntiga;
         }
 
         @Override
         protected Void doInBackground(final Itinerario... params) {
+
             db.itinerarioDAO().editar((params[0]));
+
+            if(tarifaAntiga != null && params[0].getTarifa().compareTo(tarifaAntiga) != 0){
+                HistoricoItinerario historicoItinerario = new HistoricoItinerario();
+                historicoItinerario.setItinerario(params[0].getId());
+                historicoItinerario.setTarifa(tarifaAntiga);
+                historicoItinerario.setAtivo(true);
+                historicoItinerario.setEnviado(false);
+                historicoItinerario.setDataCadastro(DateTime.now());
+                historicoItinerario.setUltimaAlteracao(DateTime.now());
+
+                db.historicoItinerarioDAO().inserir(historicoItinerario);
+            }
+
             return null;
         }
 

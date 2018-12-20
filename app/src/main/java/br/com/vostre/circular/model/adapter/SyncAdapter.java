@@ -45,6 +45,7 @@ import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.EntidadeBase;
 import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.Itinerario;
@@ -121,6 +122,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
     List<? extends EntidadeBase> paradaSugestoes;
     List<? extends EntidadeBase> preferencias;
+
+    List<? extends EntidadeBase> historicos;
 
     br.com.vostre.circular.utils.Crypt crypt;
 
@@ -484,6 +487,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 JSONArray paradasSugestoes = null;
                 JSONArray preferencias = null;
+                JSONArray historicosItinerarios = null;
 
                 if(arrayObject.optJSONArray("paradas_sugestoes") != null){
                     paradasSugestoes = arrayObject.getJSONArray("paradas_sugestoes");
@@ -491,6 +495,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 if(arrayObject.optJSONArray("usuarios_preferencias") != null){
                     preferencias = arrayObject.getJSONArray("usuarios_preferencias");
+                }
+
+                if(arrayObject.optJSONArray("historicos_itinerarios") != null){
+                    historicosItinerarios = arrayObject.getJSONArray("historicos_itinerarios");
                 }
 
                 // PAISES
@@ -951,6 +959,28 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 }
 
+                // HISTORICOS ITINERARIOS
+
+                if(historicosItinerarios != null && historicosItinerarios.length() > 0){
+
+                    int total = historicosItinerarios.length();
+                    List<HistoricoItinerario> lstHistoricos = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        HistoricoItinerario historicoItinerario;
+                        JSONObject obj = historicosItinerarios.getJSONObject(i);
+
+                        historicoItinerario = (HistoricoItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), HistoricoItinerario.class, 1);
+                        historicoItinerario.setEnviado(true);
+
+                        lstHistoricos.add(historicoItinerario);
+
+                    }
+
+                    add(lstHistoricos, "historico_itinerario");
+
+                }
+
                 Handler mainHandler = new Handler(Looper.getMainLooper());
 
                 Runnable runnable = new Runnable() {
@@ -1050,6 +1080,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             preferencias = appDatabase.usuarioPreferenciaDAO().listarTodosAEnviar();
 
+            historicos = appDatabase.historicoItinerarioDAO().listarTodosAEnviar();
+
             return null;
         }
 
@@ -1076,12 +1108,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             String strParadasSugestoes = "\"paradas_sugestoes\": "+JsonUtils.toJson((List<EntidadeBase>) paradaSugestoes);
             String strPreferencias = "\"usuarios_preferencias\": "+JsonUtils.toJson((List<EntidadeBase>) preferencias);
 
+            String strHistoricos = "\"historicos_itinerarios\": "+JsonUtils.toJson((List<EntidadeBase>) historicos);
+
             String json = "{"+strPaises+","+strEmpresas+","+strOnibus+","+strEstados+","+strCidades+","
                     +strBairros+","+strParadas+","+strItinerarios+","+strHorarios+","+strParadasItinerarios+","
                     +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
-                    +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+","+strPreferencias+"}";
+                    +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+","+strPreferencias+","+strHistoricos+"}";
 
-            //System.out.println("JSON: "+json);
+            System.out.println("JSON: "+json);
 
             // EXPORTA ARQUIVO DE DADOS
             /*
@@ -1103,7 +1137,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             int registros = paises.size()+empresas.size()+onibus.size()+estados.size()+cidades.size()
                     +bairros.size()+paradas.size()+itinerarios.size()+horarios.size()+paradasItinerario.size()
                     +secoesItinerarios.size()+horariosItinerarios.size()+mensagens.size()+parametros.size()+pontosInteresse.size()
-                    +usuarios.size()+paradaSugestoes.size()+preferencias.size();
+                    +usuarios.size()+paradaSugestoes.size()+preferencias.size()+historicos.size();
 
             if(registros > 0){
                 chamaAPI(registros, json, 0, baseUrl, token);
@@ -1450,6 +1484,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 //                        System.out.println("PREFS AAAAA a: "+a);
 //                    }
 
+                    break;
+                case "historico_itinerario":
+                    db.historicoItinerarioDAO().inserirTodos((List<HistoricoItinerario>) params[0]);
                     break;
             }
 

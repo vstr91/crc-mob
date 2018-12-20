@@ -41,12 +41,14 @@ import java.text.NumberFormat;
 import java.util.List;
 
 import br.com.vostre.circular.R;
+import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 import br.com.vostre.circular.view.adapter.ParadaItinerarioAdapter;
+import br.com.vostre.circular.view.form.FormHistorico;
 import br.com.vostre.circular.view.form.FormItinerario;
 import br.com.vostre.circular.view.utils.SortListItemHelper;
 import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
@@ -117,6 +119,7 @@ public class DetalhesItinerarioActivity extends BaseActivity {
             viewModel.paradas.observe(this, paradasObserver);
             viewModel.pits.observe(this, pitsObserver);
             viewModel.paradasItinerario.observe(this, paradasItinerarioObserver);
+            viewModel.historicoItinerario.observe(this, historicoItinerarioObserver);
 
             viewModel.localAtual.observe(this, localObserver);
 
@@ -208,6 +211,18 @@ public class DetalhesItinerarioActivity extends BaseActivity {
         formItinerario.setItinerario(viewModel.itinerario.getValue().getItinerario());
         formItinerario.setCtx(ctx.getApplication());
         formItinerario.show(getSupportFragmentManager(), "formItinerario");
+
+    }
+
+    public void onClickBtnHistorico(View v){
+
+//        Toast.makeText(getApplicationContext(), viewModel.itinerario.getValue().getItinerario().getId(), Toast.LENGTH_SHORT).show();
+
+        FormHistorico formHistorico = new FormHistorico();
+        formHistorico.setItinerario(viewModel.itinerario.getValue().getItinerario());
+        formHistorico.setHistorico(viewModel.historicoItinerario.getValue());
+        formHistorico.setCtx(ctx.getApplication());
+        formHistorico.show(getSupportFragmentManager(), "formHistorico");
 
     }
 
@@ -410,6 +425,13 @@ public class DetalhesItinerarioActivity extends BaseActivity {
         public void onChanged(List<ParadaItinerarioBairro> paradas) {
             adapter.paradas = paradas;
             adapter.notifyDataSetChanged();
+        }
+    };
+
+    Observer<List<HistoricoItinerario>> historicoItinerarioObserver = new Observer<List<HistoricoItinerario>>() {
+        @Override
+        public void onChanged(List<HistoricoItinerario> historico) {
+            System.out.println(historico);
         }
     };
 

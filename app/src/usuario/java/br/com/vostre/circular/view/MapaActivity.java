@@ -12,6 +12,7 @@ import android.content.res.ColorStateList;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -69,6 +70,8 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
@@ -84,6 +87,7 @@ import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaSugestaoBairro;
+import br.com.vostre.circular.utils.DialogUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SessionUtils;
 import br.com.vostre.circular.utils.SignInActivity;
@@ -215,7 +219,24 @@ public class MapaActivity extends BaseActivity {
 
         }
 
-    }
+        formParada = (FormParada) DialogUtils.getOpenedDialog(this);
+
+        if (requestCode == FormParada.PICK_IMAGE) {
+
+            if (data != null) {
+                try {
+                    InputStream inputStream = getContentResolver().openInputStream(data.getData());
+                    viewModel.foto = BitmapFactory.decodeStream(inputStream);
+                    formParada.exibeImagem();
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+
+        }
 
     Observer<Boolean> loginObserver = new Observer<Boolean>() {
         @Override

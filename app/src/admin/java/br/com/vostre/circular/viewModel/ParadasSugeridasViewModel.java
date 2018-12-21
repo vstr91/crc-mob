@@ -168,8 +168,8 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
                     parada.setTaxaDeEmbarque(p.getParada().getTaxaDeEmbarque());
                 }
 
-                if(foto != null){
-                    salvarFoto();
+                if(p.getParada().getImagem() != null){
+                    parada.setImagem(p.getParada().getImagem());
                 }
 
                 if(parada.valida(parada)){

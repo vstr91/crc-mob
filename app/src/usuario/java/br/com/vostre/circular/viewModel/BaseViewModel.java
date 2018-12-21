@@ -88,6 +88,8 @@ public class BaseViewModel extends AndroidViewModel {
     String baseUrl;
     public LiveData<List<Mensagem>> mensagensNaoLidas;
 
+    public boolean recebeuCallback = false;
+
     public ObservableField<String> getId() {
         return id;
     }
@@ -195,6 +197,7 @@ public class BaseViewModel extends AndroidViewModel {
 
                         if(response.code() == 200){
                             usuarioValidado.postValue(true);
+                            recebeuCallback = true;
 
                             String[] valores = response.body().split(";");
 
@@ -257,6 +260,7 @@ public class BaseViewModel extends AndroidViewModel {
                             ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
 
                         } else{
+                            recebeuCallback = true;
                             usuarioValidado.postValue(false);
                             PreferenceUtils.salvarUsuarioLogado(getApplication().getApplicationContext(), "");
                             Toast.makeText(getApplication().getApplicationContext(), "Erro ao processar a validação do usuário. " +
@@ -268,6 +272,7 @@ public class BaseViewModel extends AndroidViewModel {
 
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
+                        recebeuCallback = true;
                         usuarioValidado.postValue(false);
                         System.out.println("ERR1: "+t.getMessage());
                         Toast.makeText(getApplication().getApplicationContext(), "Erro ao validar usuário.", Toast.LENGTH_SHORT).show();

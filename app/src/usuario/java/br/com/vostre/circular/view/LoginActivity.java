@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -24,7 +25,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.drive.Drive;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
+
+import java.util.ArrayList;
 
 import br.com.vostre.circular.BuildConfig;
 import br.com.vostre.circular.R;
@@ -68,6 +73,8 @@ public class LoginActivity extends BaseActivity {
         getSupportActionBar().setHomeButtonEnabled(false);
         binding.setView(this);
         viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
 
         if(PreferenceUtils.carregarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".id_unico").isEmpty()){
 
@@ -192,38 +199,55 @@ public class LoginActivity extends BaseActivity {
         @Override
         public void onChanged(Boolean logado) {
 
-            if(logado){
+            if(viewModel.recebeuCallback){
+                if(logado){
 
-                if(binding.checkBoxLembrar.isChecked()){
-                    PreferenceUtils.salvarPreferencia(getApplicationContext(), "lembrar", "1");
+                    if(binding.checkBoxLembrar.isChecked()){
+                        PreferenceUtils.salvarPreferencia(getApplicationContext(), "lembrar", "1");
+                    } else{
+                        PreferenceUtils.salvarPreferencia(getApplicationContext(), "lembrar", "0");
+                    }
+
+                    //PreferenceDownloadAsyncTask preferenceDownloadAsyncTask = new PreferenceDownloadAsyncTask(getApplicationContext(), PreferenceUtils.carregarUsuarioLogado(getApplicationContext()));
+                    //preferenceDownloadAsyncTask.execute();
+
+                    bundle = new Bundle();
+                    mFirebaseAnalytics.logEvent("login_tela_inicial", bundle);
+
+                    Intent i = new Intent(getApplicationContext(), MenuActivity.class);
+                    startActivity(i);
                 } else{
-                    PreferenceUtils.salvarPreferencia(getApplicationContext(), "lembrar", "0");
+                    Toast.makeText(getApplicationContext(), "Não foi possível fazer login. Por favor tente novamente.", Toast.LENGTH_SHORT).show();
+                    btnLogin.setEnabled(true);
+                    signOut();
                 }
 
-                PreferenceDownloadAsyncTask preferenceDownloadAsyncTask = new PreferenceDownloadAsyncTask(getApplicationContext(), PreferenceUtils.carregarUsuarioLogado(getApplicationContext()));
-                preferenceDownloadAsyncTask.execute();
+                if(flag){
+                    btnLogin.setEnabled(true);
 
-                bundle = new Bundle();
-                mFirebaseAnalytics.logEvent("login_tela_inicial", bundle);
+                    if(progressBar != null){
+                        progressBar.setVisibility(View.GONE);
+                    }
 
-                Intent i = new Intent(getApplicationContext(), MenuActivity.class);
-                startActivity(i);
-            } else{
-
-            }
-
-            if(flag){
-                btnLogin.setEnabled(true);
-
-                if(progressBar != null){
-                    progressBar.setVisibility(View.GONE);
                 }
 
+                flag = true;
             }
 
-            flag = true;
+
 
         }
     };
+
+    private void signOut() {
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // nada ainda
+                    }
+                });
+        PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), "");
+    }
 
 }

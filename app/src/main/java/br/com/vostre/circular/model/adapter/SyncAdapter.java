@@ -410,8 +410,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 id = "-1";
             }
 
-            System.out.println("ID: "+id);
-
             Call<String> call = api.recebeDados(token, data, id);
             call.enqueue(new Callback<String>() {
                 @Override
@@ -1115,7 +1113,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
                     +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+","+strPreferencias+","+strHistoricos+"}";
 
-            System.out.println("JSON: "+json);
+             System.out.println("JSON: "+json);
 
             // EXPORTA ARQUIVO DE DADOS
             /*

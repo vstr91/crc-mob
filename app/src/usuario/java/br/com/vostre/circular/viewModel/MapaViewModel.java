@@ -287,9 +287,9 @@ public class MapaViewModel extends AndroidViewModel {
 
         try {
             fos = new FileOutputStream(file);
+            foto = ImageUtils.scaleDown(foto, 600, true);
             foto.compress(Bitmap.CompressFormat.PNG, 100, fos);
-            foto = ImageUtils.scaleDown(foto, 200, true);
-            System.out.println(foto.getHeight());
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } finally {
@@ -297,16 +297,16 @@ public class MapaViewModel extends AndroidViewModel {
                 if (fos != null) {
                     fos.close();
 
-                    if(parada.getParada().getImagem() != null && !parada.getParada().getImagem().isEmpty()){
-                        File fotoAntiga = new File(getApplication().getFilesDir(), parada.getParada().getImagem());
+                    if(paradaNova.getParada().getImagem() != null && !paradaNova.getParada().getImagem().isEmpty()){
+                        File fotoAntiga = new File(getApplication().getFilesDir(), paradaNova.getParada().getImagem());
 
                         if(fotoAntiga.exists() && fotoAntiga.canWrite() && fotoAntiga.getName() != file.getName()){
                             fotoAntiga.delete();
                         }
                     }
 
-                    parada.getParada().setImagem(file.getName());
-                    parada.getParada().setImagemEnviada(false);
+                    paradaNova.getParada().setImagem(file.getName());
+                    paradaNova.getParada().setImagemEnviada(false);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -324,6 +324,10 @@ public class MapaViewModel extends AndroidViewModel {
         parada.setSlug(StringUtils.toSlug(parada.getNome()));
 
         String id = PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext());
+
+        if(parada.getImagem() != null && !parada.getImagem().isEmpty()){
+            parada.setImagemEnviada(false);
+        }
 
         parada.setUsuarioCadastro(id);
         parada.setUsuarioUltimaAlteracao(id);
@@ -365,6 +369,19 @@ public class MapaViewModel extends AndroidViewModel {
             appDatabase = AppDatabase.getAppDatabase(context.getApplicationContext());
         }
 
+        parada.setUltimaAlteracao(new DateTime());
+        parada.setEnviado(false);
+        parada.setSlug(StringUtils.toSlug(parada.getNome()));
+        parada.setStatus(0);
+
+        String id = PreferenceUtils.carregarUsuarioLogado(context.getApplicationContext());
+
+        if(parada.getImagem() != null && !parada.getImagem().isEmpty()){
+            parada.setImagemEnviada(false);
+        }
+
+        parada.setUsuarioUltimaAlteracao(id);
+
         new editAsyncTask(appDatabase).execute(parada);
     }
 
@@ -376,6 +393,10 @@ public class MapaViewModel extends AndroidViewModel {
         parada.setStatus(0);
 
         String id = PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext());
+
+        if(parada.getImagem() != null && !parada.getImagem().isEmpty()){
+            parada.setImagemEnviada(false);
+        }
 
         parada.setUsuarioUltimaAlteracao(id);
 

@@ -90,8 +90,9 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Mensagem"
-                android:text="@={viewModel.mensagem.descricao}"
                 android:inputType="textPersonName"
+                android:singleLine="false"
+                android:text="@={viewModel.mensagem.descricao}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

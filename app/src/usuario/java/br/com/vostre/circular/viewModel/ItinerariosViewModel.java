@@ -45,6 +45,7 @@ import br.com.vostre.circular.utils.DataHoraUtils;
 import es.usc.citius.hipster.algorithm.Algorithm;
 import es.usc.citius.hipster.algorithm.Hipster;
 import es.usc.citius.hipster.graph.GraphBuilder;
+import es.usc.citius.hipster.graph.GraphEdge;
 import es.usc.citius.hipster.graph.GraphSearchProblem;
 import es.usc.citius.hipster.graph.HipsterDirectedGraph;
 import es.usc.citius.hipster.model.problem.SearchProblem;
@@ -157,440 +158,253 @@ public class ItinerariosViewModel extends AndroidViewModel {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                GraphBuilder<String, Double> builder = GraphBuilder.create();
 
-                itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosTesteSync();
+                SimpleSQLiteQuery queryOpcoes = new SimpleSQLiteQuery(
+                        geraQueryItinerarios(myPartida.getBairro().getId(), myDestino.getBairro().getId()));
 
-                for(ItinerarioPartidaDestino i : itinerarios){
-                    builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(i.getItinerario().getDistancia());
-                }
+                List<String> opcoes = appDatabase.itinerarioDAO()
+                        .carregarOpcoesPorPartidaEDestinoSync(queryOpcoes);
 
-                HipsterDirectedGraph<String,Double> graph = builder.createDirectedGraph();
+                if(opcoes.size() > 0){
 
-                SearchProblem p = GraphSearchProblem
-                        .startingFrom(myPartida.getBairro().getId())
-                        .in(graph)
-                        .takeCostsFromEdges()
-                        .build();
-
-                Algorithm.SearchResult result = Hipster.createDijkstra(p).search(myDestino.getBairro().getId());
-
-                List<List> caminhos = result.getOptimalPaths();
-
-                for(List<List> caminho : caminhos){
-                    int cont = caminho.size();
-                    List<BairroCidade> passos = new ArrayList<>();
-
-                    for(int i = 0; i < cont; i++){
-
-                        BairroCidade bairro = appDatabase.bairroDAO().carregarSync(String.valueOf(caminho.get(i)));
-
-                        passos.add(bairro);
-                    }
-
-                    BairroCidade bairroAnterior = null;
-                    ItinerarioPartidaDestino itinerarioAnterior = null;
                     List<ItinerarioPartidaDestino> itinerarios = new ArrayList<>();
 
-                    for(BairroCidade b : passos){
+                    String itinerariosDisponiveis = TextUtils.join("','", opcoes);
 
-                        if(bairroAnterior != null){
+                    SimpleSQLiteQuery query = new SimpleSQLiteQuery(
+                            geraQueryResultado(myPartida.getBairro().getId(),
+                                    myDestino.getBairro().getId(), diaAnterior, dia, diaSeguinte, horaEscolhida, itinerariosDisponiveis));
 
-                            String hora = "";
+                    ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO()
+                            .carregarPorPartidaEDestinoComHorarioSync(query);
 
-                            PeriodFormatter parser =
-                                    new PeriodFormatterBuilder()
-                                            .appendHours().appendLiteral(":")
-                                            .appendMinutes().toFormatter();
+                    if(itinerario != null){
+                        itinerario.setDia(dia);
+                        itinerario.setHora(horaEscolhida);
+                    }
 
-                            PeriodFormatter printer =
-                                    new PeriodFormatterBuilder()
-                                            .printZeroAlways().minimumPrintedDigits(2)
-                                            //.appendDays().appendLiteral(" dia(s) ")
-                                            .appendHours().appendLiteral(":")
-                                            .appendMinutes().toFormatter();
+                    if(itinerario == null){
 
-                            Period period = Period.ZERO;
+                        String diaAnt = dia;
+                        String diaAt = diaSeguinte;
+                        String diaSeg = DataHoraUtils.getDiaSeguinte(diaSeguinte);
 
-                            if(itinerarioAnterior != null){
-                                String proximoHorario = itinerarioAnterior.getProximoHorario();
-                                String tempo = DateTimeFormat.forPattern("HH:mm").print(itinerarioAnterior.getItinerario().getTempo().getMillis());
+                        query = new SimpleSQLiteQuery(
+                                geraQueryResultadoDiaSeguinte(myPartida.getBairro().getId(), myDestino.getBairro().getId(),
+                                        diaAnt, diaAt, diaSeg, itinerariosDisponiveis));
 
-                                period = period.plus(parser.parsePeriod(proximoHorario));
-                                period = period.plus(parser.parsePeriod(tempo));
+                        itinerario = appDatabase.itinerarioDAO()
+                                .carregarPorPartidaEDestinoComHorarioSync(query);
 
-                                hora = printer.print(period.normalizedStandard(PeriodType.time()));
+                        if(itinerario != null){
+                            itinerario.setDia(diaAt);
+                            itinerario.setHora(horaEscolhida);
+                        }
 
+
+                    }
+
+                    if(itinerario != null && itinerario.getProximoHorario() != null){
+
+                        if(itinerario.getIdHorarioAnterior() != null){
+                            String obsHorarioAnterior = appDatabase.horarioItinerarioDAO()
+                                    .carregarObservacaoPorHorario(itinerario.getIdHorarioAnterior());
+                            itinerario.setObservacaoHorarioAnterior(obsHorarioAnterior);
+                        }
+
+                        if(itinerario.getIdHorarioSeguinte() != null){
+                            String obsHorarioSeguinte = appDatabase.horarioItinerarioDAO()
+                                    .carregarObservacaoPorHorario(itinerario.getIdHorarioSeguinte());
+                            itinerario.setObservacaoHorarioSeguinte(obsHorarioSeguinte);
+                        }
+
+                        if(itinerario.getIdProximoHorario() != null){
+                            String obsProximoHorario = appDatabase.horarioItinerarioDAO()
+                                    .carregarObservacaoPorHorario(itinerario.getIdProximoHorario());
+                            itinerario.setObservacaoProximoHorario(obsProximoHorario);
+                        }
+
+                        itinerarios.add(itinerario);
+
+                        resultadosItinerarios.postValue(itinerarios);
+                    }
+
+                } else{
+                    GraphBuilder<String, Double> builder = GraphBuilder.create();
+
+                    itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosTesteSync();
+//                itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosSync();
+                    itinerarios.addAll(appDatabase.itinerarioDAO().listarTodosAtivosSync());
+
+                    for(ItinerarioPartidaDestino i : itinerarios){
+                        System.out.println("ITIS:: "+i.getNomeBairroPartida()+" | "+i.getNomeCidadePartida()+" x "
+                                +i.getNomeBairroDestino()+" | "+i.getNomeCidadeDestino()+" || "+i.getItinerario().getDistancia()+" | "
+                                +(i.getItinerario().getDistancia()-10));
+
+                        if(i.isFlagTrecho()){
+                            builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(i.getItinerario().getDistancia());
+                        } else{
+
+                            if(i.getItinerario().getDistancia() <= 10){
+                                builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(1d);
                             } else{
-                                hora = horaEscolhida;//"00:00";//DateTimeFormat.forPattern("HH:mm:00").print(DateTime.now());
+                                builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge((i.getItinerario().getDistancia()-10));
                             }
 
-                            SimpleSQLiteQuery queryIti = new SimpleSQLiteQuery("SELECT i.id FROM itinerario i INNER JOIN " +
-                                    "parada_itinerario pi ON pi.itinerario = i.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                    "bairro bp ON bp.id = pp.bairro INNER JOIN parada_itinerario pi2 ON pi2.itinerario = i.id INNER JOIN " +
-                                    "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                                    "WHERE i.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem " +
-                                    "AND bp.id = '" + bairroAnterior.getBairro().getId() + "' AND bd.id = '" + b.getBairro().getId() + "' ORDER BY i.id");
+                        }
 
-                            List<String> itis = appDatabase.itinerarioDAO()
-                                    .carregarOpcoesPorPartidaEDestinoSync(queryIti);
 
-                            String itinerariosDisponiveis = TextUtils.join("','", itis);
+                    }
 
-                            SimpleSQLiteQuery query = new SimpleSQLiteQuery("SELECT i.*, " +
-                                    "(" +
-                                    "SELECT pi.valorSeguinte FROM itinerario i2 INNER JOIN " +
-                                    "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                    "bairro bp ON bp.id = pp.bairro INNER JOIN " +
-                                    "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
-                                    "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                                    "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
-                                    "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
-                                    "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id" +
-                                    ") AS 'tarifaTrecho', " +
+                    HipsterDirectedGraph<String,Double> graph = builder.createDirectedGraph();
 
-                                    "(SELECT pp.id FROM itinerario i2 INNER JOIN " +
-                                    "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
-                                    "parada pp ON pp.id = pi.parada INNER JOIN " +
-                                    "bairro bp ON bp.id = pp.bairro INNER JOIN " +
-                                    "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
-                                    "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                                    "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
-                                    "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
-                                    "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id) AS 'paradaPartida', " +
+                    Iterable<GraphEdge<String, Double>> a = graph.edgesOf(myPartida.getBairro().getId());
 
-                                    "(SELECT pd.id FROM itinerario i2 INNER JOIN " +
-                                    "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
-                                    "parada pp ON pp.id = pi.parada INNER JOIN bairro bp ON bp.id = pp.bairro INNER JOIN " +
-                                    "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
-                                    "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                                    "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
-                                    "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
-                                    "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id) AS 'paradaDestino', " +
+                    for(GraphEdge<String, Double> ab : a){
+                        System.out.println("AB: "+myPartida.getBairro().getId()+" x "+myDestino.getBairro().getId()+": "
+                                +ab.getVertex1()+" | "+ab.getVertex2()+" | "
+                                +ab.getEdgeValue());
+                    }
 
-                                    "'"+bairroAnterior.getBairro().getId()+"' AS 'bairroConsultaPartida', " +
-                                    "'"+b.getBairro().getId()+"' AS 'bairroConsultaDestino'," +
-                                    " e.nome AS 'nomeEmpresa', " +
-                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) as 'proximoHorario', " +
-                                    "hi.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
-                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "ORDER BY h2.nome DESC LIMIT 1) , " +
-                                    "( SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'horarioAnterior', " +
-                                    "IFNULL( (SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
-                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "ORDER BY h2.nome DESC LIMIT 1 ) , " +
-                                    "( SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'idHorarioAnterior', " +
+                    SearchProblem p = GraphSearchProblem
+                            .startingFrom(myPartida.getBairro().getId())
+                            .in(graph)
+                            .takeCostsFromEdges()
+                            .build();
 
-                                    "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
-                                    "itinerario i2 ON i2.id = hi2.itinerario " +
-                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
-                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "ORDER BY h2.nome DESC LIMIT 1 ) , " +
-                                    "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
-                                    "itinerario i2 ON i2.id = hi2.itinerario " +
-                                    "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'obsHorarioAnterior', " +
+                    Algorithm.SearchResult result = Hipster.createDijkstra(p).search(myDestino.getBairro().getId());
 
-                                    "IFNULL( (SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
-                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "ORDER BY h2.nome DESC LIMIT 1 ) , " +
-                                    "( SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'observacaoHorarioAnterior', " +
+                    System.out.println("RES: "+result);
 
-                                    "IFNULL( (SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
-                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "ORDER BY h2.nome LIMIT 1 ) , " +
-                                    "( SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + diaSeguinte + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "ORDER BY h2.nome LIMIT 1 ) ) AS horarioSeguinte, " +
-                                    "IFNULL( (SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
-                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "ORDER BY h2.nome LIMIT 1 ) , " +
-                                    "( SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + diaSeguinte + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "ORDER BY h2.nome LIMIT 1 ) ) AS idHorarioSeguinte, " +
+                    List<List> caminhos = result.getOptimalPaths();
 
-                                    "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
-                                    "itinerario i2 ON i2.id = hi2.itinerario " +
-                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
-                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "ORDER BY h2.nome LIMIT 1 ) , " +
-                                    "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
-                                    "itinerario i2 ON i2.id = hi2.itinerario " +
-                                    "WHERE hi2." + diaSeguinte + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "ORDER BY h2.nome LIMIT 1 ) ) AS obsHorarioSeguinte, " +
+                    for(List<List> caminho : caminhos){
+                        int cont = caminho.size();
+                        List<BairroCidade> passos = new ArrayList<>();
 
-                                    "IFNULL( (SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
-                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "ORDER BY h2.nome LIMIT 1 ) , " +
-                                    "( SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + diaSeguinte + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "ORDER BY h2.nome LIMIT 1 ) ) AS observacaoHorarioSeguinte, " +
+                        for(int i = 0; i < cont; i++){
 
-                                    "( SELECT pp.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
-                                    "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-                                    "AND pi.itinerario = i.id ) AS 'idPartida', " +
-                                    "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
-                                    "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-                                    "AND pi.itinerario = i.id ) AS 'nomePartida', " +
-                                    "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
-                                    "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                                    "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'nomeDestino', " +
-                                    "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                    "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                                    "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'idBairroPartida', " +
-                                    "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                    "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                                    "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'idBairroDestino', " +
-                                    "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                    "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                                    "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'bairroPartida', " +
-                                    "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                    "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                                    "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'bairroDestino', " +
-                                    "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                    "bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
-                                    "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                                    "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'cidadePartida', " +
-                                    "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                    "bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
-                                    "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-                                    "AND pi.itinerario = i.id ) AS 'cidadeDestino' " +
-                                    "FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario INNER JOIN " +
-                                    "itinerario i ON i.id = hi.itinerario INNER JOIN empresa e ON e.id = i.empresa " +
-                                    "WHERE hi.itinerario IN ('" + itinerariosDisponiveis + "') AND " + dia + " = 1 " +
-                                    "AND strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) > '" + hora + "' ORDER BY proximoHorario LIMIT 1");
+                            BairroCidade bairro = appDatabase.bairroDAO().carregarSync(String.valueOf(caminho.get(i)));
 
-                            ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO()
-                                    .carregarPorPartidaEDestinoComHorarioSync(query);
+                            passos.add(bairro);
+                        }
 
-                            if(itinerario != null){
-                                itinerario.setDia(dia);
-                                itinerario.setHora(hora);
-                            }
+                        BairroCidade bairroAnterior = null;
+                        ItinerarioPartidaDestino itinerarioAnterior = null;
+                        List<ItinerarioPartidaDestino> itinerarios = new ArrayList<>();
 
-                            if(itinerario == null){
+                        for(BairroCidade b : passos){
 
-                                String diaAnt = dia;
-                                String diaAt = diaSeguinte;
-                                String diaSeg = DataHoraUtils.getDiaSeguinte(diaSeguinte);
+                            if(bairroAnterior != null){
 
-                                query = new SimpleSQLiteQuery("SELECT i.*, " +
-                                        "(" +
-                                        "SELECT pi.valorSeguinte FROM itinerario i2 INNER JOIN " +
-                                        "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                        "bairro bp ON bp.id = pp.bairro INNER JOIN " +
-                                        "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
-                                        "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                                        "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
-                                        "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
-                                        "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id" +
-                                        ") AS 'tarifaTrecho'," +
+                                String hora = "";
 
-                                        "(SELECT pp.id FROM itinerario i2 INNER JOIN " +
-                                        "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
-                                        "parada pp ON pp.id = pi.parada INNER JOIN " +
-                                        "bairro bp ON bp.id = pp.bairro INNER JOIN " +
-                                        "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
-                                        "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                                        "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
-                                        "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
-                                        "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id) AS 'paradaPartida', " +
+                                PeriodFormatter parser =
+                                        new PeriodFormatterBuilder()
+                                                .appendHours().appendLiteral(":")
+                                                .appendMinutes().toFormatter();
 
-                                        "(SELECT pd.id FROM itinerario i2 INNER JOIN " +
-                                        "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
-                                        "parada pp ON pp.id = pi.parada INNER JOIN bairro bp ON bp.id = pp.bairro INNER JOIN " +
-                                        "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
-                                        "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                                        "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
-                                        "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
-                                        "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id) AS 'paradaDestino', " +
+                                PeriodFormatter printer =
+                                        new PeriodFormatterBuilder()
+                                                .printZeroAlways().minimumPrintedDigits(2)
+                                                //.appendDays().appendLiteral(" dia(s) ")
+                                                .appendHours().appendLiteral(":")
+                                                .appendMinutes().toFormatter();
 
-                                        "'"+bairroAnterior.getBairro().getId()+"' AS 'bairroConsultaPartida', " +
-                                        "'"+b.getBairro().getId()+"' AS 'bairroConsultaDestino', " +
-                                        "e.nome AS 'nomeEmpresa', " +
-                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) as 'proximoHorario', " +
-                                        "hi.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
-                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "ORDER BY h2.nome DESC LIMIT 1) , " +
-                                        "( SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaAnt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'horarioAnterior', " +
-                                        "IFNULL( (SELECT h2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
-                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "ORDER BY h2.nome DESC LIMIT 1 ) , " +
-                                        "( SELECT h2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaAnt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'idHorarioAnterior', " +
+                                Period period = Period.ZERO;
 
-                                        "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
-                                        "itinerario i2 ON i2.id = hi2.itinerario " +
-                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
-                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "ORDER BY h2.nome DESC LIMIT 1 ) , " +
-                                        "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
-                                        "itinerario i2 ON i2.id = hi2.itinerario " +
-                                        "WHERE hi2." + diaAnt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'obsHorarioAnterior', " +
+                                if(itinerarioAnterior != null){
+                                    String proximoHorario = itinerarioAnterior.getProximoHorario();
+                                    String tempo = DateTimeFormat.forPattern("HH:mm").print(itinerarioAnterior.getItinerario().getTempo().getMillis());
 
-                                        "IFNULL( (SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
-                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "ORDER BY h2.nome DESC LIMIT 1 ) , " +
-                                        "( SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaAnt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'observacaoHorarioAnterior', " +
+                                    period = period.plus(parser.parsePeriod(proximoHorario));
+                                    period = period.plus(parser.parsePeriod(tempo));
 
-                                        "IFNULL( (SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
-                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "ORDER BY h2.nome LIMIT 1 ) , " +
-                                        "( SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaSeg + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "ORDER BY h2.nome LIMIT 1 ) ) AS horarioSeguinte, " +
-                                        "IFNULL( (SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
-                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "ORDER BY h2.nome LIMIT 1 ) , " +
-                                        "( SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaSeg + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "ORDER BY h2.nome LIMIT 1 ) ) AS idHorarioSeguinte, " +
+                                    hora = printer.print(period.normalizedStandard(PeriodType.time()));
 
-                                        "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
-                                        "itinerario i2 ON i2.id = hi2.itinerario " +
-                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
-                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "ORDER BY h2.nome LIMIT 1 ) , " +
-                                        "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
-                                        "itinerario i2 ON i2.id = hi2.itinerario " +
-                                        "WHERE hi2." + diaSeg + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "ORDER BY h2.nome LIMIT 1 ) ) AS obsHorarioSeguinte, " +
+                                } else{
+                                    hora = horaEscolhida;//"00:00";//DateTimeFormat.forPattern("HH:mm:00").print(DateTime.now());
+                                }
 
-                                        "IFNULL( (SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
-                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "ORDER BY h2.nome LIMIT 1 ) , " +
-                                        "( SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaSeg + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "ORDER BY h2.nome LIMIT 1 ) ) AS observacaoHorarioSeguinte, " +
+                                SimpleSQLiteQuery queryIti = new SimpleSQLiteQuery(
+                                        geraQueryItinerarios(bairroAnterior.getBairro().getId(), b.getBairro().getId()));
 
-                                        "( SELECT pp.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
-                                        "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-                                        "AND pi.itinerario = i.id ) AS 'idPartida', " +
-                                        "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
-                                        "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-                                        "AND pi.itinerario = i.id ) AS 'nomePartida', " +
-                                        "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
-                                        "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                                        "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'nomeDestino', " +
-                                        "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                        "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                                        "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'idBairroPartida', " +
-                                        "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                        "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                                        "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'idBairroDestino', " +
-                                        "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                        "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                                        "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'bairroPartida', " +
-                                        "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                        "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                                        "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'bairroDestino', " +
-                                        "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                        "bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
-                                        "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                                        "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'cidadePartida', " +
-                                        "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                        "bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
-                                        "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-                                        "AND pi.itinerario = i.id ) AS 'cidadeDestino' " +
-                                        "FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario INNER JOIN " +
-                                        "itinerario i ON i.id = hi.itinerario INNER JOIN empresa e ON e.id = i.empresa " +
-                                        "WHERE hi.itinerario IN ('" + itinerariosDisponiveis + "') AND " + diaAt + " = 1 ORDER BY proximoHorario LIMIT 1");
+                                List<String> itis = appDatabase.itinerarioDAO()
+                                        .carregarOpcoesPorPartidaEDestinoSync(queryIti);
 
-                                itinerario = appDatabase.itinerarioDAO()
+                                String itinerariosDisponiveis = TextUtils.join("','", itis);
+
+                                SimpleSQLiteQuery query = new SimpleSQLiteQuery(
+                                        geraQueryResultado(bairroAnterior.getBairro().getId(),
+                                                b.getBairro().getId(), diaAnterior, dia, diaSeguinte, hora, itinerariosDisponiveis));
+
+                                ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO()
                                         .carregarPorPartidaEDestinoComHorarioSync(query);
 
                                 if(itinerario != null){
-                                    itinerario.setDia(diaAt);
+                                    itinerario.setDia(dia);
                                     itinerario.setHora(hora);
                                 }
 
+                                if(itinerario == null){
 
-                            }
+                                    String diaAnt = dia;
+                                    String diaAt = diaSeguinte;
+                                    String diaSeg = DataHoraUtils.getDiaSeguinte(diaSeguinte);
 
-                            if(itinerario != null && itinerario.getProximoHorario() != null){
+                                    query = new SimpleSQLiteQuery(
+                                            geraQueryResultadoDiaSeguinte(bairroAnterior.getBairro().getId(), b.getBairro().getId(),
+                                                    diaAnt, diaAt, diaSeg, itinerariosDisponiveis));
 
-                                if(itinerario.getIdHorarioAnterior() != null){
-                                    String obsHorarioAnterior = appDatabase.horarioItinerarioDAO()
-                                            .carregarObservacaoPorHorario(itinerario.getIdHorarioAnterior());
-                                    itinerario.setObservacaoHorarioAnterior(obsHorarioAnterior);
+                                    itinerario = appDatabase.itinerarioDAO()
+                                            .carregarPorPartidaEDestinoComHorarioSync(query);
+
+                                    if(itinerario != null){
+                                        itinerario.setDia(diaAt);
+                                        itinerario.setHora(hora);
+                                    }
+
+
                                 }
 
-                                if(itinerario.getIdHorarioSeguinte() != null){
-                                    String obsHorarioSeguinte = appDatabase.horarioItinerarioDAO()
-                                            .carregarObservacaoPorHorario(itinerario.getIdHorarioSeguinte());
-                                    itinerario.setObservacaoHorarioSeguinte(obsHorarioSeguinte);
+                                if(itinerario != null && itinerario.getProximoHorario() != null){
+
+                                    if(itinerario.getIdHorarioAnterior() != null){
+                                        String obsHorarioAnterior = appDatabase.horarioItinerarioDAO()
+                                                .carregarObservacaoPorHorario(itinerario.getIdHorarioAnterior());
+                                        itinerario.setObservacaoHorarioAnterior(obsHorarioAnterior);
+                                    }
+
+                                    if(itinerario.getIdHorarioSeguinte() != null){
+                                        String obsHorarioSeguinte = appDatabase.horarioItinerarioDAO()
+                                                .carregarObservacaoPorHorario(itinerario.getIdHorarioSeguinte());
+                                        itinerario.setObservacaoHorarioSeguinte(obsHorarioSeguinte);
+                                    }
+
+                                    if(itinerario.getIdProximoHorario() != null){
+                                        String obsProximoHorario = appDatabase.horarioItinerarioDAO()
+                                                .carregarObservacaoPorHorario(itinerario.getIdProximoHorario());
+                                        itinerario.setObservacaoProximoHorario(obsProximoHorario);
+                                    }
+
+                                    itinerarioAnterior = itinerario;
+
+                                    itinerarios.add(itinerario);
+                                    bairroAnterior = b;
                                 }
 
-                                if(itinerario.getIdProximoHorario() != null){
-                                    String obsProximoHorario = appDatabase.horarioItinerarioDAO()
-                                            .carregarObservacaoPorHorario(itinerario.getIdProximoHorario());
-                                    itinerario.setObservacaoProximoHorario(obsProximoHorario);
-                                }
 
-                                itinerarioAnterior = itinerario;
-
-                                itinerarios.add(itinerario);
+                            } else{
                                 bairroAnterior = b;
                             }
 
-
-                        } else{
-                            bairroAnterior = b;
                         }
 
+                        resultadosItinerarios.postValue(itinerarios);
+
                     }
-
-                    resultadosItinerarios.postValue(itinerarios);
-
                 }
+
             }
         });
 
@@ -610,407 +424,255 @@ public class ItinerariosViewModel extends AndroidViewModel {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                GraphBuilder<String, Double> builder = GraphBuilder.create();
 
-                itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosTesteSync();
+                SimpleSQLiteQuery queryOpcoes = new SimpleSQLiteQuery(
+                        geraQueryItinerarios(myPartida.getBairro().getId(), myDestino.getBairro().getId()));
 
-                for(ItinerarioPartidaDestino i : itinerarios){
-                    builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(i.getItinerario().getDistancia());
-                }
+                List<String> opcoes = appDatabase.itinerarioDAO()
+                        .carregarOpcoesPorPartidaEDestinoSync(queryOpcoes);
 
-                HipsterDirectedGraph<String,Double> graph = builder.createDirectedGraph();
+                if(opcoes.size() > 0){
 
-                SearchProblem p = GraphSearchProblem
-                        .startingFrom(myPartida.getBairro().getId())
-                        .in(graph)
-                        .takeCostsFromEdges()
-                        .build();
-
-                Algorithm.SearchResult result = Hipster.createDijkstra(p).search(myDestino.getBairro().getId());
-
-                List<List> caminhos = result.getOptimalPaths();
-
-                for(List<List> caminho : caminhos){
-                    int cont = caminho.size();
-                    List<BairroCidade> passos = new ArrayList<>();
-
-                    for(int i = 0; i < cont; i++){
-
-                        BairroCidade bairro = appDatabase.bairroDAO().carregarSync(String.valueOf(caminho.get(i)));
-
-                        passos.add(bairro);
-                    }
-
-                    BairroCidade bairroAnterior = null;
-                    ItinerarioPartidaDestino itinerarioAnterior = null;
                     List<ItinerarioPartidaDestino> itinerarios = new ArrayList<>();
 
-                    for(BairroCidade b : passos){
+                    String itinerariosDisponiveis = TextUtils.join("','", opcoes);
 
-                        if(bairroAnterior != null){
+                    SimpleSQLiteQuery query = new SimpleSQLiteQuery(
+                            geraQueryResultado(myPartida.getBairro().getId(),
+                                    myDestino.getBairro().getId(), diaAnterior, dia, diaSeguinte, horaEscolhida, itinerariosDisponiveis));
 
-                            String hora = "";
+                    ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO()
+                            .carregarPorPartidaEDestinoComHorarioSync(query);
 
-                            PeriodFormatter parser =
-                                    new PeriodFormatterBuilder()
-                                            .appendHours().appendLiteral(":")
-                                            .appendMinutes().toFormatter();
+                    if(itinerario != null){
+                        itinerario.setDia(dia);
+                        itinerario.setHora(horaEscolhida);
+                    }
 
-                            PeriodFormatter printer =
-                                    new PeriodFormatterBuilder()
-                                            .printZeroAlways().minimumPrintedDigits(2)
-                                            //.appendDays().appendLiteral(" dia(s) ")
-                                            .appendHours().appendLiteral(":")
-                                            .appendMinutes().toFormatter();
+                    if(itinerario == null){
 
-                            Period period = Period.ZERO;
+                        String diaAnt = dia;
+                        String diaAt = diaSeguinte;
+                        String diaSeg = DataHoraUtils.getDiaSeguinte(diaSeguinte);
 
-                            if(itinerarioAnterior != null){
-                                String proximoHorario = itinerarioAnterior.getProximoHorario();
-                                String tempo = DateTimeFormat.forPattern("HH:mm").print(itinerarioAnterior.getItinerario().getTempo().getMillis());
+                        query = new SimpleSQLiteQuery(
+                                geraQueryResultadoDiaSeguinte(myPartida.getBairro().getId(), myDestino.getBairro().getId(),
+                                        diaAnt, diaAt, diaSeg, itinerariosDisponiveis));
 
-                                period = period.plus(parser.parsePeriod(proximoHorario));
-                                period = period.plus(parser.parsePeriod(tempo));
+                        itinerario = appDatabase.itinerarioDAO()
+                                .carregarPorPartidaEDestinoComHorarioSync(query);
 
-                                hora = printer.print(period.normalizedStandard(PeriodType.time()));
+                        if(itinerario != null){
+                            itinerario.setDia(diaAt);
+                            itinerario.setHora(horaEscolhida);
+                        }
 
+
+                    }
+
+                    if(itinerario != null && itinerario.getProximoHorario() != null){
+
+                        if(itinerario.getIdHorarioAnterior() != null){
+                            String obsHorarioAnterior = appDatabase.horarioItinerarioDAO()
+                                    .carregarObservacaoPorHorario(itinerario.getIdHorarioAnterior());
+                            itinerario.setObservacaoHorarioAnterior(obsHorarioAnterior);
+                        }
+
+                        if(itinerario.getIdHorarioSeguinte() != null){
+                            String obsHorarioSeguinte = appDatabase.horarioItinerarioDAO()
+                                    .carregarObservacaoPorHorario(itinerario.getIdHorarioSeguinte());
+                            itinerario.setObservacaoHorarioSeguinte(obsHorarioSeguinte);
+                        }
+
+                        if(itinerario.getIdProximoHorario() != null){
+                            String obsProximoHorario = appDatabase.horarioItinerarioDAO()
+                                    .carregarObservacaoPorHorario(itinerario.getIdProximoHorario());
+                            itinerario.setObservacaoProximoHorario(obsProximoHorario);
+                        }
+
+                        itinerarios.add(itinerario);
+
+                        resultadosItinerarios.postValue(itinerarios);
+                    }
+
+                } else{
+                    GraphBuilder<String, Double> builder = GraphBuilder.create();
+
+                    itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosTesteSync();
+//                itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosSync();
+                    itinerarios.addAll(appDatabase.itinerarioDAO().listarTodosAtivosSync());
+
+                    for(ItinerarioPartidaDestino i : itinerarios){
+                        System.out.println("ITIS:: "+i.getNomeBairroPartida()+" | "+i.getNomeCidadePartida()+" x "
+                                +i.getNomeBairroDestino()+" | "+i.getNomeCidadeDestino()+" || "+i.getItinerario().getDistancia()+" | "
+                                +(i.getItinerario().getDistancia()-10));
+
+                        if(i.isFlagTrecho()){
+                            builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(i.getItinerario().getDistancia());
+                        } else{
+
+                            if(i.getItinerario().getDistancia() <= 10){
+                                builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(1d);
                             } else{
-                                hora = horaEscolhida;//"00:00";//DateTimeFormat.forPattern("HH:mm:00").print(DateTime.now());
+                                builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge((i.getItinerario().getDistancia()-10));
                             }
 
-                            SimpleSQLiteQuery queryIti = new SimpleSQLiteQuery("SELECT i.id FROM itinerario i INNER JOIN " +
-                                    "parada_itinerario pi ON pi.itinerario = i.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                    "bairro bp ON bp.id = pp.bairro INNER JOIN parada_itinerario pi2 ON pi2.itinerario = i.id INNER JOIN " +
-                                    "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                                    "WHERE i.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem " +
-                                    "AND bp.id = '" + bairroAnterior.getBairro().getId() + "' AND bd.id = '" + b.getBairro().getId() + "' ORDER BY i.id");
+                        }
 
-                            List<String> itis = appDatabase.itinerarioDAO()
-                                    .carregarOpcoesPorPartidaEDestinoSync(queryIti);
 
-                            String itinerariosDisponiveis = TextUtils.join("','", itis);
+                    }
 
-                            SimpleSQLiteQuery query = new SimpleSQLiteQuery("SELECT i.*, " +
-                                    "(" +
-                                    "SELECT pi.valorSeguinte FROM itinerario i2 INNER JOIN " +
-                                    "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                    "bairro bp ON bp.id = pp.bairro INNER JOIN " +
-                                    "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
-                                    "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                                    "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
-                                    "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
-                                    "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id" +
-                                    ") AS 'tarifaTrecho'," +
+                    HipsterDirectedGraph<String,Double> graph = builder.createDirectedGraph();
 
-                                    "(SELECT pp.id FROM itinerario i2 INNER JOIN " +
-                                    "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
-                                    "parada pp ON pp.id = pi.parada INNER JOIN " +
-                                    "bairro bp ON bp.id = pp.bairro INNER JOIN " +
-                                    "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
-                                    "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                                    "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
-                                    "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
-                                    "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id) AS 'paradaPartida', " +
+                    Iterable<GraphEdge<String, Double>> a = graph.edgesOf(myPartida.getBairro().getId());
 
-                                    "(SELECT pd.id FROM itinerario i2 INNER JOIN " +
-                                    "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
-                                    "parada pp ON pp.id = pi.parada INNER JOIN bairro bp ON bp.id = pp.bairro INNER JOIN " +
-                                    "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
-                                    "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                                    "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
-                                    "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
-                                    "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id) AS 'paradaDestino', " +
+                    for(GraphEdge<String, Double> ab : a){
+                        System.out.println("AB: "+myPartida.getBairro().getId()+" x "+myDestino.getBairro().getId()+": "
+                                +ab.getVertex1()+" | "+ab.getVertex2()+" | "
+                                +ab.getEdgeValue());
+                    }
 
-                                    "'"+bairroAnterior.getBairro().getId()+"' AS 'bairroConsultaPartida', " +
-                                    "'"+b.getBairro().getId()+"' AS 'bairroConsultaDestino', " +
-                                    "e.nome AS 'nomeEmpresa', " +
-                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) as 'proximoHorario', " +
-                                    "hi.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
-                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "ORDER BY h2.nome DESC LIMIT 1) , " +
-                                    "( SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'horarioAnterior', " +
-                                    "IFNULL( (SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
-                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "ORDER BY h2.nome DESC LIMIT 1 ) , " +
-                                    "( SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'idHorarioAnterior', " +
+                    SearchProblem p = GraphSearchProblem
+                            .startingFrom(myPartida.getBairro().getId())
+                            .in(graph)
+                            .takeCostsFromEdges()
+                            .build();
 
-                                    "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
-                                    "itinerario i2 ON i2.id = hi2.itinerario " +
-                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
-                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "ORDER BY h2.nome DESC LIMIT 1 ) , " +
-                                    "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
-                                    "itinerario i2 ON i2.id = hi2.itinerario " +
-                                    "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'obsHorarioAnterior', " +
+                    Algorithm.SearchResult result = Hipster.createDijkstra(p).search(myDestino.getBairro().getId());
 
-                                    "IFNULL( (SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
-                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "ORDER BY h2.nome LIMIT 1 ) , " +
-                                    "( SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + diaSeguinte + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "ORDER BY h2.nome LIMIT 1 ) ) AS horarioSeguinte, " +
-                                    "IFNULL( (SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
-                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "ORDER BY h2.nome LIMIT 1 ) , " +
-                                    "( SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                    "WHERE hi2." + diaSeguinte + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "ORDER BY h2.nome LIMIT 1 ) ) AS idHorarioSeguinte, " +
+                    System.out.println("RES: "+result);
 
-                                    "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
-                                    "itinerario i2 ON i2.id = hi2.itinerario " +
-                                    "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
-                                    "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                    "ORDER BY h2.nome LIMIT 1 ) , " +
-                                    "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
-                                    "itinerario i2 ON i2.id = hi2.itinerario " +
-                                    "WHERE hi2." + diaSeguinte + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                    "ORDER BY h2.nome LIMIT 1 ) ) AS obsHorarioSeguinte, " +
+                    List<List> caminhos = result.getOptimalPaths();
 
-                                    "( SELECT pp.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
-                                    "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-                                    "AND pi.itinerario = i.id ) AS 'idPartida', " +
-                                    "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
-                                    "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-                                    "AND pi.itinerario = i.id ) AS 'nomePartida', " +
-                                    "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
-                                    "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                                    "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'nomeDestino', " +
-                                    "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                    "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                                    "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'idBairroPartida', " +
-                                    "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                    "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                                    "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'idBairroDestino', " +
-                                    "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                    "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                                    "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'bairroPartida', " +
-                                    "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                    "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                                    "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'bairroDestino', " +
-                                    "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                    "bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
-                                    "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                                    "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'cidadePartida', " +
-                                    "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                    "bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
-                                    "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-                                    "AND pi.itinerario = i.id ) AS 'cidadeDestino' " +
-                                    "FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario INNER JOIN " +
-                                    "itinerario i ON i.id = hi.itinerario INNER JOIN empresa e ON e.id = i.empresa " +
-                                    "WHERE hi.itinerario IN ('" + itinerariosDisponiveis + "') AND " + dia + " = 1 " +
-                                    "AND strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) > '" + hora + "' ORDER BY proximoHorario LIMIT 1");
+                    for(List<List> caminho : caminhos){
+                        int cont = caminho.size();
+                        List<BairroCidade> passos = new ArrayList<>();
 
-                            ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO()
-                                    .carregarPorPartidaEDestinoComHorarioSync(query);
+                        for(int i = 0; i < cont; i++){
 
-                            if(itinerario != null){
-                                itinerario.setDia(dia);
-                                itinerario.setHora(hora);
-                            }
+                            BairroCidade bairro = appDatabase.bairroDAO().carregarSync(String.valueOf(caminho.get(i)));
 
-                            if(itinerario == null){
+                            passos.add(bairro);
+                        }
 
-                                String diaAnt = dia;
-                                String diaAt = diaSeguinte;
-                                String diaSeg = DataHoraUtils.getDiaSeguinte(diaSeguinte);
+                        BairroCidade bairroAnterior = null;
+                        ItinerarioPartidaDestino itinerarioAnterior = null;
+                        List<ItinerarioPartidaDestino> itinerarios = new ArrayList<>();
 
-                                query = new SimpleSQLiteQuery("SELECT i.*, " +
-                                        "(" +
-                                        "SELECT pi.valorSeguinte FROM itinerario i2 INNER JOIN " +
-                                        "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                        "bairro bp ON bp.id = pp.bairro INNER JOIN " +
-                                        "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
-                                        "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                                        "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
-                                        "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
-                                        "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id" +
-                                        ") AS 'tarifaTrecho'," +
+                        for(BairroCidade b : passos){
 
-                                        "(SELECT pp.id FROM itinerario i2 INNER JOIN " +
-                                        "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
-                                        "parada pp ON pp.id = pi.parada INNER JOIN " +
-                                        "bairro bp ON bp.id = pp.bairro INNER JOIN " +
-                                        "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
-                                        "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                                        "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
-                                        "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
-                                        "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id) AS 'paradaPartida', " +
+                            if(bairroAnterior != null){
 
-                                        "(SELECT pd.id FROM itinerario i2 INNER JOIN " +
-                                        "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
-                                        "parada pp ON pp.id = pi.parada INNER JOIN bairro bp ON bp.id = pp.bairro INNER JOIN " +
-                                        "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
-                                        "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                                        "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
-                                        "AND bp.id = '"+bairroAnterior.getBairro().getId()+"' " +
-                                        "AND bd.id = '"+b.getBairro().getId()+"' ORDER BY i2.id) AS 'paradaDestino', " +
+                                String hora = "";
 
-                                        "'"+bairroAnterior.getBairro().getId()+"' AS 'bairroConsultaPartida', " +
-                                        "'"+b.getBairro().getId()+"' AS 'bairroConsultaDestino', " +
-                                        "e.nome AS 'nomeEmpresa', " +
-                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) as 'proximoHorario', " +
-                                        "hi.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
-                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "ORDER BY h2.nome DESC LIMIT 1) , " +
-                                        "( SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaAnt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'horarioAnterior', " +
-                                        "IFNULL( (SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
-                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "ORDER BY h2.nome DESC LIMIT 1 ) , " +
-                                        "( SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaAnt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'idHorarioAnterior', " +
+                                PeriodFormatter parser =
+                                        new PeriodFormatterBuilder()
+                                                .appendHours().appendLiteral(":")
+                                                .appendMinutes().toFormatter();
 
-                                        "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
-                                        "itinerario i2 ON i2.id = hi2.itinerario " +
-                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
-                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "ORDER BY h2.nome DESC LIMIT 1 ) , " +
-                                        "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
-                                        "itinerario i2 ON i2.id = hi2.itinerario " +
-                                        "WHERE hi2." + diaAnt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'obsHorarioAnterior', " +
+                                PeriodFormatter printer =
+                                        new PeriodFormatterBuilder()
+                                                .printZeroAlways().minimumPrintedDigits(2)
+                                                //.appendDays().appendLiteral(" dia(s) ")
+                                                .appendHours().appendLiteral(":")
+                                                .appendMinutes().toFormatter();
 
-                                        "IFNULL( (SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
-                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "ORDER BY h2.nome LIMIT 1 ) , " +
-                                        "( SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaSeg + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "ORDER BY h2.nome LIMIT 1 ) ) AS horarioSeguinte, " +
-                                        "IFNULL( (SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
-                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "ORDER BY h2.nome LIMIT 1 ) , " +
-                                        "( SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
-                                        "WHERE hi2." + diaSeg + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "ORDER BY h2.nome LIMIT 1 ) ) AS idHorarioSeguinte, " +
+                                Period period = Period.ZERO;
 
-                                        "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
-                                        "itinerario i2 ON i2.id = hi2.itinerario " +
-                                        "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
-                                        "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
-                                        "ORDER BY h2.nome LIMIT 1 ) , " +
-                                        "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
-                                        "itinerario i2 ON i2.id = hi2.itinerario " +
-                                        "WHERE hi2." + diaSeg + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
-                                        "ORDER BY h2.nome LIMIT 1 ) ) AS obsHorarioSeguinte, " +
+                                if(itinerarioAnterior != null){
+                                    String proximoHorario = itinerarioAnterior.getProximoHorario();
+                                    String tempo = DateTimeFormat.forPattern("HH:mm").print(itinerarioAnterior.getItinerario().getTempo().getMillis());
 
-                                        "( SELECT pp.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
-                                        "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-                                        "AND pi.itinerario = i.id ) AS 'idPartida', " +
-                                        "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
-                                        "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-                                        "AND pi.itinerario = i.id ) AS 'nomePartida', " +
-                                        "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
-                                        "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                                        "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'nomeDestino', " +
-                                        "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                        "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                                        "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'idBairroPartida', " +
-                                        "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                        "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                                        "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'idBairroDestino', " +
-                                        "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                        "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                                        "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'bairroPartida', " +
-                                        "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                        "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                                        "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'bairroDestino', " +
-                                        "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                        "bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
-                                        "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                                        "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'cidadePartida', " +
-                                        "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                                        "bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
-                                        "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-                                        "AND pi.itinerario = i.id ) AS 'cidadeDestino' " +
-                                        "FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario INNER JOIN " +
-                                        "itinerario i ON i.id = hi.itinerario INNER JOIN empresa e ON e.id = i.empresa " +
-                                        "WHERE hi.itinerario IN ('" + itinerariosDisponiveis + "') AND " + diaAt + " = 1 ORDER BY proximoHorario LIMIT 1");
+                                    period = period.plus(parser.parsePeriod(proximoHorario));
+                                    period = period.plus(parser.parsePeriod(tempo));
 
-                                itinerario = appDatabase.itinerarioDAO()
+                                    hora = printer.print(period.normalizedStandard(PeriodType.time()));
+
+                                } else{
+                                    hora = horaEscolhida;//"00:00";//DateTimeFormat.forPattern("HH:mm:00").print(DateTime.now());
+                                }
+
+                                SimpleSQLiteQuery queryIti = new SimpleSQLiteQuery(
+                                        geraQueryItinerarios(bairroAnterior.getBairro().getId(), b.getBairro().getId()));
+
+                                List<String> itis = appDatabase.itinerarioDAO()
+                                        .carregarOpcoesPorPartidaEDestinoSync(queryIti);
+
+                                String itinerariosDisponiveis = TextUtils.join("','", itis);
+
+                                SimpleSQLiteQuery query = new SimpleSQLiteQuery(
+                                        geraQueryResultado(bairroAnterior.getBairro().getId(),
+                                                b.getBairro().getId(), diaAnterior, dia, diaSeguinte, hora, itinerariosDisponiveis));
+
+                                ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO()
                                         .carregarPorPartidaEDestinoComHorarioSync(query);
 
                                 if(itinerario != null){
-                                    itinerario.setDia(diaAt);
+                                    itinerario.setDia(dia);
                                     itinerario.setHora(hora);
                                 }
 
-                            }
+                                if(itinerario == null){
 
-                            if(itinerario != null && itinerario.getProximoHorario() != null){
+                                    String diaAnt = dia;
+                                    String diaAt = diaSeguinte;
+                                    String diaSeg = DataHoraUtils.getDiaSeguinte(diaSeguinte);
 
-                                if(itinerario.getIdHorarioAnterior() != null){
-                                    String obsHorarioAnterior = appDatabase.horarioItinerarioDAO()
-                                            .carregarObservacaoPorHorario(itinerario.getIdHorarioAnterior());
-                                    itinerario.setObservacaoHorarioAnterior(obsHorarioAnterior);
+                                    query = new SimpleSQLiteQuery(
+                                            geraQueryResultadoDiaSeguinte(bairroAnterior.getBairro().getId(), b.getBairro().getId(),
+                                                    diaAnt, diaAt, diaSeg, itinerariosDisponiveis));
+
+                                    itinerario = appDatabase.itinerarioDAO()
+                                            .carregarPorPartidaEDestinoComHorarioSync(query);
+
+                                    if(itinerario != null){
+                                        itinerario.setDia(diaAt);
+                                        itinerario.setHora(hora);
+                                    }
+
+
                                 }
 
-                                if(itinerario.getIdHorarioSeguinte() != null){
-                                    String obsHorarioSeguinte = appDatabase.horarioItinerarioDAO()
-                                            .carregarObservacaoPorHorario(itinerario.getIdHorarioSeguinte());
-                                    itinerario.setObservacaoHorarioSeguinte(obsHorarioSeguinte);
+                                if(itinerario != null && itinerario.getProximoHorario() != null){
+
+                                    if(itinerario.getIdHorarioAnterior() != null){
+                                        String obsHorarioAnterior = appDatabase.horarioItinerarioDAO()
+                                                .carregarObservacaoPorHorario(itinerario.getIdHorarioAnterior());
+                                        itinerario.setObservacaoHorarioAnterior(obsHorarioAnterior);
+                                    }
+
+                                    if(itinerario.getIdHorarioSeguinte() != null){
+                                        String obsHorarioSeguinte = appDatabase.horarioItinerarioDAO()
+                                                .carregarObservacaoPorHorario(itinerario.getIdHorarioSeguinte());
+                                        itinerario.setObservacaoHorarioSeguinte(obsHorarioSeguinte);
+                                    }
+
+                                    if(itinerario.getIdProximoHorario() != null){
+                                        String obsProximoHorario = appDatabase.horarioItinerarioDAO()
+                                                .carregarObservacaoPorHorario(itinerario.getIdProximoHorario());
+                                        itinerario.setObservacaoProximoHorario(obsProximoHorario);
+                                    }
+
+                                    itinerarioAnterior = itinerario;
+
+                                    itinerarios.add(itinerario);
+                                    bairroAnterior = b;
                                 }
 
-                                if(itinerario.getIdProximoHorario() != null){
-                                    String obsProximoHorario = appDatabase.horarioItinerarioDAO()
-                                            .carregarObservacaoPorHorario(itinerario.getIdProximoHorario());
-                                    itinerario.setObservacaoProximoHorario(obsProximoHorario);
-                                }
 
-                                itinerarioAnterior = itinerario;
-
-                                itinerarios.add(itinerario);
+                            } else{
                                 bairroAnterior = b;
                             }
 
-
-                        } else{
-                            bairroAnterior = b;
                         }
 
+                        resultadosItinerarios.postValue(itinerarios);
+
                     }
-
-                    resultadosItinerarios.postValue(itinerarios);
-
                 }
+
             }
         });
-
-
 
         itinerario = appDatabase.horarioItinerarioDAO()
                 .carregarProximoPorPartidaEDestino(myPartida.getBairro().getId(),
@@ -1044,5 +706,314 @@ public class ItinerariosViewModel extends AndroidViewModel {
 //        itinerarioResultado = appDatabase.itinerarioDAO()
 //                .carregar(itinerario.getValue().getHorarioItinerario().getItinerario());
 //    }
+
+    private String geraQueryItinerarios(String bairroPartida, String bairroDestino){
+        return "SELECT i.id FROM itinerario i INNER JOIN " +
+                "parada_itinerario pi ON pi.itinerario = i.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro bp ON bp.id = pp.bairro INNER JOIN parada_itinerario pi2 ON pi2.itinerario = i.id INNER JOIN " +
+                "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                "WHERE i.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem " +
+                "AND bp.id = '" + bairroPartida + "' AND bd.id = '" + bairroDestino + "' ORDER BY i.id";
+    }
+
+    private String geraQueryResultado(String bairroPartida, String bairroDestino,
+                                      String diaAnterior, String dia, String diaSeguinte,
+                                      String hora, String itinerariosDisponiveis){
+        return "SELECT i.*, " +
+                "(" +
+                "SELECT pi.valorSeguinte FROM itinerario i2 INNER JOIN " +
+                "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                "AND bp.id = '"+bairroPartida+"' " +
+                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id" +
+                ") AS 'tarifaTrecho', " +
+
+                "(SELECT pp.id FROM itinerario i2 INNER JOIN " +
+                "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
+                "parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                "AND bp.id = '"+bairroPartida+"' " +
+                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'paradaPartida', " +
+
+                "(SELECT pd.id FROM itinerario i2 INNER JOIN " +
+                "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
+                "parada pp ON pp.id = pi.parada INNER JOIN bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                "AND bp.id = '"+bairroPartida+"' " +
+                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'paradaDestino', " +
+
+                "'"+bairroPartida+"' AS 'bairroConsultaPartida', " +
+                "'"+bairroDestino+"' AS 'bairroConsultaDestino'," +
+                " e.nome AS 'nomeEmpresa', " +
+                "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) as 'proximoHorario', " +
+                "hi.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
+                "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
+                "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                "ORDER BY h2.nome DESC LIMIT 1) , " +
+                "( SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
+                "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'horarioAnterior', " +
+                "IFNULL( (SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
+                "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                "ORDER BY h2.nome DESC LIMIT 1 ) , " +
+                "( SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'idHorarioAnterior', " +
+
+                "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                "itinerario i2 ON i2.id = hi2.itinerario " +
+                "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
+                "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                "ORDER BY h2.nome DESC LIMIT 1 ) , " +
+                "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                "itinerario i2 ON i2.id = hi2.itinerario " +
+                "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'obsHorarioAnterior', " +
+
+                "IFNULL( (SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
+                "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                "ORDER BY h2.nome DESC LIMIT 1 ) , " +
+                "( SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'observacaoHorarioAnterior', " +
+
+                "IFNULL( (SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
+                "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
+                "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                "ORDER BY h2.nome LIMIT 1 ) , " +
+                "( SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
+                "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + diaSeguinte + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "ORDER BY h2.nome LIMIT 1 ) ) AS horarioSeguinte, " +
+                "IFNULL( (SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
+                "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                "ORDER BY h2.nome LIMIT 1 ) , " +
+                "( SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + diaSeguinte + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "ORDER BY h2.nome LIMIT 1 ) ) AS idHorarioSeguinte, " +
+
+                "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                "itinerario i2 ON i2.id = hi2.itinerario " +
+                "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
+                "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                "ORDER BY h2.nome LIMIT 1 ) , " +
+                "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                "itinerario i2 ON i2.id = hi2.itinerario " +
+                "WHERE hi2." + diaSeguinte + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "ORDER BY h2.nome LIMIT 1 ) ) AS obsHorarioSeguinte, " +
+
+                "IFNULL( (SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
+                "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                "ORDER BY h2.nome LIMIT 1 ) , " +
+                "( SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + diaSeguinte + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "ORDER BY h2.nome LIMIT 1 ) ) AS observacaoHorarioSeguinte, " +
+
+                "( SELECT pp.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+                "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
+                "AND pi.itinerario = i.id ) AS 'idPartida', " +
+                "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+                "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
+                "AND pi.itinerario = i.id ) AS 'nomePartida', " +
+                "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+                "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
+                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'nomeDestino', " +
+                "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
+                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'idBairroPartida', " +
+                "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
+                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'idBairroDestino', " +
+                "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
+                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'bairroPartida', " +
+                "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
+                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'bairroDestino', " +
+                "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
+                "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
+                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'cidadePartida', " +
+                "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
+                "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
+                "AND pi.itinerario = i.id ) AS 'cidadeDestino' " +
+                "FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario INNER JOIN " +
+                "itinerario i ON i.id = hi.itinerario INNER JOIN empresa e ON e.id = i.empresa " +
+                "WHERE hi.itinerario IN ('" + itinerariosDisponiveis + "') AND " + dia + " = 1 " +
+                "AND strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) > '" + hora + "' ORDER BY proximoHorario LIMIT 1";
+    }
+
+    private String geraQueryResultadoDiaSeguinte(String bairroPartida, String bairroDestino,
+                                                 String diaAnt, String diaAt, String diaSeg, String itinerariosDisponiveis){
+        return "SELECT i.*, " +
+                "(" +
+                "SELECT pi.valorSeguinte FROM itinerario i2 INNER JOIN " +
+                "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                "AND bp.id = '"+bairroPartida+"' " +
+                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id" +
+                ") AS 'tarifaTrecho'," +
+
+                "(SELECT pp.id FROM itinerario i2 INNER JOIN " +
+                "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
+                "parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                "AND bp.id = '"+bairroPartida+"' " +
+                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'paradaPartida', " +
+
+                "(SELECT pd.id FROM itinerario i2 INNER JOIN " +
+                "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
+                "parada pp ON pp.id = pi.parada INNER JOIN bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                "AND bp.id = '"+bairroPartida+"' " +
+                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'paradaDestino', " +
+
+                "'"+bairroPartida+"' AS 'bairroConsultaPartida', " +
+                "'"+bairroDestino+"' AS 'bairroConsultaDestino', " +
+                "e.nome AS 'nomeEmpresa', " +
+                "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) as 'proximoHorario', " +
+                "hi.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
+                "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
+                "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                "ORDER BY h2.nome DESC LIMIT 1) , " +
+                "( SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
+                "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + diaAnt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'horarioAnterior', " +
+                "IFNULL( (SELECT h2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
+                "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                "ORDER BY h2.nome DESC LIMIT 1 ) , " +
+                "( SELECT h2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + diaAnt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'idHorarioAnterior', " +
+
+                "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                "itinerario i2 ON i2.id = hi2.itinerario " +
+                "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
+                "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                "ORDER BY h2.nome DESC LIMIT 1 ) , " +
+                "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                "itinerario i2 ON i2.id = hi2.itinerario " +
+                "WHERE hi2." + diaAnt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'obsHorarioAnterior', " +
+
+                "IFNULL( (SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
+                "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                "ORDER BY h2.nome DESC LIMIT 1 ) , " +
+                "( SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + diaAnt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'observacaoHorarioAnterior', " +
+
+                "IFNULL( (SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
+                "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
+                "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                "ORDER BY h2.nome LIMIT 1 ) , " +
+                "( SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
+                "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + diaSeg + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "ORDER BY h2.nome LIMIT 1 ) ) AS horarioSeguinte, " +
+                "IFNULL( (SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
+                "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                "ORDER BY h2.nome LIMIT 1 ) , " +
+                "( SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + diaSeg + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "ORDER BY h2.nome LIMIT 1 ) ) AS idHorarioSeguinte, " +
+
+                "IFNULL( (SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                "itinerario i2 ON i2.id = hi2.itinerario " +
+                "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
+                "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                "ORDER BY h2.nome LIMIT 1 ) , " +
+                "( SELECT i2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario INNER JOIN " +
+                "itinerario i2 ON i2.id = hi2.itinerario " +
+                "WHERE hi2." + diaSeg + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "ORDER BY h2.nome LIMIT 1 ) ) AS obsHorarioSeguinte, " +
+
+                "IFNULL( (SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) > " +
+                "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+                "ORDER BY h2.nome LIMIT 1 ) , " +
+                "( SELECT hi2.observacao FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
+                "WHERE hi2." + diaSeg + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
+                "ORDER BY h2.nome LIMIT 1 ) ) AS observacaoHorarioSeguinte, " +
+
+                "( SELECT pp.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+                "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
+                "AND pi.itinerario = i.id ) AS 'idPartida', " +
+                "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+                "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
+                "AND pi.itinerario = i.id ) AS 'nomePartida', " +
+                "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+                "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
+                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'nomeDestino', " +
+                "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
+                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'idBairroPartida', " +
+                "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
+                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'idBairroDestino', " +
+                "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
+                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'bairroPartida', " +
+                "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
+                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'bairroDestino', " +
+                "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
+                "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
+                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'cidadePartida', " +
+                "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
+                "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
+                "AND pi.itinerario = i.id ) AS 'cidadeDestino' " +
+                "FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario INNER JOIN " +
+                "itinerario i ON i.id = hi.itinerario INNER JOIN empresa e ON e.id = i.empresa " +
+                "WHERE hi.itinerario IN ('" + itinerariosDisponiveis + "') AND " + diaAt + " = 1 ORDER BY proximoHorario LIMIT 1";
+    }
 
 }

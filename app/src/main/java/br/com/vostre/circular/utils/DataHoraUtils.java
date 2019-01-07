@@ -328,4 +328,14 @@ public class DataHoraUtils {
         return DateTimeFormat.forPattern("HH:mm").print(DateTimeFormat.forPattern("HH:mm:ss").parseLocalTime(hora));
     }
 
+    public static String segundosParaHoraFormatado(Integer segundos){
+        int hours = segundos / 3600;
+        int minutes = (segundos % 3600) / 60;
+
+        String h = hours < 10 ? "0"+hours : String.valueOf(hours);
+        String m = minutes < 10 ? "0"+minutes : String.valueOf(minutes);
+
+        return h+":"+m;
+    }
+
 }

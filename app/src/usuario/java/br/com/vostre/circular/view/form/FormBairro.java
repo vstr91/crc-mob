@@ -113,12 +113,12 @@ public class FormBairro extends FormBase implements SelectListener {
             cidade = new CidadeEstado();
             cidade.setCidade(umaCidade);
 
-            if(viewModel.escolhaAtual == 0){
+            if(!viewModel.partidaEscolhida){
                 viewModel.setCidadePartida(cidade);
                 viewModel.bairros.observe(this, bairrosObserver);
                 adapter = new BairroAdapter(viewModel.bairros.getValue(), ctx.getApplicationContext());
                 //viewModel.escolhaAtual = 1;
-            } else{
+            } else if(!viewModel.destinoEscolhido){
                 viewModel.setCidadeDestino(cidade);
                 viewModel.bairrosDestino.observe(this, bairrosObserver);
                 adapter = new BairroAdapter(viewModel.bairrosDestino.getValue(), ctx.getApplicationContext());

@@ -11,6 +11,7 @@
     <color name="azul">#334BFF</color>
     <color name="azulClaro">#52bfb8</color>
     <color name="cinzaEscuro">#333333</color>
+    <color name="cinzaEscuro80">#DD333333</color>
     <color name="cinzaClaro">#EEEEEE</color>
     <color name="cinzaMedio">#AAAAAA</color>
     <color name="cinzaInativo">#E3E3E3</color>

@@ -24,13 +24,16 @@ public interface ParadaItinerarioDAO {
     @Query("SELECT * FROM parada_itinerario")
     List<ParadaItinerario> listarTodosSync();
 
-    @Query("SELECT pi.*, pi.itinerario AS idItinerario, p.id AS idParada, p.nome AS nomeParada, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade " +
+    @Query("SELECT pi.*, pi.itinerario AS idItinerario, p.id AS idParada, p.nome AS nomeParada, " +
+            "p.latitude AS latitude, p.longitude AS longitude, " +
+            "b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade " +
             "FROM parada_itinerario pi " +
             "INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade " +
             "WHERE p.ativo = 1 AND pi.itinerario = :itinerario")
     LiveData<List<ParadaItinerarioBairro>> listarTodosPorItinerarioComBairro(String itinerario);
 
-    @Query("SELECT pi.*, p.id AS idParada, p.nome AS nomeParada, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade " +
+    @Query("SELECT pi.*, p.id AS idParada, p.nome AS nomeParada, p.latitude AS latitude, p.longitude AS longitude, " +
+            "b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade " +
             "FROM parada_itinerario pi " +
             "INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade " +
             "WHERE pi.ativo = 1 AND pi.itinerario = :itinerario ORDER BY pi.ordem")

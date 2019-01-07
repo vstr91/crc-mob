@@ -10,6 +10,7 @@ import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.databinding.InverseBindingAdapter;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +28,9 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -44,15 +48,23 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
+import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
+import br.com.vostre.circular.utils.DataHoraUtils;
 import br.com.vostre.circular.view.adapter.ParadaItinerarioAdapter;
 import br.com.vostre.circular.view.form.FormHistorico;
 import br.com.vostre.circular.view.form.FormItinerario;
 import br.com.vostre.circular.view.utils.SortListItemHelper;
 import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
 import br.com.vostre.circular.databinding.ActivityDetalhesItinerarioBinding;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class DetalhesItinerarioActivity extends BaseActivity {
 
@@ -212,6 +224,66 @@ public class DetalhesItinerarioActivity extends BaseActivity {
         formItinerario.setCtx(ctx.getApplication());
         formItinerario.show(getSupportFragmentManager(), "formItinerario");
 
+    }
+
+    public void onClickBtnDistancia(View v){
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                List<ParadaItinerarioBairro> paradas = viewModel.pits.getValue();
+
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl("http://router.project-osrm.org/")
+                        .addConverterFactory(ScalarsConverterFactory.create())
+                        .build();
+                CircularAPI api = retrofit.create(CircularAPI.class);
+                Call<String> call = api.carregaDistancia(paradas.get(0).getLongitude()
+                        +","+paradas.get(0).getLatitude(),paradas.get(paradas.size()-1).getLongitude()
+                        +","+paradas.get(paradas.size()-1).getLatitude());
+
+                call.enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        System.out.println(response);
+                        try {
+                            JSONObject obj = new JSONObject(response.body().toString());
+                            JSONArray routes = obj.getJSONArray("routes");
+                            JSONObject objDados = routes.getJSONObject(0);
+
+                            String distancia = objDados.getString("distance");
+                            int tempo = objDados.getInt("duration");
+
+                            Double distanciaKm = Double.parseDouble(distancia) / 1000;
+                            String tempoFormatado = DataHoraUtils.segundosParaHoraFormatado(tempo);
+
+                            long distKm = (long) distanciaKm.doubleValue();
+
+                            if(distKm > 0){
+                                viewModel.itinerario.getValue().getItinerario()
+                                        .setDistancia(Double.parseDouble(String.valueOf(distKm)));
+                            }
+
+                            if(tempoFormatado != null){
+                                viewModel.itinerario.getValue().getItinerario()
+                                        .setTempo(DateTimeFormat.forPattern("HH:mm").parseDateTime(tempoFormatado));
+                            }
+
+                            viewModel.editarItinerario();
+
+                            //System.out.println(obj);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        System.out.println(call.request().body());
+                    }
+                });
+            }
+        });
     }
 
     public void onClickBtnHistorico(View v){
@@ -410,11 +482,12 @@ public class DetalhesItinerarioActivity extends BaseActivity {
 
     Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {
         @Override
-        public void onChanged(List<ParadaBairro> paradas) {
+        public void onChanged(final List<ParadaBairro> paradas) {
             map.getOverlays().clear();
             map.getOverlays().add(mLocationOverlay);
             map.getOverlays().add(overlayEvents);
             atualizarParadasMapa(paradas);
+
 //            List<Overlay> ov = map.getOverlays().;
 //            System.out.println(ov.size());
         }
@@ -422,7 +495,7 @@ public class DetalhesItinerarioActivity extends BaseActivity {
 
     Observer<List<ParadaItinerarioBairro>> paradasItinerarioObserver = new Observer<List<ParadaItinerarioBairro>>() {
         @Override
-        public void onChanged(List<ParadaItinerarioBairro> paradas) {
+        public void onChanged(final List<ParadaItinerarioBairro> paradas) {
             adapter.paradas = paradas;
             adapter.notifyDataSetChanged();
         }
@@ -437,7 +510,7 @@ public class DetalhesItinerarioActivity extends BaseActivity {
 
     Observer<List<ParadaItinerarioBairro>> pitsObserver = new Observer<List<ParadaItinerarioBairro>>() {
         @Override
-        public void onChanged(List<ParadaItinerarioBairro> paradas) {
+        public void onChanged(final List<ParadaItinerarioBairro> paradas) {
             viewModel.paradasItinerario.postValue(paradas);
         }
     };

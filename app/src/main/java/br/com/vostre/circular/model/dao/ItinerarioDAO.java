@@ -119,7 +119,7 @@ public interface ItinerarioDAO {
             "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
             "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
             "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
-            ") AS 'cidadeDestino' " +
+            ") AS 'cidadeDestino', 1 AS 'flagTrecho' " +
             "FROM parada_itinerario pit INNER JOIN itinerario i ON i.id = pit.itinerario " +
             "WHERE i.ativo = 1")
     List<ItinerarioPartidaDestino> listarTodosAtivosSync();
@@ -144,7 +144,7 @@ public interface ItinerarioDAO {
             "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
             "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
             "WHERE pi.ordem > pi2.ordem AND pi.itinerario = i.id " +
-            ") AS 'cidadeDestino' " +
+            ") AS 'cidadeDestino', 1 AS 'flagTrecho' " +
             "FROM parada_itinerario pi2 INNER JOIN itinerario i ON i.id = pi2.itinerario " +
             "WHERE pi2.ordem < (SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = i.id) " +
             "AND i.ativo = 1 " +

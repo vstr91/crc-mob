@@ -8,9 +8,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.File;
+
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.LinhaCidadesBinding;
 import br.com.vostre.circular.databinding.LinhaParadasBinding;
+import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.view.DetalheParadaActivity;
@@ -30,10 +33,17 @@ public class ParadaViewHolder extends RecyclerView.ViewHolder {
     public void bind(final ParadaBairro parada, boolean mostraBairro) {
         binding.setParada(parada);
 
-        if(parada.getParada().getImagem() != null){
+        Parada p = parada.getParada();
+        File f = null;
+
+        if(p != null && p.getImagem() != null){
+            f = new File(ctx.getApplicationContext().getFilesDir(),  p.getImagem());
+        }
+
+        if(parada.getParada().getImagem() != null && f != null && f.exists() && f.canRead()){
             binding.circleView2.setImageDrawable(Drawable.createFromPath(ctx.getApplicationContext().getFilesDir()+"/"+parada.getParada().getImagem()));
         } else{
-            binding.circleView2.setImageDrawable(ctx.getResources().getDrawable(R.drawable.imagem_nao_disponivel_16_9));
+            binding.circleView2.setImageDrawable(ctx.getResources().getDrawable(R.drawable.imagem_nao_disponivel_quadrada));
         }
 
         //binding.circleView2.setImagem(null);

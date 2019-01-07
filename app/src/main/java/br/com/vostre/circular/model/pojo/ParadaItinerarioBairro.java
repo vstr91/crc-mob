@@ -30,6 +30,12 @@ public class ParadaItinerarioBairro {
     @ColumnInfo(name = "nomeCidade")
     String nomeCidade;
 
+    @ColumnInfo(name = "latitude")
+    String latitude;
+
+    @ColumnInfo(name = "longitude")
+    String longitude;
+
     @Ignore
     String bairroComCidade;
 
@@ -97,6 +103,22 @@ public class ParadaItinerarioBairro {
 
     public String getBairroComCidade() {
         return nomeBairro+" - "+nomeCidade;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
     }
 
     @Override

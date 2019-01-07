@@ -43,4 +43,7 @@ public interface CircularAPI {
     @GET("api/recebe-preferencias/{id}")
     Call<ResponseBody> recebePreferencias(@Path("id") String id);
 
+    @GET("route/v1/driving/{partida};{destino}?overview=false")
+    Call<String> carregaDistancia(@Path("partida") String partida, @Path("destino") String destino);
+
 }

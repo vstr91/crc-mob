@@ -19,6 +19,7 @@ import br.com.vostre.circular.databinding.LinhaItinerariosResultadoBinding;
 
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.utils.DataHoraUtils;
+import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.view.BaseActivity;
 import br.com.vostre.circular.view.DetalheItinerarioActivity;
 import br.com.vostre.circular.view.DetalheParadaActivity;
@@ -177,6 +178,16 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
         };
 //
         binding.textViewParada.setOnClickListener(listenerParada);
+
+        String paramPartida = PreferenceUtils.carregarPreferencia(ctx, "param_mostrar_partida");
+
+        if(!paramPartida.equals("1")){
+            binding.textViewParada.setVisibility(View.GONE);
+            binding.imageView.setVisibility(View.GONE);
+        } else{
+            binding.textViewParada.setVisibility(View.VISIBLE);
+            binding.imageView.setVisibility(View.VISIBLE);
+        }
 
         binding.executePendingBindings();
     }

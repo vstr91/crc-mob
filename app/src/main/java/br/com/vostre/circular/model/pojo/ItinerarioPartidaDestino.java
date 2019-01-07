@@ -96,6 +96,9 @@ public class ItinerarioPartidaDestino {
     @ColumnInfo(name = "paradaDestino")
     String paradaDestino;
 
+    @ColumnInfo(name = "flagTrecho")
+    Boolean flagTrecho;
+
     @Ignore
     public boolean selecionado;
 
@@ -104,6 +107,14 @@ public class ItinerarioPartidaDestino {
 
     @Ignore
     public String hora;
+
+    public Boolean isFlagTrecho() {
+        return flagTrecho;
+    }
+
+    public void setFlagTrecho(Boolean flagTrecho) {
+        this.flagTrecho = flagTrecho;
+    }
 
     public boolean isSelecionado() {
         return selecionado;

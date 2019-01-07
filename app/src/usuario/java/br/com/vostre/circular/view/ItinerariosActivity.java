@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,6 +70,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     boolean inversao = false;
 
     Bundle bundle;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +91,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         viewModel.resultadosItinerarios.observe(this, resultadoItinerarioObserver);
 
         binding.setViewModel(viewModel);
+
+        ocultaModalLoading();
 
         listCidadesPartida = binding.listCidadesPartida;
         adapter = new CidadeAdapter(viewModel.cidades.getValue(), this);
@@ -159,6 +164,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         //viewModel.escolhaAtual = 0;
         consultaDiaSeguinte = false;
         viewModel.partidaEscolhida = false;
+        viewModel.destinoEscolhido = false;
 
         //log
         bundle = new Bundle();
@@ -200,6 +206,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
         viewModel.carregaResultadoInvertido(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte, diaAnterior);
 
+        geraModalLoading();
+
 //        BairroCidade bairro = bairroPartida;
 //        bairroPartida = bairroDestino;
 //        bairroDestino = bairro;
@@ -223,6 +231,20 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
         mFirebaseAnalytics.logEvent("inversao_consulta", bundle);
 
+    }
+
+    private void geraModalLoading() {
+        binding.fundo.setVisibility(View.VISIBLE);
+        binding.textViewCarregando.setVisibility(View.VISIBLE);
+        binding.progressBar.setIndeterminate(true);
+        binding.progressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void ocultaModalLoading(){
+        binding.fundo.setVisibility(View.GONE);
+        binding.textViewCarregando.setVisibility(View.GONE);
+        binding.progressBar.setIndeterminate(true);
+        binding.progressBar.setVisibility(View.GONE);
     }
 
     Observer<List<ItinerarioPartidaDestino>> resultadoItinerarioObserver = new Observer<List<ItinerarioPartidaDestino>>() {
@@ -271,6 +293,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
             }
 
             adapterResultado.notifyDataSetChanged();
+            ocultaModalLoading();
         }
     };
 
@@ -476,6 +499,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         viewModel.carregaResultado(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte, diaAnterior, false);
 
         viewModel.itinerario.observe(this, itinerarioObserver);
+
+        geraModalLoading();
 
 //        binding.textViewBairroPartidaResultado.setText(viewModel.);
 

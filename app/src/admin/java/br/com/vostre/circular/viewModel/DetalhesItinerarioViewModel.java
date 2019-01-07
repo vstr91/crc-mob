@@ -138,7 +138,11 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
     public void editarItinerario(){
 
         Itinerario umItinerario = itinerario.getValue().getItinerario();
-        umItinerario.setEmpresa(empresa.getId());
+
+        if(empresa != null){
+            umItinerario.setEmpresa(empresa.getId());
+        }
+
 
         if(umItinerario.valida(umItinerario)){
             edit(umItinerario);

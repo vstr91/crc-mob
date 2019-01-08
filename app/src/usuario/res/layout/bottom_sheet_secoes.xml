@@ -47,4 +47,22 @@
         app:layout_constraintStart_toEndOf="@+id/textViewStatus"
         app:layout_constraintTop_toTopOf="@+id/textViewStatus"
         app:srcCompat="@drawable/ic_close_blue_24dp" />
+
+    <TextView
+        android:id="@+id/textView57"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Fonte: DETRO-RJ (detro.rj.gov.br)"
+        android:textColor="@color/cinzaEscuro"
+        android:textSize="9sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/listSecoes" />
 </android.support.constraint.ConstraintLayout>

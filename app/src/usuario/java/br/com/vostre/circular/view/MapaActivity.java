@@ -131,6 +131,7 @@ public class MapaActivity extends BaseActivity {
     boolean flag = false;
 
     Bundle bundle;
+    boolean logado = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -873,10 +874,12 @@ public class MapaActivity extends BaseActivity {
 
             bundle = new Bundle();
             mFirebaseAnalytics.logEvent("login_mapa", bundle);
+            logado = true;
 
         } else{
             binding.btnLogin.setVisibility(View.VISIBLE);
             binding.fabParada.setEnabled(false);
+            logado = false;
         }
 
     }
@@ -902,6 +905,7 @@ public class MapaActivity extends BaseActivity {
 
         bundle = new Bundle();
         mFirebaseAnalytics.logEvent("logoff_mapa", bundle);
+        logado = false;
     }
 
 }

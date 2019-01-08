@@ -153,6 +153,8 @@ public class DetalheParadaActivity extends BaseActivity {
 
         viewModel.itinerarios.observe(this, itinerariosObserver);
 
+        geraModalLoading();
+
         if(link == null){
             checaFavorito();
         }
@@ -171,6 +173,20 @@ public class DetalheParadaActivity extends BaseActivity {
             binding.imageButton4.setImageResource(R.drawable.ic_star_border_white_24dp);
             flagFavorito = false;
         }
+    }
+
+    private void geraModalLoading() {
+        binding.fundo.setVisibility(View.VISIBLE);
+        binding.textViewCarregando.setVisibility(View.VISIBLE);
+        binding.progressBar.setIndeterminate(true);
+        binding.progressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void ocultaModalLoading(){
+        binding.fundo.setVisibility(View.GONE);
+        binding.textViewCarregando.setVisibility(View.GONE);
+        binding.progressBar.setIndeterminate(true);
+        binding.progressBar.setVisibility(View.GONE);
     }
 
     public void onClickBtnMapa(View v){
@@ -294,6 +310,7 @@ public class DetalheParadaActivity extends BaseActivity {
             });
             adapter.itinerarios = itinerarios;
             adapter.notifyDataSetChanged();
+            ocultaModalLoading();
         }
     };
 
@@ -325,6 +342,7 @@ public class DetalheParadaActivity extends BaseActivity {
                     viewModel.itinerarios.observe(ctx, itinerariosObserver);
                     idParada = parada.getParada().getId();
                     checaFavorito();
+                    geraModalLoading();
                 }
 
                 //viewModel.carregarItinerarios(parada.getParada().getId());

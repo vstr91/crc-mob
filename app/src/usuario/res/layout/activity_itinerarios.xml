@@ -48,14 +48,14 @@
             android:layout_marginBottom="8dp"
             android:elevation="25dp"
             android:gravity="center"
-            android:text="Não foi possível encontrar uma rota direta. Buscando outras rotas disponíveis! Só um momento, por favor!"
+            android:text="Buscando rotas disponíveis! Só um momento, por favor!"
             android:textColor="@color/branco"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Não foi possível encontrar uma rota direta. Buscando outras rotas disponíveis! Só um momento, por favor!" />
+            tools:text="Buscando rotas disponíveis! Só um momento, por favor!" />
 
         <ProgressBar
             android:id="@+id/progressBar"

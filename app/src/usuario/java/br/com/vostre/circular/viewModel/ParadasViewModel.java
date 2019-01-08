@@ -57,6 +57,8 @@ public class ParadasViewModel extends AndroidViewModel {
 
     public Bitmap foto;
 
+    public static MutableLiveData<Integer> retorno;
+
     public Bitmap getFoto() {
         return foto;
     }
@@ -80,7 +82,7 @@ public class ParadasViewModel extends AndroidViewModel {
 
     public void setCidade(String cidade) {
         this.cidade = appDatabase.cidadeDAO().carregar(cidade);
-        paradas = appDatabase.paradaDAO().listarTodosAtivosComBairroPorCidade(cidade);
+        paradas = appDatabase.paradaDAO().listarTodosAtivosComBairroPorCidadeComItinerario(cidade);
     }
 
     public ParadasViewModel(Application app){
@@ -88,7 +90,10 @@ public class ParadasViewModel extends AndroidViewModel {
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         cidades = appDatabase.cidadeDAO().listarTodosAtivasComEstado();
         cidade = appDatabase.cidadeDAO().carregar("");
-        paradas = appDatabase.paradaDAO().listarTodosAtivosComBairroPorCidade("");
+        paradas = appDatabase.paradaDAO().listarTodosAtivosComBairroPorCidadeComItinerario("");
+
+        retorno = new MutableLiveData<>();
+        retorno.setValue(-1);
     }
 
     public void salvarParada(){
@@ -102,7 +107,7 @@ public class ParadasViewModel extends AndroidViewModel {
         if(parada.getParada().valida(parada.getParada())){
             add(parada.getParada());
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -120,7 +125,7 @@ public class ParadasViewModel extends AndroidViewModel {
         if(parada.getParada().valida(parada.getParada())){
             edit(parada.getParada());
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }

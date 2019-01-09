@@ -31,6 +31,18 @@ public class PontoInteresseViewHolder extends RecyclerView.ViewHolder {
     public void bind(final PontoInteresse poi) {
         binding.setPontoInteresse(poi);
 
+        if(poi.isPermanente()){
+            binding.textView41.setVisibility(View.GONE);
+        } else{
+            binding.textView41.setVisibility(View.VISIBLE);
+        }
+
+        if(poi.getDescricao() == null || poi.getDescricao().isEmpty()){
+            binding.textView42.setVisibility(View.GONE);
+        } else{
+            binding.textView42.setVisibility(View.VISIBLE);
+        }
+
         binding.btnVerMapa.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -5,6 +5,9 @@ import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Relation;
 
+import org.joda.time.DateTime;
+
+import java.util.Date;
 import java.util.List;
 
 import br.com.vostre.circular.model.Itinerario;
@@ -99,6 +102,12 @@ public class ItinerarioPartidaDestino {
     @ColumnInfo(name = "flagTrecho")
     Boolean flagTrecho;
 
+    @ColumnInfo(name = "distanciaTrecho")
+    Double distanciaTrecho;
+
+    @ColumnInfo(name = "tempoTrecho")
+    DateTime tempoTrecho;
+
     @Ignore
     public boolean selecionado;
 
@@ -107,6 +116,22 @@ public class ItinerarioPartidaDestino {
 
     @Ignore
     public String hora;
+
+    public Double getDistanciaTrecho() {
+        return distanciaTrecho;
+    }
+
+    public void setDistanciaTrecho(Double distanciaTrecho) {
+        this.distanciaTrecho = distanciaTrecho;
+    }
+
+    public DateTime getTempoTrecho() {
+        return tempoTrecho;
+    }
+
+    public void setTempoTrecho(DateTime tempoTrecho) {
+        this.tempoTrecho = tempoTrecho;
+    }
 
     public Boolean isFlagTrecho() {
         return flagTrecho;

@@ -171,12 +171,20 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                     String itinerariosDisponiveis = TextUtils.join("','", opcoes);
 
+//                    String a = geraQueryResultado(myPartida.getBairro().getId(),
+//                            myDestino.getBairro().getId(), diaAnterior, dia, diaSeguinte, horaEscolhida, itinerariosDisponiveis);
+
                     SimpleSQLiteQuery query = new SimpleSQLiteQuery(
                             geraQueryResultado(myPartida.getBairro().getId(),
                                     myDestino.getBairro().getId(), diaAnterior, dia, diaSeguinte, horaEscolhida, itinerariosDisponiveis));
 
                     ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO()
                             .carregarPorPartidaEDestinoComHorarioSync(query);
+
+//                    SimpleSQLiteQuery queryTarifa =
+//                            new SimpleSQLiteQuery(geraQueryTarifaTrecho(myPartida.getBairro().getId(),
+//                                    myDestino.getBairro().getId(),
+//                            itinerario.getItinerario().getId()));
 
                     if(itinerario != null){
                         itinerario.setDia(dia);
@@ -237,9 +245,6 @@ public class ItinerariosViewModel extends AndroidViewModel {
                     itinerarios.addAll(appDatabase.itinerarioDAO().listarTodosAtivosSync());
 
                     for(ItinerarioPartidaDestino i : itinerarios){
-                        System.out.println("ITIS:: "+i.getNomeBairroPartida()+" | "+i.getNomeCidadePartida()+" x "
-                                +i.getNomeBairroDestino()+" | "+i.getNomeCidadeDestino()+" || "+i.getItinerario().getDistancia()+" | "
-                                +(i.getItinerario().getDistancia()-10));
 
                         if(i.isFlagTrecho()){
                             builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(i.getItinerario().getDistancia());
@@ -248,7 +253,8 @@ public class ItinerariosViewModel extends AndroidViewModel {
                             if(i.getItinerario().getDistancia() <= 10){
                                 builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(1d);
                             } else{
-                                builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge((i.getItinerario().getDistancia()-10));
+                                builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino())
+                                        .withEdge((i.getItinerario().getDistancia()-10));
                             }
 
                         }
@@ -259,12 +265,6 @@ public class ItinerariosViewModel extends AndroidViewModel {
                     HipsterDirectedGraph<String,Double> graph = builder.createDirectedGraph();
 
                     Iterable<GraphEdge<String, Double>> a = graph.edgesOf(myPartida.getBairro().getId());
-
-                    for(GraphEdge<String, Double> ab : a){
-                        System.out.println("AB: "+myPartida.getBairro().getId()+" x "+myDestino.getBairro().getId()+": "
-                                +ab.getVertex1()+" | "+ab.getVertex2()+" | "
-                                +ab.getEdgeValue());
-                    }
 
                     SearchProblem p = GraphSearchProblem
                             .startingFrom(myPartida.getBairro().getId())
@@ -720,16 +720,46 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                       String diaAnterior, String dia, String diaSeguinte,
                                       String hora, String itinerariosDisponiveis){
         return "SELECT i.*, " +
-                "(" +
+                "IFNULL((" +
                 "SELECT pi.valorSeguinte FROM itinerario i2 INNER JOIN " +
+                "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem = pi2.ordem-1 AND i2.id = i.id " +
+                "AND bp.id = '"+bairroPartida+"' " +
+                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id LIMIT 1), " +
+
+                "(" +
+                "SELECT pi2.valorAnterior FROM itinerario i2 INNER JOIN " +
                 "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro bp ON bp.id = pp.bairro INNER JOIN " +
                 "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
                 "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
                 "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
                 "AND bp.id = '"+bairroPartida+"' " +
-                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id" +
-                ") AS 'tarifaTrecho', " +
+                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id LIMIT 1) " +
+                ") AS 'tarifaTrecho',  " +
+
+                "(" +
+                "SELECT pi.distanciaSeguinte FROM itinerario i2 INNER JOIN " +
+                "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem = pi2.ordem-1 AND i2.id = i.id " +
+                "AND bp.id = '"+bairroPartida+"' " +
+                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'distanciaTrecho', " +
+
+                "(" +
+                "SELECT pi.tempoSeguinte FROM itinerario i2 INNER JOIN " +
+                "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem = pi2.ordem-1 AND i2.id = i.id " +
+                "AND bp.id = '"+bairroPartida+"' " +
+                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'tempoTrecho', " +
 
                 "(SELECT pp.id FROM itinerario i2 INNER JOIN " +
                 "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
@@ -876,10 +906,29 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "bairro bp ON bp.id = pp.bairro INNER JOIN " +
                 "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
                 "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem = pi2.ordem-1 AND i2.id = i.id " +
                 "AND bp.id = '"+bairroPartida+"' " +
-                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id" +
-                ") AS 'tarifaTrecho'," +
+                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'tarifaTrecho', " +
+
+                "(" +
+                "SELECT pi.distanciaSeguinte FROM itinerario i2 INNER JOIN " +
+                "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem = pi2.ordem-1 AND i2.id = i.id " +
+                "AND bp.id = '"+bairroPartida+"' " +
+                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'distanciaTrecho', " +
+
+                "(" +
+                "SELECT pi.tempoSeguinte FROM itinerario i2 INNER JOIN " +
+                "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem = pi2.ordem-1 AND i2.id = i.id " +
+                "AND bp.id = '"+bairroPartida+"' " +
+                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'tempoTrecho', " +
 
                 "(SELECT pp.id FROM itinerario i2 INNER JOIN " +
                 "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
@@ -1014,6 +1063,17 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario INNER JOIN " +
                 "itinerario i ON i.id = hi.itinerario INNER JOIN empresa e ON e.id = i.empresa " +
                 "WHERE hi.itinerario IN ('" + itinerariosDisponiveis + "') AND " + diaAt + " = 1 ORDER BY proximoHorario LIMIT 1";
+    }
+
+    private String geraQueryTarifaTrecho(String bairroPartida, String bairroDestino, String itinerario){
+        return "SELECT 7.3 FROM itinerario i2 INNER JOIN " +
+                "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+                "bairro bp ON bp.id = pp.bairro INNER JOIN " +
+                "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
+                "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = '"+itinerario+"' " +
+                "AND bp.id = '"+bairroPartida+"' " +
+                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id LIMIT 1";
     }
 
 }

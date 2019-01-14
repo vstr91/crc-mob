@@ -16,18 +16,31 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.Itinerario;
+import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
+import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
+import br.com.vostre.circular.utils.DataHoraUtils;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
@@ -118,6 +131,90 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
         retorno = new MutableLiveData<>();
         retorno.setValue(-1);
+    }
+
+    public void atualizaParadasItinerario(final String itinerario){
+        List<ParadaItinerarioBairro> pis = appDatabase.paradaItinerarioDAO()
+                .listarTodosPorItinerarioComBairroSync(itinerario);
+
+        ParadaItinerarioBairro paradaAnterior = null;
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://router.project-osrm.org/")
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .build();
+        CircularAPI api = retrofit.create(CircularAPI.class);
+
+        for(ParadaItinerarioBairro pb : pis){
+
+            if(paradaAnterior != null){
+
+                Call<String> call = api.carregaDistancia(paradaAnterior.getLongitude()+","
+                        +paradaAnterior.getLatitude(),pb.getLongitude()+","+pb.getLatitude());
+
+                final ParadaItinerarioBairro finalParadaAnterior = paradaAnterior;
+                call.enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        System.out.println(response);
+                        try {
+                            JSONObject obj = new JSONObject(response.body().toString());
+                            JSONArray routes = obj.getJSONArray("routes");
+                            JSONObject objDados = routes.getJSONObject(0);
+
+                            String distancia = objDados.getString("distance");
+                            int tempo = objDados.getInt("duration");
+
+                            Double distanciaKm = Double.parseDouble(distancia) / 1000;
+                            String tempoFormatado = DataHoraUtils.segundosParaHoraFormatado(tempo);
+
+                            long distKm = (long) distanciaKm.doubleValue();
+
+                            if(distKm > 0){
+                                finalParadaAnterior.getParadaItinerario()
+                                        .setDistanciaSeguinte(Double.parseDouble(String.valueOf(distKm)));
+                            }
+
+                            if(tempoFormatado != null){
+                                finalParadaAnterior.getParadaItinerario()
+                                        .setTempoSeguinte(DateTimeFormat.forPattern("HH:mm")
+                                                .parseDateTime(tempoFormatado));
+                            }
+
+                            AsyncTask.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    finalParadaAnterior.getParadaItinerario().setEnviado(false);
+                                    finalParadaAnterior.getParadaItinerario().setUltimaAlteracao(DateTime.now());
+                                    appDatabase.paradaItinerarioDAO().editar(finalParadaAnterior.getParadaItinerario());
+                                }
+                            });
+
+//                            viewModel.editarItinerario();
+
+                            //System.out.println(obj);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        System.out.println(call.request().body());
+                    }
+                });
+
+                System.out.println("PARADAS ITINERARIO::: "
+                        +paradaAnterior.getNomeParada()+" - "+paradaAnterior.getNomeBairro()
+                        +", "+paradaAnterior.getNomeCidade()
+                        +", ("+paradaAnterior.getLatitude()+";"+paradaAnterior.getLongitude()+") || "+pb.getNomeParada()+" - "+pb.getNomeBairro()
+                        +", "+pb.getNomeCidade()+", ("+pb.getLatitude()+";"+pb.getLongitude()+")");
+            }
+
+            paradaAnterior = pb;
+
+        }
+
     }
 
     public void salvarItinerario(){
@@ -230,6 +327,8 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
                 paradaItinerario.setDestaque(pi.getDestaque());
                 paradaItinerario.setValorAnterior(pi.getValorAnterior());
                 paradaItinerario.setValorSeguinte(pi.getValorSeguinte());
+                paradaItinerario.setEnviado(false);
+                paradaItinerario.setUltimaAlteracao(DateTime.now());
 
                 db.paradaItinerarioDAO().editar(paradaItinerario);
             } else{

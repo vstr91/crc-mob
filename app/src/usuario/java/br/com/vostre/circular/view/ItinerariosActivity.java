@@ -293,6 +293,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
             }
 
             adapterResultado.notifyDataSetChanged();
+            listResultados.scrollToPosition(0);
             ocultaModalLoading();
         }
     };

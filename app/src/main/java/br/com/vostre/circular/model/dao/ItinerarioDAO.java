@@ -254,6 +254,16 @@ public interface ItinerarioDAO {
     @RawQuery
     List<String> carregarOpcoesPorPartidaEDestinoSync(SupportSQLiteQuery query);
 
+    @Query("SELECT IFNULL(pi.valorSeguinte, pi2.valorAnterior) FROM itinerario i2 LEFT JOIN " +
+            "parada_itinerario pi ON pi.itinerario = i2.id LEFT JOIN parada pp ON pp.id = pi.parada LEFT JOIN " +
+            "bairro bp ON bp.id = pp.bairro LEFT JOIN " +
+            "parada_itinerario pi2 ON pi2.itinerario = i2.id LEFT JOIN " +
+            "parada pd ON pd.id = pi2.parada LEFT JOIN bairro bd ON bd.id = pd.bairro " +
+            "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = :itinerario " +
+            "AND bp.id = :partida " +
+            "AND bd.id = :destino ORDER BY i2.id LIMIT 1")
+    Double carregarTarifaTrechoSync(String partida, String destino, String itinerario);
+
     @Query("SELECT DISTINCT c.*, e.id AS idEstado, e.nome AS nomeEstado " +
             "FROM itinerario i INNER JOIN parada_itinerario pit ON pit.itinerario = i.id INNER JOIN parada p ON p.id = pit.parada INNER JOIN " +
             "bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado " +

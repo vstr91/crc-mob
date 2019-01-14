@@ -146,6 +146,8 @@ public class DetalheItinerarioActivity extends BaseActivity {
         viewModel.horarios.observe(this, horariosObserver);
         viewModel.localAtual.observe(this, localObserver);
 
+        geraModalLoading();
+
         configuraMapa();
 
     }
@@ -425,6 +427,8 @@ public class DetalheItinerarioActivity extends BaseActivity {
             adapterHorarios.legenda = dados;
             adapterHorarios.notifyDataSetChanged();
 
+            ocultaModalLoading();
+
 //            CustomLayoutManager customLayoutManager = new CustomLayoutManager(getApplicationContext());
 //            binding.listHorarios.setLayoutManager(customLayoutManager);
 ////            manager.scrollToPositionWithOffset(adapterHorarios.buscaPosicaoHorarioInt(horario), 0);
@@ -604,6 +608,20 @@ public class DetalheItinerarioActivity extends BaseActivity {
         pb.getParada().setLatitude(marker.getPosition().getLatitude());
         pb.getParada().setLongitude(marker.getPosition().getLongitude());
         return pb;
+    }
+
+    private void geraModalLoading() {
+        binding.fundo.setVisibility(View.VISIBLE);
+        binding.textViewCarregando.setVisibility(View.VISIBLE);
+        binding.progressBar.setIndeterminate(true);
+        binding.progressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void ocultaModalLoading(){
+        binding.fundo.setVisibility(View.GONE);
+        binding.textViewCarregando.setVisibility(View.GONE);
+        binding.progressBar.setIndeterminate(true);
+        binding.progressBar.setVisibility(View.GONE);
     }
 
 }

@@ -9,6 +9,8 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
+import org.joda.time.DateTime;
+
 import java.util.List;
 
 import br.com.vostre.circular.model.Itinerario;
@@ -31,6 +33,14 @@ public interface ParadaItinerarioDAO {
             "INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade " +
             "WHERE p.ativo = 1 AND pi.itinerario = :itinerario")
     LiveData<List<ParadaItinerarioBairro>> listarTodosPorItinerarioComBairro(String itinerario);
+
+    @Query("SELECT pi.*, pi.itinerario AS idItinerario, p.id AS idParada, p.nome AS nomeParada, " +
+            "p.latitude AS latitude, p.longitude AS longitude, " +
+            "b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade " +
+            "FROM parada_itinerario pi " +
+            "INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade " +
+            "WHERE p.ativo = 1 AND pi.itinerario = :itinerario ORDER BY pi.ordem")
+    List<ParadaItinerarioBairro> listarTodosPorItinerarioComBairroSync(String itinerario);
 
     @Query("SELECT pi.*, p.id AS idParada, p.nome AS nomeParada, p.latitude AS latitude, p.longitude AS longitude, " +
             "b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade " +
@@ -75,6 +85,11 @@ public interface ParadaItinerarioDAO {
             "INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade " +
             "WHERE p.ativo = 1 AND p.id = :parada AND pi.itinerario = :itinerario")
     ParadaItinerarioBairro carregar(String parada, String itinerario);
+
+    @Query("SELECT pi.* " +
+            "FROM parada_itinerario pi " +
+            "WHERE pi.ativo = 1 AND pi.parada = :parada AND pi.itinerario = :itinerario")
+    ParadaItinerario carregarParadaItinerario(String parada, String itinerario);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<ParadaItinerario> paradasItinerarios);

@@ -38,6 +38,7 @@ import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.ImageUtils;
 import br.com.vostre.circular.utils.StringUtils;
 
 public class ParadasViewModel extends AndroidViewModel {
@@ -170,6 +171,7 @@ public class ParadasViewModel extends AndroidViewModel {
 
         try {
             fos = new FileOutputStream(file);
+            foto = ImageUtils.scaleDown(foto, 600, true);
             foto.compress(Bitmap.CompressFormat.PNG, 100, fos);
         } catch (FileNotFoundException e) {
             e.printStackTrace();

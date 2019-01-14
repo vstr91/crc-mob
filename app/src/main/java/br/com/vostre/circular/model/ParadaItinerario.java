@@ -4,6 +4,11 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Index;
 import android.support.annotation.NonNull;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+
+import java.util.Date;
+
 @Entity(indices = {@Index(value = {"parada", "itinerario"},
         unique = true)}, tableName = "parada_itinerario")
 public class ParadaItinerario extends EntidadeBase {
@@ -23,6 +28,26 @@ public class ParadaItinerario extends EntidadeBase {
     private Double valorAnterior;
 
     private Double valorSeguinte;
+
+    private DateTime tempoSeguinte;
+
+    private Double distanciaSeguinte;
+
+    public DateTime getTempoSeguinte() {
+        return tempoSeguinte;
+    }
+
+    public void setTempoSeguinte(DateTime tempoSeguinte) {
+        this.tempoSeguinte = tempoSeguinte;
+    }
+
+    public Double getDistanciaSeguinte() {
+        return distanciaSeguinte;
+    }
+
+    public void setDistanciaSeguinte(Double distanciaSeguinte) {
+        this.distanciaSeguinte = distanciaSeguinte;
+    }
 
     @NonNull
     public String getParada() {

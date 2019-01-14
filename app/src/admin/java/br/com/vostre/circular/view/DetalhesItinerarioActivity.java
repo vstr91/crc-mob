@@ -231,6 +231,8 @@ public class DetalhesItinerarioActivity extends BaseActivity {
             @Override
             public void run() {
 
+                viewModel.atualizaParadasItinerario(viewModel.itinerario.getValue().getItinerario().getId());
+
                 List<ParadaItinerarioBairro> paradas = viewModel.pits.getValue();
 
                 Retrofit retrofit = new Retrofit.Builder()

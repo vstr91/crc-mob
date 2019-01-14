@@ -91,6 +91,23 @@ public interface ParadaItinerarioDAO {
             "WHERE pi.ativo = 1 AND pi.parada = :parada AND pi.itinerario = :itinerario")
     ParadaItinerario carregarParadaItinerario(String parada, String itinerario);
 
+    @Query("SELECT * FROM parada_itinerario pi " +
+            "WHERE pi.itinerario = :itinerario " +
+            "AND pi.ordem >= " +
+            "(" +
+            "SELECT pi2.ordem FROM parada_itinerario pi2 INNER JOIN itinerario i ON i.id = pi2.itinerario INNER JOIN parada p ON p.id = pi2.parada " +
+            "WHERE p.bairro = :partida " +
+            "AND i.id = :itinerario" +
+            ")" +
+            "AND pi.ordem < " +
+            "(" +
+            "SELECT pi2.ordem FROM parada_itinerario pi2 INNER JOIN itinerario i ON i.id = pi2.itinerario INNER JOIN parada p ON p.id = pi2.parada " +
+            "WHERE p.bairro = :destino " +
+            "AND i.id = :itinerario" +
+            ")" +
+            "ORDER BY pi.ordem")
+    List<ParadaItinerario> listarTrechosIntervalo(String itinerario, String partida, String destino);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<ParadaItinerario> paradasItinerarios);
 

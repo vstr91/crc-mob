@@ -33,6 +33,7 @@ import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.Itinerario;
+import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.BairroCidade;
@@ -159,6 +160,18 @@ public class ItinerariosViewModel extends AndroidViewModel {
             @Override
             public void run() {
 
+                PeriodFormatter parser =
+                        new PeriodFormatterBuilder()
+                                .appendHours().appendLiteral(":")
+                                .appendMinutes().toFormatter();
+
+                PeriodFormatter printer =
+                        new PeriodFormatterBuilder()
+                                .printZeroAlways().minimumPrintedDigits(2)
+                                //.appendDays().appendLiteral(" dia(s) ")
+                                .appendHours().appendLiteral(":")
+                                .appendMinutes().toFormatter();
+
                 SimpleSQLiteQuery queryOpcoes = new SimpleSQLiteQuery(
                         geraQueryItinerarios(myPartida.getBairro().getId(), myDestino.getBairro().getId()));
 
@@ -171,9 +184,6 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                     String itinerariosDisponiveis = TextUtils.join("','", opcoes);
 
-//                    String a = geraQueryResultado(myPartida.getBairro().getId(),
-//                            myDestino.getBairro().getId(), diaAnterior, dia, diaSeguinte, horaEscolhida, itinerariosDisponiveis);
-
                     SimpleSQLiteQuery query = new SimpleSQLiteQuery(
                             geraQueryResultado(myPartida.getBairro().getId(),
                                     myDestino.getBairro().getId(), diaAnterior, dia, diaSeguinte, horaEscolhida, itinerariosDisponiveis));
@@ -181,14 +191,58 @@ public class ItinerariosViewModel extends AndroidViewModel {
                     ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO()
                             .carregarPorPartidaEDestinoComHorarioSync(query);
 
-//                    SimpleSQLiteQuery queryTarifa =
-//                            new SimpleSQLiteQuery(geraQueryTarifaTrecho(myPartida.getBairro().getId(),
-//                                    myDestino.getBairro().getId(),
-//                            itinerario.getItinerario().getId()));
-
                     if(itinerario != null){
                         itinerario.setDia(dia);
                         itinerario.setHora(horaEscolhida);
+
+                        if(itinerario.isFlagTrecho()){
+
+                            List<ParadaItinerario> pis = appDatabase.paradaItinerarioDAO().listarTrechosIntervalo(itinerario.getItinerario().getId(), myPartida.getBairro().getId(),
+                                    myDestino.getBairro().getId());
+
+                            Double total = 0d;
+                            Double distanciaTotal = 0d;
+                            DateTime tempoTotal = new DateTime();
+
+                            Period period = Period.ZERO;
+
+                            for(ParadaItinerario pi : pis){
+
+                                if(pi.getValorSeguinte() != null){
+                                    total += pi.getValorSeguinte();
+                                }
+
+                                if(pi.getDistanciaSeguinte() != null){
+                                    distanciaTotal += pi.getDistanciaSeguinte();
+                                }
+
+                                if(pi.getTempoSeguinte() != null){
+                                    String tempo = DateTimeFormat.forPattern("HH:mm").print(pi.getTempoSeguinte().getMillis());
+                                    period = period.plus(parser.parsePeriod(tempo));
+                                }
+
+                            }
+
+                            tempoTotal = DateTimeFormat.forPattern("HH:mm").parseDateTime(printer.print(period.normalizedStandard(PeriodType.time())));
+
+                            if(total > 0){
+                                itinerario.setTarifaTrecho(total);
+                            }
+
+                            if(distanciaTotal > 0){
+                                itinerario.setDistanciaTrecho(distanciaTotal);
+                            }
+
+                            if(tempoTotal.getMinuteOfHour() > 0){
+                                itinerario.setTempoTrecho(tempoTotal);
+                            }
+
+                            Parada p = appDatabase.paradaDAO().carregarSync(itinerario.getParadaPartida());
+                            itinerario.setNomePartida(p.getNome());
+                            itinerario.setIdPartida(p.getId());
+
+                        }
+
                     }
 
                     if(itinerario == null){
@@ -207,6 +261,55 @@ public class ItinerariosViewModel extends AndroidViewModel {
                         if(itinerario != null){
                             itinerario.setDia(diaAt);
                             itinerario.setHora(horaEscolhida);
+
+                            if(itinerario.isFlagTrecho()){
+
+                                List<ParadaItinerario> pis = appDatabase.paradaItinerarioDAO().listarTrechosIntervalo(itinerario.getItinerario().getId(), myPartida.getBairro().getId(),
+                                        myDestino.getBairro().getId());
+
+                                Double total = 0d;
+                                Double distanciaTotal = 0d;
+                                DateTime tempoTotal = new DateTime();
+
+                                Period period = Period.ZERO;
+
+                                for(ParadaItinerario pi : pis){
+
+                                    if(pi.getValorSeguinte() != null){
+                                        total += pi.getValorSeguinte();
+                                    }
+
+                                    if(pi.getDistanciaSeguinte() != null){
+                                        distanciaTotal += pi.getDistanciaSeguinte();
+                                    }
+
+                                    if(pi.getTempoSeguinte() != null){
+                                        String tempo = DateTimeFormat.forPattern("HH:mm").print(pi.getTempoSeguinte().getMillis());
+                                        period = period.plus(parser.parsePeriod(tempo));
+                                    }
+
+                                }
+
+                                tempoTotal = DateTimeFormat.forPattern("HH:mm").parseDateTime(printer.print(period.normalizedStandard(PeriodType.time())));
+
+                                if(total > 0){
+                                    itinerario.setTarifaTrecho(total);
+                                }
+
+                                if(distanciaTotal > 0){
+                                    itinerario.setDistanciaTrecho(distanciaTotal);
+                                }
+
+                                if(tempoTotal.getMinuteOfHour() > 0){
+                                    itinerario.setTempoTrecho(tempoTotal);
+                                }
+
+                                Parada pa = appDatabase.paradaDAO().carregarSync(itinerario.getParadaPartida());
+                                itinerario.setNomePartida(pa.getNome());
+                                itinerario.setIdPartida(pa.getId());
+
+                            }
+
                         }
 
 
@@ -242,7 +345,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                     itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosTesteSync();
 //                itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosSync();
-                    itinerarios.addAll(appDatabase.itinerarioDAO().listarTodosAtivosSync());
+                    //itinerarios.addAll(appDatabase.itinerarioDAO().listarTodosAtivosSync());
 
                     for(ItinerarioPartidaDestino i : itinerarios){
 
@@ -299,18 +402,6 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                                 String hora = "";
 
-                                PeriodFormatter parser =
-                                        new PeriodFormatterBuilder()
-                                                .appendHours().appendLiteral(":")
-                                                .appendMinutes().toFormatter();
-
-                                PeriodFormatter printer =
-                                        new PeriodFormatterBuilder()
-                                                .printZeroAlways().minimumPrintedDigits(2)
-                                                //.appendDays().appendLiteral(" dia(s) ")
-                                                .appendHours().appendLiteral(":")
-                                                .appendMinutes().toFormatter();
-
                                 Period period = Period.ZERO;
 
                                 if(itinerarioAnterior != null){
@@ -344,6 +435,55 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                 if(itinerario != null){
                                     itinerario.setDia(dia);
                                     itinerario.setHora(hora);
+
+                                    if(itinerario.isFlagTrecho()){
+
+                                        List<ParadaItinerario> pis = appDatabase.paradaItinerarioDAO().listarTrechosIntervalo(itinerario.getItinerario().getId(), myPartida.getBairro().getId(),
+                                                myDestino.getBairro().getId());
+
+                                        Double total = 0d;
+                                        Double distanciaTotal = 0d;
+                                        DateTime tempoTotal = new DateTime();
+
+                                        Period per = Period.ZERO;
+
+                                        for(ParadaItinerario pi : pis){
+
+                                            if(pi.getValorSeguinte() != null){
+                                                total += pi.getValorSeguinte();
+                                            }
+
+                                            if(pi.getDistanciaSeguinte() != null){
+                                                distanciaTotal += pi.getDistanciaSeguinte();
+                                            }
+
+                                            if(pi.getTempoSeguinte() != null){
+                                                String tempo = DateTimeFormat.forPattern("HH:mm").print(pi.getTempoSeguinte().getMillis());
+                                                per = per.plus(parser.parsePeriod(tempo));
+                                            }
+
+                                        }
+
+                                        tempoTotal = DateTimeFormat.forPattern("HH:mm").parseDateTime(printer.print(per.normalizedStandard(PeriodType.time())));
+
+                                        if(total > 0){
+                                            itinerario.setTarifaTrecho(total);
+                                        }
+
+                                        if(distanciaTotal > 0){
+                                            itinerario.setDistanciaTrecho(distanciaTotal);
+                                        }
+
+                                        if(tempoTotal.getMinuteOfHour() > 0){
+                                            itinerario.setTempoTrecho(tempoTotal);
+                                        }
+
+                                        Parada pa = appDatabase.paradaDAO().carregarSync(itinerario.getParadaPartida());
+                                        itinerario.setNomePartida(pa.getNome());
+                                        itinerario.setIdPartida(pa.getId());
+
+                                    }
+
                                 }
 
                                 if(itinerario == null){
@@ -362,6 +502,54 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                     if(itinerario != null){
                                         itinerario.setDia(diaAt);
                                         itinerario.setHora(hora);
+
+                                        if(itinerario.isFlagTrecho()){
+
+                                            List<ParadaItinerario> pis = appDatabase.paradaItinerarioDAO().listarTrechosIntervalo(itinerario.getItinerario().getId(), myPartida.getBairro().getId(),
+                                                    myDestino.getBairro().getId());
+
+                                            Double total = 0d;
+                                            Double distanciaTotal = 0d;
+                                            DateTime tempoTotal = new DateTime();
+
+                                            Period per = Period.ZERO;
+
+                                            for(ParadaItinerario pi : pis){
+
+                                                if(pi.getValorSeguinte() != null){
+                                                    total += pi.getValorSeguinte();
+                                                }
+
+                                                if(pi.getDistanciaSeguinte() != null){
+                                                    distanciaTotal += pi.getDistanciaSeguinte();
+                                                }
+
+                                                if(pi.getTempoSeguinte() != null){
+                                                    String tempo = DateTimeFormat.forPattern("HH:mm").print(pi.getTempoSeguinte().getMillis());
+                                                    per = per.plus(parser.parsePeriod(tempo));
+                                                }
+
+                                            }
+
+                                            tempoTotal = DateTimeFormat.forPattern("HH:mm").parseDateTime(printer.print(per.normalizedStandard(PeriodType.time())));
+
+                                            if(total > 0){
+                                                itinerario.setTarifaTrecho(total);
+                                            }
+
+                                            if(distanciaTotal > 0){
+                                                itinerario.setDistanciaTrecho(distanciaTotal);
+                                            }
+
+                                            if(tempoTotal.getMinuteOfHour() > 0){
+                                                itinerario.setTempoTrecho(tempoTotal);
+                                            }
+
+                                            Parada pa = appDatabase.paradaDAO().carregarSync(itinerario.getParadaPartida());
+                                            itinerario.setNomePartida(pa.getNome());
+                                            itinerario.setIdPartida(pa.getId());
+
+                                        }
                                     }
 
 
@@ -425,6 +613,18 @@ public class ItinerariosViewModel extends AndroidViewModel {
             @Override
             public void run() {
 
+                PeriodFormatter parser =
+                        new PeriodFormatterBuilder()
+                                .appendHours().appendLiteral(":")
+                                .appendMinutes().toFormatter();
+
+                PeriodFormatter printer =
+                        new PeriodFormatterBuilder()
+                                .printZeroAlways().minimumPrintedDigits(2)
+                                //.appendDays().appendLiteral(" dia(s) ")
+                                .appendHours().appendLiteral(":")
+                                .appendMinutes().toFormatter();
+
                 SimpleSQLiteQuery queryOpcoes = new SimpleSQLiteQuery(
                         geraQueryItinerarios(myPartida.getBairro().getId(), myDestino.getBairro().getId()));
 
@@ -447,6 +647,55 @@ public class ItinerariosViewModel extends AndroidViewModel {
                     if(itinerario != null){
                         itinerario.setDia(dia);
                         itinerario.setHora(horaEscolhida);
+
+                        if(itinerario.isFlagTrecho()){
+
+                            List<ParadaItinerario> pis = appDatabase.paradaItinerarioDAO().listarTrechosIntervalo(itinerario.getItinerario().getId(), myPartida.getBairro().getId(),
+                                    myDestino.getBairro().getId());
+
+                            Double total = 0d;
+                            Double distanciaTotal = 0d;
+                            DateTime tempoTotal = new DateTime();
+
+                            Period period = Period.ZERO;
+
+                            for(ParadaItinerario pi : pis){
+
+                                if(pi.getValorSeguinte() != null){
+                                    total += pi.getValorSeguinte();
+                                }
+
+                                if(pi.getDistanciaSeguinte() != null){
+                                    distanciaTotal += pi.getDistanciaSeguinte();
+                                }
+
+                                if(pi.getTempoSeguinte() != null){
+                                    String tempo = DateTimeFormat.forPattern("HH:mm").print(pi.getTempoSeguinte().getMillis());
+                                    period = period.plus(parser.parsePeriod(tempo));
+                                }
+
+                            }
+
+                            tempoTotal = DateTimeFormat.forPattern("HH:mm").parseDateTime(printer.print(period.normalizedStandard(PeriodType.time())));
+
+                            if(total > 0){
+                                itinerario.setTarifaTrecho(total);
+                            }
+
+                            if(distanciaTotal > 0){
+                                itinerario.setDistanciaTrecho(distanciaTotal);
+                            }
+
+                            if(tempoTotal.getMinuteOfHour() > 0){
+                                itinerario.setTempoTrecho(tempoTotal);
+                            }
+
+                            Parada p = appDatabase.paradaDAO().carregarSync(itinerario.getParadaPartida());
+                            itinerario.setNomePartida(p.getNome());
+                            itinerario.setIdPartida(p.getId());
+
+                        }
+
                     }
 
                     if(itinerario == null){
@@ -465,6 +714,55 @@ public class ItinerariosViewModel extends AndroidViewModel {
                         if(itinerario != null){
                             itinerario.setDia(diaAt);
                             itinerario.setHora(horaEscolhida);
+
+                            if(itinerario.isFlagTrecho()){
+
+                                List<ParadaItinerario> pis = appDatabase.paradaItinerarioDAO().listarTrechosIntervalo(itinerario.getItinerario().getId(), myPartida.getBairro().getId(),
+                                        myDestino.getBairro().getId());
+
+                                Double total = 0d;
+                                Double distanciaTotal = 0d;
+                                DateTime tempoTotal = new DateTime();
+
+                                Period period = Period.ZERO;
+
+                                for(ParadaItinerario pi : pis){
+
+                                    if(pi.getValorSeguinte() != null){
+                                        total += pi.getValorSeguinte();
+                                    }
+
+                                    if(pi.getDistanciaSeguinte() != null){
+                                        distanciaTotal += pi.getDistanciaSeguinte();
+                                    }
+
+                                    if(pi.getTempoSeguinte() != null){
+                                        String tempo = DateTimeFormat.forPattern("HH:mm").print(pi.getTempoSeguinte().getMillis());
+                                        period = period.plus(parser.parsePeriod(tempo));
+                                    }
+
+                                }
+
+                                tempoTotal = DateTimeFormat.forPattern("HH:mm").parseDateTime(printer.print(period.normalizedStandard(PeriodType.time())));
+
+                                if(total > 0){
+                                    itinerario.setTarifaTrecho(total);
+                                }
+
+                                if(distanciaTotal > 0){
+                                    itinerario.setDistanciaTrecho(distanciaTotal);
+                                }
+
+                                if(tempoTotal.getMinuteOfHour() > 0){
+                                    itinerario.setTempoTrecho(tempoTotal);
+                                }
+
+                                Parada pa = appDatabase.paradaDAO().carregarSync(itinerario.getParadaPartida());
+                                itinerario.setNomePartida(pa.getNome());
+                                itinerario.setIdPartida(pa.getId());
+
+                            }
+
                         }
 
 
@@ -500,12 +798,9 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                     itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosTesteSync();
 //                itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosSync();
-                    itinerarios.addAll(appDatabase.itinerarioDAO().listarTodosAtivosSync());
+                    //itinerarios.addAll(appDatabase.itinerarioDAO().listarTodosAtivosSync());
 
                     for(ItinerarioPartidaDestino i : itinerarios){
-                        System.out.println("ITIS:: "+i.getNomeBairroPartida()+" | "+i.getNomeCidadePartida()+" x "
-                                +i.getNomeBairroDestino()+" | "+i.getNomeCidadeDestino()+" || "+i.getItinerario().getDistancia()+" | "
-                                +(i.getItinerario().getDistancia()-10));
 
                         if(i.isFlagTrecho()){
                             builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(i.getItinerario().getDistancia());
@@ -514,7 +809,8 @@ public class ItinerariosViewModel extends AndroidViewModel {
                             if(i.getItinerario().getDistancia() <= 10){
                                 builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(1d);
                             } else{
-                                builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge((i.getItinerario().getDistancia()-10));
+                                builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino())
+                                        .withEdge((i.getItinerario().getDistancia()-10));
                             }
 
                         }
@@ -525,12 +821,6 @@ public class ItinerariosViewModel extends AndroidViewModel {
                     HipsterDirectedGraph<String,Double> graph = builder.createDirectedGraph();
 
                     Iterable<GraphEdge<String, Double>> a = graph.edgesOf(myPartida.getBairro().getId());
-
-                    for(GraphEdge<String, Double> ab : a){
-                        System.out.println("AB: "+myPartida.getBairro().getId()+" x "+myDestino.getBairro().getId()+": "
-                                +ab.getVertex1()+" | "+ab.getVertex2()+" | "
-                                +ab.getEdgeValue());
-                    }
 
                     SearchProblem p = GraphSearchProblem
                             .startingFrom(myPartida.getBairro().getId())
@@ -565,18 +855,6 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                                 String hora = "";
 
-                                PeriodFormatter parser =
-                                        new PeriodFormatterBuilder()
-                                                .appendHours().appendLiteral(":")
-                                                .appendMinutes().toFormatter();
-
-                                PeriodFormatter printer =
-                                        new PeriodFormatterBuilder()
-                                                .printZeroAlways().minimumPrintedDigits(2)
-                                                //.appendDays().appendLiteral(" dia(s) ")
-                                                .appendHours().appendLiteral(":")
-                                                .appendMinutes().toFormatter();
-
                                 Period period = Period.ZERO;
 
                                 if(itinerarioAnterior != null){
@@ -610,6 +888,55 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                 if(itinerario != null){
                                     itinerario.setDia(dia);
                                     itinerario.setHora(hora);
+
+                                    if(itinerario.isFlagTrecho()){
+
+                                        List<ParadaItinerario> pis = appDatabase.paradaItinerarioDAO().listarTrechosIntervalo(itinerario.getItinerario().getId(), myPartida.getBairro().getId(),
+                                                myDestino.getBairro().getId());
+
+                                        Double total = 0d;
+                                        Double distanciaTotal = 0d;
+                                        DateTime tempoTotal = new DateTime();
+
+                                        Period per = Period.ZERO;
+
+                                        for(ParadaItinerario pi : pis){
+
+                                            if(pi.getValorSeguinte() != null){
+                                                total += pi.getValorSeguinte();
+                                            }
+
+                                            if(pi.getDistanciaSeguinte() != null){
+                                                distanciaTotal += pi.getDistanciaSeguinte();
+                                            }
+
+                                            if(pi.getTempoSeguinte() != null){
+                                                String tempo = DateTimeFormat.forPattern("HH:mm").print(pi.getTempoSeguinte().getMillis());
+                                                per = per.plus(parser.parsePeriod(tempo));
+                                            }
+
+                                        }
+
+                                        tempoTotal = DateTimeFormat.forPattern("HH:mm").parseDateTime(printer.print(per.normalizedStandard(PeriodType.time())));
+
+                                        if(total > 0){
+                                            itinerario.setTarifaTrecho(total);
+                                        }
+
+                                        if(distanciaTotal > 0){
+                                            itinerario.setDistanciaTrecho(distanciaTotal);
+                                        }
+
+                                        if(tempoTotal.getMinuteOfHour() > 0){
+                                            itinerario.setTempoTrecho(tempoTotal);
+                                        }
+
+                                        Parada pa = appDatabase.paradaDAO().carregarSync(itinerario.getParadaPartida());
+                                        itinerario.setNomePartida(pa.getNome());
+                                        itinerario.setIdPartida(pa.getId());
+
+                                    }
+
                                 }
 
                                 if(itinerario == null){
@@ -628,6 +955,54 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                     if(itinerario != null){
                                         itinerario.setDia(diaAt);
                                         itinerario.setHora(hora);
+
+                                        if(itinerario.isFlagTrecho()){
+
+                                            List<ParadaItinerario> pis = appDatabase.paradaItinerarioDAO().listarTrechosIntervalo(itinerario.getItinerario().getId(), myPartida.getBairro().getId(),
+                                                    myDestino.getBairro().getId());
+
+                                            Double total = 0d;
+                                            Double distanciaTotal = 0d;
+                                            DateTime tempoTotal = new DateTime();
+
+                                            Period per = Period.ZERO;
+
+                                            for(ParadaItinerario pi : pis){
+
+                                                if(pi.getValorSeguinte() != null){
+                                                    total += pi.getValorSeguinte();
+                                                }
+
+                                                if(pi.getDistanciaSeguinte() != null){
+                                                    distanciaTotal += pi.getDistanciaSeguinte();
+                                                }
+
+                                                if(pi.getTempoSeguinte() != null){
+                                                    String tempo = DateTimeFormat.forPattern("HH:mm").print(pi.getTempoSeguinte().getMillis());
+                                                    per = per.plus(parser.parsePeriod(tempo));
+                                                }
+
+                                            }
+
+                                            tempoTotal = DateTimeFormat.forPattern("HH:mm").parseDateTime(printer.print(per.normalizedStandard(PeriodType.time())));
+
+                                            if(total > 0){
+                                                itinerario.setTarifaTrecho(total);
+                                            }
+
+                                            if(distanciaTotal > 0){
+                                                itinerario.setDistanciaTrecho(distanciaTotal);
+                                            }
+
+                                            if(tempoTotal.getMinuteOfHour() > 0){
+                                                itinerario.setTempoTrecho(tempoTotal);
+                                            }
+
+                                            Parada pa = appDatabase.paradaDAO().carregarSync(itinerario.getParadaPartida());
+                                            itinerario.setNomePartida(pa.getNome());
+                                            itinerario.setIdPartida(pa.getId());
+
+                                        }
                                     }
 
 
@@ -720,7 +1095,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                       String diaAnterior, String dia, String diaSeguinte,
                                       String hora, String itinerariosDisponiveis){
         return "SELECT i.*, " +
-                "IFNULL((" +
+                "(" +
                 "SELECT pi.valorSeguinte FROM itinerario i2 INNER JOIN " +
                 "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro bp ON bp.id = pp.bairro INNER JOIN " +
@@ -728,18 +1103,36 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
                 "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem = pi2.ordem-1 AND i2.id = i.id " +
                 "AND bp.id = '"+bairroPartida+"' " +
-                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id LIMIT 1), " +
+                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id LIMIT 1) AS 'tarifaTrecho',  " +
 
                 "(" +
-                "SELECT pi2.valorAnterior FROM itinerario i2 INNER JOIN " +
-                "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
-                "bairro bp ON bp.id = pp.bairro INNER JOIN " +
-                "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
-                "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
-                "AND bp.id = '"+bairroPartida+"' " +
-                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id LIMIT 1) " +
-                ") AS 'tarifaTrecho',  " +
+                "           (" +
+                "               SELECT (SELECT pi3.ordem " +
+                "                           FROM   parada_itinerario pi3 " +
+                "                                  INNER JOIN parada pd2 " +
+                "                                          ON pd2.id = pi3.parada " +
+                "                                  INNER JOIN bairro bd2 " +
+                "                                          ON bd2.id = pd2.bairro " +
+                "                           WHERE " +
+                "               pi3.itinerario = pi4.itinerario " +
+                "               AND bd2.id = '"+bairroDestino+"') < COUNT(*)" +
+                "               FROM   parada_itinerario pi4 " +
+                "               WHERE  pi4.itinerario = i.id" +
+                "            ) OR " +
+                "            (" +
+                "               SELECT (SELECT pi3.ordem " +
+                "                           FROM   parada_itinerario pi3 " +
+                "                                  INNER JOIN parada pd2 " +
+                "                                          ON pd2.id = pi3.parada " +
+                "                                  INNER JOIN bairro bd2 " +
+                "                                          ON bd2.id = pd2.bairro " +
+                "                           WHERE " +
+                "               pi3.itinerario = pi4.itinerario " +
+                "               AND bd2.id = '"+bairroPartida+"') > 1 " +
+                "               FROM   parada_itinerario pi4 " +
+                "               WHERE  pi4.itinerario = i.id" +
+                "            )" +
+                "        ) AS 'flagTrecho',  " +
 
                 "(" +
                 "SELECT pi.distanciaSeguinte FROM itinerario i2 INNER JOIN " +
@@ -909,6 +1302,35 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem = pi2.ordem-1 AND i2.id = i.id " +
                 "AND bp.id = '"+bairroPartida+"' " +
                 "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'tarifaTrecho', " +
+
+                "(" +
+                "           (" +
+                "               SELECT (SELECT pi3.ordem " +
+                "                           FROM   parada_itinerario pi3 " +
+                "                                  INNER JOIN parada pd2 " +
+                "                                          ON pd2.id = pi3.parada " +
+                "                                  INNER JOIN bairro bd2 " +
+                "                                          ON bd2.id = pd2.bairro " +
+                "                           WHERE " +
+                "               pi3.itinerario = pi4.itinerario " +
+                "               AND bd2.id = '"+bairroDestino+"') < COUNT(*)" +
+                "               FROM   parada_itinerario pi4 " +
+                "               WHERE  pi4.itinerario = i.id" +
+                "            ) OR " +
+                "            (" +
+                "               SELECT (SELECT pi3.ordem " +
+                "                           FROM   parada_itinerario pi3 " +
+                "                                  INNER JOIN parada pd2 " +
+                "                                          ON pd2.id = pi3.parada " +
+                "                                  INNER JOIN bairro bd2 " +
+                "                                          ON bd2.id = pd2.bairro " +
+                "                           WHERE " +
+                "               pi3.itinerario = pi4.itinerario " +
+                "               AND bd2.id = '"+bairroPartida+"') > 1 " +
+                "               FROM   parada_itinerario pi4 " +
+                "               WHERE  pi4.itinerario = i.id" +
+                "            )" +
+                "        ) AS 'flagTrecho',  " +
 
                 "(" +
                 "SELECT pi.distanciaSeguinte FROM itinerario i2 INNER JOIN " +

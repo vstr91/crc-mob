@@ -793,6 +793,8 @@ public class ItinerariosViewModel extends AndroidViewModel {
                         resultadosItinerarios.postValue(itinerarios);
                     }
 
+                    // DIJKSTRA - NAO EXISTE LINHA DIRETA ENTRE OS LOCAIS SELECIONADOS. BUSCANDO ALTERNATIVAS
+
                 } else{
                     GraphBuilder<String, Double> builder = GraphBuilder.create();
 

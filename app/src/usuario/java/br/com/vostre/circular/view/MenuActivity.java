@@ -9,10 +9,12 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -69,6 +71,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.SQLOutput;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -87,9 +91,11 @@ import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.Parametro;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.DBUtils;
 import br.com.vostre.circular.utils.JsonUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.ToolbarUtils;
+import br.com.vostre.circular.utils.Unique;
 import br.com.vostre.circular.utils.tasks.PreferenceDownloadAsyncTask;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 import es.usc.citius.hipster.algorithm.Hipster;
@@ -112,7 +118,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     // The authority for the sync adapter's content provider
     public static final String AUTHORITY = "br.com.vostre.circular.datasync.provider";
     // An account type, in the form of a domain name
-    public static final String ACCOUNT_TYPE = "br.com.vostre.circular.usuario";
+    public static final String ACCOUNT_TYPE = "br.com.vostre.circular.usuario.main";
     // The account name
     public static final String ACCOUNT = "dummyaccount";
     // Instance fields
@@ -138,7 +144,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     GoogleSignInAccount account;
 
     ProgressBar progressBar;
-    SignInButton btnLogin;
+    //SignInButton btnLogin;
 
     static int RC_SIGN_IN = 450;
     boolean flag = false;
@@ -148,6 +154,25 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         binding = DataBindingUtil.setContentView(this, R.layout.activity_menu);
         super.onCreate(savedInstanceState);
         binding.setView(this);
+
+        carregaImagens();
+
+        if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), "init")){
+            // caregar bd
+            DBUtils.populaBancoDeDados(this);
+        }
+
+        if(PreferenceUtils.carregarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".id_unico").isEmpty()){
+
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    String identificadorUnico = Unique.geraIdentificadorUnico();
+                    PreferenceUtils.salvarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".id_unico", identificadorUnico);
+                }
+            });
+
+        }
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
@@ -164,28 +189,43 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         // PARA TESTES
 
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Permissão de GPS")
+                .setMessage("Para aproveitar todas as funções do Circular, por favor permita o uso do GPS no diálogo a seguir.")
+                .setNeutralButton("Entendi", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        PreferenceUtils.salvarPreferencia(ctx.getApplicationContext(), "mostrou_dialog_inicial", true);
+                        dialog.dismiss();
 
-        Dexter.withActivity(this)
-                .withPermissions(
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                ).withListener(new MultiplePermissionsListener() {
-            @Override
-            public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        Dexter.withActivity(ctx)
+                                .withPermissions(
+                                        Manifest.permission.ACCESS_FINE_LOCATION
+                                ).withListener(new MultiplePermissionsListener() {
+                            @Override
+                            public void onPermissionsChecked(MultiplePermissionsReport report) {
 
-                if(report.areAllPermissionsGranted()){
-                    configuraActivity();
-                } else{
-                    Toast.makeText(getApplicationContext(), "Acesso ao GPS é necessário para aproveitar ao máximo as funções do Circular!", Toast.LENGTH_LONG).show();
-                }
+                                if(report.areAllPermissionsGranted()){
+                                    configuraActivity();
+                                } else{
+                                    Toast.makeText(getApplicationContext(), "Acesso ao GPS é necessário para aproveitar ao máximo as funções do Circular!", Toast.LENGTH_LONG).show();
+                                }
 
-            }
+                            }
 
-            @Override
-            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                token.continuePermissionRequest();
-            }
-        })
-                .check();
+                            @Override
+                            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                token.continuePermissionRequest();
+                            }
+                        })
+                                .check();
+
+                    }
+                }).create();
+
+        if(!checarPermissoes() && !PreferenceUtils.carregarPreferenciaBoolean(this, "mostrou_dialog_inicial")){
+            dialog.show();
+        }
 
         // Create the dummy account
         mAccount = CreateSyncAccount(this);
@@ -193,7 +233,9 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         // Get the content resolver for your app
         mResolver = getContentResolver();
 
-        mAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
+        if(mAccount == null){
+            mAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
+        }
 
         ContentResolver.setIsSyncable(mAccount, AUTHORITY, 1);
         ContentResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
@@ -230,7 +272,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         drawerToggle.syncState();
 
         progressBar = binding.progressBar;
-        btnLogin = binding.btnLogin;
+        //btnLogin = binding.btnLogin;
 
         ctx = this;
         binding.textView36.setVisibility(View.GONE);
@@ -259,11 +301,22 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             binding.btnQrCode.setVisibility(View.GONE);
         }
 
-        if(prefVersao.equalsIgnoreCase(BuildConfig.VERSION_NAME) || prefVersao.isEmpty()){
+        int versaoAtual = -1;
+
+        try{
+            versaoAtual = Integer.parseInt(prefVersao);
+        } catch (NumberFormatException e){
+            versaoAtual = -1;
+        }
+
+        versaoAtual = versaoAtual == -1 ? BuildConfig.VERSION_CODE : versaoAtual;
+
+        if(prefVersao.equalsIgnoreCase(String.valueOf(BuildConfig.VERSION_CODE)) || prefVersao.isEmpty()
+                || versaoAtual < BuildConfig.VERSION_CODE){
             binding.btnAviso.setVisibility(View.GONE);
         } else{
             binding.btnAviso.setText("Esta versão do Circular não é a mais atual. " +
-                    "Clique aqui para atualizar e tenha acesso a correções e novas funções! Versão instalada: "+BuildConfig.VERSION_NAME+", versão atual: "+prefVersao);
+                    "Clique aqui para atualizar e tenha acesso a correções e novas funções! Versão instalada: "+BuildConfig.VERSION_CODE+", versão atual: "+prefVersao);
             binding.btnAviso.setVisibility(View.VISIBLE);
         }
 
@@ -304,8 +357,34 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnParadas(View v){
-        Intent i = new Intent(getApplicationContext(), ParadasActivity.class);
-        startActivity(i);
+
+        Dexter.withActivity(this)
+                .withPermissions(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ).withListener(new MultiplePermissionsListener() {
+            @Override
+            public void onPermissionsChecked(MultiplePermissionsReport report) {
+
+                if(report.areAllPermissionsGranted()){
+                    Intent i = new Intent(getApplicationContext(), ParadasActivity.class);
+                    startActivity(i);
+                } else{
+                    Toast.makeText(getApplicationContext(), "Acesso ao GPS é necessário para o " +
+                            "mapa funcionar corretamente! Acesso ao armazenamento externo é utilizado para fazer " +
+                            "cache de partes do mapa e permitir o acesso offline.", Toast.LENGTH_LONG).show();
+
+                    Intent i = new Intent(getApplicationContext(), ParadasActivity.class);
+                    startActivity(i);
+                }
+
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                token.continuePermissionRequest();
+            }
+        }).check();
     }
 
     public void onClickBtnMapa(View v){
@@ -374,10 +453,10 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnLogin(View v){
-
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-        btnLogin.setEnabled(false);
+// TEMPORARIAMENTE DESABILITADO
+//        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+//        startActivityForResult(signInIntent, RC_SIGN_IN);
+//        btnLogin.setEnabled(false);
 
     }
 
@@ -415,13 +494,13 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
             String id = PreferenceUtils.carregarUsuarioLogado(getApplicationContext());
 
-            binding.btnLogin.setVisibility(View.GONE);
+            //binding.btnLogin.setVisibility(View.GONE);
             binding.textViewEmail.setText(account.getEmail());
             binding.textViewEmail.setVisibility(View.VISIBLE);
             binding.textView34.setVisibility(View.VISIBLE);
             binding.btnSair.setVisibility(View.VISIBLE);
         } else{
-            binding.btnLogin.setVisibility(View.VISIBLE);
+            //binding.btnLogin.setVisibility(View.VISIBLE);
             binding.textViewEmail.setText("");
             binding.textViewEmail.setVisibility(View.GONE);
             binding.textView34.setVisibility(View.GONE);
@@ -466,13 +545,16 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
          * If successful, return the Account object, otherwise report an error.
          */
         if (accountManager.addAccountExplicitly(newAccount, null, null)) {
+            System.out.println("Entrou");
             /*
              * If you don't set android:syncable="true" in
              * in your <provider> element in the manifest,
              * then call context.setIsSyncable(account, AUTHORITY, 1)
              * here.
              */
+            return newAccount;
         } else {
+            System.out.println("Entrou erro");
             /*
              * The account exists or some other error occurred. Log this, report it,
              * or handle it internally.
@@ -561,7 +643,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w("SIGN", "signInResult:failed code=" + e.getStatusCode()+" | "+e.getMessage());
             updateUI(null);
-            btnLogin.setEnabled(true);
+            //btnLogin.setEnabled(true);
             progressBar.setVisibility(View.GONE);
             Toast.makeText(getApplicationContext(), "Erro ao efeutar login: "+e.getMessage()+". Por favor tente novamente.", Toast.LENGTH_SHORT).show();
         }
@@ -581,7 +663,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             }
 
             if(flag){
-                btnLogin.setEnabled(true);
+                //btnLogin.setEnabled(true);
                 progressBar.setVisibility(View.GONE);
             }
 
@@ -693,15 +775,15 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                         binding.textViewParada.setText(p.getParada().getNome());
                         binding.textViewDistancia.setText("~"+distancia+" m");
 
-                        if(binding.textViewParada.getVisibility() == View.GONE){
+                        if(binding.textViewParada.getVisibility() == View.INVISIBLE){
                             binding.textViewParada.setVisibility(View.VISIBLE);
                         }
 
-                        if(binding.textViewDistancia.getVisibility() == View.GONE){
+                        if(binding.textViewDistancia.getVisibility() == View.INVISIBLE){
                             binding.textViewDistancia.setVisibility(View.VISIBLE);
                         }
 
-                        if(binding.textView36.getVisibility() == View.GONE){
+                        if(binding.textView36.getVisibility() == View.INVISIBLE){
                             binding.textView36.setVisibility(View.VISIBLE);
                         }
 
@@ -726,9 +808,9 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
             }
         } else{
-            binding.textViewParada.setVisibility(View.GONE);
-            binding.textViewDistancia.setVisibility(View.GONE);
-            binding.textView36.setVisibility(View.GONE);
+            binding.textViewParada.setVisibility(View.INVISIBLE);
+            binding.textViewDistancia.setVisibility(View.INVISIBLE);
+            binding.textView36.setVisibility(View.INVISIBLE);
             binding.circleView.setImagem(null);
             binding.circleView.invalidate();
         }
@@ -744,6 +826,36 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             adicionaListaALogo(null, null);
         }
 
+    }
+
+    private void carregaImagens(){
+
+        Bitmap imagem = null;
+        FileOutputStream fos = null;
+
+        try {
+            String[] s = getApplicationContext().getAssets().list("brasao");
+
+            for(String b : s){
+                File file = new File(getApplicationContext().getFilesDir(), b);
+
+                fos = new FileOutputStream(file);
+                Bitmap bmp = BitmapFactory.decodeStream(getApplicationContext().getAssets().open("brasao/"+b));
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+                    //Toast.makeText(ctx, "Imagem "+imagem+" recebida.", Toast.LENGTH_SHORT).show();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

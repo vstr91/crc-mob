@@ -38,14 +38,23 @@ public class ParadaAdapter extends RecyclerView.Adapter<ParadaViewHolder> {
 
     @Override
     public void onBindViewHolder(ParadaViewHolder holder, int position) {
+        int i = position-1;
+        ParadaBairro paradaAnterior = null;
+
+        if(i >= 0){
+            paradaAnterior = this.paradas.get(i);
+        }
+
         final ParadaBairro parada = this.paradas.get(position);
 
-        if(!parada.getNomeBairro().equals(bairroAtual)){
-            bairroAtual = parada.getNomeBairro();
-            holder.bind(parada, true);
+        if(paradaAnterior != null){
+            holder.bind(parada, paradaAnterior.getNomeBairro());
         } else{
-            holder.bind(parada, false);
+            holder.bind(parada, "");
         }
+
+
+        //bairroAtual = parada.getNomeBairro();
 
 
     }

@@ -88,37 +88,38 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"></include>
 
-        <Button
-            android:id="@+id/btnLogin"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@color/azul"
-            android:text="Pressione para fazer login e sugerir novas paradas!"
-            android:textAllCaps="false"
-            android:textColor="@color/branco"
-            android:textSize="12sp"
-            android:onClick="onClickBtnLogin"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        <!--<Button-->
+            <!--android:id="@+id/btnLogin"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="@color/azul"-->
+            <!--android:text="Pressione para fazer login e sugerir novas paradas!"-->
+            <!--android:textAllCaps="false"-->
+            <!--android:textColor="@color/branco"-->
+            <!--android:textSize="12sp"-->
+            <!--android:onClick="onClickBtnLogin"-->
+            <!--app:layout_constraintEnd_toEndOf="parent"-->
+            <!--app:layout_constraintStart_toStartOf="parent"-->
+            <!--app:layout_constraintTop_toBottomOf="@+id/toolbar" />-->
 
         <Button
             android:id="@+id/fabSugestao"
-            android:drawableLeft="@drawable/ic_add_location_blue_24dp"
-            android:drawableTint="@color/branco"
-            android:drawablePadding="5dp"
-            android:tint="@color/branco"
             style="@style/botao_transparente"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@drawable/horario_rounded_corner_azul_left"
+            android:drawableLeft="@drawable/ic_add_location_blue_24dp"
+            android:drawablePadding="5dp"
+            android:drawableTint="@color/branco"
             android:onClick="@{view::onFabSugestaoClick}"
             android:padding="5dp"
             android:text="Minhas Sugestões"
             android:textStyle="bold"
+            android:tint="@color/branco"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     </android.support.constraint.ConstraintLayout>
 

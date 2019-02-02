@@ -30,7 +30,7 @@ public class ParadaViewHolder extends RecyclerView.ViewHolder {
         this.ctx = context;
     }
 
-    public void bind(final ParadaBairro parada, boolean mostraBairro) {
+    public void bind(final ParadaBairro parada, String bairroAtual) {
         binding.setParada(parada);
 
         Parada p = parada.getParada();
@@ -57,7 +57,7 @@ public class ParadaViewHolder extends RecyclerView.ViewHolder {
 //
 //        binding.textViewNome.setText(cidade.getCidade().getNome());
 
-        if(!mostraBairro){
+        if(bairroAtual.equals(parada.getNomeBairro())){
             binding.textViewBairro.setVisibility(View.GONE);
         } else{
             binding.textViewBairro.setVisibility(View.VISIBLE);

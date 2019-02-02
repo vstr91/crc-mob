@@ -35,7 +35,7 @@ import br.com.vostre.circular.utils.Converters;
         Parada.class, PontoInteresse.class, Itinerario.class, ParadaItinerario.class,
         Horario.class, HorarioItinerario.class, SecaoItinerario.class, Onibus.class,
         ParametroInterno.class, ParadaSugestao.class, HistoricoParada.class, UsuarioPreferencia.class, HistoricoItinerario.class},
-        version = 1)
+        version = 4)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 

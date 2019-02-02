@@ -1084,12 +1084,14 @@ public class ItinerariosViewModel extends AndroidViewModel {
 //                .carregar(itinerario.getValue().getHorarioItinerario().getItinerario());
 //    }
 
-    private String geraQueryItinerarios(String bairroPartida, String bairroDestino){
+    public static String geraQueryItinerarios(String bairroPartida, String bairroDestino){
         return "SELECT i.id FROM itinerario i INNER JOIN " +
                 "parada_itinerario pi ON pi.itinerario = i.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro bp ON bp.id = pp.bairro INNER JOIN parada_itinerario pi2 ON pi2.itinerario = i.id INNER JOIN " +
                 "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                "WHERE i.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem " +
+                "WHERE i.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND " +
+                "((pi.destaque = 1 OR pi.ordem = 1) AND (pi2.destaque = 1 " +
+                "OR pi2.ordem = (SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = i.id) )) " +
                 "AND bp.id = '" + bairroPartida + "' AND bd.id = '" + bairroDestino + "' ORDER BY i.id";
     }
 

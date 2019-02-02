@@ -130,6 +130,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     FirebaseAnalytics mFirebaseAnalytics;
     Bundle bundle;
 
+    boolean mostraToast;
+
     /**
      * Set up the sync adapter
      */
@@ -175,6 +177,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             SyncResult syncResult) {
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext().getApplicationContext());
+        mostraToast = PreferenceUtils.carregarMostraToast(ctx);
 
         bundle = new Bundle();
         bundle.putString(FirebaseAnalytics.Param.START_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
@@ -221,14 +224,20 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     public void onResponse(Call<String> call, Response<String> response) {
 
         if(response.code() == 200){
-            Toast.makeText(ctx, "Envio de dados efetuado com sucesso! Iniciando recebimento de dados...",
-                    Toast.LENGTH_SHORT).show();
+
+            if(mostraToast){
+                Toast.makeText(ctx, "Envio de dados efetuado com sucesso! Iniciando recebimento de dados...",
+                        Toast.LENGTH_SHORT).show();
+            }
 
             chamaAPI(0, null, 1, baseUrl, token);
 
         } else{
-            Toast.makeText(ctx, "Erro ao enviar dados. Código de resposta: "+response.code()+" | Mensagem: "+response.message(),
-                    Toast.LENGTH_SHORT).show();
+
+            if(mostraToast){
+                Toast.makeText(ctx, "Erro ao enviar dados. Código de resposta: "+response.code()+" | Mensagem: "+response.message(),
+                        Toast.LENGTH_SHORT).show();
+            }
 
             bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
             bundle.putBoolean("sucesso", false);
@@ -236,18 +245,26 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             bundle.putString("erro", response.code()+" | "+response.message());
             mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
 
+            PreferenceUtils.gravaMostraToast(ctx, false);
+
         }
 
     }
 
     @Override
     public void onFailure(Call<String> call, Throwable t) {
-        Toast.makeText(ctx, "Problema ao acessar para enviar dados: "+t.getMessage(), Toast.LENGTH_SHORT).show();
+
+        if(mostraToast){
+            Toast.makeText(ctx, "Problema ao acessar para enviar dados: "+t.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
         bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
         bundle.putBoolean("sucesso", false);
         bundle.putString("local", "Acesso para envio de dados");
         bundle.putString("erro", t.getMessage());
         mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
+
+        PreferenceUtils.gravaMostraToast(ctx, false);
     }
 
     private void requisitaToken(String id, int tipo) throws Exception{
@@ -279,28 +296,41 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         new listaDadosAsyncTask(appDatabase).execute();
 
                     } else{
-                        Toast.makeText(getContext().getApplicationContext(),
-                                "Erro "+response.code()+" ("+response.message()+") ao requisitar token.",
-                                Toast.LENGTH_SHORT).show();
+
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+response.code()+" ("+response.message()+") ao requisitar token.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+
                         bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
                         bundle.putBoolean("sucesso", false);
                         bundle.putString("local", "Requisição de token");
                         bundle.putString("erro", response.code()+" | "+response.message());
                         mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
+
+                        PreferenceUtils.gravaMostraToast(ctx, false);
                     }
 
                 }
 
                 @Override
                 public void onFailure(Call<String> call, Throwable t) {
-                    Toast.makeText(getContext().getApplicationContext(),
-                            "Erro "+t.getLocalizedMessage()+" ao requisitar token.",
-                            Toast.LENGTH_SHORT).show();
+
+                    if(mostraToast){
+                        Toast.makeText(getContext().getApplicationContext(),
+                                "Erro "+t.getLocalizedMessage()+" ao requisitar token.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+
                     bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
                     bundle.putBoolean("sucesso", false);
                     bundle.putString("local", "Requisição de token");
                     bundle.putString("erro", t.getMessage());
                     mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
+
+                    PreferenceUtils.gravaMostraToast(ctx, false);
                 }
             });
         } else{
@@ -322,28 +352,40 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         new enviaImagemAsyncTask(appDatabase).execute();
 
                     } else{
-                        Toast.makeText(getContext().getApplicationContext(),
-                                "Erro "+response.code()+" ("+response.message()+") ao requisitar token de imagem.",
-                                Toast.LENGTH_SHORT).show();
+
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+response.code()+" ("+response.message()+") ao requisitar token de imagem.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
                         bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
                         bundle.putBoolean("sucesso", false);
                         bundle.putString("local", "Requisição de token de imagem");
                         bundle.putString("erro", response.code()+" | "+response.message());
                         mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
+
+                        PreferenceUtils.gravaMostraToast(ctx, false);
                     }
 
                 }
 
                 @Override
                 public void onFailure(Call<String> call, Throwable t) {
-                    Toast.makeText(getContext().getApplicationContext(),
-                            "Erro "+t.getMessage()+" ao requisitar token de imagem.",
-                            Toast.LENGTH_SHORT).show();
+
+                    if(mostraToast){
+                        Toast.makeText(getContext().getApplicationContext(),
+                                "Erro "+t.getMessage()+" ao requisitar token de imagem.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+
                     bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
                     bundle.putBoolean("sucesso", false);
                     bundle.putString("local", "Requisição de token de imagem");
                     bundle.putString("erro", t.getMessage());
                     mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
+
+                    PreferenceUtils.gravaMostraToast(ctx, false);
                 }
             });
         }
@@ -390,6 +432,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 bundle.putString("local", "Processamento de JSON");
                 bundle.putString("erro", e.getMessage());
                 mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
+
+                PreferenceUtils.gravaMostraToast(ctx, false);
             }
         } else{
             CircularAPI api = retrofit.create(CircularAPI.class);
@@ -414,37 +458,61 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
-                    Toast.makeText(ctx, "Comunicação com o servidor efetuada com sucesso! Iniciando processamento...", Toast.LENGTH_SHORT).show();
+
+                    if(mostraToast){
+                        Toast.makeText(ctx, "Comunicação com o servidor efetuada com sucesso! Iniciando processamento...",
+                                Toast.LENGTH_SHORT).show();
+                    }
+
                     try {
                         requisitaToken(parametroInterno.getIdentificadorUnico(), 1);
                         processaJson(response);
                     } catch (JSONException e) {
-                        Toast.makeText(ctx, "Problema ao processar dados: "+e.getMessage(), Toast.LENGTH_LONG).show();
+
+                        if(mostraToast){
+                            Toast.makeText(ctx, "Problema ao processar dados: "+e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+
                         bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
                         bundle.putBoolean("sucesso", false);
                         bundle.putString("local", "Processamento de JSON");
                         bundle.putString("erro", e.getMessage());
                         mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
+
+                        PreferenceUtils.gravaMostraToast(ctx, false);
+
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Toast.makeText(ctx, "Problema ao processar dados: "+e.getMessage(), Toast.LENGTH_LONG).show();
+
+                        if(mostraToast){
+                            Toast.makeText(ctx, "Problema ao processar dados: "+e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+
                         bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
                         bundle.putBoolean("sucesso", false);
                         bundle.putString("local", "Processamento de JSON");
                         bundle.putString("erro", e.getMessage());
                         mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
+
+                        PreferenceUtils.gravaMostraToast(ctx, false);
                     }
 
                 }
 
                 @Override
                 public void onFailure(Call<String> call, Throwable t) {
-                    Toast.makeText(ctx, "Problema ao receber dados: "+t.getMessage(), Toast.LENGTH_SHORT).show();
+
+                    if(mostraToast){
+                        Toast.makeText(ctx, "Problema ao receber dados: "+t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+
                     bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
                     bundle.putBoolean("sucesso", false);
                     bundle.putString("local", "Recebimento de Dados");
                     bundle.putString("erro", t.getMessage());
                     mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
+
+                    PreferenceUtils.gravaMostraToast(ctx, false);
                 }
             });
         }
@@ -455,7 +523,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     private void processaJson(Response<String> response) throws JSONException {
 
         String dados = response.body();
-        System.out.println("RESPON: "+response.body());
+        //System.out.println("RESPON: "+response.body());
 
         if(dados != null){
 
@@ -984,11 +1052,16 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 Runnable runnable = new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getContext(), "Atualização finalizada!", Toast.LENGTH_SHORT).show();
+
+                        if(mostraToast){
+                            Toast.makeText(getContext(), "Atualização finalizada!", Toast.LENGTH_SHORT).show();
+                        }
 
                         bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
                         bundle.putBoolean("sucesso", true);
                         mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
+
+                        PreferenceUtils.gravaMostraToast(ctx, false);
 
                         Intent broadcast = new Intent();
                         broadcast.setAction("MensagensService");
@@ -1002,21 +1075,34 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 mainHandler.post(runnable);
 
             } else{
-                Toast.makeText(ctx, "Nenhum registro para ser recebido. Seu sistema está atualizado!",
-                        Toast.LENGTH_SHORT).show();
+
+                if(mostraToast){
+                    Toast.makeText(ctx, "Nenhum registro para ser recebido. Seu sistema está atualizado!",
+                            Toast.LENGTH_SHORT).show();
+                }
+
                 bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
                 bundle.putBoolean("sucesso", true);
                 mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
+
+                PreferenceUtils.gravaMostraToast(ctx, false);
             }
 
         } else{
-            Toast.makeText(ctx, "Erro ao receber registros... Por favor tente novamente!",
-                    Toast.LENGTH_SHORT).show();
+
+            if(mostraToast){
+                Toast.makeText(ctx, "Erro ao receber registros... Por favor tente novamente!",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+
             bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
             bundle.putBoolean("sucesso", false);
             bundle.putString("local", "Recebimento de Dados");
             bundle.putString("erro", "Dados nulos");
             mFirebaseAnalytics.logEvent("encerrou_atualizacao", bundle);
+
+            PreferenceUtils.gravaMostraToast(ctx, false);
 
         }
 
@@ -1113,7 +1199,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
                     +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+","+strPreferencias+","+strHistoricos+"}";
 
-             System.out.println("JSON: "+json);
+             //System.out.println("JSON: "+json);
 
             // EXPORTA ARQUIVO DE DADOS
             /*
@@ -1198,18 +1284,30 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                             cidade.setImagemEnviada(true);
                             CidadesViewModel.edit(cidade, getContext().getApplicationContext());
                         } else{
-                            Toast.makeText(getContext().getApplicationContext(),
-                                    "Erro "+response.code()+" ("+response.message()+") ao enviar imagem de "+cidade.getNome()+" para o servidor",
-                                    Toast.LENGTH_SHORT).show();
+
+                            if(mostraToast){
+                                Toast.makeText(getContext().getApplicationContext(),
+                                        "Erro "+response.code()+" ("+response.message()+") ao enviar imagem de "+cidade.getNome()+" para o servidor",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+
+                            PreferenceUtils.gravaMostraToast(ctx, false);
+
                         }
 
                     }
 
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
-                        Toast.makeText(getContext().getApplicationContext(),
-                                "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+cidade.getNome()+" para o servidor",
-                                Toast.LENGTH_SHORT).show();
+
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+cidade.getNome()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        PreferenceUtils.gravaMostraToast(ctx, false);
+
                     }
                 });
 
@@ -1233,18 +1331,30 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                             empresa.setImagemEnviada(true);
                             EmpresasViewModel.editEmpresa(empresa, getContext().getApplicationContext());
                         } else{
-                            Toast.makeText(getContext().getApplicationContext(),
-                                    "Erro ao enviar imagem de "+empresa.getNome()+" para o servidor",
-                                    Toast.LENGTH_SHORT).show();
+
+                            if(mostraToast){
+                                Toast.makeText(getContext().getApplicationContext(),
+                                        "Erro ao enviar imagem de "+empresa.getNome()+" para o servidor",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+
+                            PreferenceUtils.gravaMostraToast(ctx, false);
+
                         }
 
                     }
 
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
-                        Toast.makeText(getContext().getApplicationContext(),
-                                "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+empresa.getNome()+" para o servidor",
-                                Toast.LENGTH_SHORT).show();
+
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+empresa.getNome()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        PreferenceUtils.gravaMostraToast(ctx, false);
+
                     }
                 });
 
@@ -1268,18 +1378,26 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                             parada.setImagemEnviada(true);
                             ParadasViewModel.edit(parada, getContext().getApplicationContext());
                         } else{
-                            Toast.makeText(getContext().getApplicationContext(),
-                                    "Erro ao enviar imagem de "+parada.getNome()+" para o servidor",
-                                    Toast.LENGTH_SHORT).show();
+
+                            if(mostraToast){
+                                Toast.makeText(getContext().getApplicationContext(),
+                                        "Erro ao enviar imagem de "+parada.getNome()+" para o servidor",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+
                         }
 
                     }
 
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
-                        Toast.makeText(getContext().getApplicationContext(),
-                                "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+parada.getNome()+" para o servidor",
-                                Toast.LENGTH_SHORT).show();
+
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+parada.getNome()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
                     }
                 });
 
@@ -1303,18 +1421,26 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                             pontoInteresse.setImagemEnviada(true);
                             PontosInteresseViewModel.edit(pontoInteresse, getContext().getApplicationContext());
                         } else{
-                            Toast.makeText(getContext().getApplicationContext(),
-                                    "Erro "+response.code()+" ("+response.message()+") ao enviar imagem de "+pontoInteresse.getNome()+" para o servidor",
-                                    Toast.LENGTH_SHORT).show();
+
+                            if(mostraToast){
+                                Toast.makeText(getContext().getApplicationContext(),
+                                        "Erro "+response.code()+" ("+response.message()+") ao enviar imagem de "+pontoInteresse.getNome()+" para o servidor",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+
                         }
 
                     }
 
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
-                        Toast.makeText(getContext().getApplicationContext(),
-                                "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+pontoInteresse.getNome()+" para o servidor",
-                                Toast.LENGTH_SHORT).show();
+
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+pontoInteresse.getNome()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
                     }
                 });
 
@@ -1338,18 +1464,26 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                             paradaSugestao.setImagemEnviada(true);
                             ParadasSugeridasViewModel.edit(paradaSugestao, getContext().getApplicationContext());
                         } else{
-                            Toast.makeText(getContext().getApplicationContext(),
-                                    "Erro "+response.code()+" ("+response.message()+") ao enviar imagem de "+paradaSugestao.getNome()+" para o servidor",
-                                    Toast.LENGTH_SHORT).show();
+
+                            if(mostraToast){
+                                Toast.makeText(getContext().getApplicationContext(),
+                                        "Erro "+response.code()+" ("+response.message()+") ao enviar imagem de "+paradaSugestao.getNome()+" para o servidor",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+
                         }
 
                     }
 
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
-                        Toast.makeText(getContext().getApplicationContext(),
-                                "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+paradaSugestao.getNome()+" para o servidor",
-                                Toast.LENGTH_SHORT).show();
+
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+paradaSugestao.getNome()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
                     }
                 });
 

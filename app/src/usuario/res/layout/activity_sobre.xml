@@ -149,42 +149,65 @@
                     app:layout_constraintStart_toStartOf="@+id/textView40"
                     app:layout_constraintTop_toBottomOf="@+id/textView40" />
 
-                <TextView
-                    android:id="@+id/textView43"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
-                    android:paddingLeft="30dp"
-                    android:paddingRight="30dp"
-                    android:text="Circular é um aplicativo de mobilidade urbana criado para facilitar a consulta de horários de ônibus municipais e intermunicipais em Barra do Piraí-RJ e região."
-                    android:textColor="@color/cinzaEscuro"
-                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp"
+                    app:layout_constraintBottom_toTopOf="@+id/textView46"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewBaseDados" />
+                    app:layout_constraintTop_toBottomOf="@+id/textViewBaseDados">
 
-                <TextView
-                    android:id="@+id/textView44"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:paddingLeft="30dp"
-                    android:paddingRight="30dp"
-                    android:paddingBottom="10dp"
-                    android:text="Foi desenvolvido e lançado por Almir Junior em 2015 e completamente remodelado no ano de 2018, sendo relançado em 2019 com novas funções e uma navegação mais fácil e intuitiva."
-                    android:textColor="@color/cinzaEscuro"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView43" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textView43"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginRight="8dp"
+                            android:paddingLeft="30dp"
+                            android:paddingRight="30dp"
+                            android:text="Circular é um aplicativo de mobilidade urbana criado para facilitar a consulta de horários de ônibus municipais e intermunicipais em Barra do Piraí-RJ e região."
+                            android:textColor="@color/cinzaEscuro"
+                            android:textSize="14sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/textViewBaseDados" />
+
+                        <TextView
+                            android:id="@+id/textView44"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginRight="8dp"
+                            android:paddingLeft="30dp"
+                            android:paddingRight="30dp"
+                            android:paddingBottom="10dp"
+                            android:text="Foi desenvolvido e lançado por Almir Junior em 2015 e completamente remodelado no ano de 2018, sendo relançado em 2019 com novas funções e uma navegação mais fácil e intuitiva."
+                            android:textColor="@color/cinzaEscuro"
+                            android:textSize="14sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/textView43" />
+
+                    </LinearLayout>
+
+                </ScrollView>
 
                 <TextView
                     android:id="@+id/textView45"
@@ -216,6 +239,21 @@
                     app:layout_constraintBottom_toTopOf="@+id/textView45"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
+
+                <ImageButton
+                    android:id="@+id/btnInfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/transparente"
+                    android:padding="10dp"
+                    android:onClick="onClickBtnSobre"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/imageView10"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:src="@drawable/ic_info_outline_blue_24dp" />
 
             </android.support.constraint.ConstraintLayout>
 

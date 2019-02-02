@@ -113,14 +113,14 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
             paradaDestinoOriginal = paradaDestino;
             paradaDestino = null;
 
-            viewModel.setItinerario(getIntent().getStringExtra("itinerario"), paradaPartida, paradaDestino);
+            viewModel.setItinerario(getIntent().getStringExtra("itinerario"), paradaPartida, paradaDestino, itinerarioPartida, itinerarioDestino);
 
             viewModel.itinerario.observe(this, itinerarioObserver);
 
             viewModel.setPartidaEDestino(paradaPartidaOriginal, paradaDestinoOriginal);
 
         } else{
-            viewModel.setItinerario(getIntent().getStringExtra("itinerario"), paradaPartida, paradaDestino);
+            viewModel.setItinerario(getIntent().getStringExtra("itinerario"), paradaPartida, paradaDestino, itinerarioPartida, itinerarioDestino);
 
             viewModel.itinerario.observe(this, itinerarioObserver);
             binding.textViewObs.setVisibility(View.GONE);

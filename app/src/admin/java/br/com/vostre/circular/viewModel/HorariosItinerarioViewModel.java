@@ -168,6 +168,7 @@ public class HorariosItinerarioViewModel extends AndroidViewModel {
                 horarioItinerario.setObservacao(hi.getObservacao());
                 horarioItinerario.setUltimaAlteracao(new DateTime());
                 horarioItinerario.setProgramadoPara(hi.getProgramadoPara());
+                horarioItinerario.setEnviado(false);
 
                 db.horarioItinerarioDAO().editar(horarioItinerario);
             } else{

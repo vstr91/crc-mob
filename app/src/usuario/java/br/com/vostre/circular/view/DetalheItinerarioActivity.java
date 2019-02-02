@@ -114,7 +114,8 @@ public class DetalheItinerarioActivity extends BaseActivity {
         paradaPartida = getIntent().getStringExtra("paradaPartida");
         paradaDestino = getIntent().getStringExtra("paradaDestino");
 
-        viewModel.setItinerario(getIntent().getStringExtra("itinerario"), paradaPartida, paradaDestino);
+        viewModel.setItinerario(getIntent().getStringExtra("itinerario"), paradaPartida, paradaDestino,
+                itinerarioPartida, itinerarioDestino);
         horario = getIntent().getStringExtra("horario");
 
         viewModel.itinerario.observe(this, itinerarioObserver);
@@ -230,8 +231,8 @@ public class DetalheItinerarioActivity extends BaseActivity {
         Intent i = new Intent(ctx, DetalheItinerarioImpressaoActivity.class);
         i.putExtra("itinerario", viewModel.itinerario.getValue().getItinerario().getId());
 
-        i.putExtra("itinerarioPartida", viewModel.itinerario.getValue().getBairroConsultaPartida());
-        i.putExtra("itinerarioDestino", viewModel.itinerario.getValue().getBairroConsultaDestino());
+        i.putExtra("itinerarioPartida", itinerarioPartida);
+        i.putExtra("itinerarioDestino", itinerarioDestino);
 
         i.putExtra("paradaPartida", paradaPartida);
         i.putExtra("paradaDestino", paradaDestino);

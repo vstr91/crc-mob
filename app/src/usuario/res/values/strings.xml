@@ -7,4 +7,24 @@
     <!--<string name="server_client_id">301375921468-k8s5vg0gg7pqh8maitvvfh5op61d10q8.apps.googleusercontent.com</string>-->
     <string name="text_gps">Ative o GPS para que o mapa funcione corretamente</string>
     <string name="text_procurando_gps">Buscando a localização atual...</string>
+    <string name="text_termos">
+        <li>O Circular é um sistema oferecido gratuitamente via download pela Play Store.</li>\n\n
+        <li>Dados de uso anônimos podem ser coletados durante o uso do sistema,
+            visando seu correto funcionamento e melhoria.</li>\n\n
+        <li>Informações sobre sua localização via GPS só são utilizadas
+            para funções do próprio sistema, como encontrar paradas próximas a você.</li>\n\n
+        <li>Os dados inseridos no sistema são coletados em canais oficiais das prestadoras dos serviços,
+        como sites, páginas em redes sociais e guichês em rodoviárias e similares, além de
+            informações prestadas pelos órgãos responsáveis por gerenciar o serviço de transporte público.</li>\n\n
+        <li>Poderá haver mudança nos horários ou falta de prestação do serviço,
+        sendo responsabilidade da empresa que o presta.
+        O Circular se limita a informar os dados coletados e não possui qualquer vínculo
+            com empresas públicas ou privadas.</li>\n\n
+        <li>Os dados são atualizados de forma periódica.
+            Em caso de divergência em alguma informação, envie uma mensagem informando e faremos a correção.</li>\n\n
+        <li>Ao enviar uma foto para o sistema, você concorda em ceder seu uso sem limitações e sem cobrança de valores.
+            A imagem poderá ser usada dentro do sistema e em sistemas desenvolvidos posteriormente.
+            Em hipótese alguma a imagem será revendida / cedida a terceiros.
+            A propriedade intelectual sobre a foto permanece com seu criador.</li>\n
+    </string>
 </resources>

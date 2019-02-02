@@ -133,6 +133,8 @@ public class CircleView extends View {
                     br.com.vostre.circleview.R.styleable.CircleView,
                     0, 0);
 
+            float logicalDensity = context.getResources().getDisplayMetrics().density;
+
             // valores atributos xml
             corArcoMaior = typedArray.getColor(br.com.vostre.circleview.R.styleable.CircleView_corArcoMaior,
                     corArcoMaior);
@@ -140,8 +142,14 @@ public class CircleView extends View {
                     corArcoMenor);
             espessuraArcoMaior = typedArray.getInteger(br.com.vostre.circleview.R.styleable.CircleView_espessuraArcoMaior,
                     espessuraArcoMaior);
+
+            espessuraArcoMaior = (int) (espessuraArcoMaior * logicalDensity + 0.5);
+
             espessuraArcoMenor = typedArray.getInteger(br.com.vostre.circleview.R.styleable.CircleView_espessuraArcoMenor,
                     espessuraArcoMenor);
+
+            espessuraArcoMenor = (int) (espessuraArcoMenor * logicalDensity + 0.5);
+
             imagem = typedArray.getDrawable(br.com.vostre.circleview.R.styleable.CircleView_imagem);
             typedArray.recycle();
 

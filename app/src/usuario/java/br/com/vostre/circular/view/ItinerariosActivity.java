@@ -155,6 +155,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     public void onClickBtnEditarPartida(View v){
         binding.cardViewPartida.setVisibility(View.GONE);
         binding.cardViewListPartida.setVisibility(View.VISIBLE);
+        binding.cardViewListDestino.setVisibility(View.GONE);
         binding.cardViewDestino.setVisibility(View.GONE);
         binding.listResultados.setVisibility(View.GONE);
         binding.btnInverter.setVisibility(View.GONE);

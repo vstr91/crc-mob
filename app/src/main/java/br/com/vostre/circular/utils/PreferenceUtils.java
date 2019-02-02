@@ -43,6 +43,18 @@ public class PreferenceUtils {
         editor.apply();
     }
 
+    public static void gravaMostraToast(Context ctx, boolean valor){
+        SharedPreferences sharedPreferences = ctx.getSharedPreferences(ctx.getPackageName(), MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("mostra_toast", valor);
+        editor.apply();
+    }
+
+    public static boolean carregarMostraToast(Context ctx){
+        SharedPreferences sharedPreferences = ctx.getSharedPreferences(ctx.getPackageName(), MODE_PRIVATE);
+        return sharedPreferences.getBoolean("mostra_toast", false);
+    }
+
     public static String carregarPreferencia(Context ctx, String chave){
         SharedPreferences sharedPreferences = ctx.getSharedPreferences(ctx.getPackageName(), MODE_PRIVATE);
         return sharedPreferences.getString(chave, "");

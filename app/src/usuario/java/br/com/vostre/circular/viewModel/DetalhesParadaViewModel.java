@@ -100,6 +100,23 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
                 "ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1), ( SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
                 "FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario WHERE itinerario = i.id AND "+diaSeguinte+" = 1 AND hi.ativo = 1 " +
                 "ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ) ) AS 'proximoHorario', " +
+
+                "IFNULL((SELECT Strftime('%H:%M', Time(h.nome / 1000, 'unixepoch', 'localtime')) " +
+                "FROM   horario_itinerario hi " +
+                "INNER JOIN horario h ON h.id = hi.horario " +
+                "WHERE  itinerario = i.id " +
+                "AND "+dia+" = 1 " +
+                "AND hi.ativo = 1 " +
+                "AND TIME(h.nome / 1000, 'unixepoch', 'localtime') >= '"+hora+"' " +
+                "ORDER  BY TIME(h.nome / 1000, 'unixepoch', 'localtime') LIMIT  1), " +
+                "(SELECT '23:59' " +
+                "FROM   horario_itinerario hi " +
+                "INNER JOIN horario h ON h.id = hi.horario " +
+                "WHERE  itinerario = i.id " +
+                "AND "+diaSeguinte+" = 1 " +
+                "AND hi.ativo = 1 " +
+                "ORDER  BY Time(h.nome / 1000, 'unixepoch', 'localtime') LIMIT  1)) AS 'flagDia', " +
+
                 "IFNULL( ( SELECT h.id FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario " +
                 "WHERE itinerario = i.id AND "+dia+" = 1 AND hi.ativo = 1 AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= '"+hora+"' " +
                 "ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ), ( SELECT h.id FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario " +
@@ -161,8 +178,7 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
                 "FROM itinerario i INNER JOIN empresa e ON e.id = i.empresa WHERE i.id IN (SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada " +
                 "WHERE p.id = '"+parada+"' AND p.id <> (SELECT pi.parada FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
                 "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AND proximoHorario IS NOT NULL) " +
-                "ORDER BY (SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario " +
-                "WHERE itinerario = i.id AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= '"+hora+"' ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 )");
+                "ORDER BY flagDia, proximoHorario");
 
 
         itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosPorParadaComBairroEHorarioCompleto(query);

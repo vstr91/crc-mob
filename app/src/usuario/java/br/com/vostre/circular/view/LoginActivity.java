@@ -6,6 +6,8 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -29,6 +31,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import br.com.vostre.circular.BuildConfig;
@@ -73,6 +80,8 @@ public class LoginActivity extends BaseActivity {
         getSupportActionBar().setHomeButtonEnabled(false);
         binding.setView(this);
         viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
+
+        carregaImagens();
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
 
@@ -135,7 +144,6 @@ public class LoginActivity extends BaseActivity {
 
     public void onClickBtnLogin(View v){
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestScopes(Drive.SCOPE_FILE)
                 .requestIdToken(getString(R.string.server_client_id))
                 .requestEmail()
                 .build();
@@ -190,7 +198,11 @@ public class LoginActivity extends BaseActivity {
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w("SIGN", "signInResult:failed code=" + e.getStatusCode()+" | "+e.getMessage());
             btnLogin.setEnabled(true);
-            progressBar.setVisibility(View.GONE);
+
+            if(progressBar != null){
+                progressBar.setVisibility(View.GONE);
+            }
+
             Toast.makeText(getApplicationContext(), "Erro ao efeutar login: "+e.getMessage()+". Por favor tente novamente.", Toast.LENGTH_SHORT).show();
         }
     }
@@ -248,6 +260,36 @@ public class LoginActivity extends BaseActivity {
                     }
                 });
         PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), "");
+    }
+
+    private void carregaImagens(){
+
+        Bitmap imagem = null;
+        FileOutputStream fos = null;
+
+        try {
+            String[] s = getApplicationContext().getAssets().list("brasao");
+
+            for(String b : s){
+                File file = new File(getApplicationContext().getFilesDir(), b);
+
+                fos = new FileOutputStream(file);
+                Bitmap bmp = BitmapFactory.decodeStream(getApplicationContext().getAssets().open("brasao/"+b));
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+                    //Toast.makeText(ctx, "Imagem "+imagem+" recebida.", Toast.LENGTH_SHORT).show();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

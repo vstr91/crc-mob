@@ -68,7 +68,7 @@ public interface HorarioItinerarioDAO {
             "horario_itinerario hi ON hi.itinerario = i.id INNER JOIN " +
             "horario h ON h.id = hi.horario " +
             "WHERE i.ativo = 1 AND hi.ativo = 1 AND (domingo = 1 OR segunda = 1 OR terca = 1 OR quarta = 1 OR quinta = 1 OR sexta = 1 OR sabado = 1) AND pp.id <> pd.id AND pi.ordem < pi2.ordem " +
-            "AND pp.id = :partida AND pd.id = :destino ORDER BY h.nome")
+            "AND bp.id = :partida AND bd.id = :destino ORDER BY h.nome")
     List<HorarioItinerarioNome> listarApenasAtivosPorPartidaEDestinoSync(String partida, String destino);
 
     @Query("SELECT DISTINCT hi.*, h.id AS idHorario, h.nome AS nomeHorario " +
@@ -115,11 +115,15 @@ public interface HorarioItinerarioDAO {
             "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'cidadeDestino', " +
             "'' AS nomeEmpresa " +
             "FROM horario h INNER JOIN horario_itinerario hi ON hi.horario = h.id INNER JOIN itinerario i ON i.id = hi.itinerario " +
-            "WHERE h.ativo = 1 AND (domingo = 1 OR segunda = 1 OR terca = 1 OR quarta = 1 OR quinta = 1 OR sexta = 1 OR sabado = 1) " +
-            "AND hi.ativo = 1 AND hi.itinerario IN (SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada WHERE itinerario IN " +
-            "(SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada " +
-            "WHERE p.bairro = (SELECT b.id FROM parada p INNER JOIN bairro b ON b.id = p.bairro WHERE p.id = :partida) AND pi.ordem = 1)" +
-            " AND p.bairro = (SELECT b.id FROM parada p INNER JOIN bairro b ON b.id = p.bairro WHERE p.id = :destino) AND pi.ordem > 1) " +
+            "INNER JOIN parada_itinerario pi ON pi.itinerario = i.id INNER JOIN parada_itinerario pi2 ON pi2.itinerario = i.id " +
+            "INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN parada pd ON pd.id = pi2.parada " +
+            "            WHERE h.ativo = 1 AND (domingo = 1 OR segunda = 1 OR terca = 1 OR quarta = 1 OR quinta = 1 OR sexta = 1 OR sabado = 1) " +
+            "            AND hi.ativo = 1 " +
+            " AND pp.bairro = :partida " +
+            " AND pd.bairro = :destino" +
+            " AND pi2.ordem > pi.ordem " +
+            " AND (pi.destaque = 1 OR pi.ordem = 1)" +
+            " AND (pi2.destaque = 1 OR pi2.ordem = (SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = i.id)) " +
             "ORDER BY h.nome")
     List<ItinerarioPartidaDestino> contaItinerariosPorPartidaEDestinoSync(String partida, String destino);
 

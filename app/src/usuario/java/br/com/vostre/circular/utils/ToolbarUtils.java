@@ -44,7 +44,7 @@ public class ToolbarUtils {
     // The authority for the sync adapter's content provider
     public static final String AUTHORITY = "br.com.vostre.circular.datasync.provider";
     // An account type, in the form of a domain name
-    public static final String ACCOUNT_TYPE = "br.com.vostre.circular.usuario";
+    public static final String ACCOUNT_TYPE = "br.com.vostre.circular.usuario.main";
     // The account name
     public static final String ACCOUNT = "dummyaccount";
 
@@ -122,6 +122,9 @@ public class ToolbarUtils {
                  * manual sync settings
                  */
                 ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
+
+                PreferenceUtils.gravaMostraToast(activity.getApplicationContext(),true);
+
                 Toast.makeText(activity.getApplicationContext(), "Iniciando sincronização", Toast.LENGTH_SHORT).show();
 
                 break;

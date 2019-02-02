@@ -10,6 +10,7 @@ import android.widget.TabHost;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.R;
@@ -88,7 +89,13 @@ public class FavoritosActivity extends BaseActivity {
     Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {
         @Override
         public void onChanged(List<ParadaBairro> paradas) {
-            adapterParada.paradas = paradas;
+
+            if(paradas.size() > 0){
+                adapterParada.paradas = paradas;
+            } else{
+                adapterParada.paradas = new ArrayList<>();
+            }
+
             adapterParada.notifyDataSetChanged();
         }
     };
@@ -96,7 +103,13 @@ public class FavoritosActivity extends BaseActivity {
     Observer<List<ItinerarioPartidaDestino>> itinerariosObserver = new Observer<List<ItinerarioPartidaDestino>>() {
         @Override
         public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
-            adapterItinerarios.itinerarios = itinerarios;
+
+            if(itinerarios.size() > 0){
+                adapterItinerarios.itinerarios = itinerarios;
+            } else{
+                adapterItinerarios.itinerarios = new ArrayList<>();
+            }
+
             adapterItinerarios.notifyDataSetChanged();
         }
     };

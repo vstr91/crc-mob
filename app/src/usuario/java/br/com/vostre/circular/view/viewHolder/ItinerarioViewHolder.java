@@ -34,6 +34,8 @@ public class ItinerarioViewHolder extends RecyclerView.ViewHolder {
         if(itinerario.getItinerario().getObservacao() == null || (itinerario.getItinerario().getObservacao().isEmpty() ||
                 itinerario.getItinerario().getObservacao().equals("null") || itinerario.getItinerario().getObservacao().equals(""))){
             binding.textView24.setVisibility(View.GONE);
+        } else{
+            binding.textView24.setVisibility(View.VISIBLE);
         }
 
         //binding.circleView2.setImagem(null);

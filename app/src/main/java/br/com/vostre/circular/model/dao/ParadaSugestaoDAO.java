@@ -48,6 +48,12 @@ public interface ParadaSugestaoDAO {
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_sugestao p " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
+            "estado e ON e.id = c.estado WHERE p.ativo = 1 AND p.usuario_cadastro = :id")
+    LiveData<List<ParadaSugestaoBairro>> listarTodosComBairroPorUsuario(String id);
+
+    @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
+            "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_sugestao p " +
+            "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
             "estado e ON e.id = c.estado WHERE p.status = 0 AND p.ativo = 1 AND p.usuario_cadastro = :id")
     LiveData<List<ParadaSugestaoBairro>> listarTodosPendentesComBairroPorUsuario(String id);
 

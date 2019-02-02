@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
@@ -301,13 +302,23 @@ public class DetalheParadaActivity extends BaseActivity {
     Observer<List<ItinerarioPartidaDestino>> itinerariosObserver = new Observer<List<ItinerarioPartidaDestino>>() {
         @Override
         public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
-            Collections.sort(itinerarios, new Comparator<ItinerarioPartidaDestino>() {
-                @Override
-                public int compare(ItinerarioPartidaDestino o1, ItinerarioPartidaDestino o2) {
-                    return DateTimeFormat.forPattern("HH:mm").parseLocalTime(o1.getProximoHorario())
-                            .compareTo(DateTimeFormat.forPattern("HH:mm").parseLocalTime(o2.getProximoHorario()));
-                }
-            });
+//            Collections.sort(itinerarios, new Comparator<ItinerarioPartidaDestino>() {
+//                @Override
+//                public int compare(ItinerarioPartidaDestino o1, ItinerarioPartidaDestino o2) {
+//
+////                    if(DateTimeFormat.forPattern("HH:mm").parseLocalTime(o2.getProximoHorario()).isBefore(LocalTime.now())){
+////                        return 1;
+////                    } else{
+////                        return DateTimeFormat.forPattern("HH:mm").parseLocalTime(o1.getProximoHorario())
+////                                .compareTo(DateTimeFormat.forPattern("HH:mm").parseLocalTime(o2.getProximoHorario()));
+////                    }
+//
+//                    return DateTimeFormat.forPattern("HH:mm").parseLocalTime(o1.getProximoHorario())
+//                            .compareTo(DateTimeFormat.forPattern("HH:mm").parseLocalTime(o2.getProximoHorario()));
+//
+//                }
+//            });
+
             adapter.itinerarios = itinerarios;
             adapter.notifyDataSetChanged();
             ocultaModalLoading();

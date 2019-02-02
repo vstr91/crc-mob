@@ -207,8 +207,9 @@ public class MapaViewModel extends AndroidViewModel {
     public MapaViewModel(Application app){
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
-        paradas = appDatabase.paradaDAO().listarTodosAtivosComBairro();
-        paradasSugeridas = appDatabase.paradaSugestaoDAO().listarTodosComBairro();
+        paradas = appDatabase.paradaDAO().listarTodosAtivosComBairroComItinerario();
+        paradasSugeridas = appDatabase.paradaSugestaoDAO().listarTodosPendentesComBairroPorUsuario(PreferenceUtils
+                .carregarUsuarioLogado(getApplication().getApplicationContext()));
         pois = appDatabase.pontoInteresseDAO().listarTodosAtivos();
         bairros = appDatabase.bairroDAO().listarTodosComCidade();
         paradaNova = new ParadaSugestaoBairro();

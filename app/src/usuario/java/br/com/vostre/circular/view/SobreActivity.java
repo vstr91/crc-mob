@@ -2,10 +2,13 @@ package br.com.vostre.circular.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import org.joda.time.DateTime;
@@ -48,7 +51,7 @@ public class SobreActivity extends BaseActivity {
     public static void setDataAcesso(TextView textView, DateTime l){
 
         if(l != null){
-            textView.setText(DateTimeFormat.forPattern("dd/MM/YYYY")
+            textView.setText(DateTimeFormat.forPattern("dd/MM/YYYY HH:mm")
                     .print(l));
         }
 
@@ -62,6 +65,20 @@ public class SobreActivity extends BaseActivity {
                     .print(l));
         }
 
+    }
+
+    public void onClickBtnSobre(View v){
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Termos de Uso e Informações")
+                .setMessage(R.string.text_termos).setNeutralButton("Entendi", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create();
+
+                dialog.show();
     }
 
 }

@@ -264,7 +264,7 @@ public class BaseViewModel extends AndroidViewModel {
                             usuarioValidado.postValue(false);
                             PreferenceUtils.salvarUsuarioLogado(getApplication().getApplicationContext(), "");
                             Toast.makeText(getApplication().getApplicationContext(), "Erro ao processar a validação do usuário. " +
-                                    "Falha ao se comunicar com os servidores do Google", Toast.LENGTH_SHORT).show();
+                                    "Falha ao se comunicar com os servidores do Google. Por favor tente novamente mais tarde.", Toast.LENGTH_SHORT).show();
                         }
 
 

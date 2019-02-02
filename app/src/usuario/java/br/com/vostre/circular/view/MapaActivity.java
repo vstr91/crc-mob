@@ -74,6 +74,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.R;
@@ -193,7 +194,7 @@ public class MapaActivity extends BaseActivity {
     public void onClickBtnLogin(View v){
         Intent i = new Intent(getApplicationContext(), SignInActivity.class);
         startActivityForResult(i, RC_SIGN_IN);
-        binding.btnLogin.setEnabled(false);
+        //binding.btnLogin.setEnabled(false);
 
         bundle = new Bundle();
         mFirebaseAnalytics.logEvent("clicou_login_mapa", bundle);
@@ -212,7 +213,7 @@ public class MapaActivity extends BaseActivity {
                 String e = data.getExtras().getString("mensagemErro");
 
                 signOut();
-                binding.btnLogin.setEnabled(true);
+                //binding.btnLogin.setEnabled(true);
             } else{
                 account = (GoogleSignInAccount) data.getExtras().get("account");
                 updateUI(account);
@@ -251,7 +252,7 @@ public class MapaActivity extends BaseActivity {
             }
 
             if(flag){
-                binding.btnLogin.setEnabled(true);
+                //binding.btnLogin.setEnabled(true);
             }
 
             flag = true;
@@ -299,12 +300,12 @@ public class MapaActivity extends BaseActivity {
     private void checaLogin() {
         if(SessionUtils.estaLogado(getApplicationContext())){
             binding.fabParada.setEnabled(true);
-            binding.btnLogin.setVisibility(View.GONE);
+            //binding.btnLogin.setVisibility(View.GONE);
             binding.fabSugestao.setEnabled(true);
             binding.fabSugestao.setVisibility(View.VISIBLE);
         } else{
             binding.fabParada.setEnabled(false);
-            binding.btnLogin.setVisibility(View.VISIBLE);
+            //binding.btnLogin.setVisibility(View.VISIBLE);
             binding.fabSugestao.setEnabled(false);
             binding.fabSugestao.setVisibility(View.GONE);
         }
@@ -420,21 +421,22 @@ public class MapaActivity extends BaseActivity {
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                 m.setTitle(p.getParada().getNome());
                 m.setDraggable(false);
+                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
 
-                switch(p.getParada().getSentido()){
-                    case 0:
-                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_backspace_black_24dp));
-                        break;
-                    case 1:
-                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
-                        break;
-                    case 2:
-                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_swap_horiz_black_24dp));
-                        break;
-                    default:
-                        m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
-                        break;
-                }
+//                switch(p.getParada().getSentido()){
+//                    case 0:
+//                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_backspace_black_24dp));
+//                        break;
+//                    case 1:
+//                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
+//                        break;
+//                    case 2:
+//                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_swap_horiz_black_24dp));
+//                        break;
+//                    default:
+//                        m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
+//                        break;
+//                }
 
                 m.setId(p.getParada().getId());
                 m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
@@ -460,7 +462,12 @@ public class MapaActivity extends BaseActivity {
                             textViewReferencia.setText(pb.getParada().getNome());
                             textViewBairro.setText(pb.getNomeBairroComCidade());
 
+                            bsd.findViewById(R.id.textView32).setVisibility(View.VISIBLE);
+                            bsd.findViewById(R.id.textView33).setVisibility(View.VISIBLE);
+
                             Button btnDetalhes = bsd.findViewById(R.id.btnDetalhes);
+                            btnDetalhes.setVisibility(View.VISIBLE);
+
                             btnDetalhes.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
@@ -492,7 +499,13 @@ public class MapaActivity extends BaseActivity {
 
                             ImageView img = bsd.findViewById(R.id.imageView3);
 
+                            File f = null;
+
                             if(pb.getParada().getImagem() != null){
+                                f = new File(ctx.getApplicationContext().getFilesDir(),  pb.getParada().getImagem());
+                            }
+
+                            if(pb.getParada().getImagem() != null && f != null && f.exists() && f.canRead()){
                                 img.setImageDrawable(Drawable.createFromPath(getApplicationContext().getFilesDir()
                                         +"/"+pb.getParada().getImagem()));
                             } else{
@@ -613,6 +626,11 @@ public class MapaActivity extends BaseActivity {
                             viewModel.setParadaNova(p);
 
                             // bottom menu
+
+                            RecyclerView listItinerarios = bsd.findViewById(R.id.listItinerarios);
+
+                            adapterItinerarios = new ItinerarioAdapter(new ArrayList<ItinerarioPartidaDestino>(), ctx);
+                            listItinerarios.setAdapter(adapterItinerarios);
 
                             TextView textViewReferencia = bsd.findViewById(R.id.textViewReferencia);
                             TextView textViewBairro = bsd.findViewById(R.id.textViewBairro);
@@ -862,11 +880,12 @@ public class MapaActivity extends BaseActivity {
     private void updateUI(GoogleSignInAccount account){
 
         if(account != null){
-            binding.btnLogin.setVisibility(View.GONE);
+            //binding.btnLogin.setVisibility(View.GONE);
 
             if(gpsAtivo){
                 binding.fabParada.setEnabled(true);
                 binding.fabMeuLocal.setEnabled(true);
+                configuraActivity();
             }
 
             Toast.makeText(getApplicationContext(), "Login realizado com sucesso! " +
@@ -877,7 +896,7 @@ public class MapaActivity extends BaseActivity {
             logado = true;
 
         } else{
-            binding.btnLogin.setVisibility(View.VISIBLE);
+            //binding.btnLogin.setVisibility(View.VISIBLE);
             binding.fabParada.setEnabled(false);
             logado = false;
         }

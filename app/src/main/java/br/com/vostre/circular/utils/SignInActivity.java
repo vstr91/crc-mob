@@ -75,7 +75,7 @@ public class SignInActivity extends BaseActivity {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w("SIGN", "signInResult:failed code=" + e.getStatusCode()+" | "+e.getMessage());
-            Toast.makeText(getApplicationContext(), "Erro ao efeutar login: "+e.getMessage()+". Por favor tente novamente.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Erro ao efeutar login: "+e.getMessage()+". Por favor tente novamente mais tarde.", Toast.LENGTH_SHORT).show();
             Intent result = new Intent();
             result.putExtra("logado", false);
             result.putExtra("mensagemErro", e.getMessage());
@@ -90,7 +90,7 @@ public class SignInActivity extends BaseActivity {
             Intent result = new Intent();
             result.putExtra("account", account);
             result.putExtra("logado", logado);
-            result.putExtra("mensagemErro", "Erro ao validar usuário. Por favor tente novamente.");
+            result.putExtra("mensagemErro", "Erro ao validar usuário. Por favor tente novamente mais tarde.");
             setResult(Activity.RESULT_OK, result);
 
             if(cont > 0){

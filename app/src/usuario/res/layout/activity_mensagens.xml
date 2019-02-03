@@ -107,6 +107,7 @@
             android:src="@drawable/ic_add_white_24dp"
             app:backgroundTint="@color/ciano"
             android:onClick="@{view::onFabClick}"
+            android:contentDescription="Criar Nova Mensagem"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

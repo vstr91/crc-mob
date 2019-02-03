@@ -15,6 +15,7 @@
         android:layout_marginRight="16dp"
         android:background="@color/transparente"
         android:clickable="true"
+        android:contentDescription="Ícone de Horários"
         android:src="@drawable/ic_access_time_white_24dp"
         android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"

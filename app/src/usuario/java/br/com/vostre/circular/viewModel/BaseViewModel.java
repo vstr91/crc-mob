@@ -81,6 +81,7 @@ public class BaseViewModel extends AndroidViewModel {
     public LocationCallback mLocationCallback;
     public LiveData<List<ParadaBairro>> paradas;
     public LiveData<List<Parametro>> parametros;
+    public LiveData<List<ParametroInterno>> parametrosInternos;
     public boolean isRunningNearPlaces = false;
 
     public MutableLiveData usuarioValidado;
@@ -108,6 +109,7 @@ public class BaseViewModel extends AndroidViewModel {
         localAtual.postValue(new Location(LocationManager.GPS_PROVIDER));
         paradas = appDatabase.paradaDAO().listarTodosAtivosProximos(0,0,0,0);
         parametros = appDatabase.parametroDAO().listarTodos();
+        parametrosInternos = appDatabase.parametroInternoDAO().listarTodos();
         new paramAsyncTask(appDatabase).execute();
         usuarioValidado = new MutableLiveData<>();
         usuarioValidado.postValue(false);

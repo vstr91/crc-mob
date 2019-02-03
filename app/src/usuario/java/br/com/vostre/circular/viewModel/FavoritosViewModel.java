@@ -49,7 +49,14 @@ public class FavoritosViewModel extends AndroidViewModel {
 
                 for(String id : paradasFavoritas){
                     ParadaBairro paradaBairro = appDatabase.paradaDAO().carregarComBairroSync(id);
-                    listParadas.add(paradaBairro);
+
+                    if(paradaBairro != null && paradaBairro.getParada() != null &&
+                            !paradaBairro.getNomeBairro().isEmpty() &&
+                            !paradaBairro.getNomeCidade().isEmpty()){
+                        listParadas.add(paradaBairro);
+                    }
+
+
                 }
 
                 Collections.sort(listParadas, new Comparator<ParadaBairro>() {
@@ -79,8 +86,15 @@ public class FavoritosViewModel extends AndroidViewModel {
 
                     String[] dados = id.split("\\|");
 
-                    ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO().carregarPorPartidaEDestinoSync(dados[0], dados[1]);
-                    listItinerarios.add(itinerario);
+                    ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO()
+                            .carregarPorPartidaEDestinoSync(dados[0], dados[1]);
+
+                    if(itinerario != null && itinerario.getItinerario() != null &&
+                            !itinerario.getNomeBairroPartida().isEmpty() &&
+                            !itinerario.getNomeBairroDestino().isEmpty()){
+                        listItinerarios.add(itinerario);
+                    }
+
                 }
 
                 itinerarios.postValue(listItinerarios);

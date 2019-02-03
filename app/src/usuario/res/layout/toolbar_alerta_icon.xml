@@ -17,6 +17,7 @@
         android:clickable="true"
         android:src="@drawable/ic_report_problem_white_24dp"
         android:textAlignment="center"
+        android:contentDescription="Ícone de Alerta"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

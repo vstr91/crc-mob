@@ -89,6 +89,7 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityMenuBinding;
 import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.Parametro;
+import br.com.vostre.circular.model.ParametroInterno;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.DBUtils;
@@ -160,6 +161,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), "init")){
             // caregar bd
             DBUtils.populaBancoDeDados(this);
+
+            requisitaAtualizacao();
         }
 
         if(PreferenceUtils.carregarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".id_unico").isEmpty()){
@@ -291,6 +294,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
 
         viewModel.parametros.observe(this, parametrosObserver);
+        viewModel.parametrosInternos.observe(this, parametrosInternosObserver);
 
         String prefQr = PreferenceUtils.carregarPreferencia(getApplicationContext(), "param_qr");
         String prefVersao = PreferenceUtils.carregarPreferencia(getApplicationContext(), "param_versao");
@@ -707,6 +711,18 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         }
     };
 
+    Observer<List<ParametroInterno>> parametrosInternosObserver = new Observer<List<ParametroInterno>>() {
+        @Override
+        public void onChanged(List<ParametroInterno> parametros) {
+            ParametroInterno parametro = parametros.get(0);
+
+            if(parametro.getDataUltimoAcesso().isBefore(DateTime.now().minusHours(1))){
+                requisitaAtualizacao();
+            }
+
+        }
+    };
+
     Observer<List<Parametro>> parametrosObserver = new Observer<List<Parametro>>() {
         @Override
         public void onChanged(List<Parametro> parametros) {
@@ -856,6 +872,16 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                 e.printStackTrace();
             }
         }
+    }
+
+    private void requisitaAtualizacao(){
+        Bundle settingsBundle = new Bundle();
+        settingsBundle.putBoolean(
+                ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        settingsBundle.putBoolean(
+                ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+
+        ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
     }
 
 }

@@ -8,7 +8,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 26
         multiDexEnabled true
-        versionCode 15
+        versionCode 18
         versionName "2.0.0-beta.1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"

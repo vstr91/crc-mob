@@ -15,6 +15,7 @@
         android:layout_marginRight="16dp"
         android:background="@color/transparente"
         android:clickable="true"
+        android:contentDescription="Ícone de Sincronização"
         android:src="@drawable/ic_sync_white_24dp"
         android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"

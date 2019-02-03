@@ -14,22 +14,26 @@
     <item android:id="@+id/icon_sync"
         android:title="Sincronização"
         app:actionLayout="@layout/toolbar_sync_icon"
+        android:contentDescription="Ícone de sincronização"
         app:showAsAction="always" />
 
     <item android:id="@+id/icon_alerta"
         android:title="Alerta"
         android:visible="false"
         app:actionLayout="@layout/toolbar_alerta_icon"
+        android:contentDescription="Ícone de Alerta"
         app:showAsAction="always" />
 
     <item android:id="@+id/icon_favoritos"
         android:title="Favoritos"
         app:actionLayout="@layout/toolbar_favoritos_icon"
+        android:contentDescription="Ícone de Favoritos"
         app:showAsAction="always" />
 
     <item android:id="@+id/icon_msg"
         android:title="Mensagens"
         app:actionLayout="@layout/toolbar_msg_icon"
+        android:contentDescription="Ícone de Mensagens"
         app:showAsAction="always" />
 
 </menu>

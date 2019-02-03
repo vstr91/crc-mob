@@ -15,6 +15,7 @@
         android:layout_marginRight="16dp"
         android:background="@color/transparente"
         android:clickable="true"
+        android:contentDescription="Ícone de Favoritos"
         android:src="@drawable/ic_star_white_24dp"
         android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"

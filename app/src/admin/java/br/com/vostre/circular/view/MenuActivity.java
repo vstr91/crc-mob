@@ -193,6 +193,11 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         DBUtils.exportDB(getApplicationContext());
     }
 
+    public void onClickBtnDashboard(View v){
+        Intent i = new Intent(getApplicationContext(), DashboardActivity.class);
+        startActivity(i);
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false;

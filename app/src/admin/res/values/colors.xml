@@ -12,4 +12,7 @@
     <color name="cinzaClaro">#EEEEEE</color>
     <color name="cinzaMedio">#AAAAAA</color>
     <color name="cinzaInativo">#E3E3E3</color>
+
+    <color name="cianoEscuro">#25dcd2</color>
+    <color name="cianoMedio">#07d7e6</color>
 </resources>

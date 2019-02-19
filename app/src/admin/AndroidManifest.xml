@@ -22,25 +22,28 @@
         android:roundIcon="@drawable/icon_gerenciador"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".view.DetalheAcessoActivity"></activity>
+        <activity android:name=".view.DashboardActivity" />
 
-        <service
-            android:name="br.com.vostre.circular.model.service.AuthenticatorService">
+        <service android:name=".model.service.AuthenticatorService">
             <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator"/>
+                <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
+
             <meta-data
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
-
         <service
             android:name=".model.service.SyncService"
             android:exported="true"
             android:process=":sync">
             <intent-filter>
-                <action android:name="android.content.SyncAdapter"/>
+                <action android:name="android.content.SyncAdapter" />
             </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter"
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
                 android:resource="@xml/syncadapter" />
         </service>
 
@@ -48,7 +51,7 @@
             android:name=".utils.DataProvider"
             android:authorities="br.com.vostre.circular.admin.datasync.provider"
             android:exported="false"
-            android:syncable="true"/>
+            android:syncable="true" />
 
         <activity android:name=".view.LoginActivity" />
         <activity android:name=".view.MenuActivity">
@@ -78,7 +81,7 @@
         <activity android:name=".view.TarifasActivity" />
         <activity android:name=".view.SobreActivity" />
         <activity android:name=".view.ParadasSugeridasActivity" />
-        <activity android:name=".view.HorariosItinerarioActivity"></activity>
+        <activity android:name=".view.HorariosItinerarioActivity" />
     </application>
 
 </manifest>

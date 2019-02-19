@@ -29,6 +29,9 @@ public interface HorarioItinerarioDAO {
     @Query("SELECT * FROM horario_itinerario WHERE ativo = 1")
     List<HorarioItinerario> listarTodosAtivos();
 
+    @Query("SELECT COUNT(id) FROM horario_itinerario WHERE ativo = 1 AND (domingo = 1 OR segunda = 1 OR terca = 1 OR quarta = 1 OR quinta = 1 OR sexta = 1 OR sabado = 1)")
+    LiveData<Integer> contarTodosAtivos();
+
     @Query("SELECT * FROM horario_itinerario WHERE enviado = 0")
     List<HorarioItinerario> listarTodosAEnviar();
 

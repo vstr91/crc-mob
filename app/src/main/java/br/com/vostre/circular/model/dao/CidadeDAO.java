@@ -25,6 +25,9 @@ public interface CidadeDAO {
     @Query("SELECT * FROM cidade WHERE ativo = 1 ORDER BY nome")
     LiveData<List<Cidade>> listarTodosAtivos();
 
+    @Query("SELECT COUNT(DISTINCT c.id) FROM cidade c INNER JOIN bairro b ON b.cidade = c.id WHERE c.ativo = 1 AND b.ativo = 1")
+    LiveData<Integer> contarTodosAtivos();
+
     @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado FROM cidade c INNER JOIN estado e ON e.id = c.estado " +
             "            WHERE (SELECT COUNT(b.id) FROM bairro b WHERE b.cidade = c.id) > 0 \n" +
             "            AND (SELECT COUNT(pi.id) FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro " +

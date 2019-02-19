@@ -73,6 +73,9 @@ public interface ParadaDAO {
     @Query("SELECT * FROM parada WHERE ativo = 1")
     List<Parada> listarTodosAtivos();
 
+    @Query("SELECT COUNT(id) FROM parada WHERE ativo = 1")
+    LiveData<Integer> contarTodosAtivos();
+
     @Query("SELECT * FROM parada WHERE id IN (:ids)")
     List<Parada> carregarTodosPorIds(int[] ids);
 

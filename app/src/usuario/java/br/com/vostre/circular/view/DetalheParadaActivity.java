@@ -332,6 +332,11 @@ public class DetalheParadaActivity extends BaseActivity {
             if(parada != null){
                 binding.setUmaParada(parada);
 
+                //log
+                bundle = new Bundle();
+                bundle.putString("parada", parada.getParada().getNome()+" - "+parada.getNomeBairroComCidade());
+                mFirebaseAnalytics.logEvent("consulta_detalhe_parada", bundle);
+
                 if(parada.getParada().getImagem() != null){
                     binding.imageView9.setImageDrawable(Drawable.createFromPath(getApplicationContext().getFilesDir()+"/"+parada.getParada().getImagem()));
                 } else{

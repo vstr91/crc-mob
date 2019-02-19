@@ -108,6 +108,9 @@ public class ItinerarioPartidaDestino {
     @ColumnInfo(name = "tempoTrecho")
     DateTime tempoTrecho;
 
+    @ColumnInfo(name = "totalHorarios")
+    Integer totalHorarios;
+
     @Ignore
     public boolean selecionado;
 
@@ -392,6 +395,14 @@ public class ItinerarioPartidaDestino {
 
     public void setHora(String hora) {
         this.hora = hora;
+    }
+
+    public Integer getTotalHorarios() {
+        return totalHorarios;
+    }
+
+    public void setTotalHorarios(Integer totalHorarios) {
+        this.totalHorarios = totalHorarios;
     }
 
     @Override

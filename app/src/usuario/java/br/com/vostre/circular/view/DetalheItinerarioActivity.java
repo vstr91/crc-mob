@@ -244,7 +244,15 @@ public class DetalheItinerarioActivity extends BaseActivity {
         //log
         bundle = new Bundle();
         bundle.putString("parada_partida", paradaPartida);
-        i.putExtra("parada_destino", paradaDestino);
+        bundle.putString("parada_destino", paradaDestino);
+
+        ParadaBairro partida = viewModel.partida.getValue();
+        ParadaBairro destino = viewModel.destino.getValue();
+
+        if(partida != null && destino != null){
+            bundle.putString("itinerario", partida.getParada().getNome()+" - "+partida.getNomeBairroComCidade()+" x "+destino.getParada().getNome()+" - "+destino.getNomeBairroComCidade());
+        }
+
         mFirebaseAnalytics.logEvent("horario_compartilhado", bundle);
 
         ctx.startActivity(i);
@@ -499,6 +507,21 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 viewModel.secoes.observe(ctx, secoesObserver);
                 //viewModel.carregarItinerarios(parada.getParada().getId());
                 //viewModel.itinerarios.observe(ctx, itinerariosObserver);
+
+                //log
+                bundle = new Bundle();
+                bundle.putString("parada_partida", itinerario.getBairroConsultaPartida()+" - "+itinerario.getNomeCidadePartida());
+                bundle.putString("parada_destino", itinerario.getBairroConsultaDestino()+" - "+itinerario.getNomeCidadeDestino());
+
+                ParadaBairro partida = viewModel.partida.getValue();
+                ParadaBairro destino = viewModel.destino.getValue();
+
+                if(partida != null && destino != null){
+                    bundle.putString("itinerario", partida.getParada().getNome()+" - "+partida.getNomeBairroComCidade()+" x "+destino.getParada().getNome()+" - "+destino.getNomeBairroComCidade());
+                }
+
+                mFirebaseAnalytics.logEvent("quadro_de_horarios", bundle);
+
             }
 
         }

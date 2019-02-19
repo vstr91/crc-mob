@@ -11,4 +11,6 @@ public class Constants {
     public static final String ACCOUNT_TYPE = "br.com.vostre.circular.usuario";
     // The account name
     public static final String ACCOUNT = "dummyaccount";
+
+    public static final int ID_NOTIFICACAO_MSG = 2;
 }

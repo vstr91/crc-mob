@@ -53,6 +53,8 @@ import br.com.vostre.circular.model.Parametro;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Usuario;
+import br.com.vostre.circular.utils.Constants;
+import br.com.vostre.circular.utils.NotificacaoUtils;
 import br.com.vostre.circular.utils.ToolbarUtils;
 import br.com.vostre.circular.view.listener.GpsListener;
 import br.com.vostre.circular.view.listener.HoraListener;
@@ -76,6 +78,8 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     public GoogleSignInAccount account;
 
     FirebaseAnalytics mFirebaseAnalytics;
+
+    String CHANNEL_ID = "987";
 
     private BroadcastReceiver mGpsSwitchStateReceiver = new BroadcastReceiver() {
         @Override
@@ -117,6 +121,10 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
                 if(mensagens != null){
 
+                    NotificacaoUtils.criaNotificacao(MenuActivity.class, MensagensActivity.class,
+                            context.getApplicationContext(), "Circular", "Nova mensagem recebida!",
+                            CHANNEL_ID);
+
                     if(menu != null){
                         invalidateOptionsMenu();
                     }
@@ -133,6 +141,8 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         gpsAtivo = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        NotificacaoUtils.createNotificationChannel(getApplicationContext(), CHANNEL_ID);
 
     }
 

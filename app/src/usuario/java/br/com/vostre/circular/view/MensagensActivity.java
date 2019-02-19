@@ -2,6 +2,7 @@ package br.com.vostre.circular.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +16,8 @@ import java.util.List;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityMensagensBinding;
 import br.com.vostre.circular.model.Mensagem;
+import br.com.vostre.circular.utils.Constants;
+import br.com.vostre.circular.utils.NotificacaoUtils;
 import br.com.vostre.circular.view.adapter.MensagemAdapter;
 import br.com.vostre.circular.view.form.FormMensagem;
 import br.com.vostre.circular.viewModel.MensagensViewModel;
@@ -48,6 +51,8 @@ public class MensagensActivity extends BaseActivity {
         binding.setView(this);
         setTitle("Mensagens");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
+
+        NotificacaoUtils.removeNotificacao(getBaseContext(), Constants.ID_NOTIFICACAO_MSG);
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
 
@@ -93,6 +98,17 @@ public class MensagensActivity extends BaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isTaskRoot()) {
+            Intent intent = new Intent(this,MenuActivity.class);
+            startActivity(intent);
+            super.onBackPressed();
+        }else {
+            super.onBackPressed();
+        }
     }
 
     public void onFabClick(View v){

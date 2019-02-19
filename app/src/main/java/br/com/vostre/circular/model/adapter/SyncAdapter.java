@@ -66,9 +66,12 @@ import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.utils.Constants;
 import br.com.vostre.circular.utils.Crypt;
 import br.com.vostre.circular.utils.JsonUtils;
+import br.com.vostre.circular.utils.NotificacaoUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SessionUtils;
 import br.com.vostre.circular.utils.Unique;
+import br.com.vostre.circular.view.MensagensActivity;
+import br.com.vostre.circular.view.MenuActivity;
 import br.com.vostre.circular.viewModel.CidadesViewModel;
 import br.com.vostre.circular.viewModel.EmpresasViewModel;
 import br.com.vostre.circular.viewModel.ParadasSugeridasViewModel;
@@ -131,6 +134,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     Bundle bundle;
 
     boolean mostraToast;
+    String CHANNEL_ID = "987";
 
     /**
      * Set up the sync adapter
@@ -875,6 +879,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         lstMensagens.add(mensagem);
 
                     }
+
+                    NotificacaoUtils.criaNotificacao(MenuActivity.class, MensagensActivity.class,
+                            ctx.getApplicationContext(), "Circular", "Nova mensagem recebida!",
+                            CHANNEL_ID);
 
                     add(lstMensagens, "mensagem");
 

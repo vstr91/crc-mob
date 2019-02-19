@@ -38,7 +38,7 @@ public class ParadaFavoritaAdapter extends RecyclerView.Adapter<ParadaFavoritaVi
     public void onBindViewHolder(ParadaFavoritaViewHolder holder, int position) {
         final ParadaBairro parada = this.paradas.get(position);
 
-        if(!parada.getNomeBairro().equals(bairroAtual)){
+        if(parada != null && !parada.getNomeBairro().equals(bairroAtual)){
             bairroAtual = parada.getNomeBairro();
             holder.bind(parada, true);
         } else{

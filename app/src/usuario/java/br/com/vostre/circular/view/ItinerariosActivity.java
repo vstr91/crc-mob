@@ -269,6 +269,11 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
                 bundle.putString("partida", bairroPartida.getBairro().getNome()+", "+bairroPartida.getNomeCidadeComEstado());
                 bundle.putString("destino", bairroDestino.getBairro().getNome()+", "+bairroDestino.getNomeCidadeComEstado());
+
+                bundle.putString("partida_destino", bairroPartida.getBairro().getNome()+", "
+                        +bairroPartida.getNomeCidadeComEstado()+" x "
+                        +bairroDestino.getBairro().getNome()+", "+bairroDestino.getNomeCidadeComEstado());
+
                 bundle.putInt("itinerarios", itinerarios.size());
                 bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
                 bundle.putBoolean("sucesso", true);
@@ -286,6 +291,11 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
                 bundle.putString("partida", bairroPartida.getBairro().getNome()+", "+bairroPartida.getNomeCidadeComEstado());
                 bundle.putString("destino", bairroDestino.getBairro().getNome()+", "+bairroDestino.getNomeCidadeComEstado());
+
+                bundle.putString("partida_destino", bairroPartida.getBairro().getNome()+", "
+                        +bairroPartida.getNomeCidadeComEstado()+" x "
+                        +bairroDestino.getBairro().getNome()+", "+bairroDestino.getNomeCidadeComEstado());
+
                 bundle.putInt("itinerarios", 0);
                 bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
                 bundle.putBoolean("sucesso", false);
@@ -600,6 +610,11 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         bundle = new Bundle();
         bundle.putString("partida", bairroPartida.getBairro().getNome()+", "+bairroPartida.getNomeCidadeComEstado());
         bundle.putString("destino", bairroDestino.getBairro().getNome()+", "+bairroDestino.getNomeCidadeComEstado());
+
+        bundle.putString("partida_destino", bairroPartida.getBairro().getNome()+", "
+                +bairroPartida.getNomeCidadeComEstado()+" x "
+                +bairroDestino.getBairro().getNome()+", "+bairroDestino.getNomeCidadeComEstado());
+
         bundle.putString("data_hora", DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(new DateTime(data)));
         bundle.putBoolean("sucesso", true);
 

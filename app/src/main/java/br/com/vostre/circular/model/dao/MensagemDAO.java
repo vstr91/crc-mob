@@ -16,13 +16,13 @@ import br.com.vostre.circular.model.Pais;
 @Dao
 public interface MensagemDAO {
 
-    @Query("SELECT * FROM mensagem WHERE servidor = 0")
+    @Query("SELECT * FROM mensagem WHERE servidor = 0 ORDER BY data_cadastro DESC")
     LiveData<List<Mensagem>> listarTodos();
 
-    @Query("SELECT * FROM mensagem WHERE servidor = 1")
+    @Query("SELECT * FROM mensagem WHERE servidor = 1 ORDER BY data_cadastro DESC")
     LiveData<List<Mensagem>> listarTodosServidor();
 
-    @Query("SELECT * FROM mensagem WHERE servidor = 1")
+    @Query("SELECT * FROM mensagem WHERE servidor = 1 ORDER BY data_cadastro DESC")
     LiveData<List<Mensagem>> listarTodosRecebidos();
 
     @Query("SELECT * FROM mensagem WHERE servidor = 1 AND lida = 0")
@@ -31,7 +31,7 @@ public interface MensagemDAO {
     @Query("SELECT * FROM mensagem WHERE servidor = 0 AND lida = 0")
     LiveData<List<Mensagem>> listarTodosNaoLidosServidor();
 
-    @Query("SELECT * FROM mensagem WHERE ativo = 1")
+    @Query("SELECT * FROM mensagem WHERE ativo = 1 ORDER BY data_cadastro DESC")
     List<Mensagem> listarTodosAtivos();
 
     @Query("SELECT * FROM mensagem WHERE enviado = 0")

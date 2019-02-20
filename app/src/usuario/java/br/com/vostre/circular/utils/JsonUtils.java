@@ -18,6 +18,7 @@ import org.joda.time.format.DateTimeFormat;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import br.com.vostre.circular.model.Acesso;
 import br.com.vostre.circular.model.EntidadeBase;
 
 public class JsonUtils {
@@ -93,6 +94,19 @@ public class JsonUtils {
                     .registerTypeAdapter(DateTime.class, JsonUtils.deserDateTimeAPI)
                     .create();
         }
+
+
+        return gson.fromJson(json, baseClass);
+    }
+
+    public static Acesso fromJson(String json, Type baseClass){
+
+        Gson gson;
+
+            gson = new GsonBuilder()
+                    .registerTypeAdapter(DateTime.class, JsonUtils.serDateTime)
+                    .registerTypeAdapter(DateTime.class, JsonUtils.deserDateTimeAPI)
+                    .create();
 
 
         return gson.fromJson(json, baseClass);

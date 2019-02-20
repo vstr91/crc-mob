@@ -40,6 +40,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import br.com.vostre.circular.BuildConfig;
+import br.com.vostre.circular.model.Acesso;
 import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Empresa;
@@ -127,6 +128,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     List<? extends EntidadeBase> preferencias;
 
     List<? extends EntidadeBase> historicos;
+
+    List<? extends Acesso> acessos;
 
     br.com.vostre.circular.utils.Crypt crypt;
 
@@ -558,6 +561,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 JSONArray paradasSugestoes = null;
                 JSONArray preferencias = null;
                 JSONArray historicosItinerarios = null;
+                JSONArray acessos = null;
 
                 if(arrayObject.optJSONArray("paradas_sugestoes") != null){
                     paradasSugestoes = arrayObject.getJSONArray("paradas_sugestoes");
@@ -569,6 +573,31 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 if(arrayObject.optJSONArray("historicos_itinerarios") != null){
                     historicosItinerarios = arrayObject.getJSONArray("historicos_itinerarios");
+                }
+
+                if(arrayObject.optJSONArray("acessos") != null){
+                    acessos = arrayObject.getJSONArray("acessos");
+                }
+
+                // ACESSOS
+
+                if(acessos.length() > 0){
+
+                    int total = acessos.length();
+                    List<Acesso> lstAcessos = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        Acesso acesso;
+                        JSONObject obj = paises.getJSONObject(i);
+
+                        acesso = br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Acesso.class);
+
+                        lstAcessos.add(acesso);
+
+                    }
+
+                    add(lstAcessos);
+
                 }
 
                 // PAISES
@@ -1502,6 +1531,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
     // adicionar
 
+    public void add(final List<? extends Acesso> acesso) {
+
+        new addAcessoAsyncTask(appDatabase).execute(acesso);
+    }
+
     public void add(final List<? extends EntidadeBase> entidadeBase, String entidade) {
 
         new addAsyncTask(appDatabase, entidade).execute(entidadeBase);
@@ -1527,6 +1561,32 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             parametro.setUltimaAlteracao(DateTime.now());
 
             db.parametroInternoDAO().inserir(parametro);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+    }
+
+    private class addAcessoAsyncTask extends AsyncTask<List<? extends Acesso>, Void, Void> {
+
+        private AppDatabase db;
+
+        addAcessoAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final List<? extends Acesso>... params) {
+
+            db.acessoDAO().inserirTodos((List<Acesso>) params[0]);
+
+            if(!PreferenceUtils.carregarPreferenciaBoolean(ctx, "init")){
+                PreferenceUtils.salvarPreferencia(ctx, "init", true);
+            }
+
             return null;
         }
 

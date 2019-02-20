@@ -1,11 +1,14 @@
 package br.com.vostre.circular.model.dao;
 
+import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
+import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
 
+import br.com.vostre.circular.model.Acesso;
 import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Empresa;
@@ -34,8 +37,9 @@ import br.com.vostre.circular.utils.Converters;
         Empresa.class, Parametro.class, Usuario.class, Mensagem.class, MensagemResposta.class,
         Parada.class, PontoInteresse.class, Itinerario.class, ParadaItinerario.class,
         Horario.class, HorarioItinerario.class, SecaoItinerario.class, Onibus.class,
-        ParametroInterno.class, ParadaSugestao.class, HistoricoParada.class, UsuarioPreferencia.class, HistoricoItinerario.class},
-        version = 4)
+        ParametroInterno.class, ParadaSugestao.class, HistoricoParada.class, UsuarioPreferencia.class,
+        HistoricoItinerario.class, Acesso.class},
+        version = 5)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -66,6 +70,9 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract UsuarioPreferenciaDAO usuarioPreferenciaDAO();
     public abstract HistoricoItinerarioDAO historicoItinerarioDAO();
 
+    // 2.0.0-b.1.2
+    public abstract AcessoDAO acessoDAO();
+
     public static AppDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {
             INSTANCE =
@@ -73,6 +80,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             // allow queries on the main thread.
                             // Don't do this on a real app! See PersistenceBasicSample for an example.
                             //.allowMainThreadQueries()
+                            .addMigrations(MIGRATION_4_5)
                             .fallbackToDestructiveMigration()
                             .build();
         }
@@ -82,5 +90,13 @@ public abstract class AppDatabase extends RoomDatabase {
     public static void destroyInstance() {
         INSTANCE = null;
     }
+
+    static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'acesso' ('identificadorUnico' TEXT NOT NULL, " +
+                    "'dataCriacao' INTEGER NOT NULL, 'dataValidacao' INTEGER NOT NULL)");
+        }
+    };
 
 }

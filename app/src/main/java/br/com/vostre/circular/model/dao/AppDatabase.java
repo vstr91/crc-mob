@@ -94,8 +94,7 @@ public abstract class AppDatabase extends RoomDatabase {
     static final Migration MIGRATION_4_5 = new Migration(4, 5) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS 'acesso' ('identificadorUnico' TEXT NOT NULL, " +
-                    "'dataCriacao' INTEGER NOT NULL, 'dataValidacao' INTEGER NOT NULL)");
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'acesso' ('id' TEXT NOT NULL, 'identificadorUnico' TEXT NOT NULL, 'dataCriacao' INTEGER NOT NULL, 'dataValidacao' INTEGER NOT NULL, PRIMARY KEY('id'))");
         }
     };
 

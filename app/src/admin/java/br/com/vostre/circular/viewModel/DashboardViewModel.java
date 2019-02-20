@@ -10,6 +10,7 @@ import br.com.vostre.circular.model.dao.AppDatabase;
 public class DashboardViewModel extends AndroidViewModel {
 
     private AppDatabase appDatabase;
+    public LiveData<Integer> acessos;
     public LiveData<Integer> itinerarios;
     public LiveData<Integer> paradas;
     public LiveData<Integer> horarios;
@@ -18,6 +19,7 @@ public class DashboardViewModel extends AndroidViewModel {
     public DashboardViewModel(Application app){
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
+        acessos = appDatabase.acessoDAO().contarTodos();
         itinerarios = appDatabase.itinerarioDAO().contarTodosAtivos();
         paradas = appDatabase.paradaDAO().contarTodosAtivos();
         cidades = appDatabase.cidadeDAO().contarTodosAtivos();

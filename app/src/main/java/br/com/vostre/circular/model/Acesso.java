@@ -2,12 +2,19 @@ package br.com.vostre.circular.model;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Index;
+import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
 import org.joda.time.DateTime;
 
+import java.util.UUID;
+
 @Entity
 public class Acesso {
+
+    @PrimaryKey
+    @NonNull
+    private String id;
 
     @NonNull
     private String identificadorUnico;
@@ -17,6 +24,19 @@ public class Acesso {
 
     @NonNull
     private DateTime dataValidacao;
+
+    public Acesso(){
+        this.setId(UUID.randomUUID().toString());
+    }
+
+    @NonNull
+    public String getId() {
+        return id;
+    }
+
+    public void setId(@NonNull String id) {
+        this.id = id;
+    }
 
     @NonNull
     public String getIdentificadorUnico() {

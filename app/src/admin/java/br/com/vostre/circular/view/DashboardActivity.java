@@ -27,6 +27,7 @@ public class DashboardActivity extends BaseActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
         viewModel = ViewModelProviders.of(this).get(DashboardViewModel.class);
+        viewModel.acessos.observe(this, acessosObserver);
         viewModel.itinerarios.observe(this, itinerariosObserver);
         viewModel.paradas.observe(this, paradasObserver);
         viewModel.cidades.observe(this, cidadesObserver);
@@ -53,6 +54,13 @@ public class DashboardActivity extends BaseActivity {
     public void onClickCardHorario(View v){
 
     }
+
+    Observer<Integer> acessosObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer acessos) {
+            binding.textViewAcessos.setText(String.valueOf(acessos));
+        }
+    };
 
     Observer<Integer> itinerariosObserver = new Observer<Integer>() {
         @Override

@@ -8,6 +8,8 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
+import org.joda.time.DateTime;
+
 import java.util.List;
 
 import br.com.vostre.circular.model.Acesso;
@@ -24,6 +26,9 @@ public interface AcessoDAO {
 
     @Query("SELECT COUNT(identificadorUnico) FROM acesso")
     LiveData<Integer> contarTodos();
+
+    @Query("SELECT COUNT(identificadorUnico) FROM acesso WHERE dataValidacao ")
+    LiveData<Integer> contarTodosDoDia(DateTime dia);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<Acesso> acessos);

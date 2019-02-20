@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.UUID;
 
 import br.com.vostre.circular.BuildConfig;
 import br.com.vostre.circular.model.Acesso;
@@ -476,6 +478,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         processaJson(response);
                     } catch (JSONException e) {
 
+                        System.out.println("ERRO ACESSOS: "+e.getMessage());
+
                         if(mostraToast){
                             Toast.makeText(ctx, "Problema ao processar dados: "+e.getMessage(), Toast.LENGTH_LONG).show();
                         }
@@ -588,9 +592,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     for(int i = 0; i < total; i++){
                         Acesso acesso;
-                        JSONObject obj = paises.getJSONObject(i);
+                        JSONObject obj = acessos.getJSONObject(i);
 
                         acesso = br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Acesso.class);
+                        acesso.setId(UUID.randomUUID().toString());
 
                         lstAcessos.add(acesso);
 
@@ -1582,10 +1587,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         protected Void doInBackground(final List<? extends Acesso>... params) {
 
             db.acessoDAO().inserirTodos((List<Acesso>) params[0]);
-
-            if(!PreferenceUtils.carregarPreferenciaBoolean(ctx, "init")){
-                PreferenceUtils.salvarPreferencia(ctx, "init", true);
-            }
 
             return null;
         }

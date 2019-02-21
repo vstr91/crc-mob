@@ -19,7 +19,7 @@ public class DashboardViewModel extends AndroidViewModel {
     public DashboardViewModel(Application app){
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
-        acessos = appDatabase.acessoDAO().contarTodos();
+        acessos = appDatabase.acessoDAO().contarTodosDoDia();
         itinerarios = appDatabase.itinerarioDAO().contarTodosAtivos();
         paradas = appDatabase.paradaDAO().contarTodosAtivos();
         cidades = appDatabase.cidadeDAO().contarTodosAtivos();

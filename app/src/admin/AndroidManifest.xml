@@ -82,6 +82,7 @@
         <activity android:name=".view.SobreActivity" />
         <activity android:name=".view.ParadasSugeridasActivity" />
         <activity android:name=".view.HorariosItinerarioActivity" />
+        <activity android:name=".view.AcessoDiaActivity" />
     </application>
 
 </manifest>

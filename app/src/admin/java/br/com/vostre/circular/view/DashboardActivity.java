@@ -2,6 +2,7 @@ package br.com.vostre.circular.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityDashboardBinding;
 import br.com.vostre.circular.databinding.ActivitySobreBinding;
+import br.com.vostre.circular.model.pojo.AcessoDia;
 import br.com.vostre.circular.viewModel.DashboardViewModel;
 
 public class DashboardActivity extends BaseActivity {
@@ -36,7 +38,8 @@ public class DashboardActivity extends BaseActivity {
     }
 
     public void onClickCardAcesso(View v){
-        Toast.makeText(getApplicationContext(), "Acesso", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(getApplicationContext(), AcessoDiaActivity.class);
+        startActivity(i);
     }
 
     public void onClickCardItinerario(View v){

@@ -463,7 +463,7 @@ public class MapaActivity extends BaseActivity {
                             textViewBairro.setText(pb.getNomeBairroComCidade());
 
                             bsd.findViewById(R.id.textView32).setVisibility(View.VISIBLE);
-                            bsd.findViewById(R.id.textView33).setVisibility(View.VISIBLE);
+                            bsd.findViewById(R.id.textViewId).setVisibility(View.VISIBLE);
 
                             Button btnDetalhes = bsd.findViewById(R.id.btnDetalhes);
                             btnDetalhes.setVisibility(View.VISIBLE);
@@ -636,7 +636,7 @@ public class MapaActivity extends BaseActivity {
                             TextView textViewBairro = bsd.findViewById(R.id.textViewBairro);
 
                             bsd.findViewById(R.id.textView32).setVisibility(View.GONE);
-                            bsd.findViewById(R.id.textView33).setVisibility(View.GONE);
+                            bsd.findViewById(R.id.textViewId).setVisibility(View.GONE);
 
                             textViewReferencia.setText(p.getParada().getNome());
                             textViewBairro.setText(p.getNomeBairroComCidade());

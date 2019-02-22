@@ -17,6 +17,9 @@ public class CidadeEstado {
     @ColumnInfo(name = "nomeEstado")
     String nomeEstado;
 
+    @ColumnInfo(name = "totalBairros")
+    Integer totalBairros;
+
     public CidadeEstado(){
         this.setCidade(new Cidade());
     }
@@ -43,6 +46,14 @@ public class CidadeEstado {
 
     public void setNomeEstado(String nomeEstado) {
         this.nomeEstado = nomeEstado;
+    }
+
+    public Integer getTotalBairros() {
+        return totalBairros;
+    }
+
+    public void setTotalBairros(Integer totalBairros) {
+        this.totalBairros = totalBairros;
     }
 
     @Override

@@ -57,6 +57,16 @@ public interface AcessoDAO {
             "ORDER BY DATE(dataValidacao/1000, 'unixepoch', 'localtime') DESC")
     LiveData<List<AcessoDia>> listarAcessosPorDia();
 
+    @Query("SELECT DATE(dataValidacao/1000, 'unixepoch', 'localtime') AS 'dia', COUNT(id) AS 'totalAcessos' " +
+            "FROM acesso GROUP BY DATE(dataValidacao/1000, 'unixepoch', 'localtime') " +
+            "ORDER BY DATE(dataValidacao/1000, 'unixepoch', 'localtime') DESC LIMIT :limite")
+    LiveData<List<AcessoDia>> listarAcessosPorDia(int limite);
+
+    @Query("SELECT DATE(dataValidacao/1000, 'unixepoch', 'localtime') AS 'dia', COUNT(DISTINCT identificadorUnico) AS 'totalAcessos' " +
+            "FROM acesso GROUP BY DATE(dataValidacao/1000, 'unixepoch', 'localtime') " +
+            "ORDER BY DATE(dataValidacao/1000, 'unixepoch', 'localtime') DESC LIMIT :limite")
+    LiveData<List<AcessoDia>> listarAcessosUnicosPorDia(int limite);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<Acesso> acessos);
 

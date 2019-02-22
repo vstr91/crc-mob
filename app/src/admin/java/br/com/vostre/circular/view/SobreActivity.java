@@ -48,7 +48,7 @@ public class SobreActivity extends BaseActivity {
     public static void setDataAcesso(TextView textView, DateTime l){
 
         if(l != null){
-            textView.setText(DateTimeFormat.forPattern("dd/MM/YYYY")
+            textView.setText(DateTimeFormat.forPattern("dd/MM/YYYY HH:mm")
                     .print(l));
         }
 

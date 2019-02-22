@@ -29,7 +29,7 @@ public interface CidadeDAO {
     LiveData<Integer> contarTodosAtivos();
 
     @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado FROM cidade c INNER JOIN estado e ON e.id = c.estado " +
-            "            WHERE (SELECT COUNT(b.id) FROM bairro b WHERE b.cidade = c.id) > 0 \n" +
+            "            WHERE (SELECT COUNT(b.id) FROM bairro b WHERE b.cidade = c.id) > 0 " +
             "            AND (SELECT COUNT(pi.id) FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro " +
             "            WHERE c.id = b.cidade AND pi.ativo = 1) > 0 " +
             "AND (" +
@@ -58,7 +58,8 @@ public interface CidadeDAO {
     @Query("SELECT * FROM cidade WHERE imagemEnviada = 0 AND brasao IS NOT NULL")
     List<Cidade> listarTodosImagemAEnviar();
 
-    @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado FROM cidade c INNER JOIN estado e ON e.id = c.estado ORDER BY c.nome")
+    @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado, (SELECT COUNT(DISTINCT id) FROM bairro b2 WHERE b2.cidade = c.id) AS 'totalBairros' " +
+            "FROM cidade c INNER JOIN estado e ON e.id = c.estado ORDER BY c.nome")
     LiveData<List<CidadeEstado>> listarTodosComEstado();
 
     @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado FROM cidade c INNER JOIN estado e ON e.id = c.estado WHERE c.id = :id")

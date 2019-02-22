@@ -136,7 +136,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:textColor="@{itinerario.totalHorarios > 0 ? @color/azul : @color/vermelho}"
-                        android:text="@{itinerario.totalHorarios+` horários cadastrados`}"
+                        android:text="@{itinerario.totalHorarios+` horário(s) cadastrado(s)`}"
                         android:textAppearance="@style/texto_azul"
                         tools:text="10 horários cadastrados" />
 

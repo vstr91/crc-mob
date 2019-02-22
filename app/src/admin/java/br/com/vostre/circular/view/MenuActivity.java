@@ -3,6 +3,8 @@ package br.com.vostre.circular.view;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -32,11 +34,14 @@ import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.TimeZone;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityMenuBinding;
+import br.com.vostre.circular.model.ParametroInterno;
 import br.com.vostre.circular.utils.DBUtils;
+import br.com.vostre.circular.viewModel.BaseViewModel;
 
 public class MenuActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -129,6 +134,10 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         drawer.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
+
+        viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
+
+        viewModel.parametrosInternos.observe(this, parametrosInternosObserver);
 
     }
 
@@ -238,6 +247,28 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         return null;
 
+    }
+
+    Observer<List<ParametroInterno>> parametrosInternosObserver = new Observer<List<ParametroInterno>>() {
+        @Override
+        public void onChanged(List<ParametroInterno> parametros) {
+            ParametroInterno parametro = parametros.get(0);
+
+            if(parametro.getDataUltimoAcesso().isBefore(DateTime.now().minusHours(1))){
+                requisitaAtualizacao();
+            }
+
+        }
+    };
+
+    private void requisitaAtualizacao(){
+        Bundle settingsBundle = new Bundle();
+        settingsBundle.putBoolean(
+                ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        settingsBundle.putBoolean(
+                ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+
+        ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
     }
 
 }

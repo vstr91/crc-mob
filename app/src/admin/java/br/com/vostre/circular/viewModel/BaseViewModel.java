@@ -51,6 +51,8 @@ public class BaseViewModel extends AndroidViewModel {
     public MutableLiveData usuarioValidado;
     String baseUrl;
 
+    public LiveData<List<ParametroInterno>> parametrosInternos;
+
     public ObservableField<String> getId() {
         return id;
     }
@@ -65,6 +67,7 @@ public class BaseViewModel extends AndroidViewModel {
         id = new ObservableField<>();
         new paramAsyncTask(appDatabase).execute();
         mensagensNaoLidas = appDatabase.mensagemDAO().listarTodosNaoLidosServidor();
+        parametrosInternos = appDatabase.parametroInternoDAO().listarTodos();
 
         usuarioValidado = new MutableLiveData<>();
         usuarioValidado.postValue(false);

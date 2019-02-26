@@ -46,7 +46,7 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix ".debug"
+            //applicationIdSuffix ".debug"
             versionNameSuffix '-SNAPSHOT'
         }
         release {
@@ -70,7 +70,7 @@ dependencies {
     implementation('com.github.nisrulz:qreader:2.1.2') {
         exclude module: 'com.google.android.gms:play-services-vision:11.4.2'
     }
-    implementation 'com.google.firebase:firebase-core:16.0.6'
+    implementation 'com.google.firebase:firebase-core:16.0.7'
 
     // Add dependency
     //implementation 'com.crashlytics.sdk.android:crashlytics:2.9.8'

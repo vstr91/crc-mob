@@ -24,15 +24,16 @@
             android:id="@+id/fabMeuLocal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginBottom="24dp"
             android:clickable="true"
             android:onClick="@{view::onFabLocationClick}"
             android:onLongClick="@{view::onFabLocationLongClick}"
             app:backgroundTint="@color/verde"
             app:fabSize="mini"
-            app:layout_constraintBottom_toTopOf="@+id/fabParada"
-            app:layout_constraintEnd_toEndOf="@+id/fabParada"
-            app:layout_constraintStart_toStartOf="@+id/fabParada"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/ic_gps_fixed_white_24dp" />
 
         <android.support.design.widget.FloatingActionButton
@@ -44,6 +45,7 @@
             android:layout_marginBottom="16dp"
             android:clickable="true"
             android:onClick="@{view::onFabParadaClick}"
+            android:visibility="gone"
             app:backgroundTint="@color/ciano"
             app:fabSize="normal"
             app:layout_constraintBottom_toBottomOf="parent"

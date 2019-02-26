@@ -127,7 +127,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
     // Sync interval constants
     public static final long SECONDS_PER_MINUTE = 60L;
-    public static final long SYNC_INTERVAL_IN_MINUTES = 60*1L;
+    public static final long SYNC_INTERVAL_IN_MINUTES = 60*5L;
     public static final long SYNC_INTERVAL =
             SYNC_INTERVAL_IN_MINUTES *
                     SECONDS_PER_MINUTE;
@@ -549,7 +549,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
          * If successful, return the Account object, otherwise report an error.
          */
         if (accountManager.addAccountExplicitly(newAccount, null, null)) {
-            System.out.println("Entrou");
+            //System.out.println("Entrou");
             /*
              * If you don't set android:syncable="true" in
              * in your <provider> element in the manifest,
@@ -558,7 +558,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
              */
             return newAccount;
         } else {
-            System.out.println("Entrou erro");
+            //System.out.println("Entrou erro");
             /*
              * The account exists or some other error occurred. Log this, report it,
              * or handle it internally.

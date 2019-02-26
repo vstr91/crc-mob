@@ -55,6 +55,8 @@ public class InfoWindowPOI extends FormBase {
             binding.textViewDataFinal.setVisibility(View.VISIBLE);
         }
 
+
+
         if(!exibeBotaoEditar){
             binding.btnEditar.setVisibility(View.GONE);
         }

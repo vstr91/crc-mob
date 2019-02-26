@@ -463,7 +463,7 @@ public class MapaActivity extends BaseActivity {
                             textViewBairro.setText(pb.getNomeBairroComCidade());
 
                             bsd.findViewById(R.id.textView32).setVisibility(View.VISIBLE);
-                            bsd.findViewById(R.id.textViewId).setVisibility(View.VISIBLE);
+//                            bsd.findViewById(R.id.textViewId).setVisibility(View.VISIBLE);
 
                             Button btnDetalhes = bsd.findViewById(R.id.btnDetalhes);
                             btnDetalhes.setVisibility(View.VISIBLE);
@@ -566,8 +566,31 @@ public class MapaActivity extends BaseActivity {
                             // bottom menu
 
                             TextView textViewReferencia = bsdPoi.findViewById(R.id.textViewReferencia);
+                            TextView textViewDescricao = bsdPoi.findViewById(R.id.textViewDescricao);
 
                             textViewReferencia.setText(poi.getNome());
+
+                            if(poi.getDescricao() != null && !poi.getDescricao().isEmpty()){
+                                textViewDescricao.setText(poi.getDescricao());
+                                textViewDescricao.setVisibility(View.VISIBLE);
+                            } else{
+                                textViewDescricao.setVisibility(View.GONE);
+                            }
+
+                            ImageView img = bsdPoi.findViewById(R.id.imageView3);
+
+                            File f = null;
+
+                            if(poi.getImagem() != null){
+                                f = new File(ctx.getApplicationContext().getFilesDir(),  poi.getImagem());
+                            }
+
+                            if(poi.getImagem() != null && f != null && f.exists() && f.canRead()){
+                                img.setImageDrawable(Drawable.createFromPath(getApplicationContext().getFilesDir()
+                                        +"/"+poi.getImagem()));
+                            } else{
+                                img.setImageDrawable(getResources().getDrawable(R.drawable.imagem_nao_disponivel_16_9));
+                            }
 
                             Button btnFechar = bsdPoi.findViewById(R.id.btnFechar);
                             btnFechar.setOnClickListener(new View.OnClickListener() {
@@ -636,7 +659,7 @@ public class MapaActivity extends BaseActivity {
                             TextView textViewBairro = bsd.findViewById(R.id.textViewBairro);
 
                             bsd.findViewById(R.id.textView32).setVisibility(View.GONE);
-                            bsd.findViewById(R.id.textViewId).setVisibility(View.GONE);
+//                            bsd.findViewById(R.id.textViewId).setVisibility(View.GONE);
 
                             textViewReferencia.setText(p.getParada().getNome());
                             textViewBairro.setText(p.getNomeBairroComCidade());

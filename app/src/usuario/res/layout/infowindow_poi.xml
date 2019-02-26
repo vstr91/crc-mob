@@ -20,14 +20,14 @@
         <ImageView
             android:id="@+id/imageView3"
             android:layout_width="0dp"
-            android:layout_height="300dp"
+            android:layout_height="180dp"
             android:background="@color/branco"
-            android:minHeight="150dp"
+            android:minHeight="180dp"
             android:scaleType="centerCrop"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@mipmap/ic_onibus_azul"
-            tools:layout_editor_absoluteY="8dp" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/imagem_nao_disponivel_16_9" />
 
         <TextView
             android:id="@+id/textViewReferencia"
@@ -47,14 +47,25 @@
             style="@style/botao_fechar_branco"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
             android:text="Fechar"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewDescricao" />
+
+        <TextView
+            android:id="@+id/textViewDescricao"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/branco"
+            android:padding="10dp"
+            android:text="@{poi.descricao}"
+            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textViewReferencia" />

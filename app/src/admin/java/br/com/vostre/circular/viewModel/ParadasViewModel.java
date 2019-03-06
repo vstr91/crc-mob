@@ -299,7 +299,11 @@ public class ParadasViewModel extends AndroidViewModel {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            retorno.setValue(1);
+
+            if(retorno != null){
+                retorno.setValue(1);
+            }
+
         }
 
     }

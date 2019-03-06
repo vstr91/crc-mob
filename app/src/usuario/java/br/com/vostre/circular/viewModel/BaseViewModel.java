@@ -156,7 +156,7 @@ public class BaseViewModel extends AndroidViewModel {
         //double latitude = -22.470612;
         //double longitude = -43.8263613;
 
-        int raioEmMetros = 200;
+        int raioEmMetros = 500;
 
 // 6378000 Size of the Earth (in meters)
         double longitudeD = (Math.asin(raioEmMetros / (6378000 * Math.cos(Math.PI*latitude/180))))*180/Math.PI;

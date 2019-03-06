@@ -36,8 +36,19 @@ public class ParadaBairro {
     @Ignore
     String nomeBairroComCidade;
 
+    @Ignore
+    Float distancia;
+
     public ParadaBairro(){
         setParada(new Parada());
+    }
+
+    public Float getDistancia() {
+        return distancia;
+    }
+
+    public void setDistancia(Float distancia) {
+        this.distancia = distancia;
     }
 
     public Parada getParada() {

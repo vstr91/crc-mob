@@ -63,6 +63,7 @@ import br.com.vostre.circular.model.pojo.SecaoItinerarioParada;
 import br.com.vostre.circular.utils.SnackbarHelper;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.LegendaAdapter;
+import br.com.vostre.circular.view.adapter.LegendaCompartilhamentoAdapter;
 import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.SecaoItinerarioDetalhadoAdapter;
 import br.com.vostre.circular.view.listener.LegendaListener;
@@ -209,7 +210,7 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
                     cont++;
                 }
 
-                final LegendaAdapter adapter = new LegendaAdapter(dados, ctx);
+                final LegendaCompartilhamentoAdapter adapter = new LegendaCompartilhamentoAdapter(dados, ctx);
                 adapter.setListener(new LegendaListener() {
                     @Override
                     public void onLegendaSelected(boolean ativa, String itinerario) {

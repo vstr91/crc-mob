@@ -78,6 +78,8 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -349,7 +351,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         localAnterior = new Location(LocationManager.GPS_PROVIDER);
 
         if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED){
+                == PackageManager.PERMISSION_GRANTED){
             startLocationUpdates();
         }
 
@@ -758,14 +760,30 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             int total = paradas.size();
             int delay = 0;
 
+            binding.textView36.setVisibility(View.VISIBLE);
+
+            for(ParadaBairro p : paradas){
+               Float distancia;
+                Location l = new Location(LocationManager.GPS_PROVIDER);
+                l.setLatitude(p.getParada().getLatitude());
+                l.setLongitude(p.getParada().getLongitude());
+
+                distancia = l.distanceTo(myLocation);
+                p.setDistancia(distancia);
+            }
+
+            Collections.sort(paradas, new Comparator<ParadaBairro>() {
+                @Override
+                public int compare(ParadaBairro o1, ParadaBairro o2) {
+                    return (int) (o1.getDistancia() - o2.getDistancia());
+                }
+            });
+
             for(final ParadaBairro p : paradas){
 
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        Location l = new Location(LocationManager.GPS_PROVIDER);
-                        l.setLatitude(p.getParada().getLatitude());
-                        l.setLongitude(p.getParada().getLongitude());
 
                         if(p.getParada().getImagem() != null && !p.getParada().getImagem().equals("")){
 
@@ -786,7 +804,11 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                             binding.circleView.invalidate();
                         }
 
-                        String distancia = nf.format(l.distanceTo(myLocation));
+                        String distancia = "0";
+
+                        if(p.getDistancia() != null){
+                            distancia = nf.format(p.getDistancia());
+                        }
 
                         binding.textViewParada.setText(p.getParada().getNome());
                         binding.textViewDistancia.setText("~"+distancia+" m");

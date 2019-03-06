@@ -196,8 +196,9 @@ public class DetalheItinerarioActivity extends BaseActivity {
             lstItinerarios.add(paradas.get(0).getIdBairro()+"|"+paradas.get(paradas.size()-1).getIdBairro());
 
             bundle = new Bundle();
-            bundle.putString("partida", paradas.get(0).getParada().getNome()+", "+paradas.get(0).getNomeBairroComCidade());
-            bundle.putString("destino", paradas.get(paradas.size()-1).getParada().getNome()+", "+paradas.get(paradas.size()-1).getNomeBairroComCidade());
+            bundle.putString("partida_destino",
+                    paradas.get(0).getParada().getNome()+", "+paradas.get(0).getNomeBairroComCidade()+" x "
+                            +paradas.get(paradas.size()-1).getParada().getNome()+", "+paradas.get(paradas.size()-1).getNomeBairroComCidade());
             mFirebaseAnalytics.logEvent("fav_itinerario_adicionado", bundle);
 
         } else{
@@ -208,8 +209,9 @@ public class DetalheItinerarioActivity extends BaseActivity {
             lstItinerarios.remove(paradas.get(0).getIdBairro()+"|"+paradas.get(paradas.size()-1).getIdBairro());
 
             bundle = new Bundle();
-            bundle.putString("partida", paradas.get(0).getParada().getNome()+", "+paradas.get(0).getNomeBairroComCidade());
-            bundle.putString("destino", paradas.get(paradas.size()-1).getParada().getNome()+", "+paradas.get(paradas.size()-1).getNomeBairroComCidade());
+            bundle.putString("partida_destino",
+                    paradas.get(0).getParada().getNome()+", "+paradas.get(0).getNomeBairroComCidade()+" x "
+                            +paradas.get(paradas.size()-1).getParada().getNome()+", "+paradas.get(paradas.size()-1).getNomeBairroComCidade());
             mFirebaseAnalytics.logEvent("fav_itinerario_removido", bundle);
 
         }
@@ -243,8 +245,6 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
         //log
         bundle = new Bundle();
-        bundle.putString("parada_partida", paradaPartida);
-        bundle.putString("parada_destino", paradaDestino);
 
         ParadaBairro partida = viewModel.partida.getValue();
         ParadaBairro destino = viewModel.destino.getValue();
@@ -431,6 +431,18 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 binding.textView51.setVisibility(View.GONE);
             }
 
+            //log
+            bundle = new Bundle();
+
+            ParadaBairro partida = viewModel.partida.getValue();
+            ParadaBairro destino = viewModel.destino.getValue();
+
+            if(partida != null && destino != null){
+                bundle.putString("partida_destino", partida.getParada().getNome()+" - "+partida.getNomeBairroComCidade()+" x "+destino.getParada().getNome()+" - "+destino.getNomeBairroComCidade());
+            }
+
+            mFirebaseAnalytics.logEvent("quadro_de_horarios", bundle);
+
             adapterHorarios.setHorario(horario);
             adapterHorarios.horarios = horarios;
             adapterHorarios.legenda = dados;
@@ -507,20 +519,6 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 viewModel.secoes.observe(ctx, secoesObserver);
                 //viewModel.carregarItinerarios(parada.getParada().getId());
                 //viewModel.itinerarios.observe(ctx, itinerariosObserver);
-
-                //log
-                bundle = new Bundle();
-                bundle.putString("parada_partida", itinerario.getBairroConsultaPartida()+" - "+itinerario.getNomeCidadePartida());
-                bundle.putString("parada_destino", itinerario.getBairroConsultaDestino()+" - "+itinerario.getNomeCidadeDestino());
-
-                ParadaBairro partida = viewModel.partida.getValue();
-                ParadaBairro destino = viewModel.destino.getValue();
-
-                if(partida != null && destino != null){
-                    bundle.putString("itinerario", partida.getParada().getNome()+" - "+partida.getNomeBairroComCidade()+" x "+destino.getParada().getNome()+" - "+destino.getNomeBairroComCidade());
-                }
-
-                mFirebaseAnalytics.logEvent("quadro_de_horarios", bundle);
 
             }
 

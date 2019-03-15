@@ -38,6 +38,12 @@ public class ItinerarioViewHolder extends RecyclerView.ViewHolder {
             binding.textView24.setVisibility(View.VISIBLE);
         }
 
+        if(itinerario.getTempoAcumulado().getHourOfDay() == 0 && itinerario.getTempoAcumulado().getMinuteOfHour() == 0){
+            binding.textViewEstimativa.setVisibility(View.GONE);
+        } else{
+            binding.textViewEstimativa.setVisibility(View.VISIBLE);
+        }
+
         //binding.circleView2.setImagem(null);
 
 //        final File brasao = new File(ctx.getApplicationContext().getFilesDir(),  cidade.getCidade().getBrasao());

@@ -356,6 +356,9 @@ public interface ItinerarioDAO {
 
     @RawQuery(observedEntities = ItinerarioPartidaDestino.class)
     LiveData<List<ItinerarioPartidaDestino>> listarTodosAtivosPorParadaComBairroEHorarioCompleto(SupportSQLiteQuery query);
+
+    @RawQuery(observedEntities = ItinerarioPartidaDestino.class)
+    List<ItinerarioPartidaDestino> listarTodosAtivosPorParadaComBairroEHorarioCompletoSync(SupportSQLiteQuery query);
 //    @RawQuery
 //    LiveData<List<ItinerarioPartidaDestino>> listarTodosAtivosPorParadaComBairroEHorarioCompleto(SupportSQLiteQuery query);
 

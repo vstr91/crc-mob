@@ -67,9 +67,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/cinzaEscuro80"
-            android:orientation="vertical"
-            android:elevation="20dp"
             android:clickable="true"
+            android:elevation="20dp"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -240,18 +240,33 @@
             android:id="@+id/listItinerarios"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
             app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/textViewLegenda"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView18"
-            tools:listitem="@layout/linha_itinerarios" />
+            tools:listitem="@layout/linha_itinerarios">
+
+        </android.support.v7.widget.RecyclerView>
+
+        <TextView
+            android:id="@+id/textViewLegenda"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/branco"
+            android:padding="5dp"
+            android:text="* Estimativa de passagem pela parada"
+            android:textColor="@color/cianoEscuro"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/fundo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 

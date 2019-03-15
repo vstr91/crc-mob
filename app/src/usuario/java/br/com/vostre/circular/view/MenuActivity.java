@@ -52,6 +52,11 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.gson.JsonObject;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
@@ -144,13 +149,15 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
     Handler handler;
     GoogleSignInClient mGoogleSignInClient;
-    GoogleSignInAccount account;
+    FirebaseUser account;
 
     ProgressBar progressBar;
-    //SignInButton btnLogin;
+    SignInButton btnLogin;
 
     static int RC_SIGN_IN = 450;
     boolean flag = false;
+
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,6 +166,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         binding.setView(this);
 
         carregaImagens();
+        mAuth = FirebaseAuth.getInstance();
 
         if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), "init")){
             // caregar bd
@@ -277,7 +285,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         drawerToggle.syncState();
 
         progressBar = binding.progressBar;
-        //btnLogin = binding.btnLogin;
+        btnLogin = binding.btnLogin;
 
         ctx = this;
         binding.textView36.setVisibility(View.GONE);
@@ -287,7 +295,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         }
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.server_client_id))
+                .requestIdToken(getString(R.string.firebase_id))
                 .requestEmail()
                 .build();
 
@@ -326,7 +334,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             binding.btnAviso.setVisibility(View.VISIBLE);
         }
 
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        FirebaseUser account = FirebaseAuth.getInstance().getCurrentUser();
         updateUI(account);
 
 //        SignInButton btnLogin = drawer.findViewById(R.id.btnLogin);
@@ -459,10 +467,9 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnLogin(View v){
-// TEMPORARIAMENTE DESABILITADO
-//        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-//        startActivityForResult(signInIntent, RC_SIGN_IN);
-//        btnLogin.setEnabled(false);
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+        btnLogin.setEnabled(false);
 
     }
 
@@ -490,23 +497,23 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     protected void onStart() {
         super.onStart();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        FirebaseUser account = FirebaseAuth.getInstance().getCurrentUser();
         updateUI(account);
     }
 
-    private void updateUI(GoogleSignInAccount account){
+    private void updateUI(FirebaseUser account){
 
         if(account != null){
 
             String id = PreferenceUtils.carregarUsuarioLogado(getApplicationContext());
 
-            //binding.btnLogin.setVisibility(View.GONE);
+            binding.btnLogin.setVisibility(View.GONE);
             binding.textViewEmail.setText(account.getEmail());
             binding.textViewEmail.setVisibility(View.VISIBLE);
             binding.textView34.setVisibility(View.VISIBLE);
             binding.btnSair.setVisibility(View.VISIBLE);
         } else{
-            //binding.btnLogin.setVisibility(View.VISIBLE);
+            binding.btnLogin.setVisibility(View.VISIBLE);
             binding.textViewEmail.setText("");
             binding.textViewEmail.setVisibility(View.GONE);
             binding.textView34.setVisibility(View.GONE);
@@ -516,13 +523,9 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     private void signOut() {
-        mGoogleSignInClient.signOut()
-                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        updateUI(null);
-                    }
-                });
+        FirebaseAuth.getInstance().signOut();
+        updateUI(null);
+
         PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), "");
         PreferenceUtils.gravaItinerariosFavoritos(new ArrayList<String>(), getApplicationContext());
         PreferenceUtils.gravaParadasFavoritas(new ArrayList<String>(), getApplicationContext());
@@ -628,31 +631,24 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         if(requestCode == RC_SIGN_IN){
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
-            progressBar.setVisibility(View.VISIBLE);
+
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                firebaseAuthWithGoogle(account);
+            } catch (ApiException e) {
+                // Google Sign In failed, update UI appropriately
+                Log.w("login", "Google sign in failed", e);
+            }
+//            handleSignInResult(task);
+            binding.btnLogin.setEnabled(true);
+
+            if(progressBar != null){
+                progressBar.setVisibility(View.VISIBLE);
+            }
+
         }
 
-    }
-
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            String idToken = account.getIdToken();
-
-            viewModel.validaUsuario(idToken, account.getId());
-            viewModel.usuarioValidado.observe(this, loginObserver);
-
-            this.account = account;
-
-        } catch (ApiException e) {
-            // The ApiException status code indicates the detailed failure reason.
-            // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w("SIGN", "signInResult:failed code=" + e.getStatusCode()+" | "+e.getMessage());
-            updateUI(null);
-            //btnLogin.setEnabled(true);
-            progressBar.setVisibility(View.GONE);
-            Toast.makeText(getApplicationContext(), "Erro ao efeutar login: "+e.getMessage()+". Por favor tente novamente.", Toast.LENGTH_SHORT).show();
-        }
     }
 
     Observer<Boolean> loginObserver = new Observer<Boolean>() {
@@ -669,7 +665,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             }
 
             if(flag){
-                //btnLogin.setEnabled(true);
+                btnLogin.setEnabled(true);
                 progressBar.setVisibility(View.GONE);
             }
 
@@ -904,6 +900,44 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                 ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
 
         ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
+    }
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            FirebaseUser user = mAuth.getCurrentUser();
+
+                            //salva usuario preference
+                            PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), user.getUid());
+
+                            Toast.makeText(getApplicationContext(),
+                                    "Login realizado com sucesso! Seja bem vindo, "+user.getDisplayName()+"!", Toast.LENGTH_SHORT).show();
+                            updateUI(user);
+
+                            PreferenceDownloadAsyncTask preferenceDownloadAsyncTask = new PreferenceDownloadAsyncTask(getApplicationContext(), PreferenceUtils.carregarUsuarioLogado(getApplicationContext()));
+                            preferenceDownloadAsyncTask.execute();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("login", "signInWithCredential:failure", task.getException());
+                            Toast.makeText(getApplicationContext(), "Não foi possível fazer o login. " +
+                                    "Por favor tente novamente.", Toast.LENGTH_SHORT).show();
+                            binding.btnLogin.setEnabled(true);
+
+                            //salva usuario preference
+                            PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), "");
+
+                        }
+
+                        binding.progressBar.setVisibility(View.GONE);
+
+                    }
+                });
     }
 
 }

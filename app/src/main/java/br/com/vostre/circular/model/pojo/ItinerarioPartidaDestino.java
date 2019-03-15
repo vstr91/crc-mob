@@ -120,6 +120,28 @@ public class ItinerarioPartidaDestino {
     @Ignore
     public String hora;
 
+    @Ignore
+    public DateTime tempoAcumulado;
+
+    @Ignore
+    public String horarioEstimado;
+
+    public String getHorarioEstimado() {
+        return horarioEstimado;
+    }
+
+    public void setHorarioEstimado(String horarioEstimado) {
+        this.horarioEstimado = horarioEstimado;
+    }
+
+    public DateTime getTempoAcumulado() {
+        return tempoAcumulado;
+    }
+
+    public void setTempoAcumulado(DateTime tempoAcumulado) {
+        this.tempoAcumulado = tempoAcumulado;
+    }
+
     public Double getDistanciaTrecho() {
         return distanciaTrecho;
     }

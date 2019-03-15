@@ -61,6 +61,13 @@ public interface ParadaItinerarioDAO {
             "WHERE pi.ativo = 1 AND pi.itinerario = :itinerario ORDER BY pi.ordem")
     List<ParadaBairro> listarParadasAtivasPorItinerarioComBairroSync(String itinerario);
 
+    @Query("SELECT pi.* "+
+            "FROM parada_itinerario pi " +
+            "WHERE pi.ativo = 1 AND pi.itinerario = :itinerario " +
+            "AND pi.ordem < (SELECT pi2.ordem FROM parada_itinerario pi2 WHERE pi2.parada = :paradaLimite " +
+            "AND pi2.itinerario = pi.itinerario) ORDER BY pi.ordem")
+    List<ParadaItinerario> listarParadasAtivasPorItinerarioComBairroSync(String itinerario, String paradaLimite);
+
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado " +
             "FROM parada_itinerario pi " +
             "INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado " +

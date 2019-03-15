@@ -234,6 +234,12 @@ public class DetalheParadaActivity extends BaseActivity {
 
         PreferenceUtils.gravaParadasFavoritas(lstParadas, getApplicationContext());
 
+        PreferenceUtils.gravaMostraToast(getApplicationContext(), false);
+
+        if(menu != null){
+            menu.getItem(0).getActionView().performClick();
+        }
+
     }
 
     @BindingAdapter("app:textDinheiro")
@@ -318,6 +324,23 @@ public class DetalheParadaActivity extends BaseActivity {
 //
 //                }
 //            });
+
+            int contLegenda = 0;
+
+            for(ItinerarioPartidaDestino i : itinerarios){
+
+                if(i.getTempoAcumulado() != null &&
+                        (i.getTempoAcumulado().getHourOfDay() > 0 || i.getTempoAcumulado().getMinuteOfHour() > 0)){
+                    contLegenda++;
+                }
+
+            }
+
+            if(contLegenda == 0){
+                binding.textViewLegenda.setVisibility(View.GONE);
+            } else{
+                binding.textViewLegenda.setVisibility(View.VISIBLE);
+            }
 
             adapter.itinerarios = itinerarios;
             adapter.notifyDataSetChanged();

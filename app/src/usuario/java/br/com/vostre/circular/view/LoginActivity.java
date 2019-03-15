@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -30,6 +31,11 @@ import com.google.android.gms.drive.Drive;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -62,6 +68,7 @@ public class LoginActivity extends BaseActivity {
 
     static int RC_SIGN_IN = 480;
     boolean flag = false;
+    private FirebaseAuth mAuth;
 
 //    // The authority for the sync adapter's content provider
 //    public static final String AUTHORITY = "br.com.vostre.circular.datasync.provider";
@@ -81,7 +88,9 @@ public class LoginActivity extends BaseActivity {
         binding.setView(this);
         viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
 
-        carregaImagens();
+        mAuth = FirebaseAuth.getInstance();
+
+        //carregaImagens();
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
 
@@ -130,9 +139,9 @@ public class LoginActivity extends BaseActivity {
             Intent i = new Intent(getApplicationContext(), MenuActivity.class);
             startActivity(i);
         } else{
-            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+            FirebaseUser usuario = mAuth.getCurrentUser();
 
-            if(account != null){
+            if(usuario != null){
                 Intent i = new Intent(getApplicationContext(), MenuActivity.class);
                 startActivity(i);
             }
@@ -144,7 +153,7 @@ public class LoginActivity extends BaseActivity {
 
     public void onClickBtnLogin(View v){
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.server_client_id))
+                .requestIdToken(getString(R.string.firebase_id))
                 .requestEmail()
                 .build();
 
@@ -173,7 +182,17 @@ public class LoginActivity extends BaseActivity {
 
         if(requestCode == RC_SIGN_IN){
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
+
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                firebaseAuthWithGoogle(account);
+            } catch (ApiException e) {
+                // Google Sign In failed, update UI appropriately
+                Log.w("login", "Google sign in failed", e);
+            }
+//            handleSignInResult(task);
+            binding.btnLogin.setEnabled(true);
 
             if(progressBar != null){
                 progressBar.setVisibility(View.VISIBLE);
@@ -262,34 +281,43 @@ public class LoginActivity extends BaseActivity {
         PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), "");
     }
 
-    private void carregaImagens(){
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        Log.d("login", "firebaseAuthWithGoogle:" + acct.getId());
 
-        Bitmap imagem = null;
-        FileOutputStream fos = null;
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d("login", "signInWithCredential:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Toast.makeText(getApplicationContext(),
+                                    "Login realizado com sucesso! Seja bem vindo, "+user.getDisplayName()+"!",
+                                    Toast.LENGTH_SHORT).show();
 
-        try {
-            String[] s = getApplicationContext().getAssets().list("brasao");
+                            //salva usuario preference
+                            PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), user.getUid());
 
-            for(String b : s){
-                File file = new File(getApplicationContext().getFilesDir(), b);
+                            PreferenceDownloadAsyncTask preferenceDownloadAsyncTask = new PreferenceDownloadAsyncTask(getApplicationContext(), user.getUid());
+                            preferenceDownloadAsyncTask.execute();
 
-                fos = new FileOutputStream(file);
-                Bitmap bmp = BitmapFactory.decodeStream(getApplicationContext().getAssets().open("brasao/"+b));
-                bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
-            }
+                            Intent i = new Intent(getApplicationContext(), MenuActivity.class);
+                            startActivity(i);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("login", "signInWithCredential:failure", task.getException());
+                            Toast.makeText(getApplicationContext(), "Não foi possível fazer o login. " +
+                                    "Por favor tente novamente.", Toast.LENGTH_SHORT).show();
+                            binding.btnLogin.setEnabled(true);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (fos != null) {
-                    fos.close();
-                    //Toast.makeText(ctx, "Imagem "+imagem+" recebida.", Toast.LENGTH_SHORT).show();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+                            //salva usuario preference
+                            PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), "");
+                        }
+
+                    }
+                });
     }
 
 }

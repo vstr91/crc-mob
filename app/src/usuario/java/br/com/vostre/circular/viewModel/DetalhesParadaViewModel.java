@@ -17,7 +17,11 @@ import android.os.AsyncTask;
 import android.widget.ImageView;
 
 import org.joda.time.DateTime;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -35,6 +39,7 @@ import java.util.UUID;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.Parada;
+import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.BairroCidade;
@@ -57,7 +62,7 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
     public ParadaBairro paradaBairro;
     public PontoInteresse pontoInteresse;
 
-    public LiveData<List<ItinerarioPartidaDestino>> itinerarios;
+    public MutableLiveData<List<ItinerarioPartidaDestino>> itinerarios;
     public LiveData<List<PontoInteresse>> pois;
 
     public Bitmap foto;
@@ -86,7 +91,7 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
         this.foto = foto;
     }
 
-    public void setParada(String parada) {
+    public void setParada(final String parada) {
         //foto = BitmapFactory.decodeFile(parada.getParada().getImagem());
         this.parada = appDatabase.paradaDAO().carregarComBairro(parada);
 
@@ -94,7 +99,7 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
         String diaSeguinte = DataHoraUtils.getDiaSeguinte();
         String hora = DataHoraUtils.getHoraAtual()+":00";
 
-        SimpleSQLiteQuery query = new SimpleSQLiteQuery("SELECT i.*, e.nome AS 'nomeEmpresa', " +
+        final SimpleSQLiteQuery query = new SimpleSQLiteQuery("SELECT i.*, e.nome AS 'nomeEmpresa', " +
                 "IFNULL(( SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario " +
                 "WHERE itinerario = i.id AND "+dia+" = 1 AND hi.ativo = 1 AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= '"+hora+"' " +
                 "ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1), ( SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
@@ -180,8 +185,59 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
                 "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AND proximoHorario IS NOT NULL) " +
                 "ORDER BY flagDia, proximoHorario");
 
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
 
-        itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosPorParadaComBairroEHorarioCompleto(query);
+                PeriodFormatter parser =
+                        new PeriodFormatterBuilder()
+                                .appendHours().appendLiteral(":")
+                                .appendMinutes().toFormatter();
+
+                PeriodFormatter printer =
+                        new PeriodFormatterBuilder()
+                                .printZeroAlways().minimumPrintedDigits(2)
+                                //.appendDays().appendLiteral(" dia(s) ")
+                                .appendHours().appendLiteral(":")
+                                .appendMinutes().toFormatter();
+
+                List<ItinerarioPartidaDestino> itis = appDatabase.itinerarioDAO()
+                        .listarTodosAtivosPorParadaComBairroEHorarioCompletoSync(query);
+
+                for(ItinerarioPartidaDestino i : itis){
+                    List<ParadaItinerario> paradas = appDatabase.paradaItinerarioDAO()
+                            .listarParadasAtivasPorItinerarioComBairroSync(i.getItinerario().getId(), parada);
+
+                    DateTime tempoTotal = new DateTime();
+
+                    Period period = Period.ZERO;
+
+                    for(ParadaItinerario p : paradas){
+                        String tempo = DateTimeFormat.forPattern("HH:mm").print(p.getTempoSeguinte().getMillis());
+                        period = period.plus(parser.parsePeriod(tempo));
+                    }
+
+                    tempoTotal = DateTimeFormat.forPattern("HH:mm")
+                            .parseDateTime(printer.print(period.normalizedStandard(PeriodType.time())));
+
+                    i.setTempoAcumulado(tempoTotal);
+
+                    String proxHorario = i.getProximoHorario();
+
+                    Period per = Period.ZERO;
+                    per = per.plus(parser.parsePeriod(proxHorario));
+
+                    per = per.plus(parser.parsePeriod(DateTimeFormat.forPattern("HH:mm")
+                            .print(tempoTotal)));
+
+                    i.setHorarioEstimado(printer.print(per.normalizedStandard(PeriodType.time())));
+
+                }
+
+                itinerarios.postValue(itis);
+
+            }
+        });
 
         //itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosPorParadaComBairroEHorario(parada, DateTimeFormat.forPattern("HH:mm:ss").print(new DateTime()));
         pois = appDatabase.pontoInteresseDAO().listarTodosAtivosProximos(0, 0, 0, 0);
@@ -195,7 +251,7 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         parada = appDatabase.paradaDAO().carregarComBairro("");
-        itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosPorParadaComBairroEHorario("", "");
+        itinerarios = new MutableLiveData<>();
         localAtual = new MutableLiveData<>();
     }
 
@@ -240,7 +296,7 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
     }
 
     public void carregarDadosVinculadosQRCode(String parada){
-        itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosPorParadaComBairroEHorario(parada, DateTimeFormat.forPattern("HH:mm:ss").print(new DateTime()));
+        itinerarios.postValue(appDatabase.itinerarioDAO().listarTodosAtivosPorParadaComBairroEHorario(parada, DateTimeFormat.forPattern("HH:mm:ss").print(new DateTime())).getValue());
         pois = appDatabase.pontoInteresseDAO().listarTodosAtivosProximos(0, 0, 0, 0);
     }
 
@@ -286,9 +342,9 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
         }
     }
 
-    public void carregarItinerarios(String parada){
-        itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosPorParadaComBairroEHorario(parada, DateTimeFormat.forPattern("HH:mm:ss").print(new DateTime()));
-    }
+//    public void carregarItinerarios(String parada){
+//        itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosPorParadaComBairroEHorario(parada, DateTimeFormat.forPattern("HH:mm:ss").print(new DateTime()));
+//    }
 
     public void buscaPoisProximos(Location local){
 

@@ -1823,6 +1823,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     try {
                         dados = response.body().string();
 
+                        System.out.println("DADOS: "+dados);
+
                         if(dados != null){
                             JSONObject arrayObject = new JSONObject(dados);
                             JSONArray meta = arrayObject.getJSONArray("meta");
@@ -1837,8 +1839,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                                     JSONArray preferencias = arrayObject.getJSONArray("preferencias");
                                     JSONObject obj = preferencias.getJSONObject(0);
 
-                                    String itins = obj.optString(ctx.getPackageName()+".itinerarios_favoritos");
-                                    String pars = obj.optString(ctx.getPackageName()+".paradas_favoritas");
+                                    JSONObject prefs = new JSONObject(obj.getString("preferencia"));
+
+                                    //System.out.println("OBJ: "+prefs.optString(ctx.getPackageName()+".paradas_favoritas"));
+
+                                    String itins = prefs.optString(ctx.getPackageName()+".itinerarios_favoritos");
+                                    String pars = prefs.optString(ctx.getPackageName()+".paradas_favoritas");
 
                                     if(!itins.isEmpty()){
                                         List<String> itis = Arrays.asList(itins.split(";"));
@@ -1849,10 +1855,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                                     PreferenceUtils.atualizaItinerariosFavoritosNoBanco(ctx);
 
+                                    System.out.println("PARS: "+pars);
+
                                     if(!pars.isEmpty()){
                                         List<String> parads = Arrays.asList(pars.split(";"));
 
-                                        PreferenceUtils.mesclaItinerariosFavoritos(parads, ctx.getApplicationContext());
+                                        PreferenceUtils.mesclaParadasFavoritas(parads, ctx.getApplicationContext());
 
                                     }
 

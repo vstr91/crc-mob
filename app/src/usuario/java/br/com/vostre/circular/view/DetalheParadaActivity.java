@@ -234,12 +234,6 @@ public class DetalheParadaActivity extends BaseActivity {
 
         PreferenceUtils.gravaParadasFavoritas(lstParadas, getApplicationContext());
 
-        PreferenceUtils.gravaMostraToast(getApplicationContext(), false);
-
-        if(menu != null){
-            menu.getItem(0).getActionView().performClick();
-        }
-
     }
 
     @BindingAdapter("app:textDinheiro")

@@ -19,6 +19,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseUser;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.view.BaseActivity;
@@ -40,7 +41,7 @@ public class SignInActivity extends BaseActivity {
         viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestScopes(Drive.SCOPE_FILE)
+                //.requestScopes(Drive.SCOPE_FILE)
                 .requestIdToken(getString(R.string.server_client_id))
                 .requestEmail()
                 .build();
@@ -56,17 +57,17 @@ public class SignInActivity extends BaseActivity {
 
         if(requestCode == RC_SIGN_IN){
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
+            //handleSignInResult(task);
         }
 
     }
 
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+    private void handleSignInResult(Task<FirebaseUser> completedTask) {
         try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            String idToken = account.getIdToken();
+            FirebaseUser account = completedTask.getResult(ApiException.class);
+            //String idToken = account.getIdToken(false);
 
-            viewModel.validaUsuario(idToken, account.getId());
+            //viewModel.validaUsuario(idToken, account.getUid());
             viewModel.usuarioValidado.observe(this, loginObserver);
 
             this.account = account;

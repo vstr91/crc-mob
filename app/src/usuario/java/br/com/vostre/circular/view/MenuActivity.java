@@ -526,6 +526,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         FirebaseAuth.getInstance().signOut();
         updateUI(null);
 
+        requisitaAtualizacao();
+
         PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), "");
         PreferenceUtils.gravaItinerariosFavoritos(new ArrayList<String>(), getApplicationContext());
         PreferenceUtils.gravaParadasFavoritas(new ArrayList<String>(), getApplicationContext());

@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.util.JsonUtils;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -75,7 +76,7 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
     LocationManager locationManager;
     boolean gpsAtivo = false;
-    public GoogleSignInAccount account;
+    public FirebaseUser account;
 
     FirebaseAnalytics mFirebaseAnalytics;
 
@@ -119,7 +120,7 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
                 Integer mensagens = extras.getInt("mensagens");
 
-                if(mensagens != null){
+                if(mensagens != null && mensagens > 0){
 
                     NotificacaoUtils.criaNotificacao(MenuActivity.class, MensagensActivity.class,
                             context.getApplicationContext(), "Circular", "Nova mensagem recebida!",

@@ -13,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -567,6 +568,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 JSONArray historicosItinerarios = null;
                 JSONArray acessos = null;
 
+                //System.out.println("PAR_SUG: "+arrayObject.optJSONArray("paradas_sugestoes"));
+
                 if(arrayObject.optJSONArray("paradas_sugestoes") != null){
                     paradasSugestoes = arrayObject.getJSONArray("paradas_sugestoes");
                 }
@@ -1004,6 +1007,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     int total = paradasSugestoes.length();
                     List<ParadaSugestao> lstParadas = new ArrayList<>();
 
+                    System.out.println("SUGESTOES: "+paradasSugestoes.toString());
+
                     for(int i = 0; i < total; i++){
                         ParadaSugestao parada;
                         JSONObject obj = paradasSugestoes.getJSONObject(i);
@@ -1328,9 +1333,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         } else{
 
                             if(mostraToast){
-                                Toast.makeText(getContext().getApplicationContext(),
-                                        "Erro "+response.code()+" ("+response.message()+") ao enviar imagem de "+cidade.getNome()+" para o servidor",
-                                        Toast.LENGTH_SHORT).show();
+                                Log.d("ENVIA_IMAGEM", "Erro "+response.code()+" ("
+                                        +response.message()+") ao enviar imagem de "+cidade.getNome()+" para o servidor");
+//                                Toast.makeText(getContext().getApplicationContext(),
+//                                        "Erro "+response.code()+" ("+response.message()+") ao enviar imagem de "+cidade.getNome()+" para o servidor",
+//                                        Toast.LENGTH_SHORT).show();
                             }
 
                             PreferenceUtils.gravaMostraToast(ctx, false);

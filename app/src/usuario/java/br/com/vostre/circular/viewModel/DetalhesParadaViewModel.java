@@ -213,8 +213,12 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
                     Period period = Period.ZERO;
 
                     for(ParadaItinerario p : paradas){
-                        String tempo = DateTimeFormat.forPattern("HH:mm").print(p.getTempoSeguinte().getMillis());
-                        period = period.plus(parser.parsePeriod(tempo));
+
+                        if(p != null && p.getTempoSeguinte() != null){
+                            String tempo = DateTimeFormat.forPattern("HH:mm").print(p.getTempoSeguinte().getMillis());
+                            period = period.plus(parser.parsePeriod(tempo));
+                        }
+
                     }
 
                     tempoTotal = DateTimeFormat.forPattern("HH:mm")

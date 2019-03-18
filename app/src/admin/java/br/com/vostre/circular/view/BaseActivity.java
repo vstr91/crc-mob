@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.util.JsonUtils;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -69,7 +70,7 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     BroadcastReceiver receiver;
     IntentFilter filter;
 
-    public GoogleSignInAccount account;
+    public FirebaseUser account;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

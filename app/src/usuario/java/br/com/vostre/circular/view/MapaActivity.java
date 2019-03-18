@@ -48,6 +48,11 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -92,6 +97,7 @@ import br.com.vostre.circular.utils.DialogUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SessionUtils;
 import br.com.vostre.circular.utils.SignInActivity;
+import br.com.vostre.circular.utils.tasks.PreferenceDownloadAsyncTask;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ParadaAdapter;
@@ -134,6 +140,8 @@ public class MapaActivity extends BaseActivity {
     Bundle bundle;
     boolean logado = false;
 
+    private FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_mapa);
@@ -143,6 +151,7 @@ public class MapaActivity extends BaseActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
+        mAuth = FirebaseAuth.getInstance();
 
         // PARA TESTES
 
@@ -152,6 +161,13 @@ public class MapaActivity extends BaseActivity {
         // PARA TESTES
 
         ctx = this;
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.firebase_id))
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         Dexter.withActivity(this)
                 .withPermissions(
@@ -192,9 +208,13 @@ public class MapaActivity extends BaseActivity {
     }
 
     public void onClickBtnLogin(View v){
-        Intent i = new Intent(getApplicationContext(), SignInActivity.class);
-        startActivityForResult(i, RC_SIGN_IN);
-        //binding.btnLogin.setEnabled(false);
+//        Intent i = new Intent(getApplicationContext(), SignInActivity.class);
+//        startActivityForResult(i, RC_SIGN_IN);
+//        binding.btnLogin.setEnabled(false);
+
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+        binding.btnLogin.setEnabled(false);
 
         bundle = new Bundle();
         mFirebaseAnalytics.logEvent("clicou_login_mapa", bundle);
@@ -205,40 +225,37 @@ public class MapaActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if(requestCode == RC_SIGN_IN){
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
 
-            boolean logado = data.getExtras().getBoolean("logado");
-
-            if(!logado){
-
-                String e = data.getExtras().getString("mensagemErro");
-
-                signOut();
-                //binding.btnLogin.setEnabled(true);
-            } else{
-                account = (GoogleSignInAccount) data.getExtras().get("account");
-                updateUI(account);
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                firebaseAuthWithGoogle(account);
+            } catch (ApiException e) {
+                // Google Sign In failed, update UI appropriately
+                Log.w("login", "Google sign in failed", e);
             }
+//            handleSignInResult(task);
+            binding.btnLogin.setEnabled(true);
 
-        }
+        } else if(requestCode == FormParada.PICK_IMAGE) {
 
-        formParada = (FormParada) DialogUtils.getOpenedDialog(this);
+                formParada = (FormParada) DialogUtils.getOpenedDialog(this);
 
-        if (requestCode == FormParada.PICK_IMAGE) {
+                if (data != null) {
+                    try {
+                        InputStream inputStream = getContentResolver().openInputStream(data.getData());
+                        viewModel.foto = BitmapFactory.decodeStream(inputStream);
+                        formParada.exibeImagem();
 
-            if (data != null) {
-                try {
-                    InputStream inputStream = getContentResolver().openInputStream(data.getData());
-                    viewModel.foto = BitmapFactory.decodeStream(inputStream);
-                    formParada.exibeImagem();
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
+
             }
-        }
 
-
-        }
+    }
 
     Observer<Boolean> loginObserver = new Observer<Boolean>() {
         @Override
@@ -300,14 +317,16 @@ public class MapaActivity extends BaseActivity {
     private void checaLogin() {
         if(SessionUtils.estaLogado(getApplicationContext())){
             binding.fabParada.setEnabled(true);
-            //binding.btnLogin.setVisibility(View.GONE);
+            binding.btnLogin.setVisibility(View.GONE);
             binding.fabSugestao.setEnabled(true);
             binding.fabSugestao.setVisibility(View.VISIBLE);
+            binding.fabParada.setVisibility(View.VISIBLE);
         } else{
             binding.fabParada.setEnabled(false);
-            //binding.btnLogin.setVisibility(View.VISIBLE);
+            binding.btnLogin.setVisibility(View.VISIBLE);
             binding.fabSugestao.setEnabled(false);
             binding.fabSugestao.setVisibility(View.GONE);
+            binding.fabParada.setVisibility(View.GONE);
         }
     }
 
@@ -463,7 +482,8 @@ public class MapaActivity extends BaseActivity {
                             textViewBairro.setText(pb.getNomeBairroComCidade());
 
                             bsd.findViewById(R.id.textView32).setVisibility(View.VISIBLE);
-//                            bsd.findViewById(R.id.textViewId).setVisibility(View.VISIBLE);
+                            bsd.findViewById(R.id.textView33).setVisibility(View.VISIBLE);
+                            bsd.findViewById(R.id.textViewLegenda).setVisibility(View.VISIBLE);
 
                             Button btnDetalhes = bsd.findViewById(R.id.btnDetalhes);
                             btnDetalhes.setVisibility(View.VISIBLE);
@@ -659,10 +679,26 @@ public class MapaActivity extends BaseActivity {
                             TextView textViewBairro = bsd.findViewById(R.id.textViewBairro);
 
                             bsd.findViewById(R.id.textView32).setVisibility(View.GONE);
-//                            bsd.findViewById(R.id.textViewId).setVisibility(View.GONE);
+                            bsd.findViewById(R.id.textView33).setVisibility(View.GONE);
+                            bsd.findViewById(R.id.textViewLegenda).setVisibility(View.GONE);
 
                             textViewReferencia.setText(p.getParada().getNome());
                             textViewBairro.setText(p.getNomeBairroComCidade());
+
+                            ImageView img = bsd.findViewById(R.id.imageView3);
+
+                            File f = null;
+
+                            if(p.getParada().getImagem() != null){
+                                f = new File(ctx.getApplicationContext().getFilesDir(),  p.getParada().getImagem());
+                            }
+
+                            if(p.getParada().getImagem() != null && f != null && f.exists() && f.canRead()){
+                                img.setImageDrawable(Drawable.createFromPath(getApplicationContext().getFilesDir()
+                                        +"/"+p.getParada().getImagem()));
+                            } else{
+                                img.setImageDrawable(getResources().getDrawable(R.drawable.imagem_nao_disponivel_16_9));
+                            }
 
                             Button btnDetalhes = bsd.findViewById(R.id.btnDetalhes);
                             btnDetalhes.setVisibility(View.GONE);
@@ -677,6 +713,8 @@ public class MapaActivity extends BaseActivity {
                                     formParada.show(getSupportFragmentManager(), "formParada");
                                 }
                             });
+
+                            btnEdicao.setVisibility(View.GONE);
 
                             Button btnFechar = bsd.findViewById(R.id.btnFechar);
                             btnFechar.setOnClickListener(new View.OnClickListener() {
@@ -900,26 +938,29 @@ public class MapaActivity extends BaseActivity {
 
     }
 
-    private void updateUI(GoogleSignInAccount account){
+    private void updateUI(FirebaseUser account){
 
         if(account != null){
-            //binding.btnLogin.setVisibility(View.GONE);
+            binding.btnLogin.setVisibility(View.GONE);
 
             if(gpsAtivo){
                 binding.fabParada.setEnabled(true);
                 binding.fabMeuLocal.setEnabled(true);
                 configuraActivity();
+            } else{
+                binding.fabParada.setEnabled(false);
+                binding.fabMeuLocal.setEnabled(false);
             }
 
             Toast.makeText(getApplicationContext(), "Login realizado com sucesso! " +
-                    "Seja bem vindo, "+account.getGivenName()+"!", Toast.LENGTH_LONG).show();
+                    "Seja bem vindo, "+account.getDisplayName()+"!", Toast.LENGTH_LONG).show();
 
             bundle = new Bundle();
             mFirebaseAnalytics.logEvent("login_mapa", bundle);
             logado = true;
 
         } else{
-            //binding.btnLogin.setVisibility(View.VISIBLE);
+            binding.btnLogin.setVisibility(View.VISIBLE);
             binding.fabParada.setEnabled(false);
             logado = false;
         }
@@ -949,5 +990,43 @@ public class MapaActivity extends BaseActivity {
         mFirebaseAnalytics.logEvent("logoff_mapa", bundle);
         logado = false;
     }
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            FirebaseUser user = mAuth.getCurrentUser();
+
+                            //salva usuario preference
+                            PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), user.getUid());
+
+                            Toast.makeText(getApplicationContext(),
+                                    "Login realizado com sucesso! Seja bem vindo, "+user.getDisplayName()+"!", Toast.LENGTH_SHORT).show();
+                            updateUI(user);
+
+                            PreferenceDownloadAsyncTask preferenceDownloadAsyncTask = new PreferenceDownloadAsyncTask(getApplicationContext(), PreferenceUtils.carregarUsuarioLogado(getApplicationContext()));
+                            preferenceDownloadAsyncTask.execute();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("login", "signInWithCredential:failure", task.getException());
+                            Toast.makeText(getApplicationContext(), "Não foi possível fazer o login. " +
+                                    "Por favor tente novamente.", Toast.LENGTH_SHORT).show();
+                            binding.btnLogin.setEnabled(true);
+
+                            //salva usuario preference
+                            PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), "");
+
+                        }
+
+                    }
+                });
+    }
+
+
 
 }

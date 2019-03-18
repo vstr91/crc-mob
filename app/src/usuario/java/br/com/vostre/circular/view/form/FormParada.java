@@ -161,6 +161,8 @@ public class FormParada extends FormBase {
             }
 
             flagInicioEdicao = true;
+        } else{
+            viewModel.paradaNova.setParada(new ParadaSugestao());
         }
 
         if(paradaRelativa != null){
@@ -286,14 +288,14 @@ public class FormParada extends FormBase {
                 BairroCidade bairro = new BairroCidade();
                 bairro.getBairro().setId(parada.getBairro());
                 int i = viewModel.bairros.getValue().indexOf(bairro);
-                binding.spinnerBairro.setSelection(i);
+                binding.spinnerBairro.setSelection(i, false);
             }
 
             if(paradaRelativa != null){
                 BairroCidade bairro = new BairroCidade();
                 bairro.getBairro().setId(paradaRelativa.getParada().getBairro());
                 int i = viewModel.bairros.getValue().indexOf(bairro);
-                binding.spinnerBairro.setSelection(i);
+                binding.spinnerBairro.setSelection(i, false);
             }
 
         }

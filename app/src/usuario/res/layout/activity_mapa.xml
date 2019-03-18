@@ -24,33 +24,17 @@
             android:id="@+id/fabMeuLocal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
-            android:layout_marginRight="24dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginRight="32dp"
             android:layout_marginBottom="24dp"
             android:clickable="true"
             android:onClick="@{view::onFabLocationClick}"
             android:onLongClick="@{view::onFabLocationLongClick}"
             app:backgroundTint="@color/verde"
             app:fabSize="mini"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/fabParada"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/ic_gps_fixed_white_24dp" />
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fabParada"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="16dp"
-            android:clickable="true"
-            android:onClick="@{view::onFabParadaClick}"
-            android:visibility="gone"
-            app:backgroundTint="@color/ciano"
-            app:fabSize="normal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/ic_add_location_blue_24dp" />
 
         <org.osmdroid.views.MapView
             android:id="@+id/map"
@@ -83,6 +67,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabParada"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginBottom="24dp"
+            android:clickable="true"
+            android:onClick="@{view::onFabParadaClick}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/ic_add_location_blue_24dp" />
+
         <include
             android:id="@+id/toolbar"
             layout="@layout/toolbar"
@@ -90,19 +87,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"></include>
 
-        <!--<Button-->
-            <!--android:id="@+id/btnLogin"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:background="@color/azul"-->
-            <!--android:text="Pressione para fazer login e sugerir novas paradas!"-->
-            <!--android:textAllCaps="false"-->
-            <!--android:textColor="@color/branco"-->
-            <!--android:textSize="12sp"-->
-            <!--android:onClick="onClickBtnLogin"-->
-            <!--app:layout_constraintEnd_toEndOf="parent"-->
-            <!--app:layout_constraintStart_toStartOf="parent"-->
-            <!--app:layout_constraintTop_toBottomOf="@+id/toolbar" />-->
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/azul"
+            android:text="Pressione para fazer login e sugerir novas paradas!"
+            android:textAllCaps="false"
+            android:textColor="@color/branco"
+            android:textSize="12sp"
+            android:onClick="onClickBtnLogin"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
         <Button
             android:id="@+id/fabSugestao"

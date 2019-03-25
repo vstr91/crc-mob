@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.util.JsonUtils;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -62,6 +63,7 @@ import br.com.vostre.circular.view.listener.HoraListener;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
 import br.com.vostre.circular.databinding.DrawerHeaderBinding;
+import io.fabric.sdk.android.Fabric;
 
 import static br.com.vostre.circular.utils.ToolbarUtils.PICK_FILE;
 
@@ -104,6 +106,8 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
             getSupportActionBar().setHomeButtonEnabled(true);
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
+
+        Fabric.with(this, new Crashlytics());
 
         //viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
 

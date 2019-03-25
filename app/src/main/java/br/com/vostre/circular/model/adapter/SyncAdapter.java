@@ -476,6 +476,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     try {
                         requisitaToken(parametroInterno.getIdentificadorUnico(), 1);
+                        System.out.println("URL: "+call.request().url().url().toString());
                         processaJson(response);
                     } catch (JSONException e) {
 
@@ -568,7 +569,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 JSONArray historicosItinerarios = null;
                 JSONArray acessos = null;
 
-                //System.out.println("PAR_SUG: "+arrayObject.optJSONArray("paradas_sugestoes"));
+                System.out.println("PAR_SUG: "+arrayObject.optJSONArray("paradas_sugestoes"));
 
                 if(arrayObject.optJSONArray("paradas_sugestoes") != null){
                     paradasSugestoes = arrayObject.getJSONArray("paradas_sugestoes");
@@ -1248,6 +1249,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
              //System.out.println("JSON: "+json);
 
+            System.out.println("SUGESTOES A ENV: "+strParadasSugestoes);
             // EXPORTA ARQUIVO DE DADOS
             /*
             File caminho = Environment.getExternalStorageDirectory();

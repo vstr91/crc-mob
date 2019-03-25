@@ -75,6 +75,8 @@ public class PreferenceUtils {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("usuario", id);
         editor.apply();
+
+        SessionUtils.logUser(id);
     }
 
     public static String carregarUsuarioLogado(Context ctx){

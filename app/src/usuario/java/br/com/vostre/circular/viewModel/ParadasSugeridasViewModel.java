@@ -111,7 +111,14 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
 
         sugeridas = appDatabase.paradaSugestaoDAO().listarTodosPendentesComBairroPorUsuario(PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext()));
 
-        aceitas = appDatabase.paradaSugestaoDAO().listarTodosAceitosComBairroPorUsuario(PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext()));
+        aceitas = appDatabase.paradaSugestaoDAO()
+                .listarTodosAceitosComBairroPorUsuario(PreferenceUtils
+                        .carregarUsuarioLogado(getApplication().getApplicationContext()));
+
+//        aceitas = appDatabase.paradaSugestaoDAO()
+//                .listarTodosComBairroPorUsuario(PreferenceUtils
+//                        .carregarUsuarioLogado(getApplication().getApplicationContext()));
+
         rejeitadas = appDatabase.paradaSugestaoDAO().listarTodosRejeitadosComBairroPorUsuario(PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext()));
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplication());

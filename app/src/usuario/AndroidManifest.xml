@@ -116,6 +116,9 @@
         <activity android:name=".view.OpcoesActivity" android:screenOrientation="portrait" />
         <activity android:name=".view.QRCodeActivity" android:screenOrientation="portrait"
             android:noHistory="true"></activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="048b5dba17da58b2de2b7470cf50a3def5e51fb3" />
     </application>
 
 </manifest>

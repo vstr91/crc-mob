@@ -36,6 +36,7 @@ import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.ParadaSugestao;
 import br.com.vostre.circular.model.PontoInteresse;
+import br.com.vostre.circular.model.PontoInteresseSugestao;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.BairroCidade;
@@ -72,6 +73,10 @@ public class MapaViewModel extends AndroidViewModel {
 
     public static MutableLiveData<Integer> retorno;
 
+    public PontoInteresseSugestao poiNovo;
+    public Bitmap fotoPoi;
+    public BairroCidade bairroPoi;
+
     public ParadaSugestaoBairro getParadaNova() {
         return paradaNova;
     }
@@ -80,6 +85,20 @@ public class MapaViewModel extends AndroidViewModel {
         this.paradaNova = paradaNova;
 
         if(paradaNova.getParada().getImagem() != null){
+            File foto = new File(getApplication().getFilesDir(), paradaNova.getParada().getImagem());
+
+            if(foto.exists() && foto.canRead()){
+                this.fotoParada = BitmapFactory.decodeFile(foto.getAbsolutePath());
+            }
+        } else{
+            this.fotoParada = null;
+        }
+    }
+
+    public void setPoiNovo(PontoInteresseSugestao poiNovo) {
+        this.poiNovo = poiNovo;
+
+        if(poiNovo.getPontoInteresse().getImagem() != null){
             File foto = new File(getApplication().getFilesDir(), paradaNova.getParada().getImagem());
 
             if(foto.exists() && foto.canRead()){

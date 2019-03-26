@@ -28,4 +28,8 @@
             Em hipótese alguma a imagem será revendida / cedida a terceiros.
             A propriedade intelectual sobre a foto permanece com seu criador.</li>\n
     </string>
+    <string-array name="sugestao">
+        <item>Parada</item>
+        <item>Ponto de Interesse</item>
+    </string-array>
 </resources>

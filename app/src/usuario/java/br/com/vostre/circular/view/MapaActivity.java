@@ -3,9 +3,12 @@ package br.com.vostre.circular.view;
 import android.Manifest;
 import android.accounts.Account;
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.Dialog;
 import android.app.IntentService;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -24,6 +27,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DrawableUtils;
 import android.support.v7.widget.RecyclerView;
@@ -142,6 +146,8 @@ public class MapaActivity extends BaseActivity {
 
     private FirebaseAuth mAuth;
 
+    boolean submenuAberto = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_mapa);
@@ -152,6 +158,8 @@ public class MapaActivity extends BaseActivity {
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
         mAuth = FirebaseAuth.getInstance();
+
+        fechaSubmenu();
 
         // PARA TESTES
 
@@ -800,6 +808,16 @@ public class MapaActivity extends BaseActivity {
         return p;
     }
 
+    public void onFabAddClick(View v){
+
+        if(submenuAberto){
+            fechaSubmenu();
+        } else{
+            abreSubmenu();
+        }
+
+    }
+
     public void onFabParadaClick(View v){
 
         if(viewModel.localAtual != null){
@@ -812,6 +830,22 @@ public class MapaActivity extends BaseActivity {
 
             bundle = new Bundle();
             mFirebaseAnalytics.logEvent("clicou_fab_parada_mapa", bundle);
+        }
+
+    }
+
+    public void onFabPoiClick(View v){
+
+        if(viewModel.localAtual != null){
+            formPoi = new FormPoi();
+            formPoi.setLatitude(viewModel.localAtual.getValue().getLatitude());
+            formPoi.setLongitude(viewModel.localAtual.getValue().getLongitude());
+            //formParada.setParada(new ParadaSugestao());
+            formPoi.setCtx(getApplication());
+            formPoi.show(getSupportFragmentManager(), "formPoi");
+
+            bundle = new Bundle();
+            mFirebaseAnalytics.logEvent("clicou_fab_poi_mapa", bundle);
         }
 
     }
@@ -1027,6 +1061,22 @@ public class MapaActivity extends BaseActivity {
                 });
     }
 
+    private void abreSubmenu(){
+//        binding.linearLayoutParada.setVisibility(View.VISIBLE);
+//        binding.linearLayoutPoi.setVisibility(View.VISIBLE);
 
+        binding.linearLayoutParada.animate().translationY(-55);
+        binding.linearLayoutPoi.animate().translationY(-105);
+        submenuAberto = true;
+    }
+
+    private void fechaSubmenu(){
+//        binding.linearLayoutParada.setVisibility(View.GONE);
+//        binding.linearLayoutPoi.setVisibility(View.GONE);
+
+        binding.linearLayoutParada.animate().translationY(0);
+        binding.linearLayoutPoi.animate().translationY(0);
+        submenuAberto = false;
+    }
 
 }

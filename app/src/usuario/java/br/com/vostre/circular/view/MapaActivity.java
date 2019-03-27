@@ -107,6 +107,7 @@ import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ParadaAdapter;
 import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
 import br.com.vostre.circular.view.form.FormParada;
+import br.com.vostre.circular.view.form.FormPoi;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.view.utils.InfoWindowParada;
 import br.com.vostre.circular.viewModel.BaseViewModel;
@@ -135,6 +136,7 @@ public class MapaActivity extends BaseActivity {
     BottomSheetDialog bsdPoi;
 
     FormParada formParada;
+    FormPoi formPoi;
 
     GoogleSignInClient mGoogleSignInClient;
 

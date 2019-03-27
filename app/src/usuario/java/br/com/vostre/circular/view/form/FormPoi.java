@@ -29,6 +29,7 @@ import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormParadaBinding;
+import br.com.vostre.circular.databinding.FormPoiBinding;
 import br.com.vostre.circular.model.ParadaSugestao;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.PontoInteresseSugestao;
@@ -40,7 +41,7 @@ import br.com.vostre.circular.viewModel.MapaViewModel;
 
 public class FormPoi extends FormBase {
 
-    FormParadaBinding binding;
+    FormPoiBinding binding;
 
     ImageView imageViewFoto;
     Button btnTrocarFoto;
@@ -117,7 +118,7 @@ public class FormPoi extends FormBase {
         viewModel.bairros.observe(this, bairrosObserver);
 
         if(poi != null){
-            viewModel.poiNovo.setPoi(poi);
+            viewModel.poiNovo.setPontoInteresse(poi);
 
             if(poi.getImagem() != null){
                 File foto = new File(ctx.getFilesDir(), poi.getImagem());
@@ -135,19 +136,7 @@ public class FormPoi extends FormBase {
 
             flagInicioEdicao = true;
         } else{
-            viewModel.paradaNova.setParada(new ParadaSugestao());
-        }
-
-        if(paradaRelativa != null){
-            viewModel.paradaNova.getParada().setParada(paradaRelativa.getParada().getId());
-
-            viewModel.paradaNova.getParada().setNome(paradaRelativa.getParada().getNome());
-            viewModel.paradaNova.getParada().setLatitude(paradaRelativa.getParada().getLatitude());
-            viewModel.paradaNova.getParada().setLongitude(paradaRelativa.getParada().getLongitude());
-            viewModel.paradaNova.getParada().setTaxaDeEmbarque(paradaRelativa.getParada().getTaxaDeEmbarque());
-            viewModel.paradaNova.getParada().setSlug(paradaRelativa.getParada().getSlug());
-            viewModel.paradaNova.getParada().setBairro(paradaRelativa.getParada().getBairro());
-            viewModel.paradaNova.getParada().setSentido(paradaRelativa.getParada().getSentido());
+            viewModel.poiNovo.setPontoInteresse(new PontoInteresseSugestao());
         }
 
         return binding.getRoot();
@@ -157,14 +146,14 @@ public class FormPoi extends FormBase {
     public void onClickSalvar(View v){
 
         if(latitude != null && longitude != null){
-            viewModel.paradaNova.getParada().setLatitude(latitude);
-            viewModel.paradaNova.getParada().setLongitude(longitude);
+            viewModel.poiNovo.getPontoInteresse().setLatitude(latitude);
+            viewModel.poiNovo.getPontoInteresse().setLongitude(longitude);
         }
 
         if(poi != null){
-            viewModel.editarParada();
+            viewModel.editarPontoInteresse();
         } else{
-            viewModel.salvarParada();
+            viewModel.salvarPontoInteresse();
         }
 
         viewModel.retorno.observe(this, retornoObserver);
@@ -178,13 +167,13 @@ public class FormPoi extends FormBase {
     private void ocultaImagem(){
         imageViewFoto.setVisibility(View.GONE);
         btnTrocarFoto.setVisibility(View.GONE);
-        viewModel.foto = null;
-        viewModel.paradaNova.getParada().setImagem(null);
+        viewModel.fotoPoi = null;
+        viewModel.poiNovo.getPontoInteresse().setImagem(null);
         binding.btnFoto.setVisibility(View.VISIBLE);
     }
 
     public void exibeImagem(){
-        imageViewFoto.setImageBitmap(viewModel.foto);
+        imageViewFoto.setImageBitmap(viewModel.fotoPoi);
         imageViewFoto.invalidate();
         imageViewFoto.setVisibility(View.VISIBLE);
         btnTrocarFoto.setVisibility(View.VISIBLE);
@@ -206,7 +195,7 @@ public class FormPoi extends FormBase {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        getActivity().startActivityForResult(Intent.createChooser(intent, "Escolha uma foto da poi"), PICK_IMAGE);
+        getActivity().startActivityForResult(Intent.createChooser(intent, "Escolha uma foto do poi"), PICK_IMAGE);
     }
 
     @BindingAdapter("srcCompat")
@@ -260,13 +249,6 @@ public class FormPoi extends FormBase {
             if(poi != null){
                 BairroCidade bairro = new BairroCidade();
                 bairro.getBairro().setId(poi.getBairro());
-                int i = viewModel.bairros.getValue().indexOf(bairro);
-                binding.spinnerBairro.setSelection(i, false);
-            }
-
-            if(paradaRelativa != null){
-                BairroCidade bairro = new BairroCidade();
-                bairro.getBairro().setId(paradaRelativa.getParada().getBairro());
                 int i = viewModel.bairros.getValue().indexOf(bairro);
                 binding.spinnerBairro.setSelection(i, false);
             }

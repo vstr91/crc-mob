@@ -44,6 +44,7 @@ import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaSugestaoBairro;
+import br.com.vostre.circular.model.pojo.PontoInteresseSugestaoBairro;
 import br.com.vostre.circular.utils.DataHoraUtils;
 import br.com.vostre.circular.utils.ImageUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
@@ -73,7 +74,7 @@ public class MapaViewModel extends AndroidViewModel {
 
     public static MutableLiveData<Integer> retorno;
 
-    public PontoInteresseSugestao poiNovo;
+    public PontoInteresseSugestaoBairro poiNovo;
     public Bitmap fotoPoi;
     public BairroCidade bairroPoi;
 
@@ -95,7 +96,7 @@ public class MapaViewModel extends AndroidViewModel {
         }
     }
 
-    public void setPoiNovo(PontoInteresseSugestao poiNovo) {
+    public void setPoiNovo(PontoInteresseSugestaoBairro poiNovo) {
         this.poiNovo = poiNovo;
 
         if(poiNovo.getPontoInteresse().getImagem() != null){
@@ -374,6 +375,7 @@ public class MapaViewModel extends AndroidViewModel {
         pois = appDatabase.pontoInteresseDAO().listarTodosAtivos();
         bairros = appDatabase.bairroDAO().listarTodosComCidade();
         paradaNova = new ParadaSugestaoBairro();
+        poiNovo = new PontoInteresseSugestaoBairro();
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplication());
 
@@ -445,6 +447,40 @@ public class MapaViewModel extends AndroidViewModel {
 
     }
 
+    public void salvarPontoInteresse(){
+
+        poiNovo.getPontoInteresse().setBairro(bairro.getBairro().getId());
+
+        if(fotoPoi != null){
+            salvarFotoPoi();
+        }
+
+        if(poiNovo.getPontoInteresse().valida(poiNovo.getPontoInteresse())){
+            addPoi(poiNovo.getPontoInteresse());
+        } else{
+            retorno.setValue(0);
+        }
+
+    }
+
+    public void editarPontoInteresse(){
+
+        if(bairro != null){
+            poiNovo.getPontoInteresse().setBairro(bairro.getBairro().getId());
+        }
+
+        if(fotoPoi != null){
+            salvarFotoPoi();
+        }
+
+        if(poiNovo.getPontoInteresse().valida(poiNovo.getPontoInteresse())){
+            editPoi(poiNovo.getPontoInteresse());
+        } else{
+            retorno.setValue(0);
+        }
+
+    }
+
     private void salvarFoto() {
         FileOutputStream fos = null;
         File file = new File(getApplication().getFilesDir(),  UUID.randomUUID().toString()+".png");
@@ -471,6 +507,39 @@ public class MapaViewModel extends AndroidViewModel {
 
                     paradaNova.getParada().setImagem(file.getName());
                     paradaNova.getParada().setImagemEnviada(false);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void salvarFotoPoi() {
+        FileOutputStream fos = null;
+        File file = new File(getApplication().getFilesDir(),  UUID.randomUUID().toString()+".png");
+
+        try {
+            fos = new FileOutputStream(file);
+            fotoPoi = ImageUtils.scaleDown(fotoPoi, 600, true);
+            fotoPoi.compress(Bitmap.CompressFormat.PNG, 100, fos);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+
+                    if(poiNovo.getPontoInteresse().getImagem() != null && !poiNovo.getPontoInteresse().getImagem().isEmpty()){
+                        File fotoAntiga = new File(getApplication().getFilesDir(), poiNovo.getPontoInteresse().getImagem());
+
+                        if(fotoAntiga.exists() && fotoAntiga.canWrite() && fotoAntiga.getName() != file.getName()){
+                            fotoAntiga.delete();
+                        }
+                    }
+
+                    poiNovo.getPontoInteresse().setImagem(file.getName());
+                    poiNovo.getPontoInteresse().setImagemEnviada(false);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -589,5 +658,117 @@ public class MapaViewModel extends AndroidViewModel {
     }
 
     // fim editar
+
+    // adicionar poi
+
+    public void addPoi(final PontoInteresseSugestao poi) {
+
+        poi.setDataCadastro(new DateTime());
+        poi.setUltimaAlteracao(new DateTime());
+        poi.setEnviado(false);
+        poi.setSlug(StringUtils.toSlug(poi.getNome()));
+
+        String id = PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext());
+
+        if(poi.getImagem() != null && !poi.getImagem().isEmpty()){
+            poi.setImagemEnviada(false);
+        }
+
+        poi.setUsuarioCadastro(id);
+        poi.setUsuarioUltimaAlteracao(id);
+        poi.setStatus(0);
+
+        poi.setBairro(bairro.getBairro().getId());
+
+        new addPoiAsyncTask(appDatabase).execute(poi);
+    }
+
+    private static class addPoiAsyncTask extends AsyncTask<PontoInteresseSugestao, Void, Void> {
+
+        private AppDatabase db;
+
+        addPoiAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final PontoInteresseSugestao... params) {
+            db.pontoInteresseSugestaoDAO().inserir((params[0]));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
+        }
+
+    }
+
+    // fim adicionar poi
+
+    // editar poi
+
+    public static void editPoi(final PontoInteresseSugestao poi, Context context) {
+
+        if(appDatabase == null){
+            appDatabase = AppDatabase.getAppDatabase(context.getApplicationContext());
+        }
+
+        poi.setUltimaAlteracao(new DateTime());
+        poi.setEnviado(false);
+        poi.setSlug(StringUtils.toSlug(poi.getNome()));
+        poi.setStatus(0);
+
+        String id = PreferenceUtils.carregarUsuarioLogado(context.getApplicationContext());
+
+        if(poi.getImagem() != null && !poi.getImagem().isEmpty()){
+            poi.setImagemEnviada(false);
+        }
+
+        poi.setUsuarioUltimaAlteracao(id);
+
+        new editPoiAsyncTask(appDatabase).execute(poi);
+    }
+
+    public void editPoi(final PontoInteresseSugestao poi) {
+
+        poi.setUltimaAlteracao(new DateTime());
+        poi.setEnviado(false);
+        poi.setSlug(StringUtils.toSlug(poi.getNome()));
+        poi.setStatus(0);
+
+        String id = PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext());
+
+        if(poi.getImagem() != null && !poi.getImagem().isEmpty()){
+            poi.setImagemEnviada(false);
+        }
+
+        poi.setUsuarioUltimaAlteracao(id);
+
+        new editPoiAsyncTask(appDatabase).execute(poi);
+    }
+
+    private static class editPoiAsyncTask extends AsyncTask<PontoInteresseSugestao, Void, Void> {
+
+        private AppDatabase db;
+
+        editPoiAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final PontoInteresseSugestao... params) {
+            db.pontoInteresseSugestaoDAO().editar((params[0]));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
+        }
+
+    }
+
+    // fim editar poi
 
 }

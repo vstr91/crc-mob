@@ -57,6 +57,7 @@ public class MapaViewModel extends AndroidViewModel {
     public LiveData<List<ParadaBairro>> paradas;
     public LiveData<List<ParadaSugestaoBairro>> paradasSugeridas;
     public LiveData<List<PontoInteresse>> pois;
+    public LiveData<List<PontoInteresseSugestaoBairro>> poisSugeridos;
     public MutableLiveData<Location> localAtual;
     public boolean centralizaMapa = true;
 
@@ -373,6 +374,8 @@ public class MapaViewModel extends AndroidViewModel {
         paradasSugeridas = appDatabase.paradaSugestaoDAO().listarTodosPendentesComBairroPorUsuario(PreferenceUtils
                 .carregarUsuarioLogado(getApplication().getApplicationContext()));
         pois = appDatabase.pontoInteresseDAO().listarTodosAtivos();
+        poisSugeridos = appDatabase.pontoInteresseSugestaoDAO().listarTodosPendentesComBairroPorUsuario(PreferenceUtils
+                .carregarUsuarioLogado(getApplication().getApplicationContext()));
         bairros = appDatabase.bairroDAO().listarTodosComCidade();
         paradaNova = new ParadaSugestaoBairro();
         poiNovo = new PontoInteresseSugestaoBairro();

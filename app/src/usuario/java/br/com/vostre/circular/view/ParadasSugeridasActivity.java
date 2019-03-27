@@ -55,9 +55,11 @@ import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaSugestao;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaSugestaoBairro;
+import br.com.vostre.circular.model.pojo.PontoInteresseSugestaoBairro;
 import br.com.vostre.circular.utils.DialogUtils;
 import br.com.vostre.circular.utils.DrawableUtils;
 import br.com.vostre.circular.view.adapter.ParadaSugestaoAdapter;
+import br.com.vostre.circular.view.adapter.PontoInteresseSugestaoAdapter;
 import br.com.vostre.circular.view.form.FormParada;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.viewModel.ParadasSugeridasViewModel;
@@ -76,6 +78,10 @@ public class ParadasSugeridasActivity extends BaseActivity {
     ParadaSugestaoAdapter adapterSugestao;
     ParadaSugestaoAdapter adapterAceitas;
     ParadaSugestaoAdapter adapterRejeitadas;
+
+    PontoInteresseSugestaoAdapter adapterSugestaoPois;
+    PontoInteresseSugestaoAdapter adapterAceitasPois;
+    PontoInteresseSugestaoAdapter adapterRejeitadasPois;
 
     TabHost tabHost;
 
@@ -96,6 +102,11 @@ public class ParadasSugeridasActivity extends BaseActivity {
         viewModel.aceitas.observe(this, paradasAceitasObserver);
         viewModel.rejeitadas.observe(this, paradasRejeitadasObserver);
 
+        // POIS
+        viewModel.sugeridasPois.observe(this, poisSugeridosObserver);
+        viewModel.aceitasPois.observe(this, poisAceitosObserver);
+        viewModel.rejeitadasPois.observe(this, poisRejeitadosObserver);
+
         adapterSugestao = new ParadaSugestaoAdapter(viewModel.sugeridas.getValue(), this);
 
         binding.listSugestoes.setAdapter(adapterSugestao);
@@ -107,6 +118,20 @@ public class ParadasSugeridasActivity extends BaseActivity {
         adapterRejeitadas = new ParadaSugestaoAdapter(viewModel.rejeitadas.getValue(), this);
 
         binding.listRejeitadas.setAdapter(adapterRejeitadas);
+
+        // POIS
+
+        adapterSugestaoPois = new PontoInteresseSugestaoAdapter(viewModel.sugeridasPois.getValue(), this);
+
+        binding.listSugestoesPois.setAdapter(adapterSugestaoPois);
+
+        adapterAceitasPois = new PontoInteresseSugestaoAdapter(viewModel.aceitasPois.getValue(), this);
+
+        binding.listAceitasPois.setAdapter(adapterAceitasPois);
+
+        adapterRejeitadasPois = new PontoInteresseSugestaoAdapter(viewModel.rejeitadasPois.getValue(), this);
+
+        binding.listRejeitadasPois.setAdapter(adapterRejeitadasPois);
 
         tabHost = binding.tabs;
         tabHost.setup();
@@ -160,6 +185,32 @@ public class ParadasSugeridasActivity extends BaseActivity {
         public void onChanged(List<ParadaSugestaoBairro> paradas) {
             adapterRejeitadas.paradas = paradas;
             adapterRejeitadas.notifyDataSetChanged();
+        }
+    };
+
+    // POIS
+
+    Observer<List<PontoInteresseSugestaoBairro>> poisSugeridosObserver = new Observer<List<PontoInteresseSugestaoBairro>>() {
+        @Override
+        public void onChanged(List<PontoInteresseSugestaoBairro> pois) {
+            adapterSugestaoPois.pois = pois;
+            adapterSugestaoPois.notifyDataSetChanged();
+        }
+    };
+
+    Observer<List<PontoInteresseSugestaoBairro>> poisAceitosObserver = new Observer<List<PontoInteresseSugestaoBairro>>() {
+        @Override
+        public void onChanged(List<PontoInteresseSugestaoBairro> pois) {
+            adapterAceitasPois.pois = pois;
+            adapterAceitasPois.notifyDataSetChanged();
+        }
+    };
+
+    Observer<List<PontoInteresseSugestaoBairro>> poisRejeitadosObserver = new Observer<List<PontoInteresseSugestaoBairro>>() {
+        @Override
+        public void onChanged(List<PontoInteresseSugestaoBairro> pois) {
+            adapterRejeitadasPois.pois = pois;
+            adapterRejeitadasPois.notifyDataSetChanged();
         }
     };
 

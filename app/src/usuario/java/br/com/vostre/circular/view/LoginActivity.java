@@ -53,6 +53,7 @@ import br.com.vostre.circular.utils.DBUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.Unique;
 import br.com.vostre.circular.utils.tasks.PreferenceDownloadAsyncTask;
+import br.com.vostre.circular.view.form.FormNovidades;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 import io.fabric.sdk.android.Fabric;
 
@@ -128,6 +129,17 @@ public class LoginActivity extends BaseActivity {
             // caregar bd
             DBUtils.populaBancoDeDados(this);
         }
+
+        if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), "novidades_210")){
+            FormNovidades formNovidades = new FormNovidades();
+            formNovidades.setVersao(BuildConfig.VERSION_NAME);
+            formNovidades.show(this.getSupportFragmentManager(), "formNovidades");
+
+            PreferenceUtils.salvarPreferencia(getApplicationContext(), "novidades_210", true);
+        }
+
+
+
 
     }
 

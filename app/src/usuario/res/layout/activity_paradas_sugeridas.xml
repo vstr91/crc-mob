@@ -27,8 +27,10 @@
             android:id="@+id/tabs"
             style="@style/TabWidget"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
@@ -77,16 +79,47 @@
                             <android.support.v7.widget.RecyclerView
                                 android:id="@+id/listSugestoes"
                                 android:layout_width="0dp"
-                                android:layout_height="wrap_content"
+                                android:layout_height="250dp"
                                 android:layout_marginTop="8dp"
-                                android:layout_marginBottom="96dp"
+                                android:paddingBottom="20dp"
+                                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/textView26"
+                                tools:listitem="@layout/linha_paradas_sugeridas">
+
+                            </android.support.v7.widget.RecyclerView>
+
+                            <TextView
+                                android:id="@+id/textView29"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginLeft="8dp"
+                                android:layout_marginTop="8dp"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginRight="8dp"
+                                android:gravity="center_horizontal|center"
+                                android:paddingTop="5dp"
+                                android:text="Pontos de Interesse Pendentes"
+                                android:textAppearance="@style/texto_branco"
+                                android:textStyle="bold"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/listSugestoes" />
+
+                            <android.support.v7.widget.RecyclerView
+                                android:id="@+id/listSugestoesPois"
+                                android:layout_width="0dp"
+                                android:layout_height="250dp"
+                                android:layout_marginBottom="8dp"
                                 android:paddingBottom="20dp"
                                 app:layoutManager="android.support.v7.widget.LinearLayoutManager"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/textView26"
-                                tools:listitem="@layout/linha_paradas_sugeridas">
+                                app:layout_constraintTop_toBottomOf="@+id/textView29"
+                                tools:listitem="@layout/linha_pois_sugeridos">
 
                             </android.support.v7.widget.RecyclerView>
 
@@ -105,14 +138,14 @@
                             android:layout_height="match_parent">
 
                             <TextView
-                                android:id="@+id/textView27"
+                                android:id="@+id/textView31"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginEnd="8dp"
-                                android:layout_marginLeft="8dp"
-                                android:layout_marginRight="8dp"
+                                android:layout_height="0dp"
                                 android:layout_marginStart="8dp"
-                                android:gravity="center"
+                                android:layout_marginLeft="8dp"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginRight="8dp"
+                                android:gravity="center_horizontal|center"
                                 android:paddingTop="5dp"
                                 android:text="Paradas Aceitas"
                                 android:textAppearance="@style/texto_branco"
@@ -124,16 +157,47 @@
                             <android.support.v7.widget.RecyclerView
                                 android:id="@+id/listAceitas"
                                 android:layout_width="0dp"
-                                android:layout_height="wrap_content"
+                                android:layout_height="250dp"
                                 android:layout_marginTop="8dp"
-                                android:layout_marginBottom="96dp"
+                                android:paddingBottom="20dp"
+                                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/textView31"
+                                tools:listitem="@layout/linha_paradas_sugeridas">
+
+                            </android.support.v7.widget.RecyclerView>
+
+                            <TextView
+                                android:id="@+id/textView30"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginLeft="8dp"
+                                android:layout_marginTop="8dp"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginRight="8dp"
+                                android:gravity="center_horizontal|center"
+                                android:paddingTop="5dp"
+                                android:text="Pontos de Interesse Aceitos"
+                                android:textAppearance="@style/texto_branco"
+                                android:textStyle="bold"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/listAceitas" />
+
+                            <android.support.v7.widget.RecyclerView
+                                android:id="@+id/listAceitasPois"
+                                android:layout_width="0dp"
+                                android:layout_height="250dp"
+                                android:layout_marginBottom="8dp"
                                 android:paddingBottom="20dp"
                                 app:layoutManager="android.support.v7.widget.LinearLayoutManager"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/textView27"
-                                tools:listitem="@layout/linha_paradas_sugeridas">
+                                app:layout_constraintTop_toBottomOf="@+id/textView30"
+                                tools:listitem="@layout/linha_pois_sugeridos">
 
                             </android.support.v7.widget.RecyclerView>
 
@@ -152,16 +216,16 @@
                             android:layout_height="match_parent">
 
                             <TextView
-                                android:id="@+id/textView28"
+                                android:id="@+id/textView33"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginEnd="8dp"
-                                android:layout_marginLeft="8dp"
-                                android:layout_marginRight="8dp"
+                                android:layout_height="0dp"
                                 android:layout_marginStart="8dp"
-                                android:gravity="center"
+                                android:layout_marginLeft="8dp"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginRight="8dp"
+                                android:gravity="center_horizontal|center"
                                 android:paddingTop="5dp"
-                                android:text="Paradas Rejeitadas"
+                                android:text="Paradas Pendentes"
                                 android:textAppearance="@style/texto_branco"
                                 android:textStyle="bold"
                                 app:layout_constraintEnd_toEndOf="parent"
@@ -171,16 +235,47 @@
                             <android.support.v7.widget.RecyclerView
                                 android:id="@+id/listRejeitadas"
                                 android:layout_width="0dp"
-                                android:layout_height="wrap_content"
+                                android:layout_height="250dp"
                                 android:layout_marginTop="8dp"
-                                android:layout_marginBottom="96dp"
+                                android:paddingBottom="20dp"
+                                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/textView33"
+                                tools:listitem="@layout/linha_paradas_sugeridas">
+
+                            </android.support.v7.widget.RecyclerView>
+
+                            <TextView
+                                android:id="@+id/textView32"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginLeft="8dp"
+                                android:layout_marginTop="8dp"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginRight="8dp"
+                                android:gravity="center_horizontal|center"
+                                android:paddingTop="5dp"
+                                android:text="Pontos de Interesse Rejeitados"
+                                android:textAppearance="@style/texto_branco"
+                                android:textStyle="bold"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/listSugestoes" />
+
+                            <android.support.v7.widget.RecyclerView
+                                android:id="@+id/listRejeitadasPois"
+                                android:layout_width="0dp"
+                                android:layout_height="250dp"
+                                android:layout_marginBottom="8dp"
                                 android:paddingBottom="20dp"
                                 app:layoutManager="android.support.v7.widget.LinearLayoutManager"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/textView28"
-                                tools:listitem="@layout/linha_paradas_sugeridas">
+                                app:layout_constraintTop_toBottomOf="@+id/textView32"
+                                tools:listitem="@layout/linha_pois_sugeridos">
 
                             </android.support.v7.widget.RecyclerView>
 

@@ -33,10 +33,12 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.HistoricoParada;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaSugestao;
+import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaSugestaoBairro;
+import br.com.vostre.circular.model.pojo.PontoInteresseSugestaoBairro;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.StringUtils;
 
@@ -52,6 +54,12 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
 
     public LiveData<List<ParadaSugestaoBairro>> aceitas;
     public LiveData<List<ParadaSugestaoBairro>> rejeitadas;
+
+    public LiveData<List<PontoInteresseSugestaoBairro>> sugeridasPois;
+    public PontoInteresseSugestaoBairro sugestaoPoi;
+
+    public LiveData<List<PontoInteresseSugestaoBairro>> aceitasPois;
+    public LiveData<List<PontoInteresseSugestaoBairro>> rejeitadasPois;
 
     public boolean centralizaMapa = true;
 
@@ -115,11 +123,17 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
                 .listarTodosAceitosComBairroPorUsuario(PreferenceUtils
                         .carregarUsuarioLogado(getApplication().getApplicationContext()));
 
-//        aceitas = appDatabase.paradaSugestaoDAO()
-//                .listarTodosComBairroPorUsuario(PreferenceUtils
-//                        .carregarUsuarioLogado(getApplication().getApplicationContext()));
-
         rejeitadas = appDatabase.paradaSugestaoDAO().listarTodosRejeitadosComBairroPorUsuario(PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext()));
+
+        // POIS
+
+        sugeridasPois = appDatabase.pontoInteresseSugestaoDAO().listarTodosPendentesComBairroPorUsuario(PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext()));
+
+        aceitasPois = appDatabase.pontoInteresseSugestaoDAO()
+                .listarTodosAceitosComBairroPorUsuario(PreferenceUtils
+                        .carregarUsuarioLogado(getApplication().getApplicationContext()));
+
+        rejeitadasPois = appDatabase.pontoInteresseSugestaoDAO().listarTodosRejeitadosComBairroPorUsuario(PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext()));
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplication());
         localAtual = new MutableLiveData<>();
@@ -362,6 +376,53 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
     }
 
     // fim editar
+
+    // editar poi
+
+    public static void editPoi(final PontoInteresse pontoInteresse, Context context) {
+
+        if(appDatabase == null){
+            appDatabase = AppDatabase.getAppDatabase(context.getApplicationContext());
+        }
+
+        new editPoiAsyncTask(appDatabase).execute(pontoInteresse);
+    }
+
+    public void editPoi(final PontoInteresse pontoInteresse) {
+
+        pontoInteresse.setUltimaAlteracao(new DateTime());
+        pontoInteresse.setEnviado(false);
+        pontoInteresse.setSlug(StringUtils.toSlug(pontoInteresse.getNome()));
+
+        new editPoiAsyncTask(appDatabase).execute(pontoInteresse);
+    }
+
+    private static class editPoiAsyncTask extends AsyncTask<PontoInteresse, Void, Void> {
+
+        private AppDatabase db;
+
+        editPoiAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final PontoInteresse... params) {
+            db.pontoInteresseDAO().editar((params[0]));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            if(retorno != null){
+                retorno.setValue(1);
+            }
+
+        }
+
+    }
+
+    // fim editar poi
 
     public void iniciarAtualizacoesPosicao(){
         mLocationCallback = new LocationCallback() {

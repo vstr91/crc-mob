@@ -27,6 +27,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DrawableUtils;
@@ -97,6 +98,7 @@ import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaSugestaoBairro;
+import br.com.vostre.circular.model.pojo.PontoInteresseSugestaoBairro;
 import br.com.vostre.circular.utils.DialogUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SessionUtils;
@@ -296,6 +298,7 @@ public class MapaActivity extends BaseActivity {
         viewModel.paradas.observe(this, paradasObserver);
         viewModel.paradasSugeridas.observe(this, paradasSugeridasObserver);
         viewModel.pois.observe(this, poisObserver);
+        viewModel.poisSugeridos.observe(this, poisSugeridosObserver);
         viewModel.localAtual.observe(this, localObserver);
         viewModel.iniciarAtualizacoesPosicao();
 
@@ -384,7 +387,7 @@ public class MapaActivity extends BaseActivity {
     Observer<List<ParadaSugestaoBairro>> paradasSugeridasObserver = new Observer<List<ParadaSugestaoBairro>>() {
         @Override
         public void onChanged(List<ParadaSugestaoBairro> paradas) {
-            atualizarSugestoessMapa(paradas);
+            atualizarSugestoesMapa(paradas);
         }
     };
 
@@ -392,6 +395,13 @@ public class MapaActivity extends BaseActivity {
         @Override
         public void onChanged(List<PontoInteresse> pois) {
             atualizarPoisMapa(pois);
+        }
+    };
+
+    Observer<List<PontoInteresseSugestaoBairro>> poisSugeridosObserver = new Observer<List<PontoInteresseSugestaoBairro>>() {
+        @Override
+        public void onChanged(List<PontoInteresseSugestaoBairro> pois) {
+            atualizarSugestoesPoiMapa(pois);
         }
     };
 
@@ -647,7 +657,7 @@ public class MapaActivity extends BaseActivity {
 
     }
 
-    private void atualizarSugestoessMapa(final List<ParadaSugestaoBairro> paradasSugeridas){
+    private void atualizarSugestoesMapa(final List<ParadaSugestaoBairro> paradasSugeridas){
 
         if(paradasSugeridas != null){
 
@@ -774,6 +784,128 @@ public class MapaActivity extends BaseActivity {
 
     }
 
+    private void atualizarSugestoesPoiMapa(final List<PontoInteresseSugestaoBairro> paradasSugeridas){
+
+        if(paradasSugeridas != null){
+
+            RadiusMarkerClusterer poiMarkers = new RadiusMarkerClusterer(this);
+            poiMarkers.setRadius(200);
+
+            Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_cluster);
+            Bitmap clusterIcon = ((BitmapDrawable)clusterIconD).getBitmap();
+
+            map.getOverlays().add(poiMarkers);
+            poiMarkers.setIcon(clusterIcon);
+
+            for(final PontoInteresseSugestaoBairro p : paradasSugeridas){
+
+                Marker m = new Marker(map);
+                m.setPosition(new GeoPoint(p.getPontoInteresse().getLatitude(), p.getPontoInteresse().getLongitude()));
+                m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                m.setTitle(p.getPontoInteresse().getNome());
+                m.setDraggable(true);
+                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.sugestao));
+                m.setId(p.getPontoInteresse().getId());
+                m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker, MapView mapView) {
+
+                        if(gpsAtivo){
+                            final PontoInteresseSugestaoBairro p = getSugestaoPoiFromMarker(marker, paradasSugeridas);
+
+                            viewModel.setPoiNovo(p);
+
+                            // bottom menu
+
+                            TextView textViewReferencia = bsdPoi.findViewById(R.id.textViewReferencia);
+                            TextView textViewBairro = bsdPoi.findViewById(R.id.textViewBairro);
+
+                            bsdPoi.findViewById(R.id.textView32).setVisibility(View.GONE);
+                            bsdPoi.findViewById(R.id.textView33).setVisibility(View.GONE);
+                            bsdPoi.findViewById(R.id.textViewLegenda).setVisibility(View.GONE);
+
+                            textViewReferencia.setText(p.getPontoInteresse().getNome());
+                            textViewBairro.setText(p.getNomeBairroComCidade());
+
+                            ImageView img = bsdPoi.findViewById(R.id.imageView3);
+
+                            File f = null;
+
+                            if(p.getPontoInteresse().getImagem() != null){
+                                f = new File(ctx.getApplicationContext().getFilesDir(),  p.getPontoInteresse().getImagem());
+                            }
+
+                            if(p.getPontoInteresse().getImagem() != null && f != null && f.exists() && f.canRead()){
+                                img.setImageDrawable(Drawable.createFromPath(getApplicationContext().getFilesDir()
+                                        +"/"+p.getPontoInteresse().getImagem()));
+                            } else{
+                                img.setImageDrawable(getResources().getDrawable(R.drawable.imagem_nao_disponivel_16_9));
+                            }
+
+                            Button btnDetalhes = bsdPoi.findViewById(R.id.btnDetalhes);
+                            btnDetalhes.setVisibility(View.GONE);
+
+                            Button btnEdicao = bsdPoi.findViewById(R.id.btnEdicao);
+                            btnEdicao.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    formPoi = new FormPoi();
+                                    formPoi.setParada(p.getPontoInteresse());
+                                    formPoi.setCtx(getApplication());
+                                    formPoi.show(getSupportFragmentManager(), "formPoi");
+                                }
+                            });
+
+                            btnEdicao.setVisibility(View.GONE);
+
+                            Button btnFechar = bsdPoi.findViewById(R.id.btnFechar);
+                            btnFechar.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    bsdPoi.dismiss();
+                                }
+                            });
+
+                            // fim bottom menu
+
+                            mapController.animateTo(marker.getPosition());
+                            bsdPoi.show();
+                        }
+
+                        return true;
+                    }
+                });
+                m.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
+                    @Override
+                    public void onMarkerDrag(Marker marker) {
+
+                    }
+
+                    @Override
+                    public void onMarkerDragEnd(Marker marker) {
+                        PontoInteresseSugestaoBairro p = getSugestaoPoiFromMarker(marker, paradasSugeridas);
+                        viewModel.setPoiNovo(p);
+                        viewModel.editarPontoInteresse();
+                        Toast.makeText(getApplicationContext(), "Sugestão alterada", Toast.LENGTH_SHORT).show();
+
+                        bundle = new Bundle();
+                        bundle.putString("ponto_interesse", p.getPontoInteresse().getNome()+", "+p.getNomeBairroComCidade());
+                        mFirebaseAnalytics.logEvent("sugestao_poi_alterada", bundle);
+                    }
+
+                    @Override
+                    public void onMarkerDragStart(Marker marker) {
+
+                    }
+                });
+//                map.getOverlays().add(m);
+                poiMarkers.add(m);
+            }
+
+        }
+
+    }
+
     @NonNull
     private ParadaBairro getParadaFromMarker(Marker marker, List<ParadaBairro> paradas) {
         Parada p = new Parada();
@@ -807,6 +939,17 @@ public class MapaActivity extends BaseActivity {
         p = sugestoes.get(sugestoes.indexOf(p));
         p.getParada().setLatitude(marker.getPosition().getLatitude());
         p.getParada().setLongitude(marker.getPosition().getLongitude());
+        return p;
+    }
+
+    @NonNull
+    private PontoInteresseSugestaoBairro getSugestaoPoiFromMarker(Marker marker, List<PontoInteresseSugestaoBairro> sugestoes) {
+        PontoInteresseSugestaoBairro p = new PontoInteresseSugestaoBairro();
+        p.getPontoInteresse().setId(marker.getId());
+
+        p = sugestoes.get(sugestoes.indexOf(p));
+        p.getPontoInteresse().setLatitude(marker.getPosition().getLatitude());
+        p.getPontoInteresse().setLongitude(marker.getPosition().getLongitude());
         return p;
     }
 
@@ -874,9 +1017,9 @@ public class MapaActivity extends BaseActivity {
         if(viewModel.centralizaMapa){
             mapController.animateTo(new GeoPoint(viewModel.localAtual.getValue().getLatitude(),
                     viewModel.localAtual.getValue().getLongitude()));
-            v.setBackgroundTintList(ColorStateList.valueOf(Color.GREEN));
+            ViewCompat.setBackgroundTintList(v, ColorStateList.valueOf(Color.GREEN));
         } else{
-            v.setBackgroundTintList(ColorStateList.valueOf(Color.DKGRAY));
+            ViewCompat.setBackgroundTintList(v, ColorStateList.valueOf(Color.DKGRAY));
         }
 
         v.invalidate();
@@ -1067,6 +1210,9 @@ public class MapaActivity extends BaseActivity {
 //        binding.linearLayoutParada.setVisibility(View.VISIBLE);
 //        binding.linearLayoutPoi.setVisibility(View.VISIBLE);
 
+        binding.linearLayoutParada.animate().alpha(1);
+        binding.linearLayoutPoi.animate().alpha(1);
+
         binding.linearLayoutParada.animate().translationY(-55);
         binding.linearLayoutPoi.animate().translationY(-105);
         submenuAberto = true;
@@ -1078,6 +1224,18 @@ public class MapaActivity extends BaseActivity {
 
         binding.linearLayoutParada.animate().translationY(0);
         binding.linearLayoutPoi.animate().translationY(0);
+
+        ocultaSubmenu();
+
+        submenuAberto = false;
+    }
+
+    private void ocultaSubmenu(){
+//        binding.linearLayoutParada.setVisibility(View.GONE);
+//        binding.linearLayoutPoi.setVisibility(View.GONE);
+
+        binding.linearLayoutParada.animate().alpha(0);
+        binding.linearLayoutPoi.animate().alpha(0);
         submenuAberto = false;
     }
 

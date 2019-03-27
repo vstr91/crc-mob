@@ -62,6 +62,7 @@ import br.com.vostre.circular.model.ParadaSugestao;
 import br.com.vostre.circular.model.Parametro;
 import br.com.vostre.circular.model.ParametroInterno;
 import br.com.vostre.circular.model.PontoInteresse;
+import br.com.vostre.circular.model.PontoInteresseSugestao;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.model.UsuarioPreferencia;
@@ -133,6 +134,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     List<? extends EntidadeBase> historicos;
 
     List<? extends Acesso> acessos;
+
+    List<? extends EntidadeBase> pontosInteresseSugestoes;
 
     br.com.vostre.circular.utils.Crypt crypt;
 
@@ -569,6 +572,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 JSONArray historicosItinerarios = null;
                 JSONArray acessos = null;
 
+                JSONArray pontosInteresseSugestoes = null;
+
                 System.out.println("PAR_SUG: "+arrayObject.optJSONArray("paradas_sugestoes"));
 
                 if(arrayObject.optJSONArray("paradas_sugestoes") != null){
@@ -585,6 +590,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 if(arrayObject.optJSONArray("acessos") != null){
                     acessos = arrayObject.getJSONArray("acessos");
+                }
+
+                if(arrayObject.optJSONArray("pontos_interesse_sugestoes") != null){
+                    pontosInteresseSugestoes = arrayObject.getJSONArray("pontos_interesse_sugestoes");
                 }
 
                 // ACESSOS
@@ -1034,6 +1043,39 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 }
 
+                // PONTOS INTERESSE SUGESTOES
+
+                if(pontosInteresseSugestoes != null && pontosInteresseSugestoes.length() > 0){
+
+                    int total = pontosInteresseSugestoes.length();
+                    List<PontoInteresseSugestao> lstPois = new ArrayList<>();
+
+                    System.out.println("SUGESTOES POI: "+pontosInteresseSugestoes.toString());
+
+                    for(int i = 0; i < total; i++){
+                        PontoInteresseSugestao poi;
+                        JSONObject obj = pontosInteresseSugestoes.getJSONObject(i);
+
+                        poi = (PontoInteresseSugestao) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), PontoInteresseSugestao.class, 1);
+                        poi.setEnviado(true);
+                        poi.setImagemEnviada(true);
+
+                        lstPois.add(poi);
+
+                        if(poi.getImagem() != null && !poi.getImagem().isEmpty()){
+                            File imagem = new File(getContext().getApplicationContext().getFilesDir(), poi.getImagem());
+
+                            if(!imagem.exists() || !imagem.canWrite()){
+                                imageDownload(baseUrl, poi.getImagem());
+                            }
+                        }
+
+                    }
+
+                    add(lstPois, "ponto_interesse_sugestao");
+
+                }
+
                 // PREFERENCIAS
 
                 if(preferencias != null && preferencias.length() > 0){
@@ -1214,6 +1256,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             historicos = appDatabase.historicoItinerarioDAO().listarTodosAEnviar();
 
+            pontosInteresseSugestoes = appDatabase.pontoInteresseSugestaoDAO().listarTodosAEnviar();
+
             return null;
         }
 
@@ -1242,10 +1286,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             String strHistoricos = "\"historicos_itinerarios\": "+JsonUtils.toJson((List<EntidadeBase>) historicos);
 
+            String strPontosInteresseSugestoes = "\"pontos_interesse_sugestoes\": "+JsonUtils.toJson((List<EntidadeBase>) pontosInteresseSugestoes);
+
             String json = "{"+strPaises+","+strEmpresas+","+strOnibus+","+strEstados+","+strCidades+","
                     +strBairros+","+strParadas+","+strItinerarios+","+strHorarios+","+strParadasItinerarios+","
                     +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
-                    +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+","+strPreferencias+","+strHistoricos+"}";
+                    +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+","+strPreferencias+","+strHistoricos+","+strPontosInteresseSugestoes+"}";
 
              //System.out.println("JSON: "+json);
 
@@ -1270,7 +1316,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             int registros = paises.size()+empresas.size()+onibus.size()+estados.size()+cidades.size()
                     +bairros.size()+paradas.size()+itinerarios.size()+horarios.size()+paradasItinerario.size()
                     +secoesItinerarios.size()+horariosItinerarios.size()+mensagens.size()+parametros.size()+pontosInteresse.size()
-                    +usuarios.size()+paradaSugestoes.size()+preferencias.size()+historicos.size();
+                    +usuarios.size()+paradaSugestoes.size()+preferencias.size()+historicos.size()+pontosInteresseSugestoes.size();
 
             if(registros > 0){
                 chamaAPI(registros, json, 0, baseUrl, token);
@@ -1294,6 +1340,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         List<PontoInteresse> pontosInteresse;
         List<ParadaSugestao> paradasSugestoes;
 
+        List<PontoInteresseSugestao> pontosInteresseSugestoes;
+
         @Override
         protected Void doInBackground(final Void... params) {
 
@@ -1302,6 +1350,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             paradas = appDatabase.paradaDAO().listarTodosImagemAEnviar();
             pontosInteresse = appDatabase.pontoInteresseDAO().listarTodosImagemAEnviar();
             paradasSugestoes = appDatabase.paradaSugestaoDAO().listarTodosImagemAEnviar();
+
+            pontosInteresseSugestoes = appDatabase.pontoInteresseSugestaoDAO().listarTodosImagemAEnviar();
 
             return null;
         }
@@ -1540,6 +1590,49 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             }
 
+            for(final PontoInteresseSugestao pontoInteresseSugestao : pontosInteresseSugestoes){
+
+                File imagem = new File(getContext().getApplicationContext().getFilesDir(),  pontoInteresseSugestao.getImagem());
+
+                RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
+                MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
+                RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
+
+                CircularAPI api = retrofit.create(CircularAPI.class);
+                Call<String> call = api.enviaImagem(body, name, tokenImagem);
+                call.enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+
+                        if(response.code() == 200){
+                            pontoInteresseSugestao.setImagemEnviada(true);
+                            ParadasSugeridasViewModel.editPoi(pontoInteresseSugestao, getContext().getApplicationContext());
+                        } else{
+
+                            if(mostraToast){
+                                Toast.makeText(getContext().getApplicationContext(),
+                                        "Erro "+response.code()+" ("+response.message()+") ao enviar imagem de "+pontoInteresseSugestao.getNome()+" para o servidor",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+pontoInteresseSugestao.getNome()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                });
+
+            }
+
         }
     }
 
@@ -1697,6 +1790,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     break;
                 case "historico_itinerario":
                     db.historicoItinerarioDAO().inserirTodos((List<HistoricoItinerario>) params[0]);
+                    break;
+                case "ponto_interesse_sugestao":
+                    db.pontoInteresseSugestaoDAO().deletarTodosNaoPendentesPorUsuarioLogado(PreferenceUtils.carregarUsuarioLogado(ctx.getApplicationContext()));
+                    db.pontoInteresseSugestaoDAO().inserirTodos((List<PontoInteresseSugestao>) params[0]);
                     break;
             }
 

@@ -67,7 +67,7 @@ public interface PontoInteresseSugestaoDAO {
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM ponto_interesse_sugestao p " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
             "estado e ON e.id = c.estado WHERE p.status = 2 AND p.ativo = 1 AND p.usuario_cadastro = :id")
-    LiveData<List<ParadaSugestaoBairro>> listarTodosRejeitadosComBairroPorUsuario(String id);
+    LiveData<List<PontoInteresseSugestaoBairro>> listarTodosRejeitadosComBairroPorUsuario(String id);
 
     @Query("SELECT * FROM ponto_interesse_sugestao WHERE enviado = 0")
     List<PontoInteresseSugestao> listarTodosAEnviar();

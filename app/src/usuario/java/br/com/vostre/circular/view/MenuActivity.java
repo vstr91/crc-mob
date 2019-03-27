@@ -105,6 +105,7 @@ import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.ToolbarUtils;
 import br.com.vostre.circular.utils.Unique;
 import br.com.vostre.circular.utils.tasks.PreferenceDownloadAsyncTask;
+import br.com.vostre.circular.view.form.FormNovidades;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 import es.usc.citius.hipster.algorithm.Hipster;
 import es.usc.citius.hipster.graph.GraphBuilder;

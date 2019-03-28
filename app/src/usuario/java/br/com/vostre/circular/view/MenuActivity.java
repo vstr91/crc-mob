@@ -205,7 +205,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Permissão de GPS")
-                .setMessage("Para aproveitar todas as funções do Circular, por favor permita o uso do GPS no diálogo a seguir.")
+                .setMessage("Para aproveitar todas as funções do Circular, por favor permita o uso do GPS no diálogo a seguir. " +
+                        "O GPS é necessário para mostrar paradas próximas a você e fazer com que os mapas no aplicativo funcionem corretamente.")
                 .setNeutralButton("Entendi", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -220,9 +221,14 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                             public void onPermissionsChecked(MultiplePermissionsReport report) {
 
                                 if(report.areAllPermissionsGranted()){
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("permissoes", "1");
                                     configuraActivity();
                                 } else{
-                                    Toast.makeText(getApplicationContext(), "Acesso ao GPS é necessário para aproveitar ao máximo as funções do Circular!", Toast.LENGTH_LONG).show();
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("permissoes", "0");
+
+                                    Toast.makeText(getApplicationContext(), "Acesso ao GPS e Armazenamento são necessários para aproveitar ao máximo as funções do Circular!", Toast.LENGTH_LONG).show();
                                 }
 
                             }

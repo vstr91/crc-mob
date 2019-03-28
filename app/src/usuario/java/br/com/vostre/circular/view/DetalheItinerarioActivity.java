@@ -31,6 +31,7 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -430,6 +431,16 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 binding.listLegenda.setVisibility(View.GONE);
                 binding.textView51.setVisibility(View.GONE);
             }
+
+            HorarioItinerarioNome horarioItinerarioNome = horarios.get(0);
+
+            if(horarioItinerarioNome != null && horarioItinerarioNome.getUltimaAtualizacao() != null){
+                DateTime ultimaAtualizacao = new DateTime(horarioItinerarioNome.getUltimaAtualizacao());
+
+                binding.textViewUltimaAtualizacao.setText("Última atualização em "+ DateTimeFormat.forPattern("dd/MM/YYYY").print(ultimaAtualizacao));
+            }
+
+
 
             //log
             bundle = new Bundle();

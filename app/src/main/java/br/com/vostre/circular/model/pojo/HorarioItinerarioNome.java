@@ -18,6 +18,9 @@ public class HorarioItinerarioNome {
     @ColumnInfo(name = "nomeHorario")
     Long nomeHorario;
 
+    @ColumnInfo(name = "ultimaAtualizacao")
+    Long ultimaAtualizacao;
+
     public HorarioItinerarioNome(){
         this.setHorarioItinerario(new HorarioItinerario());
     }
@@ -44,6 +47,14 @@ public class HorarioItinerarioNome {
 
     public void setNomeHorario(Long nomeHorario) {
         this.nomeHorario = nomeHorario;
+    }
+
+    public Long getUltimaAtualizacao() {
+        return ultimaAtualizacao;
+    }
+
+    public void setUltimaAtualizacao(Long ultimaAtualizacao) {
+        this.ultimaAtualizacao = ultimaAtualizacao;
     }
 
     public boolean isAtivo(){

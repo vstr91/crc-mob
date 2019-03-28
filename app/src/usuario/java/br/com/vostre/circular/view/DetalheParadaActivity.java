@@ -160,6 +160,8 @@ public class DetalheParadaActivity extends BaseActivity {
             checaFavorito();
         }
 
+        binding.textViewLegenda.setVisibility(View.GONE);
+
     }
 
     private void checaFavorito() {
@@ -296,7 +298,7 @@ public class DetalheParadaActivity extends BaseActivity {
 
     @Override
     public void onGpsChanged(boolean ativo) {
-        Toast.makeText(getApplicationContext(), "GPS Status: "+ativo, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(), "GPS Status: "+ativo, Toast.LENGTH_SHORT).show();
     }
 
     Observer<List<ItinerarioPartidaDestino>> itinerariosObserver = new Observer<List<ItinerarioPartidaDestino>>() {

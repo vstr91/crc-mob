@@ -19,6 +19,8 @@ android {
             }
         }
 
+        vectorDrawables.useSupportLibrary = true
+
     }
 
     //Signing configurations for build variants "release"

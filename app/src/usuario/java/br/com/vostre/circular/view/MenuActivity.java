@@ -379,87 +379,151 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
     public void onClickBtnParadas(View v){
 
-        Dexter.withActivity(this)
-                .withPermissions(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ).withListener(new MultiplePermissionsListener() {
-            @Override
-            public void onPermissionsChecked(MultiplePermissionsReport report) {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED){
+            Intent i = new Intent(getApplicationContext(), ParadasActivity.class);
+            startActivity(i);
+        } else{
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle("Permissão de GPS e Armazenamento")
+                    .setMessage("Para aproveitar todas as funções do Circular, por favor permita o uso do GPS e/ou armazenamento no diálogo a seguir. " +
+                            "O GPS é necessário para mostrar paradas próximas a você e fazer com que os mapas no aplicativo funcionem corretamente. " +
+                            "O Armazenamento é utilizado para o download dos dados dos mapas.")
+                    .setNeutralButton("Entendi", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
 
-                if(report.areAllPermissionsGranted()){
-                    Intent i = new Intent(getApplicationContext(), ParadasActivity.class);
-                    startActivity(i);
-                } else{
-                    Toast.makeText(getApplicationContext(), "Acesso ao GPS é necessário para o " +
-                            "mapa funcionar corretamente! Acesso ao armazenamento externo é utilizado para fazer " +
-                            "cache de partes do mapa e permitir o acesso offline.", Toast.LENGTH_LONG).show();
+                            Dexter.withActivity(ctx)
+                                    .withPermissions(
+                                            Manifest.permission.ACCESS_FINE_LOCATION,
+                                            Manifest.permission.WRITE_EXTERNAL_STORAGE
+                                    ).withListener(new MultiplePermissionsListener() {
+                                @Override
+                                public void onPermissionsChecked(MultiplePermissionsReport report) {
 
-                    Intent i = new Intent(getApplicationContext(), ParadasActivity.class);
-                    startActivity(i);
-                }
+                                    if(report.areAllPermissionsGranted()){
+                                        Intent i = new Intent(getApplicationContext(), ParadasActivity.class);
+                                        startActivity(i);
+                                    } else{
+                                        Toast.makeText(getApplicationContext(), "Acesso ao GPS é necessário para o " +
+                                                "mapa funcionar corretamente! Acesso ao armazenamento externo é utilizado para fazer " +
+                                                "cache de partes do mapa e permitir o acesso offline.", Toast.LENGTH_LONG).show();
 
-            }
+                                        Intent i = new Intent(getApplicationContext(), ParadasActivity.class);
+                                        startActivity(i);
+                                    }
 
-            @Override
-            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                token.continuePermissionRequest();
-            }
-        }).check();
+                                }
+
+                                @Override
+                                public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                    token.continuePermissionRequest();
+                                }
+                            }).check();
+
+                        }
+                    }).create();
+
+            dialog.show();
+        }
+
     }
 
     public void onClickBtnMapa(View v){
 
-        Dexter.withActivity(this)
-                .withPermissions(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ).withListener(new MultiplePermissionsListener() {
-            @Override
-            public void onPermissionsChecked(MultiplePermissionsReport report) {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED){
+            Intent i = new Intent(getApplicationContext(), MapaActivity.class);
+            startActivity(i);
+        } else{
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle("Permissão de GPS e Armazenamento")
+                    .setMessage("Para aproveitar todas as funções do Circular, por favor permita o uso do GPS e/ou armazenamento no diálogo a seguir. " +
+                            "O GPS é necessário para mostrar paradas próximas a você e fazer com que os mapas no aplicativo funcionem corretamente. " +
+                            "O Armazenamento é utilizado para o download dos dados dos mapas.")
+                    .setNeutralButton("Entendi", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
 
-                if(report.areAllPermissionsGranted()){
-                    Intent i = new Intent(getApplicationContext(), MapaActivity.class);
-                    startActivity(i);
-                } else{
-                    Toast.makeText(getApplicationContext(), "Acesso ao GPS é necessário para o " +
-                            "mapa funcionar corretamente! Acesso ao armazenamento externo é utilizado para fazer " +
-                            "cache de partes do mapa e permitir o acesso offline.", Toast.LENGTH_LONG).show();
-                }
+                            Dexter.withActivity(ctx)
+                                    .withPermissions(
+                                            Manifest.permission.ACCESS_FINE_LOCATION,
+                                            Manifest.permission.WRITE_EXTERNAL_STORAGE
+                                    ).withListener(new MultiplePermissionsListener() {
+                                @Override
+                                public void onPermissionsChecked(MultiplePermissionsReport report) {
 
-            }
+                                    if(report.areAllPermissionsGranted()){
+                                        Intent i = new Intent(getApplicationContext(), MapaActivity.class);
+                                        startActivity(i);
+                                    } else{
+                                        Toast.makeText(getApplicationContext(), "Acesso ao GPS é necessário para o " +
+                                                "mapa funcionar corretamente! Acesso ao armazenamento externo é utilizado para fazer " +
+                                                "cache de partes do mapa e permitir o acesso offline.", Toast.LENGTH_LONG).show();
+                                    }
 
-            @Override
-            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                token.continuePermissionRequest();
-            }
-        }).check();
+                                }
+
+                                @Override
+                                public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                    token.continuePermissionRequest();
+                                }
+                            }).check();
+
+                        }
+                    }).create();
+
+            dialog.show();
+        }
 
     }
 
     public void onClickBtnQRCode(View v){
 
-        Dexter.withActivity(this)
-                .withPermissions(
-                        Manifest.permission.CAMERA
-                ).withListener(new MultiplePermissionsListener() {
-            @Override
-            public void onPermissionsChecked(MultiplePermissionsReport report) {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED){
+            Intent i = new Intent(getApplicationContext(), QRCodeActivity.class);
+            startActivity(i);
+        } else{
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle("Permissão de Câmera")
+                    .setMessage("Para escanear o QR Code, por favor permita o acesso à Câmera.")
+                    .setNeutralButton("Entendi", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
 
-                if(report.areAllPermissionsGranted()){
-                    Intent i = new Intent(getApplicationContext(), QRCodeActivity.class);
-                    startActivity(i);
-                } else{
-                    Toast.makeText(getApplicationContext(), "Acesso à câmera é necessário para escanear o QR Code!", Toast.LENGTH_LONG).show();
-                }
+                            Dexter.withActivity(ctx)
+                                    .withPermissions(
+                                            Manifest.permission.CAMERA
+                                    ).withListener(new MultiplePermissionsListener() {
+                                @Override
+                                public void onPermissionsChecked(MultiplePermissionsReport report) {
 
-            }
+                                    if(report.areAllPermissionsGranted()){
+                                        Intent i = new Intent(getApplicationContext(), QRCodeActivity.class);
+                                        startActivity(i);
+                                    } else{
+                                        Toast.makeText(getApplicationContext(), "Acesso à câmera é necessário para escanear o QR Code!", Toast.LENGTH_LONG).show();
+                                    }
 
-            @Override
-            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                token.continuePermissionRequest();
-            }
-        }).check();
+                                }
+
+                                @Override
+                                public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                    token.continuePermissionRequest();
+                                }
+                            }).check();
+
+                        }
+                    }).create();
+
+            dialog.show();
+        }
 
     }
 
@@ -660,29 +724,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
     }
 
-    Observer<Boolean> loginObserver = new Observer<Boolean>() {
-        @Override
-        public void onChanged(Boolean logado) {
-
-            if(logado){
-                updateUI(account);
-                PreferenceDownloadAsyncTask preferenceDownloadAsyncTask = new PreferenceDownloadAsyncTask(getApplicationContext(), PreferenceUtils.carregarUsuarioLogado(getApplicationContext()));
-                preferenceDownloadAsyncTask.execute();
-            } else{
-                updateUI(null);
-                signOut();
-            }
-
-            if(flag){
-                btnLogin.setEnabled(true);
-                progressBar.setVisibility(View.GONE);
-            }
-
-            flag = true;
-
-        }
-    };
-
     Observer<Location> localObserver = new Observer<Location>() {
         @Override
         public void onChanged(Location local) {
@@ -709,7 +750,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             //double latitude = -22.470612;
             //double longitude = -43.8263613;
 
-            Location l0 = new Location(LocationManager.GPS_PROVIDER);
+            //Location l0 = new Location(LocationManager.GPS_PROVIDER);
             //l0.setLatitude(latitude);
             //l0.setLongitude(longitude);
 

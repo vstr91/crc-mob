@@ -222,10 +222,6 @@ public class MapaActivity extends BaseActivity {
     }
 
     public void onClickBtnLogin(View v){
-//        Intent i = new Intent(getApplicationContext(), SignInActivity.class);
-//        startActivityForResult(i, RC_SIGN_IN);
-//        binding.btnLogin.setEnabled(false);
-
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
         binding.btnLogin.setEnabled(false);
@@ -267,7 +263,22 @@ public class MapaActivity extends BaseActivity {
                     }
                 }
 
+            } else if(requestCode == FormPoi.PICK_IMAGE) {
+
+            formPoi = (FormPoi) DialogUtils.getOpenedDialog(this);
+
+            if (data != null) {
+                try {
+                    InputStream inputStream = getContentResolver().openInputStream(data.getData());
+                    viewModel.fotoPoi = BitmapFactory.decodeStream(inputStream);
+                    formPoi.exibeImagem();
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
+
+        }
 
     }
 
@@ -1190,7 +1201,8 @@ public class MapaActivity extends BaseActivity {
                                     "Login realizado com sucesso! Seja bem vindo, "+user.getDisplayName()+"!", Toast.LENGTH_SHORT).show();
                             updateUI(user);
 
-                            PreferenceDownloadAsyncTask preferenceDownloadAsyncTask = new PreferenceDownloadAsyncTask(getApplicationContext(), PreferenceUtils.carregarUsuarioLogado(getApplicationContext()));
+                            PreferenceDownloadAsyncTask preferenceDownloadAsyncTask = new PreferenceDownloadAsyncTask(getApplicationContext(),
+                                    PreferenceUtils.carregarUsuarioLogado(getApplicationContext()));
                             preferenceDownloadAsyncTask.execute();
                         } else {
                             // If sign in fails, display a message to the user.
@@ -1209,9 +1221,6 @@ public class MapaActivity extends BaseActivity {
     }
 
     private void abreSubmenu(){
-//        binding.linearLayoutParada.setVisibility(View.VISIBLE);
-//        binding.linearLayoutPoi.setVisibility(View.VISIBLE);
-
         binding.linearLayoutParada.animate().alpha(1);
         binding.linearLayoutPoi.animate().alpha(1);
 
@@ -1221,9 +1230,6 @@ public class MapaActivity extends BaseActivity {
     }
 
     private void fechaSubmenu(){
-//        binding.linearLayoutParada.setVisibility(View.GONE);
-//        binding.linearLayoutPoi.setVisibility(View.GONE);
-
         binding.linearLayoutParada.animate().translationY(0);
         binding.linearLayoutPoi.animate().translationY(0);
 
@@ -1233,9 +1239,6 @@ public class MapaActivity extends BaseActivity {
     }
 
     private void ocultaSubmenu(){
-//        binding.linearLayoutParada.setVisibility(View.GONE);
-//        binding.linearLayoutPoi.setVisibility(View.GONE);
-
         binding.linearLayoutParada.animate().alpha(0);
         binding.linearLayoutPoi.animate().alpha(0);
         submenuAberto = false;

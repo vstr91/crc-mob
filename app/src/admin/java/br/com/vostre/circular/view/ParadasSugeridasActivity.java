@@ -52,22 +52,28 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityParadasBinding;
 import br.com.vostre.circular.databinding.ActivityParadasSugeridasBinding;
 import br.com.vostre.circular.listener.ParadaSugestaoListener;
+import br.com.vostre.circular.listener.PontoInteresseSugestaoListener;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaSugestao;
+import br.com.vostre.circular.model.PontoInteresse;
+import br.com.vostre.circular.model.PontoInteresseSugestao;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaSugestaoBairro;
+import br.com.vostre.circular.model.pojo.PontoInteresseSugestaoBairro;
 import br.com.vostre.circular.utils.DialogUtils;
 import br.com.vostre.circular.utils.DrawableUtils;
 import br.com.vostre.circular.view.adapter.ParadaSugestaoAdapter;
+import br.com.vostre.circular.view.adapter.PontoInteresseSugestaoAdapter;
 import br.com.vostre.circular.view.form.FormParada;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.view.utils.InfoWindowSugestao;
+import br.com.vostre.circular.view.utils.InfoWindowSugestaoPoi;
 import br.com.vostre.circular.viewModel.ParadasSugeridasViewModel;
 import br.com.vostre.circular.viewModel.ParadasViewModel;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
-public class ParadasSugeridasActivity extends BaseActivity implements ParadaSugestaoListener {
+public class ParadasSugeridasActivity extends BaseActivity implements ParadaSugestaoListener, PontoInteresseSugestaoListener {
 
     ActivityParadasSugeridasBinding binding;
     MapView map;
@@ -86,6 +92,10 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
     ParadaSugestaoAdapter adapterSugestao;
     ParadaSugestaoAdapter adapterAceitas;
     ParadaSugestaoAdapter adapterRejeitadas;
+
+    PontoInteresseSugestaoAdapter adapterSugestaoPois;
+    PontoInteresseSugestaoAdapter adapterAceitasPois;
+    PontoInteresseSugestaoAdapter adapterRejeitadasPois;
 
     boolean mapaOculto = false;
     int tamanhoOriginalMapa = 0;
@@ -139,6 +149,10 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
             viewModel.aceitas.observe(this, paradasAceitasObserver);
             viewModel.rejeitadas.observe(this, paradasRejeitadasObserver);
 
+            viewModel.sugeridasPoi.observe(this, poisSugeridosObserver);
+            viewModel.aceitasPoi.observe(this, poisAceitosObserver);
+            viewModel.rejeitadasPoi.observe(this, poisRejeitadosObserver);
+
             viewModel.localAtual.observe(this, centroObserver);
 
             adapterSugestao = new ParadaSugestaoAdapter(viewModel.sugeridas.getValue(), this);
@@ -155,6 +169,23 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
             adapterRejeitadas.setListener(this);
 
             binding.listRejeitadas.setAdapter(adapterRejeitadas);
+
+            // POIS
+
+            adapterSugestaoPois = new PontoInteresseSugestaoAdapter(viewModel.sugeridasPoi.getValue(), this);
+            adapterSugestaoPois.setListener(this);
+
+            binding.listSugestoesPois.setAdapter(adapterSugestaoPois);
+
+            adapterAceitasPois = new PontoInteresseSugestaoAdapter(viewModel.aceitasPoi.getValue(), this);
+            adapterAceitasPois.setListener(this);
+
+            binding.listAceitasPois.setAdapter(adapterAceitasPois);
+
+            adapterRejeitadasPois = new PontoInteresseSugestaoAdapter(viewModel.rejeitadasPoi.getValue(), this);
+            adapterRejeitadasPois.setListener(this);
+
+            binding.listRejeitadasPois.setAdapter(adapterRejeitadasPois);
 
             configuraMapa();
 
@@ -345,6 +376,47 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
         }
     };
 
+    //pois
+
+    Observer<List<PontoInteresseSugestaoBairro>> poisSugeridosObserver = new Observer<List<PontoInteresseSugestaoBairro>>() {
+        @Override
+        public void onChanged(List<PontoInteresseSugestaoBairro> paradas) {
+            adapterSugestaoPois.paradas = paradas;
+            adapterSugestao.notifyDataSetChanged();
+
+            map.getOverlays().clear();
+            map.getOverlays().add(mLocationOverlay);
+            map.getOverlays().add(overlayEvents);
+            atualizarSugestoesPoiMapa(paradas);
+        }
+    };
+
+    Observer<List<PontoInteresseSugestaoBairro>> poisAceitosObserver = new Observer<List<PontoInteresseSugestaoBairro>>() {
+        @Override
+        public void onChanged(List<PontoInteresseSugestaoBairro> paradas) {
+            adapterAceitasPois.paradas = paradas;
+            adapterAceitas.notifyDataSetChanged();
+
+            map.getOverlays().clear();
+            map.getOverlays().add(mLocationOverlay);
+            map.getOverlays().add(overlayEvents);
+            atualizarSugestoesPoiMapa(paradas);
+        }
+    };
+
+    Observer<List<PontoInteresseSugestaoBairro>> poisRejeitadosObserver = new Observer<List<PontoInteresseSugestaoBairro>>() {
+        @Override
+        public void onChanged(List<PontoInteresseSugestaoBairro> paradas) {
+            adapterRejeitadasPois.paradas = paradas;
+            adapterRejeitadas.notifyDataSetChanged();
+
+            map.getOverlays().clear();
+            map.getOverlays().add(mLocationOverlay);
+            map.getOverlays().add(overlayEvents);
+            atualizarSugestoesPoiMapa(paradas);
+        }
+    };
+
     Observer<Location> centroObserver = new Observer<Location>() {
         @Override
         public void onChanged(Location centro) {
@@ -489,6 +561,50 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
 
     }
 
+    private void atualizarSugestoesPoiMapa(final List<PontoInteresseSugestaoBairro> paradas){
+
+        if(paradas != null){
+
+            RadiusMarkerClusterer poiMarkers = new RadiusMarkerClusterer(this);
+            poiMarkers.setRadius(200);
+
+            Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_cluster);
+            Bitmap clusterIcon = ((BitmapDrawable)clusterIconD).getBitmap();
+
+            map.getOverlays().add(poiMarkers);
+            poiMarkers.setIcon(clusterIcon);
+
+            for(PontoInteresseSugestaoBairro p : paradas){
+
+                Marker m = new Marker(map);
+                m.setPosition(new GeoPoint(p.getPontoInteresse().getLatitude(), p.getPontoInteresse().getLongitude()));
+                m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                m.setTitle(p.getPontoInteresse().getNome());
+
+                m.setDraggable(false);
+                m.setId(p.getPontoInteresse().getId());
+                m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker, MapView mapView) {
+
+                        PontoInteresseSugestaoBairro pb = getSugestaoPoiFromMarker(marker, paradas);
+
+                        InfoWindowSugestaoPoi infoWindow = new InfoWindowSugestaoPoi();
+                        infoWindow.setParada(pb);
+                        infoWindow.setCtx(ctx);
+                        infoWindow.show(getSupportFragmentManager(), "infoWindowPoi");
+                        mapController.animateTo(marker.getPosition());
+                        return true;
+                    }
+                });
+                poiMarkers.add(m);
+                //map.getOverlays().add(m);
+            }
+
+        }
+
+    }
+
     @NonNull
     private ParadaBairro getParadaFromMarker(Marker marker, List<ParadaBairro> paradas) {
         Parada p = new Parada();
@@ -514,6 +630,20 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
         ParadaSugestaoBairro pb = paradas.get(paradas.indexOf(parada));
         pb.getParada().setLatitude(marker.getPosition().getLatitude());
         pb.getParada().setLongitude(marker.getPosition().getLongitude());
+        return pb;
+    }
+
+    @NonNull
+    private PontoInteresseSugestaoBairro getSugestaoPoiFromMarker(Marker marker, List<PontoInteresseSugestaoBairro> paradas) {
+        PontoInteresseSugestao p = new PontoInteresseSugestao();
+        p.setId(marker.getId());
+
+        PontoInteresseSugestaoBairro parada = new PontoInteresseSugestaoBairro();
+        parada.setPontoInteresse(p);
+
+        PontoInteresseSugestaoBairro pb = paradas.get(paradas.indexOf(parada));
+        pb.getPontoInteresse().setLatitude(marker.getPosition().getLatitude());
+        pb.getPontoInteresse().setLongitude(marker.getPosition().getLongitude());
         return pb;
     }
 
@@ -617,4 +747,95 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
         }
 
     }
+
+    @Override
+    public void onSelectedPoi(String id, int acao) {
+
+        PontoInteresseSugestaoBairro pa = new PontoInteresseSugestaoBairro();
+        pa.getPontoInteresse().setId(id);
+
+        final PontoInteresseSugestaoBairro p = viewModel.sugeridasPoi.getValue().get(viewModel.sugeridasPoi.getValue().indexOf(pa));
+
+        switch(acao){
+            case 0:
+                // rejeitou
+                new AlertDialog.Builder(this)
+                        .setTitle("Confirma a rejeição?")
+                        .setMessage("Deseja realmente rejeitar a sugestão para o Ponto de Interesse "+p.getPontoInteresse().getNome()+"?")
+                        .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                                final View v = ctx.getLayoutInflater().inflate(R.layout.form_obs_sugestao, null);
+
+                                new AlertDialog.Builder(ctx)
+                                        .setTitle("Adicionar observação?")
+                                        .setMessage("Digite-a no campo abaixo")
+                                        .setView(v)
+                                        .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                EditText editTextObservacao = v.findViewById(R.id.editTextObservacao);
+                                                String text = editTextObservacao.getText().toString();
+
+                                                if(!text.isEmpty()){
+
+                                                    if(p.getPontoInteresse().getObservacao() != null){
+                                                        p.getPontoInteresse().setObservacao(p.getPontoInteresse().getObservacao().concat(System.getProperty("line.separator")).concat(text));
+                                                    } else{
+                                                        p.getPontoInteresse().setObservacao(text);
+                                                    }
+
+
+                                                }
+
+                                                viewModel.rejeitaSugestaoPoi(p);
+
+                                            }
+                                        })
+                                        .setNegativeButton("Não, apenas rejeitar", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                viewModel.rejeitaSugestaoPoi(p);
+                                            }
+                                        })
+                                        .show();
+
+                            }
+                        })
+                        .setNegativeButton("Não", null)
+                        .show();
+                break;
+            case 1:
+                //aceitou
+                new AlertDialog.Builder(this)
+                        .setTitle("Confirma o aceite?")
+                        .setMessage("Deseja realmente aceitar a sugestão para o Ponto de Interesse "+p.getPontoInteresse().getNome()+"?")
+                        .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                viewModel.aceitaSugestaoPoi(p);
+                            }
+                        })
+                        .setNegativeButton("Não", null)
+                        .show();
+                break;
+            case 2:
+                // ver no mapa
+
+                List<Overlay> overlays = map.getOverlays();
+
+                for(Overlay o : overlays){
+
+                    if(o instanceof Marker && ((Marker) o).getId().equals(id)){
+                        map.getController().animateTo(((Marker) o).getPosition());
+                    }
+
+                }
+
+                break;
+        }
+
+    }
+
 }

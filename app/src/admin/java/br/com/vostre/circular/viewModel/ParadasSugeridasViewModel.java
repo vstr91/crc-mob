@@ -33,10 +33,13 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.HistoricoParada;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaSugestao;
+import br.com.vostre.circular.model.PontoInteresse;
+import br.com.vostre.circular.model.PontoInteresseSugestao;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaSugestaoBairro;
+import br.com.vostre.circular.model.pojo.PontoInteresseSugestaoBairro;
 import br.com.vostre.circular.utils.StringUtils;
 
 public class ParadasSugeridasViewModel extends AndroidViewModel {
@@ -51,6 +54,10 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
 
     public LiveData<List<ParadaSugestaoBairro>> aceitas;
     public LiveData<List<ParadaSugestaoBairro>> rejeitadas;
+
+    public LiveData<List<PontoInteresseSugestaoBairro>> sugeridasPoi;
+    public LiveData<List<PontoInteresseSugestaoBairro>> aceitasPoi;
+    public LiveData<List<PontoInteresseSugestaoBairro>> rejeitadasPoi;
 
     public boolean centralizaMapa = true;
 
@@ -111,6 +118,11 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
 
         aceitas = appDatabase.paradaSugestaoDAO().listarTodosAceitosComBairro();
         rejeitadas = appDatabase.paradaSugestaoDAO().listarTodosRejeitadosComBairro();
+
+        // pois
+        sugeridasPoi = appDatabase.pontoInteresseSugestaoDAO().listarTodosPendentesComBairro();
+        aceitasPoi = appDatabase.pontoInteresseSugestaoDAO().listarTodosAceitosComBairro();
+        rejeitadasPoi = appDatabase.pontoInteresseSugestaoDAO().listarTodosRejeitadosComBairro();
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplication());
         localAtual = new MutableLiveData<>();
@@ -212,6 +224,87 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
                 p.getParada().setUltimaAlteracao(DateTime.now());
                 appDatabase.paradaSugestaoDAO().editar(p.getParada());
                 retorno.postValue(1);
+            }
+        });
+
+
+    }
+
+    public void aceitaSugestaoPoi(final PontoInteresseSugestaoBairro p){
+
+        if(p.getPontoInteresse().getImagem() != null && !p.getPontoInteresse().getImagem().isEmpty()){
+            foto = BitmapFactory.decodeFile(p.getPontoInteresse().getImagem());
+        }
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                PontoInteresse parada;
+
+                // checa se existe parada vinculada
+                if(p.getPontoInteresse().getPontoInteresse() != null && !p.getPontoInteresse().getPontoInteresse().isEmpty()){
+                    parada = new PontoInteresse();
+                    parada.setId(p.getPontoInteresse().getPontoInteresse());
+                    parada = appDatabase.pontoInteresseDAO().carregarSync(parada.getId());
+                } else{
+                    parada = new PontoInteresse();
+                }
+                // fim da checagem
+
+
+                // altera apenas os dados informados para evitar nulos e inconsistencias
+                if(p.getParada().getNome() != null && !p.getParada().getNome().isEmpty()){
+                    parada.setNome(p.getParada().getNome());
+                }
+
+                if(p.getParada().getBairro() != null && !p.getParada().getBairro().isEmpty()){
+                    parada.setBairro(p.getParada().getBairro());
+                }
+
+                if(p.getParada().getLatitude() != null){
+                    parada.setLatitude(p.getParada().getLatitude());
+                }
+
+                if(p.getParada().getLongitude() != null){
+                    parada.setLongitude(p.getParada().getLongitude());
+                }
+
+                if(p.getParada().getSentido() != -1){
+                    parada.setSentido(p.getParada().getSentido());
+                }
+
+                if(p.getParada().getTaxaDeEmbarque() != null){
+                    parada.setTaxaDeEmbarque(p.getParada().getTaxaDeEmbarque());
+                }
+
+                if(p.getParada().getImagem() != null){
+                    parada.setImagem(p.getParada().getImagem());
+                }
+
+                if(parada.valida(parada)){
+
+                    p.getParada().setStatus(1);
+                    p.getParada().setEnviado(false);
+                    p.getParada().setUltimaAlteracao(DateTime.now());
+                    appDatabase.paradaSugestaoDAO().editar(p.getParada());
+
+                    if(parada.getDataCadastro() != null){
+                        parada.setUsuarioUltimaAlteracao(p.getParada().getUsuarioUltimaAlteracao());
+                        edit(parada);
+                    } else{
+                        parada.setUsuarioCadastro(p.getParada().getUsuarioCadastro());
+                        add(parada);
+                    }
+
+                    gravarHistorico(p, parada);
+
+                    retorno.postValue(1);
+
+                } else{
+                    retorno.postValue(0);
+                }
+
             }
         });
 

@@ -28,7 +28,7 @@ public class PontoInteresseSugestaoViewHolder extends RecyclerView.ViewHolder {
         if(poi.getPontoInteresse().getStatus() != 0){
             binding.textViewStatus.setVisibility(View.VISIBLE);
 
-            binding.textViewStatus.setText(DateTimeFormat.forPattern("dd/MM/YYYY HH:mm:ss").print(poi.getPontoInteresse().getUltimaAlteracao()));
+            binding.textViewStatus.setText(DateTimeFormat.forPattern("dd/MM/YYYY").print(poi.getPontoInteresse().getUltimaAlteracao()));
         } else{
             binding.textViewStatus.setVisibility(View.GONE);
             binding.textViewStatus.setText("");

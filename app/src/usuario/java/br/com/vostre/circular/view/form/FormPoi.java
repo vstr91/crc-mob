@@ -56,7 +56,7 @@ public class FormPoi extends FormBase {
 
     BairroAdapterSpinner adapter;
 
-    public static final int PICK_IMAGE = 400;
+    public static final int PICK_IMAGE = 407;
 
     public PontoInteresseSugestao getPoi() {
         return poi;

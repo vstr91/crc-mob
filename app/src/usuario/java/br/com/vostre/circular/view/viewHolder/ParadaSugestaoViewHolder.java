@@ -32,7 +32,7 @@ public class ParadaSugestaoViewHolder extends RecyclerView.ViewHolder {
         if(parada.getParada().getStatus() != 0){
             binding.textViewStatus.setVisibility(View.VISIBLE);
 
-            binding.textViewStatus.setText(DateTimeFormat.forPattern("dd/MM/YYYY HH:mm:ss").print(parada.getParada().getUltimaAlteracao()));
+            binding.textViewStatus.setText(DateTimeFormat.forPattern("dd/MM/YYYY").print(parada.getParada().getUltimaAlteracao()));
         } else{
             binding.textViewStatus.setVisibility(View.GONE);
             binding.textViewStatus.setText("");

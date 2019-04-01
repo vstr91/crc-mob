@@ -94,7 +94,7 @@ public class ParadasSugeridasActivity extends BaseActivity {
         ctx = this;
 
         binding.setView(this);
-        setTitle("Paradas Sugeridas");
+        setTitle("Sugestões");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
         viewModel = ViewModelProviders.of(this).get(ParadasSugeridasViewModel.class);

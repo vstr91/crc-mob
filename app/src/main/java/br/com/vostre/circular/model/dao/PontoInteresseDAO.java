@@ -37,6 +37,9 @@ public interface PontoInteresseDAO {
     @Query("SELECT * FROM ponto_interesse WHERE id IN (:ids)")
     List<PontoInteresse> carregarTodosPorIds(int[] ids);
 
+    @Query("SELECT * FROM ponto_interesse WHERE id = :id")
+    PontoInteresse carregarSync(String id);
+
     @Query("SELECT * FROM ponto_interesse WHERE nome LIKE :nome LIMIT 1")
     PontoInteresse encontrarPorNome(String nome);
 

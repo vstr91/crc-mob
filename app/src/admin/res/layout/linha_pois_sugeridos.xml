@@ -43,7 +43,7 @@
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:paddingTop="10dp"
-                    android:text="@{parada.parada.nome}"
+                    android:text="@{parada.pontoInteresse.nome}"
                     app:layout_constraintEnd_toStartOf="@+id/textViewStatus"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

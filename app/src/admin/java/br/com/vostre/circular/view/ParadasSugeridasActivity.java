@@ -256,6 +256,8 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
 
         map.setMaxZoomLevel(19d);
         map.setMinZoomLevel(5d);
+
+        ocultarMapa(map);
     }
 
     public void ocultarMapa(View v){
@@ -382,7 +384,7 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
         @Override
         public void onChanged(List<PontoInteresseSugestaoBairro> paradas) {
             adapterSugestaoPois.paradas = paradas;
-            adapterSugestao.notifyDataSetChanged();
+            adapterSugestaoPois.notifyDataSetChanged();
 
             map.getOverlays().clear();
             map.getOverlays().add(mLocationOverlay);
@@ -395,7 +397,7 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
         @Override
         public void onChanged(List<PontoInteresseSugestaoBairro> paradas) {
             adapterAceitasPois.paradas = paradas;
-            adapterAceitas.notifyDataSetChanged();
+            adapterAceitasPois.notifyDataSetChanged();
 
             map.getOverlays().clear();
             map.getOverlays().add(mLocationOverlay);
@@ -408,7 +410,9 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
         @Override
         public void onChanged(List<PontoInteresseSugestaoBairro> paradas) {
             adapterRejeitadasPois.paradas = paradas;
-            adapterRejeitadas.notifyDataSetChanged();
+            adapterRejeitadasPois.notifyDataSetChanged();
+
+            Toast.makeText(getApplicationContext(), "POIS: "+binding.listRejeitadasPois.getAdapter().getItemCount()+" | "+binding.listRejeitadasPois.getMeasuredHeight(), Toast.LENGTH_SHORT).show();
 
             map.getOverlays().clear();
             map.getOverlays().add(mLocationOverlay);

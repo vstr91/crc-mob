@@ -39,14 +39,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <androidx.constraintlayout.widget.Guideline
+                <android.support.constraint.Guideline
                     android:id="@+id/guideline8"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     app:layout_constraintGuide_begin="736dp" />
 
-                <androidx.cardview.widget.CardView
+                <android.support.v7.widget.CardView
                     android:id="@+id/cardView3"
                     android:layout_width="0dp"
                     android:layout_height="200dp"
@@ -97,23 +97,23 @@
                             app:layout_constraintTop_toBottomOf="@+id/textView32" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.cardview.widget.CardView>
+                </android.support.v7.widget.CardView>
 
-                <androidx.constraintlayout.widget.Guideline
+                <android.support.constraint.Guideline
                     android:id="@+id/guideline4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     app:layout_constraintGuide_begin="307dp" />
 
-                <androidx.constraintlayout.widget.Guideline
+                <android.support.constraint.Guideline
                     android:id="@+id/guideline6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     app:layout_constraintGuide_begin="560dp" />
 
-                <androidx.cardview.widget.CardView
+                <android.support.v7.widget.CardView
                     android:id="@+id/cardViewItinerario"
                     android:layout_width="0dp"
                     android:layout_height="200dp"
@@ -164,9 +164,9 @@
                             app:layout_constraintTop_toBottomOf="@+id/textView34" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.cardview.widget.CardView>
+                </android.support.v7.widget.CardView>
 
-                <androidx.cardview.widget.CardView
+                <android.support.v7.widget.CardView
                     android:id="@+id/cardViewParada"
                     android:layout_width="0dp"
                     android:layout_height="200dp"
@@ -222,9 +222,9 @@
                             app:layout_constraintTop_toBottomOf="@+id/textView36"
                             tools:text="100" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.cardview.widget.CardView>
+                </android.support.v7.widget.CardView>
 
-                <androidx.cardview.widget.CardView
+                <android.support.v7.widget.CardView
                     android:id="@+id/cardViewCidade"
                     android:layout_width="0dp"
                     android:layout_height="200dp"
@@ -279,9 +279,9 @@
                             app:layout_constraintTop_toBottomOf="@+id/textView38"
                             tools:text="100" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.cardview.widget.CardView>
+                </android.support.v7.widget.CardView>
 
-                <androidx.cardview.widget.CardView
+                <android.support.v7.widget.CardView
                     android:id="@+id/cardViewHorario"
                     android:layout_width="0dp"
                     android:layout_height="200dp"
@@ -336,7 +336,7 @@
                             app:layout_constraintTop_toBottomOf="@+id/textView40"
                             tools:text="100" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.cardview.widget.CardView>
+                </android.support.v7.widget.CardView>
 
 
             </android.support.constraint.ConstraintLayout>

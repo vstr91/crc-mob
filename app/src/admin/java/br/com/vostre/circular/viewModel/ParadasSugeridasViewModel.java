@@ -49,6 +49,8 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
     public LiveData<List<ParadaBairro>> paradas;
     public ParadaBairro parada;
 
+    public PontoInteresseSugestaoBairro poi;
+
     public LiveData<List<ParadaSugestaoBairro>> sugeridas;
     public ParadaSugestaoBairro sugestao;
 
@@ -66,6 +68,7 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
     public MutableLiveData<Location> localAtual;
 
     public Bitmap foto;
+    public Bitmap fotoPoi;
 
     public static MutableLiveData<Integer> retorno;
 
@@ -107,6 +110,16 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
         foto = BitmapFactory.decodeFile(parada.getParada().getImagem());
     }
 
+    public PontoInteresseSugestaoBairro getPoi() {
+        return poi;
+    }
+
+    public void setPoi(PontoInteresseSugestaoBairro poi) {
+        this.poi = poi;
+
+        fotoPoi = BitmapFactory.decodeFile(poi.getPontoInteresse().getImagem());
+    }
+
     public ParadasSugeridasViewModel(Application app){
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
@@ -120,6 +133,7 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
         rejeitadas = appDatabase.paradaSugestaoDAO().listarTodosRejeitadosComBairro();
 
         // pois
+        poi = new PontoInteresseSugestaoBairro();
         sugeridasPoi = appDatabase.pontoInteresseSugestaoDAO().listarTodosPendentesComBairro();
         aceitasPoi = appDatabase.pontoInteresseSugestaoDAO().listarTodosAceitosComBairro();
         rejeitadasPoi = appDatabase.pontoInteresseSugestaoDAO().listarTodosRejeitadosComBairro();
@@ -233,7 +247,7 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
     public void aceitaSugestaoPoi(final PontoInteresseSugestaoBairro p){
 
         if(p.getPontoInteresse().getImagem() != null && !p.getPontoInteresse().getImagem().isEmpty()){
-            foto = BitmapFactory.decodeFile(p.getPontoInteresse().getImagem());
+            fotoPoi = BitmapFactory.decodeFile(p.getPontoInteresse().getImagem());
         }
 
         AsyncTask.execute(new Runnable() {
@@ -242,7 +256,7 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
 
                 PontoInteresse parada;
 
-                // checa se existe parada vinculada
+                // checa se existe poi vinculado
                 if(p.getPontoInteresse().getPontoInteresse() != null && !p.getPontoInteresse().getPontoInteresse().isEmpty()){
                     parada = new PontoInteresse();
                     parada.setId(p.getPontoInteresse().getPontoInteresse());
@@ -254,50 +268,54 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
 
 
                 // altera apenas os dados informados para evitar nulos e inconsistencias
-                if(p.getParada().getNome() != null && !p.getParada().getNome().isEmpty()){
-                    parada.setNome(p.getParada().getNome());
+                if(p.getPontoInteresse().getNome() != null && !p.getPontoInteresse().getNome().isEmpty()){
+                    parada.setNome(p.getPontoInteresse().getNome());
                 }
 
-                if(p.getParada().getBairro() != null && !p.getParada().getBairro().isEmpty()){
-                    parada.setBairro(p.getParada().getBairro());
+                if(p.getPontoInteresse().getBairro() != null && !p.getPontoInteresse().getBairro().isEmpty()){
+                    parada.setBairro(p.getPontoInteresse().getBairro());
                 }
 
-                if(p.getParada().getLatitude() != null){
-                    parada.setLatitude(p.getParada().getLatitude());
+                if(p.getPontoInteresse().getLatitude() != null){
+                    parada.setLatitude(p.getPontoInteresse().getLatitude());
                 }
 
-                if(p.getParada().getLongitude() != null){
-                    parada.setLongitude(p.getParada().getLongitude());
+                if(p.getPontoInteresse().getLongitude() != null){
+                    parada.setLongitude(p.getPontoInteresse().getLongitude());
                 }
 
-                if(p.getParada().getSentido() != -1){
-                    parada.setSentido(p.getParada().getSentido());
+                if(p.getPontoInteresse().getDescricao() != null){
+                    parada.setDescricao(p.getPontoInteresse().getDescricao());
                 }
 
-                if(p.getParada().getTaxaDeEmbarque() != null){
-                    parada.setTaxaDeEmbarque(p.getParada().getTaxaDeEmbarque());
+                if(p.getPontoInteresse().getImagem() != null){
+                    parada.setImagem(p.getPontoInteresse().getImagem());
                 }
 
-                if(p.getParada().getImagem() != null){
-                    parada.setImagem(p.getParada().getImagem());
+                if(p.getPontoInteresse().getDataInicial() != null){
+                    parada.setDataInicial(p.getPontoInteresse().getDataInicial());
                 }
+
+                if(p.getPontoInteresse().getDataFinal() != null){
+                    parada.setDataFinal(p.getPontoInteresse().getDataFinal());
+                }
+
+                parada.setPermanente(p.getPontoInteresse().isPermanente());
 
                 if(parada.valida(parada)){
 
-                    p.getParada().setStatus(1);
-                    p.getParada().setEnviado(false);
-                    p.getParada().setUltimaAlteracao(DateTime.now());
-                    appDatabase.paradaSugestaoDAO().editar(p.getParada());
+                    p.getPontoInteresse().setStatus(1);
+                    p.getPontoInteresse().setEnviado(false);
+                    p.getPontoInteresse().setUltimaAlteracao(DateTime.now());
+                    appDatabase.pontoInteresseSugestaoDAO().editar(p.getPontoInteresse());
 
                     if(parada.getDataCadastro() != null){
-                        parada.setUsuarioUltimaAlteracao(p.getParada().getUsuarioUltimaAlteracao());
-                        edit(parada);
+                        parada.setUsuarioUltimaAlteracao(p.getPontoInteresse().getUsuarioUltimaAlteracao());
+                        editPoi(parada);
                     } else{
-                        parada.setUsuarioCadastro(p.getParada().getUsuarioCadastro());
-                        add(parada);
+                        parada.setUsuarioCadastro(p.getPontoInteresse().getUsuarioCadastro());
+                        addPoi(parada);
                     }
-
-                    gravarHistorico(p, parada);
 
                     retorno.postValue(1);
 
@@ -305,6 +323,23 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
                     retorno.postValue(0);
                 }
 
+            }
+        });
+
+
+    }
+
+    public void rejeitaSugestaoPoi(final PontoInteresseSugestaoBairro p){
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                p.getPontoInteresse().setStatus(2);
+                p.getPontoInteresse().setEnviado(false);
+                p.getPontoInteresse().setUltimaAlteracao(DateTime.now());
+                appDatabase.pontoInteresseSugestaoDAO().editar(p.getPontoInteresse());
+                retorno.postValue(1);
             }
         });
 
@@ -354,6 +389,37 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
         }
     }
 
+    private void salvarFotoPoi() {
+        FileOutputStream fos = null;
+        File file = new File(getApplication().getFilesDir(),  UUID.randomUUID().toString()+".png");
+
+        try {
+            fos = new FileOutputStream(file);
+            fotoPoi.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+
+                    if(poi.getPontoInteresse().getImagem() != null && !poi.getPontoInteresse().getImagem().isEmpty()){
+                        File fotoAntiga = new File(getApplication().getFilesDir(), poi.getPontoInteresse().getImagem());
+
+                        if(fotoAntiga.exists() && fotoAntiga.canWrite() && fotoAntiga.getName() != file.getName()){
+                            fotoAntiga.delete();
+                        }
+                    }
+
+                    poi.getPontoInteresse().setImagem(file.getName());
+                    poi.getPontoInteresse().setImagemEnviada(false);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @BindingAdapter("srcCompat")
     public static void setImagemFoto(ImageView imageView, Bitmap bitmap){
 
@@ -373,6 +439,10 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
         parada.setUltimaAlteracao(new DateTime());
         parada.setEnviado(false);
         parada.setSlug(StringUtils.toSlug(parada.getNome()));
+
+        if(foto != null){
+            salvarFoto();
+        }
 
         new addAsyncTask(appDatabase).execute(parada);
     }
@@ -417,6 +487,10 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
         parada.setEnviado(false);
         parada.setSlug(StringUtils.toSlug(parada.getNome()));
 
+        if(foto != null){
+            salvarFoto();
+        }
+
         new editAsyncTask(appDatabase).execute(parada);
     }
 
@@ -431,6 +505,92 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
         @Override
         protected Void doInBackground(final Parada... params) {
             db.paradaDAO().editar((params[0]));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
+        }
+
+    }
+
+    // fim editar
+
+    // adicionar poi
+
+    public void addPoi(final PontoInteresse parada) {
+
+        parada.setDataCadastro(new DateTime());
+        parada.setUltimaAlteracao(new DateTime());
+        parada.setEnviado(false);
+        parada.setSlug(StringUtils.toSlug(parada.getNome()));
+
+        if(fotoPoi != null){
+            salvarFotoPoi();
+        }
+
+        new addPoiAsyncTask(appDatabase).execute(parada);
+    }
+
+    private static class addPoiAsyncTask extends AsyncTask<PontoInteresse, Void, Void> {
+
+        private AppDatabase db;
+
+        addPoiAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final PontoInteresse... params) {
+            db.pontoInteresseDAO().inserir((params[0]));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
+        }
+
+    }
+
+    // fim adicionar
+
+    // editar
+
+    public static void editPoi(final PontoInteresse parada, Context context) {
+
+        if(appDatabase == null){
+            appDatabase = AppDatabase.getAppDatabase(context.getApplicationContext());
+        }
+
+        new editPoiAsyncTask(appDatabase).execute(parada);
+    }
+
+    public void editPoi(final PontoInteresse parada) {
+
+        parada.setUltimaAlteracao(new DateTime());
+        parada.setEnviado(false);
+        parada.setSlug(StringUtils.toSlug(parada.getNome()));
+
+        if(fotoPoi != null){
+            salvarFotoPoi();
+        }
+
+        new editPoiAsyncTask(appDatabase).execute(parada);
+    }
+
+    private static class editPoiAsyncTask extends AsyncTask<PontoInteresse, Void, Void> {
+
+        private AppDatabase db;
+
+        editPoiAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final PontoInteresse... params) {
+            db.pontoInteresseDAO().editar((params[0]));
             return null;
         }
 

@@ -52,76 +52,115 @@
                         android:layout_height="match_parent"
                         android:orientation="vertical">
 
-                        <android.support.constraint.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <TextView
-                                android:id="@+id/textView26"
+                            <android.support.v4.widget.NestedScrollView
+                                android:overScrollMode="never"
                                 android:layout_width="match_parent"
-                                android:layout_height="0dp"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginLeft="8dp"
-                                android:layout_marginEnd="8dp"
-                                android:layout_marginRight="8dp"
-                                android:gravity="center_horizontal|center"
-                                android:paddingTop="5dp"
-                                android:text="Paradas"
-                                android:textAppearance="@style/texto_branco"
-                                android:textStyle="bold"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                android:layout_height="match_parent">
 
-                            <android.support.v7.widget.RecyclerView
-                                android:id="@+id/listSugestoes"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:maxHeight="200dp"
-                                android:paddingBottom="20dp"
-                                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/textView26"
-                                tools:listitem="@layout/linha_paradas_sugeridas">
-
-                            </android.support.v7.widget.RecyclerView>
-
-                            <TextView
-                                android:id="@+id/textView29"
+                            <android.support.constraint.ConstraintLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="0dp"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginLeft="8dp"
-                                android:layout_marginTop="8dp"
-                                android:layout_marginEnd="8dp"
-                                android:layout_marginRight="8dp"
-                                android:gravity="center_horizontal|center"
-                                android:paddingTop="5dp"
-                                android:text="Pontos de Interesse"
-                                android:textAppearance="@style/texto_branco"
-                                android:textStyle="bold"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/listSugestoes" />
+                                android:layout_height="match_parent">
 
-                            <android.support.v7.widget.RecyclerView
-                                android:id="@+id/listSugestoesPois"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:maxHeight="200dp"
-                                android:paddingBottom="20dp"
-                                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/textView29"
-                                tools:listitem="@layout/linha_pois_sugeridos">
+                                <TextView
+                                    android:id="@+id/textView26"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginLeft="8dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_marginRight="8dp"
+                                    android:gravity="center_horizontal|center"
+                                    android:paddingTop="5dp"
+                                    android:text="Paradas"
+                                    android:textAppearance="@style/texto_branco"
+                                    android:textStyle="bold"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
 
-                            </android.support.v7.widget.RecyclerView>
+                                <android.support.v7.widget.RecyclerView
+                                    android:id="@+id/listSugestoes"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:maxHeight="100dp"
+                                    android:paddingBottom="20dp"
+                                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/textView26"
+                                    tools:listitem="@layout/linha_paradas_sugeridas">
 
-                        </android.support.constraint.ConstraintLayout>
+                                </android.support.v7.widget.RecyclerView>
+
+                                <TextView
+                                    android:id="@+id/textView29"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginLeft="8dp"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_marginRight="8dp"
+                                    android:gravity="center_horizontal|center"
+                                    android:paddingTop="5dp"
+                                    android:text="Pontos de Interesse"
+                                    android:textAppearance="@style/texto_branco"
+                                    android:textStyle="bold"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/textViewSugestoesParadasVazia" />
+
+                                <android.support.v7.widget.RecyclerView
+                                    android:id="@+id/listSugestoesPois"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:maxHeight="100dp"
+                                    android:paddingBottom="100dp"
+                                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/textView29"
+                                    tools:listitem="@layout/linha_pois_sugeridos">
+
+                                </android.support.v7.widget.RecyclerView>
+
+                                <TextView
+                                    android:id="@+id/textViewSugestoesParadasVazia"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginLeft="8dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_marginRight="8dp"
+                                    android:gravity="center"
+                                    android:text="Ainda não há nada aqui... Que tal sugerir uma parada próxima a você?"
+                                    android:textAppearance="@style/texto_branco"
+                                    android:textSize="11sp"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/listSugestoes" />
+
+                                <TextView
+                                    android:id="@+id/textViewSugestoesPoisVazia"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginLeft="8dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_marginRight="8dp"
+                                    android:gravity="center"
+                                    android:text="Ainda não há nada aqui... Que tal sugerir um ponto de interesse próximo a você?"
+                                    android:textAppearance="@style/texto_branco"
+                                    android:textSize="11sp"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/listSugestoesPois" />
+
+                            </android.support.constraint.ConstraintLayout>
+
+                        </android.support.v4.widget.NestedScrollView>
 
                     </LinearLayout>
 
@@ -131,76 +170,83 @@
                         android:layout_height="match_parent"
                         android:orientation="vertical">
 
-                        <android.support.constraint.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <TextView
-                                android:id="@+id/textView27"
+                            <android.support.v4.widget.NestedScrollView
+                                android:overScrollMode="never"
                                 android:layout_width="match_parent"
-                                android:layout_height="0dp"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginLeft="8dp"
-                                android:layout_marginEnd="8dp"
-                                android:layout_marginRight="8dp"
-                                android:gravity="center_horizontal|center"
-                                android:paddingTop="5dp"
-                                android:text="Paradas"
-                                android:textAppearance="@style/texto_branco"
-                                android:textStyle="bold"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                android:layout_height="match_parent">
 
-                            <android.support.v7.widget.RecyclerView
-                                android:id="@+id/listAceitas"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:maxHeight="200dp"
-                                android:paddingBottom="20dp"
-                                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/textView27"
-                                tools:listitem="@layout/linha_paradas_sugeridas">
-
-                            </android.support.v7.widget.RecyclerView>
-
-                            <TextView
-                                android:id="@+id/textView30"
+                            <android.support.constraint.ConstraintLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="0dp"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginLeft="8dp"
-                                android:layout_marginTop="8dp"
-                                android:layout_marginEnd="8dp"
-                                android:layout_marginRight="8dp"
-                                android:gravity="center_horizontal|center"
-                                android:paddingTop="5dp"
-                                android:text="Pontos de Interesse"
-                                android:textAppearance="@style/texto_branco"
-                                android:textStyle="bold"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/listAceitas" />
+                                android:layout_height="match_parent">
 
-                            <android.support.v7.widget.RecyclerView
-                                android:id="@+id/listAceitasPois"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:maxHeight="200dp"
-                                android:paddingBottom="20dp"
-                                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/textView30"
-                                tools:listitem="@layout/linha_pois_sugeridos">
+                                <TextView
+                                    android:id="@+id/textView27"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginLeft="8dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_marginRight="8dp"
+                                    android:gravity="center_horizontal|center"
+                                    android:paddingTop="5dp"
+                                    android:text="Paradas"
+                                    android:textAppearance="@style/texto_branco"
+                                    android:textStyle="bold"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
 
-                            </android.support.v7.widget.RecyclerView>
+                                <android.support.v7.widget.RecyclerView
+                                    android:id="@+id/listAceitas"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:maxHeight="100dp"
+                                    android:paddingBottom="20dp"
+                                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/textView27"
+                                    tools:listitem="@layout/linha_paradas_sugeridas">
 
-                        </android.support.constraint.ConstraintLayout>
+                                </android.support.v7.widget.RecyclerView>
+
+                                <TextView
+                                    android:id="@+id/textView30"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginLeft="8dp"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_marginRight="8dp"
+                                    android:gravity="center_horizontal|center"
+                                    android:paddingTop="5dp"
+                                    android:text="Pontos de Interesse"
+                                    android:textAppearance="@style/texto_branco"
+                                    android:textStyle="bold"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/listAceitas" />
+
+                                <android.support.v7.widget.RecyclerView
+                                    android:id="@+id/listAceitasPois"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:maxHeight="100dp"
+                                    android:paddingBottom="100dp"
+                                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/textView30"
+                                    tools:listitem="@layout/linha_pois_sugeridos">
+
+                                </android.support.v7.widget.RecyclerView>
+
+                            </android.support.constraint.ConstraintLayout>
+
+                        </android.support.v4.widget.NestedScrollView>
 
                     </LinearLayout>
 
@@ -211,6 +257,7 @@
                         android:orientation="vertical">
 
                                 <android.support.v4.widget.NestedScrollView
+                                    android:overScrollMode="never"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent">
 
@@ -274,8 +321,8 @@
                                                             android:layout_height="wrap_content"
                                                             android:layout_marginTop="8dp"
                                                             android:maxHeight="100dp"
-                                                            android:paddingBottom="20dp"
-                                                            android:layout_marginBottom="20dp"
+                                                            android:paddingBottom="100dp"
+                                                            android:layout_marginBottom="200dp"
                                                             app:layoutManager="android.support.v7.widget.LinearLayoutManager"
                                                             app:layout_constraintEnd_toEndOf="parent"
                                                             app:layout_constraintStart_toStartOf="parent"

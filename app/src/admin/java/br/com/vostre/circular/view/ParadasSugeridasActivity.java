@@ -19,6 +19,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -160,15 +161,21 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
 
             binding.listSugestoes.setAdapter(adapterSugestao);
 
+            ViewCompat.setNestedScrollingEnabled(binding.listSugestoes, false);
+
             adapterAceitas = new ParadaSugestaoAdapter(viewModel.aceitas.getValue(), this);
             adapterAceitas.setListener(this);
 
             binding.listAceitas.setAdapter(adapterAceitas);
 
+            ViewCompat.setNestedScrollingEnabled(binding.listAceitas, false);
+
             adapterRejeitadas = new ParadaSugestaoAdapter(viewModel.rejeitadas.getValue(), this);
             adapterRejeitadas.setListener(this);
 
             binding.listRejeitadas.setAdapter(adapterRejeitadas);
+
+            ViewCompat.setNestedScrollingEnabled(binding.listRejeitadas, false);
 
             // POIS
 
@@ -177,15 +184,21 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
 
             binding.listSugestoesPois.setAdapter(adapterSugestaoPois);
 
+            ViewCompat.setNestedScrollingEnabled(binding.listSugestoesPois, false);
+
             adapterAceitasPois = new PontoInteresseSugestaoAdapter(viewModel.aceitasPoi.getValue(), this);
             adapterAceitasPois.setListener(this);
 
             binding.listAceitasPois.setAdapter(adapterAceitasPois);
 
+            ViewCompat.setNestedScrollingEnabled(binding.listAceitasPois, false);
+
             adapterRejeitadasPois = new PontoInteresseSugestaoAdapter(viewModel.rejeitadasPoi.getValue(), this);
             adapterRejeitadasPois.setListener(this);
 
             binding.listRejeitadasPois.setAdapter(adapterRejeitadasPois);
+
+            ViewCompat.setNestedScrollingEnabled(binding.listRejeitadasPois, false);
 
             configuraMapa();
 
@@ -334,6 +347,7 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
             map.getOverlays().add(mLocationOverlay);
             map.getOverlays().add(overlayEvents);
             atualizarParadasMapa(paradas);
+
 //            List<Overlay> ov = map.getOverlays().;
 //            System.out.println(ov.size());
         }
@@ -344,6 +358,12 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
         public void onChanged(List<ParadaSugestaoBairro> paradas) {
             adapterSugestao.paradas = paradas;
             adapterSugestao.notifyDataSetChanged();
+
+            if(paradas.size() > 0){
+                binding.textViewSugestoesParadasVazia.setVisibility(View.GONE);
+            } else{
+                binding.textViewSugestoesParadasVazia.setVisibility(View.VISIBLE);
+            }
 
             map.getOverlays().clear();
             map.getOverlays().add(mLocationOverlay);
@@ -386,6 +406,12 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
             adapterSugestaoPois.paradas = paradas;
             adapterSugestaoPois.notifyDataSetChanged();
 
+            if(paradas.size() > 0){
+                binding.textViewSugestoesPoisVazia.setVisibility(View.GONE);
+            } else{
+                binding.textViewSugestoesPoisVazia.setVisibility(View.VISIBLE);
+            }
+
             map.getOverlays().clear();
             map.getOverlays().add(mLocationOverlay);
             map.getOverlays().add(overlayEvents);
@@ -411,8 +437,6 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
         public void onChanged(List<PontoInteresseSugestaoBairro> paradas) {
             adapterRejeitadasPois.paradas = paradas;
             adapterRejeitadasPois.notifyDataSetChanged();
-
-            Toast.makeText(getApplicationContext(), "POIS: "+binding.listRejeitadasPois.getAdapter().getItemCount()+" | "+binding.listRejeitadasPois.getMeasuredHeight(), Toast.LENGTH_SHORT).show();
 
             map.getOverlays().clear();
             map.getOverlays().add(mLocationOverlay);

@@ -9,337 +9,353 @@
             type="br.com.vostre.circular.view.MenuActivity" />
     </data>
 
-        <android.support.v4.widget.DrawerLayout
-            android:id="@+id/container"
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@drawable/gradiente"
+            tools:context=".view.MenuActivity">
 
-            <android.support.constraint.ConstraintLayout
+            <include
+                layout="@layout/toolbar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"></include>
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginBottom="32dp"
+                android:src="@mipmap/ic_onibus_branco"
+                app:layout_constraintBottom_toTopOf="@+id/guideline"
+                app:layout_constraintEnd_toEndOf="@+id/circleView"
+                app:layout_constraintStart_toStartOf="@+id/circleView"
+                app:layout_constraintTop_toTopOf="@+id/guideline2"
+                app:srcCompat="@mipmap/ic_onibus_branco" />
+
+            <br.com.vostre.circleview.CircleView
+                android:id="@+id/circleView"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                app:corArcoMaior="@color/branco"
+                app:corArcoMenor="@color/branco"
+                app:espessuraArcoMaior="45"
+                app:espessuraArcoMenor="5"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/button"
+                style="@style/botao_transparente"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:onClick="@{view::onClickBtnPaises}"
+                android:text="Países"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/button2"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnExportarDB" />
+
+            <Button
+                android:id="@+id/button2"
+                style="@style/botao_transparente"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:onClick="@{view::onClickBtnEstados}"
+                android:text="Estados"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/button"
+                app:layout_constraintTop_toBottomOf="@+id/btnExportarDB" />
+
+            <Button
+                android:id="@+id/button3"
+                style="@style/botao_transparente"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:onClick="@{view::onClickBtnCidades}"
+                android:text="Cidades"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/button4"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button" />
+
+            <Button
+                android:id="@+id/button4"
+                style="@style/botao_transparente"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:onClick="@{view::onClickBtnBairros}"
+                android:text="Bairros"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/button3"
+                app:layout_constraintTop_toBottomOf="@+id/button2" />
+
+            <Button
+                android:id="@+id/button5"
+                style="@style/botao_transparente"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:onClick="@{view::onClickBtnParadas}"
+                android:text="Paradas"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/button6"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button3" />
+
+            <Button
+                android:id="@+id/button6"
+                style="@style/botao_transparente"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:onClick="@{view::onClickBtnItinerarios}"
+                android:text="Itinerários"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/button5"
+                app:layout_constraintTop_toBottomOf="@+id/button4" />
+
+            <Button
+                android:id="@+id/button7"
+                style="@style/botao_transparente"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:onClick="@{view::onClickBtnPontosInteresse}"
+                android:text="Pontos Interesse"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/button8"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button5" />
+
+            <Button
+                android:id="@+id/button8"
+                style="@style/botao_transparente"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:onClick="@{view::onClickBtnEmpresas}"
+                android:text="Empresas"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/button7"
+                app:layout_constraintTop_toBottomOf="@+id/button6" />
+
+            <Button
+                android:id="@+id/button9"
+                style="@style/botao_transparente"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:onClick="@{view::onClickBtnParametros}"
+                android:text="Parâmetros"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/button10"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button7" />
+
+            <Button
+                android:id="@+id/button10"
+                style="@style/botao_transparente"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:onClick="@{view::onClickBtnUsuarios}"
+                android:text="Usuários"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/button9"
+                app:layout_constraintTop_toBottomOf="@+id/button8" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@drawable/rounded_corner_button_branco"
+                android:gravity="center_vertical|center_horizontal"
+                android:padding="5dp"
+                android:text="Gerenciador"
+                android:textColor="@color/azul"
+                android:textSize="30sp"
+                app:layout_constraintBottom_toBottomOf="@+id/circleView"
+                app:layout_constraintEnd_toEndOf="@+id/circleView"
+                app:layout_constraintStart_toStartOf="@+id/circleView"
+                app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+
+            <android.support.constraint.Guideline
+                android:id="@+id/guideline"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_begin="224dp" />
+
+            <android.support.constraint.Guideline
+                android:id="@+id/guideline2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_begin="74dp" />
+
+            <Button
+                android:id="@+id/btnExportarDB"
+                style="@style/botao_transparente"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:onClick="@{view::onClickBtnExportar}"
+                android:text="Exportar DB"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/btnDashboard"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+            <Button
+                android:id="@+id/btnDashboard"
+                style="@style/botao_transparente"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:onClick="@{view::onClickBtnDashboard}"
+                android:text="Dashboard"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/btnExportarDB"
+                app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+            <ImageButton
+                android:id="@+id/btnCamera"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@color/transparente"
+                android:scaleType="fitCenter"
+                android:onClick="@{view::onClickBtnCamera}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/circleView"
+                app:layout_constraintTop_toTopOf="@+id/guideline2"
+                android:src="@drawable/ic_photo_camera_white_24dp" />
+
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.design.widget.NavigationView
+            android:id="@+id/nav"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center|start"
+            android:fitsSystemWindows="true"
+            app:headerLayout="@layout/drawer_header">
+
+            <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/gradiente"
-                tools:context=".view.MenuActivity">
+                android:layout_height="match_parent">
 
-                <include
-                    layout="@layout/toolbar"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"></include>
-
-                <ImageView
-                    android:id="@+id/imageView2"
+                <Button
+                    android:id="@+id/btnSobre"
                     android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginLeft="24dp"
-                    android:layout_marginEnd="24dp"
-                    android:layout_marginRight="24dp"
-                    android:layout_marginBottom="32dp"
-                    android:src="@mipmap/ic_onibus_branco"
-                    app:layout_constraintBottom_toTopOf="@+id/guideline"
-                    app:layout_constraintEnd_toEndOf="@+id/circleView"
-                    app:layout_constraintStart_toStartOf="@+id/circleView"
-                    app:layout_constraintTop_toTopOf="@+id/guideline2"
-                    app:srcCompat="@mipmap/ic_onibus_branco" />
-
-                <br.com.vostre.circleview.CircleView
-                    android:id="@+id/circleView"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginLeft="8dp"
-                    android:layout_marginTop="32dp"
+                    android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
-                    app:corArcoMaior="@color/branco"
-                    app:corArcoMenor="@color/branco"
-                    app:espessuraArcoMaior="45"
-                    app:espessuraArcoMenor="5"
+                    android:background="@color/transparente"
+                    android:onClick="@{view::onClickBtnSobre}"
+                    android:text="Sobre o Aplicativo"
+                    android:textAppearance="@style/botao_principal"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <Button
-                    android:id="@+id/button"
-                    style="@style/botao_transparente"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:onClick="@{view::onClickBtnPaises}"
-                    android:text="Países"
-                    android:textAllCaps="false"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/button2"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/btnExportarDB" />
-
-                <Button
-                    android:id="@+id/button2"
-                    style="@style/botao_transparente"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:onClick="@{view::onClickBtnEstados}"
-                    android:text="Estados"
-                    android:textAllCaps="false"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/button"
-                    app:layout_constraintTop_toBottomOf="@+id/btnExportarDB" />
-
-                <Button
-                    android:id="@+id/button3"
-                    style="@style/botao_transparente"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginTop="8dp"
-                    android:onClick="@{view::onClickBtnCidades}"
-                    android:text="Cidades"
-                    android:textAllCaps="false"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/button4"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintHorizontal_chainStyle="spread_inside"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/button" />
-
-                <Button
-                    android:id="@+id/button4"
-                    style="@style/botao_transparente"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginTop="8dp"
-                    android:onClick="@{view::onClickBtnBairros}"
-                    android:text="Bairros"
-                    android:textAllCaps="false"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/button3"
-                    app:layout_constraintTop_toBottomOf="@+id/button2" />
-
-                <Button
-                    android:id="@+id/button5"
-                    style="@style/botao_transparente"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginTop="8dp"
-                    android:onClick="@{view::onClickBtnParadas}"
-                    android:text="Paradas"
-                    android:textAllCaps="false"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/button6"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/button3" />
-
-                <Button
-                    android:id="@+id/button6"
-                    style="@style/botao_transparente"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginTop="8dp"
-                    android:onClick="@{view::onClickBtnItinerarios}"
-                    android:text="Itinerários"
-                    android:textAllCaps="false"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/button5"
-                    app:layout_constraintTop_toBottomOf="@+id/button4" />
-
-                <Button
-                    android:id="@+id/button7"
-                    style="@style/botao_transparente"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginTop="8dp"
-                    android:onClick="@{view::onClickBtnPontosInteresse}"
-                    android:text="Pontos Interesse"
-                    android:textAllCaps="false"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/button8"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/button5" />
-
-                <Button
-                    android:id="@+id/button8"
-                    style="@style/botao_transparente"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginTop="8dp"
-                    android:onClick="@{view::onClickBtnEmpresas}"
-                    android:text="Empresas"
-                    android:textAllCaps="false"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/button7"
-                    app:layout_constraintTop_toBottomOf="@+id/button6" />
-
-                <Button
-                    android:id="@+id/button9"
-                    style="@style/botao_transparente"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginTop="8dp"
-                    android:onClick="@{view::onClickBtnParametros}"
-                    android:text="Parâmetros"
-                    android:textAllCaps="false"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/button10"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/button7" />
-
-                <Button
-                    android:id="@+id/button10"
-                    style="@style/botao_transparente"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginTop="8dp"
-                    android:onClick="@{view::onClickBtnUsuarios}"
-                    android:text="Usuários"
-                    android:textAllCaps="false"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/button9"
-                    app:layout_constraintTop_toBottomOf="@+id/button8" />
-
-                <TextView
-                    android:id="@+id/textView2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginTop="24dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:background="@drawable/rounded_corner_button_branco"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:padding="5dp"
-                    android:text="Gerenciador"
-                    android:textColor="@color/azul"
-                    android:textSize="30sp"
-                    app:layout_constraintBottom_toBottomOf="@+id/circleView"
-                    app:layout_constraintEnd_toEndOf="@+id/circleView"
-                    app:layout_constraintStart_toStartOf="@+id/circleView"
-                    app:layout_constraintTop_toBottomOf="@+id/imageView2" />
-
-                <android.support.constraint.Guideline
-                    android:id="@+id/guideline"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layout_constraintGuide_begin="224dp" />
-
-                <android.support.constraint.Guideline
-                    android:id="@+id/guideline2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layout_constraintGuide_begin="74dp" />
-
-                <Button
-                    android:id="@+id/btnExportarDB"
-                    style="@style/botao_transparente"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:onClick="@{view::onClickBtnExportar}"
-                    android:text="Exportar DB"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/btnDashboard"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView2" />
-
-                <Button
-                    android:id="@+id/btnDashboard"
-                    style="@style/botao_transparente"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:onClick="@{view::onClickBtnDashboard}"
-                    android:text="Dashboard"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/btnExportarDB"
-                    app:layout_constraintTop_toBottomOf="@+id/textView2" />
+                    app:layout_constraintStart_toStartOf="parent" />
 
             </android.support.constraint.ConstraintLayout>
 
-            <android.support.design.widget.NavigationView
-                android:id="@+id/nav"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center|start"
-                android:fitsSystemWindows="true"
-                app:headerLayout="@layout/drawer_header">
+        </android.support.design.widget.NavigationView>
 
-                <android.support.constraint.ConstraintLayout
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    xmlns:tools="http://schemas.android.com/tools"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <Button
-                        android:id="@+id/btnSobre"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:onClick="@{view::onClickBtnSobre}"
-                        android:background="@color/transparente"
-                        android:text="Sobre o Aplicativo"
-                        android:textAppearance="@style/botao_principal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
-
-                </android.support.constraint.ConstraintLayout>
-
-            </android.support.design.widget.NavigationView>
-
-        </android.support.v4.widget.DrawerLayout>
+    </android.support.v4.widget.DrawerLayout>
 
 </layout>

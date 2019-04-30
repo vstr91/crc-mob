@@ -83,6 +83,12 @@
         <activity android:name=".view.ParadasSugeridasActivity" />
         <activity android:name=".view.HorariosItinerarioActivity" />
         <activity android:name=".view.AcessoDiaActivity" />
+
+        <meta-data
+            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+            android:value="ocr" />
+        <!-- To use multiple models: android:value="ocr,model2,model3" -->
+
     </application>
 
 </manifest>

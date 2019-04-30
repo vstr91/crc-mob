@@ -9,6 +9,10 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -21,6 +25,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.ml.vision.FirebaseVision;
+import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
+import com.google.firebase.ml.vision.text.FirebaseVisionText;
+import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
+import com.google.firebase.ml.vision.text.RecognizedLanguage;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
@@ -32,7 +45,14 @@ import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
+import org.json.JSONException;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
@@ -71,6 +91,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     ContentResolver mResolver;
 
     int permissionStorage;
+
+    static int PICK_FILE = 174;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -207,6 +229,13 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         startActivity(i);
     }
 
+    public void onClickBtnCamera(View v){
+        Intent intentFile = new Intent();
+        intentFile.setType("text/*");
+        intentFile.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intentFile, "Escolha o arquivo de dados"), PICK_FILE);
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false;
@@ -269,6 +298,88 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                 ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
 
         ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (requestCode == PICK_FILE) {
+
+            if(data != null){
+                try {
+                    InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(data.getData());
+
+                    BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+
+                    Bitmap bmp = BitmapFactory.decodeStream(bufferedInputStream);
+
+                    FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bmp);
+
+                    FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance()
+                            .getOnDeviceTextRecognizer();
+
+                    Task<FirebaseVisionText> result =
+                            detector.processImage(image)
+                                    .addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
+                                        @Override
+                                        public void onSuccess(FirebaseVisionText firebaseVisionText) {
+
+                                            String res = firebaseVisionText.getText();
+                                            System.out.println(res);
+
+                                            for (FirebaseVisionText.TextBlock block: firebaseVisionText.getTextBlocks()) {
+                                                String blockText = block.getText();
+                                                Float blockConfidence = block.getConfidence();
+                                                List<RecognizedLanguage> blockLanguages = block.getRecognizedLanguages();
+                                                Point[] blockCornerPoints = block.getCornerPoints();
+                                                Rect blockFrame = block.getBoundingBox();
+
+                                                for (FirebaseVisionText.Line line: block.getLines()) {
+                                                    String lineText = line.getText();
+                                                    Float lineConfidence = line.getConfidence();
+                                                    List<RecognizedLanguage> lineLanguages = line.getRecognizedLanguages();
+                                                    Point[] lineCornerPoints = line.getCornerPoints();
+                                                    Rect lineFrame = line.getBoundingBox();
+
+                                                    System.out.println("LINE TEXT: "+lineText);
+
+                                                    for (FirebaseVisionText.Element element: line.getElements()) {
+                                                        String elementText = element.getText();
+                                                        Float elementConfidence = element.getConfidence();
+                                                        List<RecognizedLanguage> elementLanguages = element.getRecognizedLanguages();
+                                                        Point[] elementCornerPoints = element.getCornerPoints();
+                                                        Rect elementFrame = element.getBoundingBox();
+
+                                                        System.out.println("TEXT:: "+elementText);
+                                                    }
+
+                                                }
+
+                                            }
+
+                                        }
+
+                                    })
+                                    .addOnFailureListener(
+                                            new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    // Task failed with an exception
+                                                    // ...
+                                                }
+                                            });
+
+                    Toast.makeText(getApplicationContext(), "Finalizou!", Toast.LENGTH_SHORT).show();
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+        }
     }
 
 }

@@ -108,7 +108,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         Dexter.withActivity(this)
                 .withPermissions(
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.CAMERA
                 ).withListener(listener)
                 .check();
 
@@ -230,10 +231,12 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnCamera(View v){
-        Intent intentFile = new Intent();
-        intentFile.setType("text/*");
-        intentFile.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intentFile, "Escolha o arquivo de dados"), PICK_FILE);
+        Intent i = new Intent(getApplicationContext(), CameraActivity.class);
+        startActivity(i);
+//        Intent intentFile = new Intent();
+//        intentFile.setType("text/*");
+//        intentFile.setAction(Intent.ACTION_GET_CONTENT);
+//        startActivityForResult(Intent.createChooser(intentFile, "Escolha o arquivo de dados"), PICK_FILE);
     }
 
     @Override
@@ -312,64 +315,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                     BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
 
                     Bitmap bmp = BitmapFactory.decodeStream(bufferedInputStream);
-
-                    FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bmp);
-
-                    FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance()
-                            .getOnDeviceTextRecognizer();
-
-                    Task<FirebaseVisionText> result =
-                            detector.processImage(image)
-                                    .addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
-                                        @Override
-                                        public void onSuccess(FirebaseVisionText firebaseVisionText) {
-
-                                            String res = firebaseVisionText.getText();
-                                            System.out.println(res);
-
-                                            for (FirebaseVisionText.TextBlock block: firebaseVisionText.getTextBlocks()) {
-                                                String blockText = block.getText();
-                                                Float blockConfidence = block.getConfidence();
-                                                List<RecognizedLanguage> blockLanguages = block.getRecognizedLanguages();
-                                                Point[] blockCornerPoints = block.getCornerPoints();
-                                                Rect blockFrame = block.getBoundingBox();
-
-                                                for (FirebaseVisionText.Line line: block.getLines()) {
-                                                    String lineText = line.getText();
-                                                    Float lineConfidence = line.getConfidence();
-                                                    List<RecognizedLanguage> lineLanguages = line.getRecognizedLanguages();
-                                                    Point[] lineCornerPoints = line.getCornerPoints();
-                                                    Rect lineFrame = line.getBoundingBox();
-
-                                                    System.out.println("LINE TEXT: "+lineText);
-
-                                                    for (FirebaseVisionText.Element element: line.getElements()) {
-                                                        String elementText = element.getText();
-                                                        Float elementConfidence = element.getConfidence();
-                                                        List<RecognizedLanguage> elementLanguages = element.getRecognizedLanguages();
-                                                        Point[] elementCornerPoints = element.getCornerPoints();
-                                                        Rect elementFrame = element.getBoundingBox();
-
-                                                        System.out.println("TEXT:: "+elementText);
-                                                    }
-
-                                                }
-
-                                            }
-
-                                        }
-
-                                    })
-                                    .addOnFailureListener(
-                                            new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    // Task failed with an exception
-                                                    // ...
-                                                }
-                                            });
-
-                    Toast.makeText(getApplicationContext(), "Finalizou!", Toast.LENGTH_SHORT).show();
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();

@@ -83,6 +83,7 @@
         <activity android:name=".view.ParadasSugeridasActivity" />
         <activity android:name=".view.HorariosItinerarioActivity" />
         <activity android:name=".view.AcessoDiaActivity" />
+        <activity android:name=".view.CameraActivity" />
 
         <meta-data
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"

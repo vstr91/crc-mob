@@ -45,11 +45,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/preview" />
 
-        <ImageView
+        <SurfaceView
             android:id="@+id/imageView9"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="8dp"
+            android:scaleType="center"
             app:layout_constraintBottom_toBottomOf="@+id/preview"
             app:layout_constraintEnd_toEndOf="@+id/preview"
             app:layout_constraintStart_toStartOf="@id/preview"

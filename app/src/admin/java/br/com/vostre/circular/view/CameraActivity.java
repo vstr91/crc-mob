@@ -2,6 +2,7 @@ package br.com.vostre.circular.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
@@ -9,17 +10,26 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.media.ExifInterface;
 import android.os.Bundle;
 import android.os.Environment;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicYuvToRGB;
+import android.renderscript.Type;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.Size;
+import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +46,7 @@ import com.google.firebase.ml.vision.text.RecognizedLanguage;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -61,6 +72,7 @@ public class CameraActivity extends BaseActivity {
     Bitmap bitmap;
     private Camera.PictureCallback mPicture;
     GraphicOverlay mGraphicOverlay;
+    Boolean processando = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,17 +89,10 @@ public class CameraActivity extends BaseActivity {
         binding.imageView9.setVisibility(View.GONE);
         binding.btnFechar.setVisibility(View.GONE);
 
-        camera = Camera.open();
-        camera.setDisplayOrientation(90);
-
-        Camera.Parameters params = camera.getParameters();
-        params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-        camera.setParameters(params);
-
-        mPicture = getPictureCallback();
-
-        preview = new CameraPreview(this, camera);
+        preview = new CameraPreview(this, camera, null);
         binding.preview.addView(preview);
+
+        preparaCamera();
 
         binding.btnfoto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,8 +100,6 @@ public class CameraActivity extends BaseActivity {
                 camera.takePicture(null, null, mPicture);
             }
         });
-
-        camera.startPreview();
 
         binding.btnFechar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,11 +111,10 @@ public class CameraActivity extends BaseActivity {
 
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    private void preparaCamera() {
 
-        if(camera == null) {
+        if(camera == null){
+
             camera = Camera.open();
             camera.setDisplayOrientation(90);
 
@@ -122,11 +124,14 @@ public class CameraActivity extends BaseActivity {
 
             mPicture = getPictureCallback();
             preview.refreshCamera(camera);
-            Log.d("nu", "null");
-        }else {
-            Log.d("nu","no null");
         }
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        preparaCamera();
     }
 
     @Override
@@ -161,17 +166,24 @@ public class CameraActivity extends BaseActivity {
 //                bitmap = ajustarImagem(bitmap);
                 // ajustando para portrait
                 bitmap = rotateImage(bitmap, 90);
-                processaImagem(bitmap);
+
+                if(bitmap != null){
+                    processaImagem(bitmap);
+                }
+
             }
         };
         return picture;
     }
 
     private void processaImagem(Bitmap bmp){
+        processando = true;
         FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bmp);
 
         FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance()
                 .getOnDeviceTextRecognizer();
+
+        Toast.makeText(getApplicationContext(), "Iniciando processamento...", Toast.LENGTH_SHORT).show();
 
         final Task<FirebaseVisionText> result =
                 detector.processImage(image)
@@ -181,38 +193,62 @@ public class CameraActivity extends BaseActivity {
 
                                 processTextRecognitionResult(firebaseVisionText);
 
-                                String res = firebaseVisionText.getText();
-                                System.out.println(res);
+                                binding.imageView9.getHolder().addCallback(new SurfaceHolder.Callback() {
 
-                                for (FirebaseVisionText.TextBlock block: firebaseVisionText.getTextBlocks()) {
-                                    String blockText = block.getText();
-                                    Float blockConfidence = block.getConfidence();
-                                    List<RecognizedLanguage> blockLanguages = block.getRecognizedLanguages();
-                                    Point[] blockCornerPoints = block.getCornerPoints();
-                                    Rect blockFrame = block.getBoundingBox();
-
-                                    for (FirebaseVisionText.Line line: block.getLines()) {
-                                        String lineText = line.getText();
-                                        Float lineConfidence = line.getConfidence();
-                                        List<RecognizedLanguage> lineLanguages = line.getRecognizedLanguages();
-                                        Point[] lineCornerPoints = line.getCornerPoints();
-                                        Rect lineFrame = line.getBoundingBox();
-
-                                        System.out.println("LINE TEXT: "+lineText);
-
-                                        for (FirebaseVisionText.Element element: line.getElements()) {
-                                            String elementText = element.getText();
-                                            Float elementConfidence = element.getConfidence();
-                                            List<RecognizedLanguage> elementLanguages = element.getRecognizedLanguages();
-                                            Point[] elementCornerPoints = element.getCornerPoints();
-                                            Rect elementFrame = element.getBoundingBox();
-
-                                            System.out.println("TEXT:: "+elementText);
-                                        }
-
+                                    @Override
+                                    public void surfaceCreated(SurfaceHolder holder) {
+                                        // Do some drawing when surface is ready
+                                        Canvas canvas = holder.lockCanvas();
+                                        canvas.drawBitmap(bitmap, null, new RectF(0, 0, canvas.getWidth(), canvas.getHeight()), null);
+                                        holder.unlockCanvasAndPost(canvas);
                                     }
 
-                                }
+                                    @Override
+                                    public void surfaceDestroyed(SurfaceHolder holder) {
+                                    }
+
+                                    @Override
+                                    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+                                    }
+                                });
+
+                                binding.imageView9.setVisibility(View.VISIBLE);
+                                binding.btnFechar.setVisibility(View.VISIBLE);
+
+//                                String res = firebaseVisionText.getText();
+//                                System.out.println(res);
+//
+//                                for (FirebaseVisionText.TextBlock block: firebaseVisionText.getTextBlocks()) {
+//                                    String blockText = block.getText();
+//                                    Float blockConfidence = block.getConfidence();
+//                                    List<RecognizedLanguage> blockLanguages = block.getRecognizedLanguages();
+//                                    Point[] blockCornerPoints = block.getCornerPoints();
+//                                    Rect blockFrame = block.getBoundingBox();
+//
+//                                    for (FirebaseVisionText.Line line: block.getLines()) {
+//                                        String lineText = line.getText();
+//                                        Float lineConfidence = line.getConfidence();
+//                                        List<RecognizedLanguage> lineLanguages = line.getRecognizedLanguages();
+//                                        Point[] lineCornerPoints = line.getCornerPoints();
+//                                        Rect lineFrame = line.getBoundingBox();
+//
+//                                        System.out.println("LINE TEXT: "+lineText);
+//
+//                                        for (FirebaseVisionText.Element element: line.getElements()) {
+//                                            String elementText = element.getText();
+//                                            Float elementConfidence = element.getConfidence();
+//                                            List<RecognizedLanguage> elementLanguages = element.getRecognizedLanguages();
+//                                            Point[] elementCornerPoints = element.getCornerPoints();
+//                                            Rect elementFrame = element.getBoundingBox();
+//
+//                                            System.out.println("TEXT:: "+elementText);
+//                                        }
+//
+//                                    }
+//
+//                                }
+
+                                processando = false;
 
                             }
 
@@ -223,6 +259,7 @@ public class CameraActivity extends BaseActivity {
                                     public void onFailure(@NonNull Exception e) {
                                         // Task failed with an exception
                                         // ...
+                                        processando = false;
                                     }
                                 });
 
@@ -279,10 +316,17 @@ public class CameraActivity extends BaseActivity {
     }
 
     public static Bitmap rotateImage(Bitmap source, float angle) {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(angle);
-        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
-                matrix, true);
+
+        if(source != null){
+            Matrix matrix = new Matrix();
+            matrix.postRotate(angle);
+            return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
+                    matrix, true);
+        } else{
+            return null;
+        }
+
+
     }
 
     private void processTextRecognitionResult(FirebaseVisionText texts) {
@@ -305,24 +349,39 @@ public class CameraActivity extends BaseActivity {
             for (int j = 0; j < lines.size(); j++) {
                 List<FirebaseVisionText.Element> elements = lines.get(j).getElements();
                 for (int k = 0; k < elements.size(); k++) {
-//                    GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, elements.get(k));
+                    GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, elements.get(k));
 //                    mGraphicOverlay.add(textGraphic);
 
                     FirebaseVisionText.Element e = elements.get(k);
 
                     canvas.drawRect(e.getBoundingBox(), p2);
-                    canvas.drawText(e.getText(), e.getBoundingBox().top, e.getBoundingBox().left, new Paint());
+                    canvas.drawText(e.getText(), -e.getBoundingBox().top, -e.getBoundingBox().left, new Paint());
 
                 }
             }
         }
 
-        System.out.println("AAAAA");
-
-        binding.imageView9.setImageBitmap(bitmap);
-        binding.imageView9.setVisibility(View.VISIBLE);
-        binding.btnFechar.setVisibility(View.VISIBLE);
-
     }
+
+//    @Override
+//    public void onPreviewFrame(byte[] bytes, Camera camera) {
+//
+//        if(!processando){
+//
+//            YuvImage yuvimage = new YuvImage(bytes, ImageFormat.NV21, camera.getParameters().getPreviewSize().width, camera.getParameters().getPreviewSize().height,null);
+//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//            yuvimage.compressToJpeg(new Rect(0,0, camera.getParameters().getPreviewSize().width, camera.getParameters().getPreviewSize().height), 80, baos);
+//
+//            bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+////                bitmap = ajustarImagem(bitmap);
+//            // ajustando para portrait
+//            bitmap = rotateImage(bitmap, 90);
+//
+//            if(bitmap != null){
+//                processaImagem(bitmap);
+//            }
+//        }
+//
+//    }
 
 }

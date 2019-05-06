@@ -48,7 +48,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.drive.Drive;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -831,14 +830,14 @@ public class MapaActivity extends BaseActivity {
                             // bottom menu
 
                             TextView textViewReferencia = bsdPoi.findViewById(R.id.textViewReferencia);
-                            TextView textViewBairro = bsdPoi.findViewById(R.id.textViewBairro);
+                            TextView textViewDescricao = bsdPoi.findViewById(R.id.textViewDescricao);
 
-                            bsdPoi.findViewById(R.id.textView32).setVisibility(View.GONE);
-                            bsdPoi.findViewById(R.id.textView33).setVisibility(View.GONE);
-                            bsdPoi.findViewById(R.id.textViewLegenda).setVisibility(View.GONE);
+//                            bsdPoi.findViewById(R.id.textView32).setVisibility(View.GONE);
+//                            bsdPoi.findViewById(R.id.textView33).setVisibility(View.GONE);
+//                            bsdPoi.findViewById(R.id.textViewLegenda).setVisibility(View.GONE);
 
                             textViewReferencia.setText(p.getPontoInteresse().getNome());
-                            textViewBairro.setText(p.getNomeBairroComCidade());
+                            textViewDescricao.setText(p.getPontoInteresse().getDescricao());
 
                             ImageView img = bsdPoi.findViewById(R.id.imageView3);
 
@@ -856,20 +855,20 @@ public class MapaActivity extends BaseActivity {
                             }
 
                             Button btnDetalhes = bsdPoi.findViewById(R.id.btnDetalhes);
-                            btnDetalhes.setVisibility(View.GONE);
+//                            btnDetalhes.setVisibility(View.GONE);
 
-                            Button btnEdicao = bsdPoi.findViewById(R.id.btnEdicao);
-                            btnEdicao.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    formPoi = new FormPoi();
-                                    formPoi.setParada(p.getPontoInteresse());
-                                    formPoi.setCtx(getApplication());
-                                    formPoi.show(getSupportFragmentManager(), "formPoi");
-                                }
-                            });
-
-                            btnEdicao.setVisibility(View.GONE);
+//                            Button btnEdicao = bsdPoi.findViewById(R.id.btnEdicao);
+//                            btnEdicao.setOnClickListener(new View.OnClickListener() {
+//                                @Override
+//                                public void onClick(View view) {
+//                                    formPoi = new FormPoi();
+//                                    formPoi.setParada(p.getPontoInteresse());
+//                                    formPoi.setCtx(getApplication());
+//                                    formPoi.show(getSupportFragmentManager(), "formPoi");
+//                                }
+//                            });
+//
+//                            btnEdicao.setVisibility(View.GONE);
 
                             Button btnFechar = bsdPoi.findViewById(R.id.btnFechar);
                             btnFechar.setOnClickListener(new View.OnClickListener() {
@@ -1162,7 +1161,6 @@ public class MapaActivity extends BaseActivity {
     private void signOut() {
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestScopes(Drive.SCOPE_FILE)
                 .requestIdToken(getString(R.string.server_client_id))
                 .requestEmail()
                 .build();

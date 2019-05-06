@@ -101,13 +101,13 @@ public class MapaViewModel extends AndroidViewModel {
         this.poiNovo = poiNovo;
 
         if(poiNovo.getPontoInteresse().getImagem() != null){
-            File foto = new File(getApplication().getFilesDir(), paradaNova.getParada().getImagem());
+            File foto = new File(getApplication().getFilesDir(), poiNovo.getPontoInteresse().getImagem());
 
             if(foto.exists() && foto.canRead()){
-                this.fotoParada = BitmapFactory.decodeFile(foto.getAbsolutePath());
+                this.fotoPoi = BitmapFactory.decodeFile(foto.getAbsolutePath());
             }
         } else{
-            this.fotoParada = null;
+            this.fotoPoi = null;
         }
     }
 

@@ -85,9 +85,9 @@
         <activity android:name=".view.AcessoDiaActivity" />
         <activity android:name=".view.CameraActivity" />
 
-        <meta-data
-            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
-            android:value="ocr" />
+        <!--<meta-data-->
+            <!--android:name="com.google.firebase.ml.vision.DEPENDENCIES"-->
+            <!--android:value="ocr" />-->
         <!-- To use multiple models: android:value="ocr,model2,model3" -->
 
     </application>

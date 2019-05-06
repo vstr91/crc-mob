@@ -300,7 +300,7 @@ public class ParadasSugeridasViewModel extends AndroidViewModel {
                     parada.setDataFinal(p.getPontoInteresse().getDataFinal());
                 }
 
-                parada.setPermanente(p.getPontoInteresse().isPermanente());
+                parada.setPermanente(true);
 
                 if(parada.valida(parada)){
 

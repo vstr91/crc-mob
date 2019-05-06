@@ -31,7 +31,7 @@ public interface PontoInteresseDAO {
     List<PontoInteresse> listarTodosImagemAEnviar();
 
     @Query("SELECT p.* FROM ponto_interesse p WHERE (latitude >= :minLat AND latitude <= :maxLat) " +
-            "AND (longitude >= :minLng AND longitude <= :maxLng)")
+            "AND (longitude >= :minLng AND longitude <= :maxLng) AND p.ativo = 1")
     LiveData<List<PontoInteresse>> listarTodosAtivosProximos(double minLat, double maxLat, double minLng, double maxLng);
 
     @Query("SELECT * FROM ponto_interesse WHERE id IN (:ids)")

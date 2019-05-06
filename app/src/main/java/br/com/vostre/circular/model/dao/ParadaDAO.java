@@ -33,7 +33,7 @@ public interface ParadaDAO {
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada p " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
-            "estado e ON e.id = c.estado")
+            "estado e ON e.id = c.estado ORDER BY c.nome, b.nome, p.nome")
     LiveData<List<ParadaBairro>> listarTodosComBairro();
 
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +

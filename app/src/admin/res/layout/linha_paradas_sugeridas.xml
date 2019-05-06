@@ -6,6 +6,9 @@
         <variable
             name="parada"
             type="br.com.vostre.circular.model.pojo.ParadaSugestaoBairro" />
+        <variable
+            name="foto"
+            type="android.graphics.Bitmap" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -35,17 +38,17 @@
                     style="@style/texto_lista"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
                     android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
                     android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
                     android:paddingTop="10dp"
+                    android:paddingRight="10dp"
                     android:text="@{parada.parada.nome}"
                     app:layout_constraintEnd_toStartOf="@+id/textViewStatus"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/imageViewFoto"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
@@ -53,54 +56,54 @@
                     style="@style/texto_lista_menor"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
-                    android:paddingBottom="10dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
                     android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
                     android:paddingTop="0dp"
+                    android:paddingRight="10dp"
+                    android:paddingBottom="10dp"
                     android:text="@{parada.nomeBairroComCidade}"
                     android:textSize="12sp"
                     app:layout_constraintEnd_toStartOf="@+id/textViewStatus"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/imageViewFoto"
                     app:layout_constraintTop_toBottomOf="@+id/textViewNome" />
 
                 <ImageButton
                     android:id="@+id/btnAceitar"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginLeft="8dp"
                     android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
                     android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
                     android:background="@color/verde"
                     android:padding="5dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/btnRejeitar"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewCidade"
+                    app:layout_constraintTop_toBottomOf="@+id/imageViewFoto"
                     app:srcCompat="@drawable/ic_check_blue_24dp" />
 
                 <ImageButton
                     android:id="@+id/btnRejeitar"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
                     android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginBottom="8dp"
                     android:background="@color/vermelho"
                     android:padding="5dp"
                     android:tint="@color/branco"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/btnVerNoMapa"
                     app:layout_constraintStart_toEndOf="@+id/btnAceitar"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewCidade"
+                    app:layout_constraintTop_toBottomOf="@+id/imageViewFoto"
                     app:srcCompat="@drawable/ic_close_blue_24dp" />
 
                 <TextView
@@ -124,10 +127,10 @@
                     style="@style/botao_transparente"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
                     android:text="Ver no Mapa"
                     android:textAppearance="@style/texto_azul"
                     android:textColor="@color/azul"
@@ -135,7 +138,18 @@
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewCidade" />
+                    app:layout_constraintTop_toBottomOf="@+id/imageViewFoto" />
+
+                <ImageView
+                    android:id="@+id/imageViewFoto"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@{foto}" />
 
             </android.support.constraint.ConstraintLayout>
 

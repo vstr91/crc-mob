@@ -56,7 +56,7 @@
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="@+id/textViewNome"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView11"
+            app:layout_constraintStart_toEndOf="@+id/imageViewFoto"
             app:layout_constraintTop_toTopOf="@+id/textViewNome" />
 
         <TextView

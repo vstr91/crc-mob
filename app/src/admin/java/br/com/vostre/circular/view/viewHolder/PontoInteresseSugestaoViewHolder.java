@@ -1,10 +1,14 @@
 package br.com.vostre.circular.view.viewHolder;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import org.joda.time.format.DateTimeFormat;
+
+import java.io.File;
 
 import br.com.vostre.circular.databinding.LinhaParadasSugeridasBinding;
 import br.com.vostre.circular.databinding.LinhaPoisSugeridosBinding;
@@ -18,6 +22,7 @@ public class PontoInteresseSugestaoViewHolder extends RecyclerView.ViewHolder {
     private final LinhaPoisSugeridosBinding binding;
     AppCompatActivity ctx;
     PontoInteresseSugestaoListener listener;
+    Bitmap foto;
 
     public PontoInteresseSugestaoViewHolder(LinhaPoisSugeridosBinding binding, AppCompatActivity context, PontoInteresseSugestaoListener listener) {
         super(binding.getRoot());
@@ -28,6 +33,18 @@ public class PontoInteresseSugestaoViewHolder extends RecyclerView.ViewHolder {
 
     public void bind(final PontoInteresseSugestaoBairro parada) {
         binding.setParada(parada);
+
+        if(parada.getPontoInteresse().getImagem() != null){
+            File foto = new File(ctx.getFilesDir(), parada.getPontoInteresse().getImagem());
+
+            if(foto.exists() && foto.canRead()){
+                this.foto = BitmapFactory.decodeFile(foto.getAbsolutePath());
+            }
+        } else{
+            this.foto = null;
+        }
+
+        binding.setFoto(foto);
 
         if(parada.getPontoInteresse().getStatus() != 0){
             binding.btnAceitar.setVisibility(View.GONE);

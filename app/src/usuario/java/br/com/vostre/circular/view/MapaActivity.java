@@ -977,7 +977,7 @@ public class MapaActivity extends BaseActivity {
 
     public void onFabParadaClick(View v){
 
-        if(viewModel.localAtual != null){
+        if(viewModel.localAtual != null && viewModel.localAtual.getValue().getLatitude() != 0 && viewModel.localAtual.getValue().getLongitude() != 0){
             formParada = new FormParada();
             formParada.setLatitude(viewModel.localAtual.getValue().getLatitude());
             formParada.setLongitude(viewModel.localAtual.getValue().getLongitude());
@@ -987,13 +987,15 @@ public class MapaActivity extends BaseActivity {
 
             bundle = new Bundle();
             mFirebaseAnalytics.logEvent("clicou_fab_parada_mapa", bundle);
+        } else{
+            Toast.makeText(getApplicationContext(), "Coordenadas inválidas. Favor verificar o funcionamento do GPS.", Toast.LENGTH_SHORT).show();
         }
 
     }
 
     public void onFabPoiClick(View v){
 
-        if(viewModel.localAtual != null){
+        if(viewModel.localAtual != null && viewModel.localAtual.getValue().getLatitude() != 0 && viewModel.localAtual.getValue().getLongitude() != 0){
             formPoi = new FormPoi();
             formPoi.setLatitude(viewModel.localAtual.getValue().getLatitude());
             formPoi.setLongitude(viewModel.localAtual.getValue().getLongitude());
@@ -1003,6 +1005,8 @@ public class MapaActivity extends BaseActivity {
 
             bundle = new Bundle();
             mFirebaseAnalytics.logEvent("clicou_fab_poi_mapa", bundle);
+        } else{
+            Toast.makeText(getApplicationContext(), "Coordenadas inválidas. Favor verificar o funcionamento do GPS.", Toast.LENGTH_SHORT).show();
         }
 
     }

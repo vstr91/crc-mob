@@ -97,6 +97,24 @@
                                 </android.support.v7.widget.RecyclerView>
 
                                 <TextView
+                                    android:id="@+id/textViewParadaPendenteVazia"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginLeft="8dp"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_marginRight="8dp"
+                                    android:gravity="center"
+                                    android:padding="10dp"
+                                    android:text="Nenhuma sugestão de parada aguardando aprovação. Que tal sugerir mais?"
+                                    android:textColor="@color/branco"
+                                    android:textStyle="bold"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/listSugestoes" />
+
+                                <TextView
                                     android:id="@+id/textView29"
                                     android:layout_width="match_parent"
                                     android:layout_height="0dp"
@@ -112,7 +130,7 @@
                                     android:textStyle="bold"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toBottomOf="@+id/listSugestoes" />
+                                    app:layout_constraintTop_toBottomOf="@+id/textViewParadaPendenteVazia" />
 
                                 <android.support.v7.widget.RecyclerView
                                     android:id="@+id/listSugestoesPois"
@@ -128,6 +146,24 @@
                                     tools:listitem="@layout/linha_pois_sugeridos">
 
                                 </android.support.v7.widget.RecyclerView>
+
+                                <TextView
+                                    android:id="@+id/textViewPoiPendenteVazia"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginLeft="8dp"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_marginRight="8dp"
+                                    android:gravity="center"
+                                    android:padding="10dp"
+                                    android:text="Nenhuma sugestão de ponto de interesse aguardando aprovação. Que tal sugerir mais?"
+                                    android:textColor="@color/branco"
+                                    android:textStyle="bold"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/listSugestoesPois" />
 
                             </android.support.constraint.ConstraintLayout>
 

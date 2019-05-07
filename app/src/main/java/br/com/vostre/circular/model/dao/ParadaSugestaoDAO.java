@@ -24,49 +24,52 @@ public interface ParadaSugestaoDAO {
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_sugestao p " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
-            "estado e ON e.id = c.estado")
+            "estado e ON e.id = c.estado ORDER BY p.data_cadastro DESC")
     LiveData<List<ParadaSugestaoBairro>> listarTodosComBairro();
 
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_sugestao p " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
-            "estado e ON e.id = c.estado WHERE p.status = 0")
+            "estado e ON e.id = c.estado WHERE p.status = 0 ORDER BY p.data_cadastro DESC")
     LiveData<List<ParadaSugestaoBairro>> listarTodosPendentesComBairro();
 
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_sugestao p " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
-            "estado e ON e.id = c.estado WHERE p.status = 1")
+            "estado e ON e.id = c.estado WHERE p.status = 1 ORDER BY p.data_cadastro DESC")
     LiveData<List<ParadaSugestaoBairro>> listarTodosAceitosComBairro();
 
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_sugestao p " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
-            "estado e ON e.id = c.estado WHERE p.status = 2")
+            "estado e ON e.id = c.estado WHERE p.status = 2 ORDER BY p.data_cadastro DESC")
     LiveData<List<ParadaSugestaoBairro>> listarTodosRejeitadosComBairro();
 
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_sugestao p " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
-            "estado e ON e.id = c.estado WHERE p.ativo = 1 AND p.usuario_cadastro = :id")
+            "estado e ON e.id = c.estado WHERE p.ativo = 1 AND p.usuario_cadastro = :id ORDER BY p.data_cadastro DESC")
     LiveData<List<ParadaSugestaoBairro>> listarTodosComBairroPorUsuario(String id);
 
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_sugestao p " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
-            "estado e ON e.id = c.estado WHERE p.status = 0 AND p.ativo = 1 AND p.usuario_cadastro = :id")
+            "estado e ON e.id = c.estado WHERE p.status = 0 AND p.ativo = 1 AND p.usuario_cadastro = :id " +
+            "ORDER BY p.data_cadastro DESC")
     LiveData<List<ParadaSugestaoBairro>> listarTodosPendentesComBairroPorUsuario(String id);
 
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_sugestao p " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
-            "estado e ON e.id = c.estado WHERE p.status = 1 AND p.ativo = 1 AND p.usuario_cadastro = :id")
+            "estado e ON e.id = c.estado WHERE p.status = 1 AND p.ativo = 1 AND p.usuario_cadastro = :id " +
+            "ORDER BY p.data_cadastro DESC")
     LiveData<List<ParadaSugestaoBairro>> listarTodosAceitosComBairroPorUsuario(String id);
 
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_sugestao p " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
-            "estado e ON e.id = c.estado WHERE p.status = 2 AND p.ativo = 1 AND p.usuario_cadastro = :id")
+            "estado e ON e.id = c.estado WHERE p.status = 2 AND p.ativo = 1 AND p.usuario_cadastro = :id " +
+            "ORDER BY p.data_cadastro DESC")
     LiveData<List<ParadaSugestaoBairro>> listarTodosRejeitadosComBairroPorUsuario(String id);
 
     @Query("SELECT * FROM parada_sugestao WHERE enviado = 0")

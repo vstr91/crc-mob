@@ -169,6 +169,13 @@ public class ParadasSugeridasActivity extends BaseActivity {
         public void onChanged(List<ParadaSugestaoBairro> paradas) {
             adapterSugestao.paradas = paradas;
             adapterSugestao.notifyDataSetChanged();
+
+            if(paradas.size() > 0){
+                binding.textViewParadaPendenteVazia.setVisibility(View.GONE);
+            } else{
+                binding.textViewParadaPendenteVazia.setVisibility(View.VISIBLE);
+            }
+
         }
     };
 
@@ -195,6 +202,13 @@ public class ParadasSugeridasActivity extends BaseActivity {
         public void onChanged(List<PontoInteresseSugestaoBairro> pois) {
             adapterSugestaoPois.pois = pois;
             adapterSugestaoPois.notifyDataSetChanged();
+
+            if(pois.size() > 0){
+                binding.textViewPoiPendenteVazia.setVisibility(View.GONE);
+            } else{
+                binding.textViewPoiPendenteVazia.setVisibility(View.VISIBLE);
+            }
+
         }
     };
 

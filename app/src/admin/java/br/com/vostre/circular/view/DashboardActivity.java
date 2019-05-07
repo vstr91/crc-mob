@@ -15,6 +15,7 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -77,6 +78,7 @@ public class DashboardActivity extends BaseActivity {
         viewModel.paradas.observe(this, paradasObserver);
         viewModel.cidades.observe(this, cidadesObserver);
         viewModel.horarios.observe(this, horariosObserver);
+        viewModel.empresas.observe(this, empresasObserver);
 
         viewModel.itinerariosMunicipais.observe(this, municipaisObserver);
         viewModel.itinerariosIntermunicipais.observe(this, intermunicipaisObserver);
@@ -208,6 +210,13 @@ public class DashboardActivity extends BaseActivity {
         }
     };
 
+    Observer<Integer> empresasObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer empresas) {
+            binding.textViewEmpresas.setText(String.valueOf(empresas));
+        }
+    };
+
     Observer<List<ItinerarioPartidaDestino>> municipaisObserver = new Observer<List<ItinerarioPartidaDestino>>() {
         @Override
         public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
@@ -263,6 +272,9 @@ public class DashboardActivity extends BaseActivity {
             chartItinerarios.setClickable(false);
             chartItinerarios.setDrawCenterText(false);
             chartItinerarios.setDrawEntryLabels(false);
+//            chartItinerarios.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+//            chartItinerarios.getLegend().setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+//            chartItinerarios.getLegend().setOrientation(Legend.LegendOrientation.VERTICAL);
             chartItinerarios.invalidate(); // refresh
         }
 

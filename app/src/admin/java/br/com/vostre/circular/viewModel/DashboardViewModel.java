@@ -19,6 +19,7 @@ public class DashboardViewModel extends AndroidViewModel {
     public LiveData<Integer> paradas;
     public LiveData<Integer> horarios;
     public LiveData<Integer> cidades;
+    public LiveData<Integer> empresas;
 
     public LiveData<List<ItinerarioPartidaDestino>> itinerariosMunicipais;
     public LiveData<List<ItinerarioPartidaDestino>> itinerariosIntermunicipais;
@@ -31,6 +32,7 @@ public class DashboardViewModel extends AndroidViewModel {
         paradas = appDatabase.paradaDAO().contarTodosAtivos();
         cidades = appDatabase.cidadeDAO().contarTodosAtivos();
         horarios = appDatabase.horarioItinerarioDAO().contarTodosAtivos();
+        empresas = appDatabase.empresaDAO().contarTodosAtivos();
 
         itinerariosMunicipais = appDatabase.itinerarioDAO().listarTodosMunicipaisAtivosComTotalHorarios();
         itinerariosIntermunicipais = appDatabase.itinerarioDAO().listarTodosIntermunicipaisAtivosComTotalHorarios();

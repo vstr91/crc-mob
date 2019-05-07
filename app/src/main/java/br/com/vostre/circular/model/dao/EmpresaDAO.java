@@ -27,6 +27,9 @@ public interface EmpresaDAO {
     @Query("SELECT * FROM empresa WHERE ativo = 1 ORDER BY nome")
     LiveData<List<Empresa>> listarTodosAtivos();
 
+    @Query("SELECT COUNT(DISTINCT e.id) FROM empresa e INNER JOIN itinerario i ON i.empresa = e.id WHERE e.ativo = 1 AND i.ativo = 1")
+    LiveData<Integer> contarTodosAtivos();
+
     @Query("SELECT * FROM empresa WHERE enviado = 0")
     List<Empresa> listarTodosAEnviar();
 

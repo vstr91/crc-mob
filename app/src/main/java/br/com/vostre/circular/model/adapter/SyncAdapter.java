@@ -432,8 +432,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         if(tipo == 0){
             JSONObject paramObject = new JSONObject();
             try {
+
+                String versao = BuildConfig.VERSION_NAME;
+
                 paramObject.put("dados", json);
                 paramObject.put("qtd", registros);
+                paramObject.put("versao", versao);
 
                 CircularAPI api = retrofit.create(CircularAPI.class);
                 Call<String> call = api.enviaDados(paramObject.toString(), token);
@@ -466,6 +470,17 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             if(id.isEmpty()){
                 id = "-1";
             }
+
+            String versao = BuildConfig.VERSION_NAME;
+
+            JSONObject paramObject = new JSONObject();
+            try {
+                paramObject.put("usuario", id);
+                paramObject.put("versao", versao);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
 
             Call<String> call = api.recebeDados(token, data, id);
             call.enqueue(new Callback<String>() {

@@ -28,21 +28,21 @@ public interface PontoInteresseSugestaoDAO {
     LiveData<List<PontoInteresseSugestaoBairro>> listarTodosComBairro();
 
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
-            "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM ponto_interesse_sugestao p " +
+            "e.nome AS nomeEstado, e.sigla AS siglaEstado, u.nome AS usuario FROM ponto_interesse_sugestao p " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
-            "estado e ON e.id = c.estado WHERE p.status = 0 ORDER BY p.data_cadastro DESC")
+            "estado e ON e.id = c.estado LEFT JOIN usuario u ON u.id = p.usuario_cadastro WHERE p.status = 0 ORDER BY p.data_cadastro DESC")
     LiveData<List<PontoInteresseSugestaoBairro>> listarTodosPendentesComBairro();
 
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
-            "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM ponto_interesse_sugestao p " +
+            "e.nome AS nomeEstado, e.sigla AS siglaEstado, u.nome AS usuario FROM ponto_interesse_sugestao p " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
-            "estado e ON e.id = c.estado WHERE p.status = 1 ORDER BY p.data_cadastro DESC")
+            "estado e ON e.id = c.estado LEFT JOIN usuario u ON u.id = p.usuario_cadastro WHERE p.status = 1 ORDER BY p.data_cadastro DESC")
     LiveData<List<PontoInteresseSugestaoBairro>> listarTodosAceitosComBairro();
 
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
-            "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM ponto_interesse_sugestao p " +
+            "e.nome AS nomeEstado, e.sigla AS siglaEstado, u.nome AS usuario FROM ponto_interesse_sugestao p " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
-            "estado e ON e.id = c.estado WHERE p.status = 2 ORDER BY p.data_cadastro DESC")
+            "estado e ON e.id = c.estado LEFT JOIN usuario u ON u.id = p.usuario_cadastro WHERE p.status = 2 ORDER BY p.data_cadastro DESC")
     LiveData<List<PontoInteresseSugestaoBairro>> listarTodosRejeitadosComBairro();
 
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +

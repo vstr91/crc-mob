@@ -33,6 +33,9 @@ public class ParadaSugestaoBairro {
     @ColumnInfo(name = "siglaEstado")
     String siglaEstado;
 
+    @ColumnInfo(name = "usuario")
+    String usuario;
+
     @Ignore
     String nomeBairroComCidade;
 
@@ -102,6 +105,14 @@ public class ParadaSugestaoBairro {
 
     public void setSiglaEstado(String siglaEstado) {
         this.siglaEstado = siglaEstado;
+    }
+
+    public String getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
     }
 
     public String getNomeBairroComCidade() {

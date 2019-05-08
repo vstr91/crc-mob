@@ -227,6 +227,9 @@ public class DetalhesItinerarioActivity extends BaseActivity {
     }
 
     public void onClickBtnDistancia(View v){
+
+        Toast.makeText(getApplicationContext(), "Atualizando dados de distância...", Toast.LENGTH_SHORT).show();
+
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -235,55 +238,7 @@ public class DetalhesItinerarioActivity extends BaseActivity {
 
                 List<ParadaItinerarioBairro> paradas = viewModel.pits.getValue();
 
-                Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl("http://router.project-osrm.org/")
-                        .addConverterFactory(ScalarsConverterFactory.create())
-                        .build();
-                CircularAPI api = retrofit.create(CircularAPI.class);
-                Call<String> call = api.carregaDistancia(paradas.get(0).getLongitude()
-                        +","+paradas.get(0).getLatitude(),paradas.get(paradas.size()-1).getLongitude()
-                        +","+paradas.get(paradas.size()-1).getLatitude());
-
-                call.enqueue(new Callback<String>() {
-                    @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
-                        System.out.println(response);
-                        try {
-                            JSONObject obj = new JSONObject(response.body().toString());
-                            JSONArray routes = obj.getJSONArray("routes");
-                            JSONObject objDados = routes.getJSONObject(0);
-
-                            String distancia = objDados.getString("distance");
-                            int tempo = objDados.getInt("duration");
-
-                            Double distanciaKm = Double.parseDouble(distancia) / 1000;
-                            String tempoFormatado = DataHoraUtils.segundosParaHoraFormatado(tempo);
-
-                            long distKm = (long) distanciaKm.doubleValue();
-
-                            if(distKm > 0){
-                                viewModel.itinerario.getValue().getItinerario()
-                                        .setDistancia(Double.parseDouble(String.valueOf(distKm)));
-                            }
-
-                            if(tempoFormatado != null){
-                                viewModel.itinerario.getValue().getItinerario()
-                                        .setTempo(DateTimeFormat.forPattern("HH:mm").parseDateTime(tempoFormatado));
-                            }
-
-                            viewModel.editarItinerario();
-
-                            //System.out.println(obj);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<String> call, Throwable t) {
-                        System.out.println(call.request().body());
-                    }
-                });
+                viewModel.calculaDistancia(paradas, false);
             }
         });
     }

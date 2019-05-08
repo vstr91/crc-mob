@@ -78,7 +78,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginLeft="8dp"
-                    android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
                     android:background="@color/verde"
                     android:padding="5dp"
@@ -86,7 +85,7 @@
                     app:layout_constraintEnd_toStartOf="@+id/btnRejeitar"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewCoordenadas"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewUsuario"
                     app:srcCompat="@drawable/ic_check_blue_24dp" />
 
                 <ImageButton
@@ -95,7 +94,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginLeft="8dp"
-                    android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginBottom="8dp"
@@ -105,7 +103,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/btnVerNoMapa"
                     app:layout_constraintStart_toEndOf="@+id/btnAceitar"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewCoordenadas"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewUsuario"
                     app:srcCompat="@drawable/ic_close_blue_24dp" />
 
                 <TextView
@@ -139,7 +137,7 @@
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewCoordenadas" />
+                    app:layout_constraintTop_toBottomOf="@+id/textViewUsuario" />
 
                 <TextView
                     android:id="@+id/textViewDescricao"
@@ -204,6 +202,21 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textViewObservacao" />
+
+                <TextView
+                    android:id="@+id/textViewUsuario"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
+                    android:padding="5dp"
+                    android:text="@{`Usuário: `+parada.usuario}"
+                    android:textColor="@color/cinzaInativo"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewCoordenadas" />
 
             </android.support.constraint.ConstraintLayout>
 

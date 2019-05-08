@@ -204,11 +204,11 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
                     }
                 });
 
-                System.out.println("PARADAS ITINERARIO::: "
-                        +paradaAnterior.getNomeParada()+" - "+paradaAnterior.getNomeBairro()
-                        +", "+paradaAnterior.getNomeCidade()
-                        +", ("+paradaAnterior.getLatitude()+";"+paradaAnterior.getLongitude()+") || "+pb.getNomeParada()+" - "+pb.getNomeBairro()
-                        +", "+pb.getNomeCidade()+", ("+pb.getLatitude()+";"+pb.getLongitude()+")");
+//                System.out.println("PARADAS ITINERARIO::: "
+//                        +paradaAnterior.getNomeParada()+" - "+paradaAnterior.getNomeBairro()
+//                        +", "+paradaAnterior.getNomeCidade()
+//                        +", ("+paradaAnterior.getLatitude()+";"+paradaAnterior.getLongitude()+") || "+pb.getNomeParada()+" - "+pb.getNomeBairro()
+//                        +", "+pb.getNomeCidade()+", ("+pb.getLatitude()+";"+pb.getLongitude()+")");
             }
 
             paradaAnterior = pb;
@@ -225,6 +225,8 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
         if(umItinerario.valida(umItinerario)){
             add(umItinerario);
             addParadas(this.paradasItinerario.getValue());
+
+            calculaDistancia(this.paradasItinerario.getValue(), false);
 
         } else{
             retorno.setValue(0);
@@ -426,6 +428,60 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
                 }
             }
         };
+    }
+
+    public void calculaDistancia(List<ParadaItinerarioBairro> paradas, final boolean isEdicao) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://router.project-osrm.org/")
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .build();
+        CircularAPI api = retrofit.create(CircularAPI.class);
+        Call<String> call = api.carregaDistancia(paradas.get(0).getLongitude()
+                +","+paradas.get(0).getLatitude(),paradas.get(paradas.size()-1).getLongitude()
+                +","+paradas.get(paradas.size()-1).getLatitude());
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+
+                try {
+                    JSONObject obj = new JSONObject(response.body().toString());
+                    JSONArray routes = obj.getJSONArray("routes");
+                    JSONObject objDados = routes.getJSONObject(0);
+
+                    String distancia = objDados.getString("distance");
+                    int tempo = objDados.getInt("duration");
+
+                    Double distanciaKm = Double.parseDouble(distancia) / 1000;
+                    String tempoFormatado = DataHoraUtils.segundosParaHoraFormatado(tempo);
+
+                    long distKm = (long) distanciaKm.doubleValue();
+
+                    if(distKm > 0){
+                        itinerario.getValue().getItinerario()
+                                .setDistancia(Double.parseDouble(String.valueOf(distKm)));
+                    }
+
+                    if(tempoFormatado != null){
+                        itinerario.getValue().getItinerario()
+                                .setTempo(DateTimeFormat.forPattern("HH:mm").parseDateTime(tempoFormatado));
+                    }
+
+                    if(!isEdicao){
+                        editarItinerario();
+                    }
+
+                    //System.out.println(obj);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                System.out.println(call.request().body());
+            }
+        });
     }
 
 }

@@ -759,17 +759,9 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
             case 2:
                 // ver no mapa
 
-                p.getParada();
+                GeoPoint point = new GeoPoint(p.getParada().getLatitude(), p.getParada().getLongitude());
 
-                List<Overlay> overlays = map.getOverlays();
-
-                for(Overlay o : overlays){
-
-                    if(o instanceof Marker && ((Marker) o).getId().equals(id)){
-                        map.getController().animateTo(((Marker) o).getPosition());
-                    }
-
-                }
+                map.getController().animateTo(point);
 
                 break;
         }
@@ -851,15 +843,9 @@ public class ParadasSugeridasActivity extends BaseActivity implements ParadaSuge
             case 2:
                 // ver no mapa
 
-                List<Overlay> overlays = map.getOverlays();
+                GeoPoint point = new GeoPoint(p.getPontoInteresse().getLatitude(), p.getPontoInteresse().getLongitude());
 
-                for(Overlay o : overlays){
-
-                    if(o instanceof Marker && ((Marker) o).getId().equals(id)){
-                        map.getController().animateTo(((Marker) o).getPosition());
-                    }
-
-                }
+                map.getController().animateTo(point);
 
                 break;
         }

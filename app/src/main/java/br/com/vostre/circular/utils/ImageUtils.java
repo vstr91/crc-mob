@@ -1,7 +1,14 @@
 package br.com.vostre.circular.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.UUID;
 
 public class ImageUtils {
 
@@ -92,6 +99,33 @@ public class ImageUtils {
             }
         }
 
+    }
+
+    public static File salvarImagem(Context ctx, Bitmap b) {
+        FileOutputStream fos = null;
+        File file = new File(ctx.getApplicationContext().getFilesDir(), UUID.randomUUID().toString() + ".png");
+
+        try {
+            fos = new FileOutputStream(file);
+            //b = ImageUtils.scaleDown(b, 600, true);
+            b.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return file;
+    }
+
+    public static boolean deletarImagem(File f){
+        return f.delete();
     }
 
 }

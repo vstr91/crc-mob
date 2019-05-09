@@ -84,6 +84,10 @@
         <activity android:name=".view.HorariosItinerarioActivity" />
         <activity android:name=".view.AcessoDiaActivity" />
         <activity android:name=".view.CameraActivity" />
+        <activity android:name=".view.CameraResultadoActivity" />
+
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat"/>
 
         <!--<meta-data-->
             <!--android:name="com.google.firebase.ml.vision.DEPENDENCIES"-->

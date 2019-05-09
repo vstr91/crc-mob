@@ -20,6 +20,8 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.Log;
 
+import com.google.firebase.ml.vision.text.FirebaseVisionText;
+
 /**
  * Graphic instance for rendering TextBlock position, size, and ID within an associated graphic
  * overlay view.
@@ -33,12 +35,12 @@ public class TextGraphic extends GraphicOverlay.Graphic {
 
     private final Paint rectPaint;
     private final Paint textPaint;
-//    private final FirebaseVisionText.Element element;
+    private final FirebaseVisionText.Element element;
 
-    public TextGraphic(GraphicOverlay overlay/*, FirebaseVisionText.Element element*/) {
+    public TextGraphic(GraphicOverlay overlay, FirebaseVisionText.Element element) {
         super(overlay);
 
-//        this.element = element;
+        this.element = element;
 
         rectPaint = new Paint();
         rectPaint.setColor(TEXT_COLOR);
@@ -57,16 +59,16 @@ public class TextGraphic extends GraphicOverlay.Graphic {
      */
     @Override
     public void draw(Canvas canvas) {
-//        Log.d(TAG, "on draw text graphic");
-//        if (element == null) {
-//            throw new IllegalStateException("Attempting to draw a null text.");
-//        }
-//
-//        // Draws the bounding box around the TextBlock.
-//        RectF rect = new RectF(element.getBoundingBox());
-//        canvas.drawRect(rect, rectPaint);
-//
-//        // Renders the text at the bottom of the box.
-//        canvas.drawText(element.getText(), rect.left, rect.bottom, textPaint);
+        Log.d(TAG, "on draw text graphic");
+        if (element == null) {
+            throw new IllegalStateException("Attempting to draw a null text.");
+        }
+
+        // Draws the bounding box around the TextBlock.
+        RectF rect = new RectF(element.getBoundingBox());
+        canvas.drawRect(rect, rectPaint);
+
+        // Renders the text at the bottom of the box.
+        canvas.drawText(element.getText(), rect.left, rect.bottom, textPaint);
     }
 }

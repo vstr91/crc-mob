@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -31,6 +32,8 @@ import com.google.android.gms.tasks.Task;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
@@ -225,8 +228,13 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnCamera(View v){
-        Intent i = new Intent(getApplicationContext(), CameraActivity.class);
-        startActivity(i);
+//        Intent i = new Intent(getApplicationContext(), CameraActivity.class);
+//        startActivity(i);
+
+        CropImage.activity(null)
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .start(this);
+
 //        Intent intentFile = new Intent();
 //        intentFile.setType("text/*");
 //        intentFile.setAction(Intent.ACTION_GET_CONTENT);
@@ -319,6 +327,21 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
 
         }
+
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri resultUri = result.getUri();
+
+                Intent i = new Intent(getApplicationContext(), CameraResultadoActivity.class);
+                    i.putExtra("imagem", resultUri.toString());
+                    startActivity(i);
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
+        }
+
     }
 
 }

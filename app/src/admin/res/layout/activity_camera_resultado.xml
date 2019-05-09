@@ -6,7 +6,7 @@
     <data>
         <variable
             name="view"
-            type="br.com.vostre.circular.view.CameraActivity" />
+            type="br.com.vostre.circular.view.CameraResultadoActivity" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -22,51 +22,26 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"></include>
 
-        <LinearLayout
-            android:id="@+id/preview"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toTopOf="@+id/btnfoto"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
-
         <br.com.vostre.circular.utils.GraphicOverlay
             android:id="@+id/graphicOverlay"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
-            app:layout_constraintBottom_toBottomOf="@+id/preview"
+            app:layout_constraintBottom_toBottomOf="@+id/btnfoto"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/preview" />
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
-        <com.theartofdev.edmodo.cropper.CropImageView
+        <ImageView
             android:id="@+id/imageView9"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:scaleType="center"
-            app:layout_constraintBottom_toBottomOf="@+id/preview"
-            app:layout_constraintEnd_toEndOf="@+id/preview"
-            app:layout_constraintStart_toStartOf="@id/preview"
-            app:layout_constraintTop_toTopOf="@+id/preview" >
-
-        </com.theartofdev.edmodo.cropper.CropImageView>
-
-        <ImageView
-            android:id="@+id/imageViewCortada"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/btnFechar"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/imageView9"
-            app:srcCompat="@drawable/circle" />
+            app:layout_constraintTop_toTopOf="@+id/graphicOverlay" />
 
         <Button
             android:id="@+id/btnFechar"

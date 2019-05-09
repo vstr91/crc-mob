@@ -1,42 +1,21 @@
 package br.com.vostre.circular.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.content.Intent;
-import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.Point;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.renderscript.Allocation;
-import android.renderscript.Element;
-import android.renderscript.RenderScript;
-import android.renderscript.ScriptIntrinsicYuvToRGB;
-import android.renderscript.Type;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.util.Log;
-import android.util.Size;
-import android.view.DragEvent;
-import android.view.MotionEvent;
-import android.view.SurfaceHolder;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -48,109 +27,57 @@ import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 import com.google.firebase.ml.vision.text.RecognizedLanguage;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import br.com.vostre.circular.BuildConfig;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityCameraBinding;
-import br.com.vostre.circular.databinding.ActivitySobreBinding;
-import br.com.vostre.circular.model.ParametroInterno;
+import br.com.vostre.circular.databinding.ActivityCameraResultadoBinding;
 import br.com.vostre.circular.utils.CameraPreview;
 import br.com.vostre.circular.utils.GraphicOverlay;
 import br.com.vostre.circular.utils.ImageUtils;
 import br.com.vostre.circular.utils.TextGraphic;
-import br.com.vostre.circular.viewModel.SobreViewModel;
 
-public class CameraActivity extends BaseActivity {
+public class CameraResultadoActivity extends BaseActivity {
 
-    ActivityCameraBinding binding;
+    ActivityCameraResultadoBinding binding;
 //    SobreViewModel viewModel;
-    Camera camera;
-    CameraPreview preview;
     Bitmap bitmap;
-    private Camera.PictureCallback mPicture;
     GraphicOverlay mGraphicOverlay;
     Boolean processando = false;
 
     int acao = 1;
+    Uri imagem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_camera);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_camera_resultado);
         super.onCreate(savedInstanceState);
         binding.setView(this);
         setTitle("Câmera");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
+        String uri = getIntent().getStringExtra("imagem");
+
+        imagem = Uri.parse(uri);
+
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imagem);
+
+            binding.imageView9.setImageURI(imagem);
+
+            processaImagem(bitmap);
+
 //        viewModel = ViewModelProviders.of(this).get(SobreViewModel.class);
 //        viewModel.parametros.observe(this, parametrosObserver);
 
-        mGraphicOverlay = binding.graphicOverlay;
-        binding.imageView9.setVisibility(View.GONE);
-        binding.btnFechar.setVisibility(View.GONE);
+            mGraphicOverlay = binding.graphicOverlay;
 
-        preview = new CameraPreview(this, camera, null);
-        binding.preview.addView(preview);
-
-        preparaCamera();
-
-        binding.btnfoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if(acao == 1){
-                    camera.takePicture(null, null, mPicture);
-                } else{
-
-                    bitmap = binding.imageView9.getCroppedImage();
-
-                    File f = ImageUtils.salvarImagem(getApplicationContext(), bitmap);
-
-//                    Intent i = new Intent(getApplicationContext(), CameraResultadoActivity.class);
-//                    i.putExtra("imagem", f.toURI().toString());
-//                    startActivity(i);
-                    processaImagem(binding.imageView9.getCroppedImage());
-                }
-
-
-            }
-        });
-
-        binding.btnFechar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                binding.btnFechar.setVisibility(View.GONE);
-                binding.imageView9.setVisibility(View.GONE);
-
-                binding.btnfoto.setText("Tirar Foto");
-                acao = 1;
-            }
-        });
-
-    }
-
-    private void preparaCamera() {
-
-        if(camera == null){
-
-            camera = Camera.open();
-            camera.setDisplayOrientation(90);
-
-            Camera.Parameters params = camera.getParameters();
-            params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-            camera.setParameters(params);
-
-            mPicture = getPictureCallback();
-            preview.refreshCamera(camera);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }
@@ -158,24 +85,11 @@ public class CameraActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-        preparaCamera();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        //when on Pause, release camera in order to be used from other applications
-        releaseCamera();
-    }
-
-    private void releaseCamera() {
-        // stop and release camera
-        if (camera != null) {
-            camera.stopPreview();
-            camera.setPreviewCallback(null);
-            camera.release();
-            camera = null;
-        }
     }
 
 //    Observer<ParametroInterno> parametrosObserver = new Observer<ParametroInterno>() {
@@ -185,40 +99,9 @@ public class CameraActivity extends BaseActivity {
 //        }
 //    };
 
-    private Camera.PictureCallback getPictureCallback() {
-        Camera.PictureCallback picture = new Camera.PictureCallback() {
-            @Override
-            public void onPictureTaken(byte[] data, Camera camera) {
-                bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-//                bitmap = ajustarImagem(bitmap);
-                // ajustando para portrait
-                bitmap = rotateImage(bitmap, 90);
-
-                if(bitmap != null){
-                    exibeImagem(bitmap);
-                    //processaImagem(bitmap);
-                }
-
-            }
-        };
-        return picture;
-    }
-
-    private void exibeImagem(Bitmap bitmap){
-        binding.imageView9.setImageBitmap(bitmap);
-        binding.imageView9.setVisibility(View.VISIBLE);
-        binding.btnFechar.setVisibility(View.VISIBLE);
-
-        binding.btnfoto.setText("Cortar Foto");
-        acao = 2;
-    }
-
     private void processaImagem(Bitmap bmp){
         processando = true;
         FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bmp);
-
-        binding.imageViewCortada.setImageBitmap(bmp);
-        binding.imageViewCortada.setVisibility(View.VISIBLE);
 
         FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance()
                 .getOnDeviceTextRecognizer();
@@ -232,9 +115,6 @@ public class CameraActivity extends BaseActivity {
                             public void onSuccess(final FirebaseVisionText firebaseVisionText) {
 
                                 processTextRecognitionResult(firebaseVisionText);
-
-                                //binding.imageView9.setVisibility(View.VISIBLE);
-                                //binding.btnFechar.setVisibility(View.VISIBLE);
 
                                 String res = firebaseVisionText.getText();
                                 System.out.println(res);
@@ -285,6 +165,8 @@ public class CameraActivity extends BaseActivity {
                                 });
 
         Toast.makeText(getApplicationContext(), "Finalizou!", Toast.LENGTH_SHORT).show();
+
+        //ImageUtils.deletarImagem(new File(imagem.getPath()));
     }
 
     private Bitmap ajustarImagem(Bitmap bitmap){
@@ -358,12 +240,18 @@ public class CameraActivity extends BaseActivity {
 
         mGraphicOverlay.clear();
 
-        Canvas canvas = new Canvas(bitmap);
+        Bitmap b = Bitmap.createBitmap(binding.imageView9.getWidth(), binding.imageView9.getWidth(), Bitmap.Config.ARGB_8888);
+
+        binding.graphicOverlay.setVisibility(View.GONE);
+
+        Canvas canvas = new Canvas(b);
 
         Paint p2 = new Paint();
         p2.setColor(Color.RED);
         p2.setStyle(Paint.Style.STROKE);
         p2.setStrokeWidth(10);
+
+        canvas.drawBitmap(bitmap, 0, 0, new Paint());
 
         for (int i = 0; i < blocks.size(); i++) {
             List<FirebaseVisionText.Line> lines = blocks.get(i).getLines();
@@ -383,6 +271,8 @@ public class CameraActivity extends BaseActivity {
                 }
             }
         }
+
+        binding.imageView9.setImageBitmap(b);
 
     }
 

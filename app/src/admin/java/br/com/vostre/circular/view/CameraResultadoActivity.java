@@ -27,6 +27,9 @@ import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 import com.google.firebase.ml.vision.text.RecognizedLanguage;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -51,6 +54,8 @@ public class CameraResultadoActivity extends BaseActivity {
 
     int acao = 1;
     Uri imagem;
+
+    FirebaseVisionText resultadoOCR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,38 +121,10 @@ public class CameraResultadoActivity extends BaseActivity {
 
                                 processTextRecognitionResult(firebaseVisionText);
 
+                                resultadoOCR = firebaseVisionText;
+
                                 String res = firebaseVisionText.getText();
                                 System.out.println(res);
-
-                                for (FirebaseVisionText.TextBlock block: firebaseVisionText.getTextBlocks()) {
-                                    String blockText = block.getText();
-                                    Float blockConfidence = block.getConfidence();
-                                    List<RecognizedLanguage> blockLanguages = block.getRecognizedLanguages();
-                                    Point[] blockCornerPoints = block.getCornerPoints();
-                                    Rect blockFrame = block.getBoundingBox();
-
-                                    for (FirebaseVisionText.Line line: block.getLines()) {
-                                        String lineText = line.getText();
-                                        Float lineConfidence = line.getConfidence();
-                                        List<RecognizedLanguage> lineLanguages = line.getRecognizedLanguages();
-                                        Point[] lineCornerPoints = line.getCornerPoints();
-                                        Rect lineFrame = line.getBoundingBox();
-
-                                        System.out.println("LINE TEXT: "+lineText);
-
-                                        for (FirebaseVisionText.Element element: line.getElements()) {
-                                            String elementText = element.getText();
-                                            Float elementConfidence = element.getConfidence();
-                                            List<RecognizedLanguage> elementLanguages = element.getRecognizedLanguages();
-                                            Point[] elementCornerPoints = element.getCornerPoints();
-                                            Rect elementFrame = element.getBoundingBox();
-
-                                            System.out.println("TEXT:: "+elementText);
-                                        }
-
-                                    }
-
-                                }
 
                                 processando = false;
 
@@ -240,7 +217,7 @@ public class CameraResultadoActivity extends BaseActivity {
 
         mGraphicOverlay.clear();
 
-        Bitmap b = Bitmap.createBitmap(binding.imageView9.getWidth(), binding.imageView9.getWidth(), Bitmap.Config.ARGB_8888);
+        Bitmap b = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
 
         binding.graphicOverlay.setVisibility(View.GONE);
 
@@ -276,25 +253,46 @@ public class CameraResultadoActivity extends BaseActivity {
 
     }
 
-//    @Override
-//    public void onPreviewFrame(byte[] bytes, Camera camera) {
-//
-//        if(!processando){
-//
-//            YuvImage yuvimage = new YuvImage(bytes, ImageFormat.NV21, camera.getParameters().getPreviewSize().width, camera.getParameters().getPreviewSize().height,null);
-//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//            yuvimage.compressToJpeg(new Rect(0,0, camera.getParameters().getPreviewSize().width, camera.getParameters().getPreviewSize().height), 80, baos);
-//
-//            bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-////                bitmap = ajustarImagem(bitmap);
-//            // ajustando para portrait
-//            bitmap = rotateImage(bitmap, 90);
-//
-//            if(bitmap != null){
-//                processaImagem(bitmap);
-//            }
-//        }
-//
-//    }
+    public void onClickBtnProcessar(View v){
+        for (FirebaseVisionText.TextBlock block: resultadoOCR.getTextBlocks()) {
+            String blockText = block.getText();
+            Float blockConfidence = block.getConfidence();
+            List<RecognizedLanguage> blockLanguages = block.getRecognizedLanguages();
+            Point[] blockCornerPoints = block.getCornerPoints();
+            Rect blockFrame = block.getBoundingBox();
+
+            for (FirebaseVisionText.Line line: block.getLines()) {
+                String lineText = line.getText();
+                Float lineConfidence = line.getConfidence();
+                List<RecognizedLanguage> lineLanguages = line.getRecognizedLanguages();
+                Point[] lineCornerPoints = line.getCornerPoints();
+                Rect lineFrame = line.getBoundingBox();
+
+                System.out.println("LINE TEXT: "+lineText);
+
+                for (FirebaseVisionText.Element element: line.getElements()) {
+                    String elementText = element.getText();
+                    Float elementConfidence = element.getConfidence();
+                    List<RecognizedLanguage> elementLanguages = element.getRecognizedLanguages();
+                    Point[] elementCornerPoints = element.getCornerPoints();
+                    Rect elementFrame = element.getBoundingBox();
+
+                    DateTime f;
+
+                    try{
+                        f = DateTimeFormat.forPattern("HH:mm").parseDateTime(elementText);
+
+                        Toast.makeText(getApplicationContext(), DateTimeFormat.forPattern("HH:mm").print(f), Toast.LENGTH_SHORT).show();
+                    } catch(Exception e){
+                        System.out.println("ERROR DT: "+e.getMessage());
+                    }
+
+                    System.out.println("OCR:: "+elementText);
+                }
+
+            }
+
+        }
+    }
 
 }

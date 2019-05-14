@@ -34,7 +34,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityCameraBinding;
@@ -111,7 +120,7 @@ public class CameraResultadoActivity extends BaseActivity {
         FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance()
                 .getOnDeviceTextRecognizer();
 
-        Toast.makeText(getApplicationContext(), "Iniciando processamento...", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), "Iniciando processamento...", Toast.LENGTH_SHORT).show();
 
         final Task<FirebaseVisionText> result =
                 detector.processImage(image)
@@ -141,7 +150,7 @@ public class CameraResultadoActivity extends BaseActivity {
                                     }
                                 });
 
-        Toast.makeText(getApplicationContext(), "Finalizou!", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), "Finalizou!", Toast.LENGTH_SHORT).show();
 
         //ImageUtils.deletarImagem(new File(imagem.getPath()));
     }
@@ -254,12 +263,21 @@ public class CameraResultadoActivity extends BaseActivity {
     }
 
     public void onClickBtnProcessar(View v){
+
+        Toast.makeText(getApplicationContext(), "Horários Encontrados", Toast.LENGTH_SHORT).show();
+
+        binding.imageView9.setImageBitmap(bitmap);
+
+        Map<String, Integer> elementos = new HashMap<>();
+
         for (FirebaseVisionText.TextBlock block: resultadoOCR.getTextBlocks()) {
             String blockText = block.getText();
             Float blockConfidence = block.getConfidence();
             List<RecognizedLanguage> blockLanguages = block.getRecognizedLanguages();
             Point[] blockCornerPoints = block.getCornerPoints();
             Rect blockFrame = block.getBoundingBox();
+
+            //System.out.println("BLOCK TEXT: "+blockText+" | "+blockFrame.bottom);
 
             for (FirebaseVisionText.Line line: block.getLines()) {
                 String lineText = line.getText();
@@ -268,7 +286,9 @@ public class CameraResultadoActivity extends BaseActivity {
                 Point[] lineCornerPoints = line.getCornerPoints();
                 Rect lineFrame = line.getBoundingBox();
 
-                System.out.println("LINE TEXT: "+lineText);
+                System.out.println("LINE TEXT: "+lineText+" | "+lineFrame.bottom);
+
+                elementos.put(lineText, lineFrame.bottom);
 
                 for (FirebaseVisionText.Element element: line.getElements()) {
                     String elementText = element.getText();
@@ -278,6 +298,8 @@ public class CameraResultadoActivity extends BaseActivity {
                     Rect elementFrame = element.getBoundingBox();
 
                     DateTime f;
+
+                    //System.out.println("TEXT: "+elementText+" | "+elementFrame.bottom);
 
                     try{
                         f = DateTimeFormat.forPattern("HH:mm").parseDateTime(elementText);
@@ -293,6 +315,19 @@ public class CameraResultadoActivity extends BaseActivity {
             }
 
         }
+
+        Set<Map.Entry<String, Integer>> set = elementos.entrySet();
+        List<Map.Entry<String, Integer>> list = new ArrayList<>(
+                set);
+        Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+            public int compare(Map.Entry<String, Integer> o1,
+                               Map.Entry<String, Integer> o2) {
+                return o1.getValue().compareTo(o2.getValue());
+            }
+        });
+
+        System.out.println(list);
+
     }
 
 }

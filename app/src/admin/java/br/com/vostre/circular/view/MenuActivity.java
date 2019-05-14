@@ -286,11 +286,19 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     Observer<List<ParametroInterno>> parametrosInternosObserver = new Observer<List<ParametroInterno>>() {
         @Override
         public void onChanged(List<ParametroInterno> parametros) {
-            ParametroInterno parametro = parametros.get(0);
 
-            if(parametro.getDataUltimoAcesso().isBefore(DateTime.now().minusHours(1))){
+            if(parametros.size() > 0){
+                ParametroInterno parametro = parametros.get(0);
+
+                if(parametro.getDataUltimoAcesso().isBefore(DateTime.now().minusHours(1))){
+                    requisitaAtualizacao();
+                }
+
+            } else{
                 requisitaAtualizacao();
             }
+
+
 
         }
     };

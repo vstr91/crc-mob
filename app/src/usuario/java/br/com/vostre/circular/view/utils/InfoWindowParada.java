@@ -57,6 +57,8 @@ public class InfoWindowParada extends FormBase {
         adapter = new ItinerarioAdapter(viewModel.itinerarios.getValue(), ctx);
         listItinerarios.setAdapter(adapter);
 
+        binding.textViewLegenda.setVisibility(View.GONE);
+
         return binding.getRoot();
 
     }
@@ -104,6 +106,24 @@ public class InfoWindowParada extends FormBase {
             adapter.itinerarios = itinerarios;
             adapter.notifyDataSetChanged();
             binding.invalidateAll();
+
+            int contLegenda = 0;
+
+            for(ItinerarioPartidaDestino i : itinerarios){
+
+                if(i.getTempoAcumulado() != null &&
+                        (i.getTempoAcumulado().getHourOfDay() > 0 || i.getTempoAcumulado().getMinuteOfHour() > 0)){
+                    contLegenda++;
+                }
+
+            }
+
+            if(contLegenda == 0){
+                binding.textViewLegenda.setVisibility(View.GONE);
+            } else{
+                binding.textViewLegenda.setVisibility(View.VISIBLE);
+            }
+
         }
     };
 

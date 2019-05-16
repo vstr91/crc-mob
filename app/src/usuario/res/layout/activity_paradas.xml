@@ -106,6 +106,7 @@
                     app:espessuraArcoMaior="4"
                     app:espessuraArcoMenor="4"
                     app:imagem="@{cidade.cidade.brasao}"
+                    android:contentDescription="@{`Brasão `+cidade.cidade.nome}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
 
@@ -134,6 +135,7 @@
                     android:layout_marginRight="16dp"
                     android:layout_marginTop="8dp"
                     android:onClick="@{view::onClickBtnEditarPartida}"
+                    android:contentDescription="Botão trocar cidade"
                     android:src="@drawable/ic_edit_blue_24dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

@@ -43,7 +43,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import br.com.vostre.circular.BR;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityDetalheParadaBinding;
 import br.com.vostre.circular.model.PontoInteresse;

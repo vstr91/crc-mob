@@ -290,8 +290,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
         id = crypt.bytesToHex(crypt.encrypt(id));
 
+        String versao = BuildConfig.VERSION_NAME;
+
         if(tipo == 0){
-            Call<String> call = api.requisitaToken(id, tipo);
+            Call<String> call = api.requisitaToken(id, tipo, versao);
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
@@ -347,7 +349,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 }
             });
         } else{
-            Call<String> call = api.requisitaToken(id, tipo);
+            Call<String> call = api.requisitaToken(id, tipo, versao);
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {

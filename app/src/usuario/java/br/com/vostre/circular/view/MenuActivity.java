@@ -336,7 +336,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             binding.btnAviso.setVisibility(View.GONE);
         } else{
             binding.btnAviso.setText("Esta versão do Circular não é a mais atual. " +
-                    "Clique aqui para atualizar e tenha acesso a correções e novas funções! Versão instalada: "+BuildConfig.VERSION_CODE+", versão atual: "+prefVersao);
+                    "Clique aqui para atualizar e tenha acesso a correções e/ou novas funções! Versão instalada: "+BuildConfig.VERSION_CODE+", versão atual: "+prefVersao);
             binding.btnAviso.setVisibility(View.VISIBLE);
         }
 

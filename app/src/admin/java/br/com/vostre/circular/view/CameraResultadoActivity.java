@@ -29,6 +29,7 @@ import com.google.firebase.ml.vision.text.RecognizedLanguage;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -48,6 +49,8 @@ import java.util.stream.Collectors;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityCameraBinding;
 import br.com.vostre.circular.databinding.ActivityCameraResultadoBinding;
+import br.com.vostre.circular.model.HorarioItinerario;
+import br.com.vostre.circular.model.pojo.ocr.Bloco;
 import br.com.vostre.circular.utils.CameraPreview;
 import br.com.vostre.circular.utils.GraphicOverlay;
 import br.com.vostre.circular.utils.ImageUtils;
@@ -264,69 +267,50 @@ public class CameraResultadoActivity extends BaseActivity {
 
     public void onClickBtnProcessar(View v){
 
-        Toast.makeText(getApplicationContext(), "Horários Encontrados", Toast.LENGTH_SHORT).show();
+        boolean segSex = binding.checkBoxSegSex.isChecked();
+        boolean sabado = binding.checkBoxSabado.isChecked();
+        boolean domingo = binding.checkBoxDom.isChecked();
 
-        binding.imageView9.setImageBitmap(bitmap);
+        System.out.println("DIAS: "+segSex+" | "+sabado+" | "+domingo);
 
-        Map<String, Integer> elementos = new HashMap<>();
+        if(!segSex && !sabado && !domingo){
+            Toast.makeText(getApplicationContext(), "Ao menos um dia/período deve ser escolhido!", Toast.LENGTH_SHORT).show();
+        } else{
 
-        for (FirebaseVisionText.TextBlock block: resultadoOCR.getTextBlocks()) {
-            String blockText = block.getText();
-            Float blockConfidence = block.getConfidence();
-            List<RecognizedLanguage> blockLanguages = block.getRecognizedLanguages();
-            Point[] blockCornerPoints = block.getCornerPoints();
-            Rect blockFrame = block.getBoundingBox();
+            Toast.makeText(getApplicationContext(), "Horários Encontrados", Toast.LENGTH_SHORT).show();
 
-            //System.out.println("BLOCK TEXT: "+blockText+" | "+blockFrame.bottom);
+            binding.imageView9.setImageBitmap(bitmap);
 
-            for (FirebaseVisionText.Line line: block.getLines()) {
-                String lineText = line.getText();
-                Float lineConfidence = line.getConfidence();
-                List<RecognizedLanguage> lineLanguages = line.getRecognizedLanguages();
-                Point[] lineCornerPoints = line.getCornerPoints();
-                Rect lineFrame = line.getBoundingBox();
+            List<Bloco> elementos = new ArrayList<>();
 
-                System.out.println("LINE TEXT: "+lineText+" | "+lineFrame.bottom);
+            for (FirebaseVisionText.TextBlock block: resultadoOCR.getTextBlocks()) {
 
-                elementos.put(lineText, lineFrame.bottom);
+                for (FirebaseVisionText.Line line: block.getLines()) {
+                    String lineText = line.getText();
+                    Rect lineFrame = line.getBoundingBox();
 
-                for (FirebaseVisionText.Element element: line.getElements()) {
-                    String elementText = element.getText();
-                    Float elementConfidence = element.getConfidence();
-                    List<RecognizedLanguage> elementLanguages = element.getRecognizedLanguages();
-                    Point[] elementCornerPoints = element.getCornerPoints();
-                    Rect elementFrame = element.getBoundingBox();
+                    Bloco bloco = new Bloco();
+                    bloco.setTexto(lineText);
+                    bloco.setCoordenada(lineFrame.bottom);
 
-                    DateTime f;
-
-                    //System.out.println("TEXT: "+elementText+" | "+elementFrame.bottom);
-
-                    try{
-                        f = DateTimeFormat.forPattern("HH:mm").parseDateTime(elementText);
-
-                        Toast.makeText(getApplicationContext(), DateTimeFormat.forPattern("HH:mm").print(f), Toast.LENGTH_SHORT).show();
-                    } catch(Exception e){
-                        System.out.println("ERROR DT: "+e.getMessage());
-                    }
-
-                    System.out.println("OCR:: "+elementText);
+                    elementos.add(bloco);
                 }
 
             }
 
+            Collections.sort(elementos, new Comparator<Bloco>() {
+                public int compare(Bloco o1,
+                                   Bloco o2) {
+                    return o1.getCoordenada().compareTo(o2.getCoordenada());
+                }
+            });
+
+            System.out.println(elementos);
+
+            binding.checkBoxSegSex.setChecked(false);
+            binding.checkBoxSabado.setChecked(false);
+            binding.checkBoxDom.setChecked(false);
         }
-
-        Set<Map.Entry<String, Integer>> set = elementos.entrySet();
-        List<Map.Entry<String, Integer>> list = new ArrayList<>(
-                set);
-        Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
-            public int compare(Map.Entry<String, Integer> o1,
-                               Map.Entry<String, Integer> o2) {
-                return o1.getValue().compareTo(o2.getValue());
-            }
-        });
-
-        System.out.println(list);
 
     }
 

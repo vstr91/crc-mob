@@ -59,7 +59,7 @@ public class ItinerarioResultadoAdapter extends RecyclerView.Adapter<ItinerarioR
 
         boolean ocultaSeta = position+1 == itinerarios.size();
 
-        holder.bind(itinerario, position+1, ocultaSeta, itinerario.getDia(), itinerario.getHora());
+        holder.bind(itinerario, position+1, ocultaSeta, itinerario.getDia(), itinerario.getHora(), itinerarios.size());
 
 
     }

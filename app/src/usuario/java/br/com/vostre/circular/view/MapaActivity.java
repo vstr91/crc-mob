@@ -165,6 +165,7 @@ public class MapaActivity extends BaseActivity {
         mAuth = FirebaseAuth.getInstance();
 
         fechaSubmenu();
+        ocultaModalLoading();
 
         // PARA TESTES
 
@@ -436,6 +437,8 @@ public class MapaActivity extends BaseActivity {
             adapterItinerarios.itinerarios = itinerarios;
             adapterItinerarios.notifyDataSetChanged();
 
+            ocultaModalLoading();
+
             if(!bsd.isShowing()){
                 bsd.show();
             }
@@ -495,6 +498,8 @@ public class MapaActivity extends BaseActivity {
                     public boolean onMarkerClick(Marker marker, MapView mapView) {
 
                         if(gpsAtivo){
+                            geraModalLoading();
+
                             final ParadaBairro pb = getParadaFromMarker(marker, paradas);
 
                             viewModel.setParada(pb);
@@ -696,6 +701,9 @@ public class MapaActivity extends BaseActivity {
                     public boolean onMarkerClick(Marker marker, MapView mapView) {
 
                         if(gpsAtivo){
+
+                            geraModalLoading();
+
                             final ParadaSugestaoBairro p = getSugestaoFromMarker(marker, paradasSugeridas);
 
                             viewModel.setParadaNova(p);
@@ -1244,6 +1252,20 @@ public class MapaActivity extends BaseActivity {
         binding.linearLayoutParada.animate().alpha(0);
         binding.linearLayoutPoi.animate().alpha(0);
         submenuAberto = false;
+    }
+
+    private void geraModalLoading() {
+        binding.fundo.setVisibility(View.VISIBLE);
+        binding.textViewCarregando.setVisibility(View.VISIBLE);
+        binding.progressBar.setIndeterminate(true);
+        binding.progressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void ocultaModalLoading(){
+        binding.fundo.setVisibility(View.GONE);
+        binding.textViewCarregando.setVisibility(View.GONE);
+        binding.progressBar.setIndeterminate(true);
+        binding.progressBar.setVisibility(View.GONE);
     }
 
 }

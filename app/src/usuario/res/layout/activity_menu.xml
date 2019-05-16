@@ -38,6 +38,7 @@
                     android:layout_marginBottom="32dp"
                     android:onClick="onClickBtnLogo"
                     android:src="@mipmap/ic_onibus_branco"
+                    android:contentDescription="Logo do projeto. Ônibus dentro de um círculo estilizado"
                     app:layout_constraintBottom_toTopOf="@+id/guideline"
                     app:layout_constraintEnd_toEndOf="@+id/circleView"
                     app:layout_constraintStart_toStartOf="@+id/circleView"

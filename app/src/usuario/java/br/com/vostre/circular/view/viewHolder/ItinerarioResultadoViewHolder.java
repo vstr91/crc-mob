@@ -39,7 +39,7 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
         this.parent = parent;
     }
 
-    public void bind(final ItinerarioPartidaDestino itinerario, int ordem, boolean ocultaSeta, String dia, String hora) {
+    public void bind(final ItinerarioPartidaDestino itinerario, int ordem, boolean ocultaSeta, String dia, String hora, int quantidade) {
         binding.setItinerario(itinerario);
 
 //        if(!itinerario.getItinerario().getAcessivel()){
@@ -50,6 +50,12 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
 //                itinerario.getItinerario().getObservacao().equals("null") || itinerario.getItinerario().getObservacao().equals(""))){
 //            binding.textViewObservacao.setVisibility(View.GONE);
 //        }
+
+        if(quantidade == 1){
+            binding.textViewOrdem.setVisibility(View.GONE);
+        } else{
+            binding.textViewOrdem.setVisibility(View.VISIBLE);
+        }
 
         if(itinerario.getObservacaoProximoHorario() == null || (itinerario.getObservacaoProximoHorario().isEmpty() ||
                 itinerario.getObservacaoProximoHorario().equals("null") || itinerario.getObservacaoProximoHorario().equals(""))){

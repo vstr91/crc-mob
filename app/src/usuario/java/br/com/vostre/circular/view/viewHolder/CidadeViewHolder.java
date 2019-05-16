@@ -71,6 +71,8 @@ public class CidadeViewHolder extends RecyclerView.ViewHolder {
         binding.circleView2.setOnClickListener(listener);
         binding.textViewNome.setOnClickListener(listener);
 
+        binding.circleView2.setContentDescription("Brasão cidade "+cidade.getCidade().getNome()+", "+cidade.getNomeEstado());
+
         binding.executePendingBindings();
     }
 

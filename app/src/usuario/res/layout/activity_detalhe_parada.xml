@@ -99,6 +99,7 @@
 
                 <ImageView
                     android:id="@+id/imageView9"
+                    android:contentDescription="Imagem da parada"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop" />
@@ -132,6 +133,7 @@
                     android:textColor="@color/branco"
                     android:textStyle="bold"
                     android:visibility="gone"
+                    android:drawableBottom="@drawable/dashed"
                     app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
                     app:layout_constraintStart_toStartOf="parent" />
 
@@ -186,6 +188,8 @@
                         android:background="@color/transparente"
                         android:src="@drawable/ic_map_white_24dp"
                         android:onClick="onClickBtnMapa"
+                        android:tooltipText="Ver parada no mapa"
+                        android:contentDescription="Botão ver parada no mapa"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -195,6 +199,8 @@
                         android:layout_height="match_parent"
                         android:layout_marginRight="10dp"
                         android:layout_weight=".5"
+                        android:contentDescription="Botão adicionar aos favoritos"
+                        android:tooltipText="Adicionar parada aos favoritos"
                         android:onClick="@{view::onClickBtnFavorito}"
                         android:background="@color/transparente"
                         android:src="@drawable/ic_star_white_24dp" />

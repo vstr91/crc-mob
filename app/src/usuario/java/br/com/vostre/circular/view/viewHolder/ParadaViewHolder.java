@@ -75,6 +75,8 @@ public class ParadaViewHolder extends RecyclerView.ViewHolder {
         binding.circleView2.setOnClickListener(listener);
         binding.textViewNome.setOnClickListener(listener);
 
+        binding.circleView2.setContentDescription("Imagem "+parada.getParada().getNome()+", "+parada.getNomeBairroComCidade());
+
         binding.executePendingBindings();
     }
 

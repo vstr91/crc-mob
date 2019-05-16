@@ -9,15 +9,16 @@
         android:id="@+id/textView30"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:text="Ponto de Interesse Próximos"
         android:textAppearance="@style/texto_azul"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="8dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/listPois"
@@ -40,6 +41,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:background="@color/transparente"
+        android:contentDescription="Botão fechar"
         app:layout_constraintBottom_toBottomOf="@+id/textViewStatus"
         app:layout_constraintStart_toEndOf="@+id/textViewStatus"
         app:layout_constraintTop_toTopOf="@+id/textViewStatus"

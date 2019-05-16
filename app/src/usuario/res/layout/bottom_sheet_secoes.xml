@@ -44,6 +44,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         android:background="@color/transparente"
+        android:contentDescription="Botão fechar"
         app:layout_constraintBottom_toBottomOf="@+id/textViewStatus"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

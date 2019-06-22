@@ -26,6 +26,8 @@ public class Acesso {
     @NonNull
     private DateTime dataValidacao;
 
+    private String versao;
+
     public Acesso(){
         this.setId(UUID.randomUUID().toString());
     }
@@ -64,6 +66,14 @@ public class Acesso {
 
     public void setDataValidacao(@NonNull DateTime dataValidacao) {
         this.dataValidacao = dataValidacao;
+    }
+
+    public String getVersao() {
+        return versao;
+    }
+
+    public void setVersao(String versao) {
+        this.versao = versao;
     }
 
     public boolean valida(Acesso acesso) {

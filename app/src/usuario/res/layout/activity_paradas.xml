@@ -136,7 +136,7 @@
                     android:layout_marginTop="8dp"
                     android:onClick="@{view::onClickBtnEditarPartida}"
                     android:contentDescription="Botão trocar cidade"
-                    android:src="@drawable/ic_edit_blue_24dp"
+                    app:srcCompat="@drawable/ic_edit_blue_24dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

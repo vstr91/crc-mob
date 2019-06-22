@@ -219,6 +219,24 @@
                                 </android.support.v7.widget.RecyclerView>
 
                                 <TextView
+                                    android:id="@+id/textViewParadaAceitaVazia"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginLeft="8dp"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_marginRight="8dp"
+                                    android:gravity="center"
+                                    android:padding="10dp"
+                                    android:text="Nenhuma sugestão de parada foi aprovada. Quando uma parada sugerida for aceita, ela aparecerá aqui."
+                                    android:textColor="@color/branco"
+                                    android:textStyle="bold"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/listAceitas" />
+
+                                <TextView
                                     android:id="@+id/textView30"
                                     android:layout_width="match_parent"
                                     android:layout_height="0dp"
@@ -234,7 +252,7 @@
                                     android:textStyle="bold"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toBottomOf="@+id/listAceitas" />
+                                    app:layout_constraintTop_toBottomOf="@+id/textViewParadaAceitaVazia" />
 
                                 <android.support.v7.widget.RecyclerView
                                     android:id="@+id/listAceitasPois"
@@ -250,6 +268,24 @@
                                     tools:listitem="@layout/linha_pois_sugeridos">
 
                                 </android.support.v7.widget.RecyclerView>
+
+                                <TextView
+                                    android:id="@+id/textViewPoiAceitaVazia"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginLeft="8dp"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_marginRight="8dp"
+                                    android:gravity="center"
+                                    android:padding="10dp"
+                                    android:text="Nenhuma sugestão de ponto de interesse aceita. Quando um ponto de interesse for aceito, ele aparecerá aqui."
+                                    android:textColor="@color/branco"
+                                    android:textStyle="bold"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/listAceitasPois" />
 
                             </android.support.constraint.ConstraintLayout>
 
@@ -304,6 +340,24 @@
                                 </android.support.v7.widget.RecyclerView>
 
                                 <TextView
+                                    android:id="@+id/textViewParadaRejeitadaVazia"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginLeft="8dp"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_marginRight="8dp"
+                                    android:gravity="center"
+                                    android:padding="10dp"
+                                    android:text="Nenhuma sugestão de parada foi rejeitada. Se uma parada sugerida não for aceita, ela aparecerá aqui."
+                                    android:textColor="@color/branco"
+                                    android:textStyle="bold"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/listRejeitadas" />
+
+                                <TextView
                                     android:id="@+id/textView32"
                                     android:layout_width="match_parent"
                                     android:layout_height="0dp"
@@ -319,7 +373,7 @@
                                     android:textStyle="bold"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toBottomOf="@+id/listRejeitadas" />
+                                    app:layout_constraintTop_toBottomOf="@+id/textViewParadaRejeitadaVazia" />
 
                                 <android.support.v7.widget.RecyclerView
                                     android:id="@+id/listRejeitadasPois"
@@ -334,6 +388,24 @@
                                     tools:listitem="@layout/linha_pois_sugeridos">
 
                                 </android.support.v7.widget.RecyclerView>
+
+                                <TextView
+                                    android:id="@+id/textViewPoiRejeitadoVazia"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginLeft="8dp"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_marginRight="8dp"
+                                    android:gravity="center"
+                                    android:padding="10dp"
+                                    android:text="Nenhuma sugestão de ponto de interesse rejeitada. Se um ponto de interesse for rejeitado, ele aparecerá aqui."
+                                    android:textColor="@color/branco"
+                                    android:textStyle="bold"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/listRejeitadasPois" />
 
                             </android.support.constraint.ConstraintLayout>
 

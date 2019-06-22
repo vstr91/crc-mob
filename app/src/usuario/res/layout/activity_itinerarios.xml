@@ -75,9 +75,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/cinzaEscuro80"
-            android:orientation="vertical"
-            android:elevation="20dp"
             android:clickable="true"
+            android:elevation="20dp"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -86,7 +86,7 @@
 
         </LinearLayout>
 
-        <ImageButton
+        <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/btnInverter"
             android:layout_width="80dp"
             android:layout_height="80dp"
@@ -97,7 +97,7 @@
             android:layout_marginTop="16dp"
             android:background="@color/transparente"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_swap_vert_blue_24dp"
+            app:srcCompat="@drawable/ic_swap_vert_blue_24dp"
             android:onClick="@{view::onClickBtnInverter}"
             android:translationZ="3dp"
             android:visibility="gone"
@@ -228,7 +228,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/textViewBairroPartida"
                     tools:text="Cidade Partida" />
 
-                <ImageButton
+                <android.support.v7.widget.AppCompatImageButton
                     android:id="@+id/imageButton"
                     style="@style/botao_transparente"
                     android:layout_width="wrap_content"
@@ -238,7 +238,7 @@
                     android:layout_marginRight="16dp"
                     android:contentDescription="Botão editar partida"
                     android:onClick="@{view::onClickBtnEditarPartida}"
-                    android:src="@drawable/ic_edit_blue_24dp"
+                    app:srcCompat="@drawable/ic_edit_blue_24dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView26" />
@@ -317,7 +317,7 @@
 
                 </android.support.constraint.ConstraintLayout>
 
-                <ImageButton
+                <android.support.v7.widget.AppCompatImageButton
                     android:id="@+id/imageButton2"
                     style="@style/botao_transparente"
                     android:layout_width="wrap_content"
@@ -328,7 +328,7 @@
                     android:layout_marginTop="8dp"
                     android:contentDescription="Botão editar destino"
                     android:onClick="@{view::onClickBtnEditarDestino}"
-                    android:src="@drawable/ic_edit_blue_24dp"
+                    app:srcCompat="@drawable/ic_edit_blue_24dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView27" />

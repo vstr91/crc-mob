@@ -32,8 +32,7 @@
         <item>Parada</item>
         <item>Ponto de Interesse</item>
     </string-array>
-    <string name="novidade_210_login">Fazendo login você salva seus favoritos e tem acesso a eles mesmo trocando de smartphone!</string>
-    <string name="novidade_210_sugestao">Sugira paradas e pontos de interesse público (praças, pontos
-        turísticos, hospitais, locais de prática religiosa, etc.) direto na tela de Mapa!\n\nFaça login e contribua com o projeto!</string>
+    <string name="novidade_210_login">Fazendo login, você salva seus favoritos e tem acesso a eles mesmo trocando de smartphone!</string>
+    <string name="novidade_210_sugestao">Sugira paradas e pontos de interesse público, como praças, pontos turísticos, hospitais e locais de prática religiosa direto na tela de Mapa!\n\nFaça login e contribua com o projeto!</string>
     <string name="novidade_210_horario">Veja o tempo estimado* em que o ônibus passará pela parada escolhida!\n\n\n*Estimativa calculada automaticamente. Os dados não são calculados em tempo real!</string>
 </resources>

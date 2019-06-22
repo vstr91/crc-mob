@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.karumi.dexter.Dexter;
@@ -52,9 +53,9 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
 //        }
 
         if(quantidade == 1){
-            binding.textViewOrdem.setVisibility(View.GONE);
+            binding.linearLayoutOrdem.setVisibility(View.GONE);
         } else{
-            binding.textViewOrdem.setVisibility(View.VISIBLE);
+            binding.linearLayoutOrdem.setVisibility(View.VISIBLE);
         }
 
         if(itinerario.getObservacaoProximoHorario() == null || (itinerario.getObservacaoProximoHorario().isEmpty() ||
@@ -172,6 +173,9 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
             };
 
             binding.linearLayoutHora.setOnClickListener(listenerHora);
+            binding.imageView19.setVisibility(View.VISIBLE);
+        } else{
+            binding.imageView19.setVisibility(View.GONE);
         }
 
         final View.OnClickListener listenerParada = new View.OnClickListener() {

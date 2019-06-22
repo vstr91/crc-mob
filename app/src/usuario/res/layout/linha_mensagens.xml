@@ -75,7 +75,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    android:src="@{mensagem.lida ? @drawable/ic_drafts_black_24dp : @drawable/ic_email_black_24dp}" />
+                    app:srcCompat="@{mensagem.lida ? @drawable/ic_drafts_black_24dp : @drawable/ic_email_black_24dp}" />
             </android.support.constraint.ConstraintLayout>
 
         </android.support.v7.widget.CardView>

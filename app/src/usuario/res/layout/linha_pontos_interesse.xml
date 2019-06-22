@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
-            android:src="@drawable/ic_place_blue_24dp"
+            app:srcCompat="@drawable/ic_place_blue_24dp"
             app:layout_constraintBottom_toBottomOf="@+id/btnVerMapa"
             app:layout_constraintStart_toStartOf="@+id/guideline6"
             app:layout_constraintTop_toTopOf="@+id/btnVerMapa" />
@@ -46,17 +46,17 @@
             style="@style/botao_branco"
             android:layout_width="wrap_content"
             android:layout_height="20dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="24dp"
             android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginRight="24dp"
             android:background="@color/transparente"
             android:text="Ver Local no mapa"
             android:textAppearance="@style/texto_azul"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="@+id/textViewNome"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageViewFoto"
+            app:layout_constraintStart_toEndOf="@+id/imageView11"
             app:layout_constraintTop_toTopOf="@+id/textViewNome" />
 
         <TextView

@@ -291,6 +291,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         id = crypt.bytesToHex(crypt.encrypt(id));
 
         String versao = BuildConfig.VERSION_NAME;
+        versao = versao.replace(".", "");
 
         if(tipo == 0){
             Call<String> call = api.requisitaToken(id, tipo, versao);

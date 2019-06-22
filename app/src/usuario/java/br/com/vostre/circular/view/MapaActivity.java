@@ -325,17 +325,18 @@ public class MapaActivity extends BaseActivity {
 
         bsdPoi.setContentView(R.layout.infowindow_poi);
 
+        checaLogin();
+
         if(!gpsAtivo){
             binding.textViewGps.setVisibility(View.VISIBLE);
             binding.fabParada.setEnabled(false);
             binding.fabMeuLocal.setEnabled(false);
+            binding.fabParada.setVisibility(View.GONE);
         } else{
             binding.textViewGps.setVisibility(View.GONE);
             binding.fabParada.setEnabled(true);
             binding.fabMeuLocal.setEnabled(true);
         }
-
-        checaLogin();
 
         configuraMapa();
     }
@@ -378,11 +379,11 @@ public class MapaActivity extends BaseActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
-                if(gpsAtivo){
-                    return false;
-                } else{
-                    return true;
+                if(submenuAberto){
+                    fechaSubmenu();
                 }
+
+                return false;
 
             }
         });
@@ -438,6 +439,23 @@ public class MapaActivity extends BaseActivity {
             adapterItinerarios.notifyDataSetChanged();
 
             ocultaModalLoading();
+
+            int contLegenda = 0;
+
+            for(ItinerarioPartidaDestino i : itinerarios){
+
+                if(i.getTempoAcumulado() != null &&
+                        (i.getTempoAcumulado().getHourOfDay() > 0 || i.getTempoAcumulado().getMinuteOfHour() > 0)){
+                    contLegenda++;
+                }
+
+            }
+
+            if(contLegenda == 0){
+                bsd.findViewById(R.id.textViewLegenda).setVisibility(View.GONE);
+            } else{
+                bsd.findViewById(R.id.textViewLegenda).setVisibility(View.VISIBLE);
+            }
 
             if(!bsd.isShowing()){
                 bsd.show();
@@ -761,6 +779,7 @@ public class MapaActivity extends BaseActivity {
                                 @Override
                                 public void onClick(View view) {
                                     bsd.dismiss();
+                                    ocultaModalLoading();
                                 }
                             });
 
@@ -883,6 +902,7 @@ public class MapaActivity extends BaseActivity {
                                 @Override
                                 public void onClick(View view) {
                                     bsdPoi.dismiss();
+                                    ocultaModalLoading();
                                 }
                             });
 
@@ -1124,6 +1144,7 @@ public class MapaActivity extends BaseActivity {
             binding.textViewGps.setText(R.string.text_gps);
             binding.textViewGps.setVisibility(View.VISIBLE);
             binding.fabParada.setEnabled(false);
+            binding.fabParada.setVisibility(View.GONE);
             binding.fabMeuLocal.setEnabled(false);
             binding.map.setEnabled(false);
         } else{
@@ -1132,6 +1153,10 @@ public class MapaActivity extends BaseActivity {
 
             if(SessionUtils.estaLogado(getApplicationContext())){
                 binding.fabParada.setEnabled(true);
+                binding.fabParada.setVisibility(View.VISIBLE);
+            } else{
+                binding.fabParada.setEnabled(false);
+                binding.fabParada.setVisibility(View.GONE);
             }
 
             binding.fabMeuLocal.setEnabled(true);
@@ -1231,6 +1256,13 @@ public class MapaActivity extends BaseActivity {
     }
 
     private void abreSubmenu(){
+
+        binding.linearLayoutParada.setEnabled(true);
+        binding.linearLayoutPoi.setEnabled(true);
+
+        binding.fabParadaSug.setEnabled(true);
+        binding.fabPoiSug.setEnabled(true);
+
         binding.linearLayoutParada.animate().alpha(1);
         binding.linearLayoutPoi.animate().alpha(1);
 
@@ -1251,6 +1283,13 @@ public class MapaActivity extends BaseActivity {
     private void ocultaSubmenu(){
         binding.linearLayoutParada.animate().alpha(0);
         binding.linearLayoutPoi.animate().alpha(0);
+
+        binding.linearLayoutParada.setEnabled(false);
+        binding.linearLayoutPoi.setEnabled(false);
+
+        binding.fabParadaSug.setEnabled(false);
+        binding.fabPoiSug.setEnabled(false);
+
         submenuAberto = false;
     }
 

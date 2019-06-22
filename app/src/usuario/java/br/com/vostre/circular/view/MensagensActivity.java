@@ -3,6 +3,8 @@ package br.com.vostre.circular.view;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.databinding.BindingMethod;
+import android.databinding.BindingMethods;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +24,10 @@ import br.com.vostre.circular.view.adapter.MensagemAdapter;
 import br.com.vostre.circular.view.form.FormMensagem;
 import br.com.vostre.circular.viewModel.MensagensViewModel;
 
+@BindingMethods({
+        @BindingMethod(type = android.widget.ImageView.class,
+                attribute = "app:srcCompat",
+                method = "setImageDrawable") })
 public class MensagensActivity extends BaseActivity {
 
     ActivityMensagensBinding binding;
@@ -125,6 +131,13 @@ public class MensagensActivity extends BaseActivity {
         public void onChanged(List<Mensagem> mensagens) {
             adapter.mensagens = mensagens;
             adapter.notifyDataSetChanged();
+
+            if(mensagens.size() > 0){
+                binding.textViewListaVazia.setVisibility(View.GONE);
+            } else{
+                binding.textViewListaVazia.setVisibility(View.VISIBLE);
+            }
+
         }
     };
 

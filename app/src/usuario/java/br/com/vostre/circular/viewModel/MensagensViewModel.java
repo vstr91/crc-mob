@@ -3,6 +3,7 @@ package br.com.vostre.circular.viewModel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 
 import org.joda.time.DateTime;
@@ -23,6 +24,8 @@ public class MensagensViewModel extends AndroidViewModel {
     public LiveData<List<Mensagem>> mensagens;
     public LiveData<List<Mensagem>> mensagensRecebidas;
     public Mensagem mensagem;
+
+    public static MutableLiveData<Integer> retorno;
 
     public LiveData<List<Mensagem>> getMensagensRecebidas() {
         return mensagensRecebidas;
@@ -54,6 +57,9 @@ public class MensagensViewModel extends AndroidViewModel {
         mensagem = new Mensagem();
         mensagens = appDatabase.mensagemDAO().listarTodos();
         mensagensRecebidas = appDatabase.mensagemDAO().listarTodosRecebidos();
+
+        retorno = new MutableLiveData<>();
+        retorno.setValue(-1);
     }
 
     public void atualizarMensagens(){
@@ -61,14 +67,15 @@ public class MensagensViewModel extends AndroidViewModel {
         mensagensRecebidas = appDatabase.mensagemDAO().listarTodosRecebidos();
     }
 
-    public void salvarMensagem(){
+    public void salvarMensagem(String id){
 
         mensagem.setServidor(false);
+        mensagem.setUsuarioCadastro(id);
 
         if(mensagem.valida(mensagem)){
             add(mensagem);
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -80,7 +87,7 @@ public class MensagensViewModel extends AndroidViewModel {
         if(mensagem.valida(mensagem)){
             edit(mensagem);
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -117,6 +124,11 @@ public class MensagensViewModel extends AndroidViewModel {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
+        }
+
     }
 
     // fim adicionar
@@ -143,6 +155,11 @@ public class MensagensViewModel extends AndroidViewModel {
         protected Void doInBackground(final Mensagem... params) {
             db.mensagemDAO().editar((params[0]));
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
         }
 
     }

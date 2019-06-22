@@ -896,6 +896,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             binding.textView36.setVisibility(View.INVISIBLE);
             binding.circleView.setImagem(null);
             binding.circleView.invalidate();
+            paradaAtual = null;
         }
 
 

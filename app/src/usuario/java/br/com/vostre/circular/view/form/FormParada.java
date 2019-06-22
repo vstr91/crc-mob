@@ -76,6 +76,9 @@ public class FormParada extends FormBase {
 
     public static final int PICK_IMAGE = 400;
 
+    int indexBairro = -1;
+    static FormParada thiz;
+
     public ParadaBairro getParadaRelativa() {
         return paradaRelativa;
     }
@@ -134,6 +137,8 @@ public class FormParada extends FormBase {
 
         binding.setView(this);
         binding.setViewModel(viewModel);
+
+        thiz = this;
 
         imageViewFoto = binding.imageView;
         btnTrocarFoto = binding.btnTrocarFoto;
@@ -218,13 +223,15 @@ public class FormParada extends FormBase {
         binding.btnFoto.setVisibility(View.GONE);
     }
 
-    @BindingAdapter("entries")
+    @BindingAdapter("entriesParada")
     public static void setSpinnerEntries(Spinner spinner, LiveData<List<BairroCidade>> bairros){
 
         if(bairros.getValue() != null){
             BairroAdapterSpinner adapter = new BairroAdapterSpinner(ctx, R.layout.linha_bairros_spinner,
                     R.id.textViewNome, bairros.getValue());
             spinner.setAdapter(adapter);
+
+            thiz.setaBairroParada();
         }
 
     }
@@ -284,26 +291,37 @@ public class FormParada extends FormBase {
                     R.id.textViewNome, bairros);
             spinner.setAdapter(adapter);
 
-            if(parada != null){
-                BairroCidade bairro = new BairroCidade();
-                bairro.getBairro().setId(parada.getBairro());
-                int i = viewModel.bairros.getValue().indexOf(bairro);
-                binding.spinnerBairro.setSelection(i, false);
-            }
-
-            if(paradaRelativa != null){
-                BairroCidade bairro = new BairroCidade();
-                bairro.getBairro().setId(paradaRelativa.getParada().getBairro());
-                int i = viewModel.bairros.getValue().indexOf(bairro);
-                binding.spinnerBairro.setSelection(i, false);
-            }
+            setaBairroParada();
 
         }
 
     }
 
+    void setaBairroParada() {
+        if(parada != null){
+            BairroCidade bairro = new BairroCidade();
+            bairro.getBairro().setId(parada.getBairro());
+            indexBairro = viewModel.bairros.getValue().indexOf(bairro);
+            binding.spinnerBairro.setSelection(indexBairro, true);
+        }
+
+        if(paradaRelativa != null){
+            BairroCidade bairro = new BairroCidade();
+            bairro.getBairro().setId(paradaRelativa.getParada().getBairro());
+            indexBairro = viewModel.bairros.getValue().indexOf(bairro);
+            binding.spinnerBairro.setSelection(indexBairro, true);
+        }
+    }
+
     public void onItemSelectedSpinnerBairro (AdapterView<?> adapterView, View view, int i, long l){
-        viewModel.bairro = viewModel.bairros.getValue().get(i);
+
+        if(indexBairro > 0){
+            viewModel.bairro = viewModel.bairros.getValue().get(indexBairro);
+        } else{
+            viewModel.bairro = viewModel.bairros.getValue().get(i);
+        }
+
+
     }
 
     Observer<List<BairroCidade>> bairrosObserver = new Observer<List<BairroCidade>>() {

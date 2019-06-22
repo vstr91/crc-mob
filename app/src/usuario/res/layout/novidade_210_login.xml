@@ -14,7 +14,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/imagem_nao_disponivel_16_9" />
+        app:srcCompat="@drawable/novo_login" />
 
     <TextView
         android:id="@+id/textView63"
@@ -37,13 +37,14 @@
         android:id="@+id/textView64"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:lineSpacingExtra="4sp"
-        android:layout_gravity="center_vertical|end"
+        android:padding="5dp"
         android:text="@string/novidade_210_login"
         android:textColor="@color/branco"
         app:layout_constraintEnd_toEndOf="parent"

@@ -89,44 +89,76 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
     Bundle bundle;
 
+    boolean inversao = false;
+    String itinerario;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_itinerario);
         binding.getRoot().setDrawingCacheEnabled(true);
         binding.setView(this);
         binding.setLifecycleOwner(this);
-        super.onCreate(savedInstanceState);
-        setTitle("Detalhe Itinerário");
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
 
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
+        if(!inversao){
+            super.onCreate(savedInstanceState);
+            setTitle("Detalhe Itinerário");
+            getSupportActionBar().setDisplayShowTitleEnabled(true);
+
+            mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
+
+            ctx = this;
+
+            viewModel = ViewModelProviders.of(this).get(DetalhesItinerarioViewModel.class);
+
+            binding.setViewModel(viewModel);
+
+            itinerario = getIntent().getStringExtra("itinerario");
+            horario = getIntent().getStringExtra("horario");
+        }
 
         listLegenda = binding.listLegenda;
 
-        ctx = this;
+        //inversao false == primeira entrada;
+        if(inversao){
+            String tempItinerario = itinerarioPartida;
+            itinerarioPartida = itinerarioDestino;
+            itinerarioDestino = tempItinerario;
 
-        viewModel = ViewModelProviders.of(this).get(DetalhesItinerarioViewModel.class);
+            String tempParada = paradaPartida;
+            paradaPartida = paradaDestino;
+            paradaDestino = tempParada;
 
-        binding.setViewModel(viewModel);
+            viewModel.setItinerario(itinerario, paradaPartida, paradaDestino,
+                    itinerarioPartida, itinerarioDestino);
 
-        itinerarioPartida = getIntent().getStringExtra("itinerarioPartida");
-        itinerarioDestino = getIntent().getStringExtra("itinerarioDestino");
+            viewModel.itinerario.observe(this, itinerarioObserver);
 
-        paradaPartida = getIntent().getStringExtra("paradaPartida");
-        paradaDestino = getIntent().getStringExtra("paradaDestino");
+            viewModel.partida.observe(this, partidaObserver);
+            viewModel.destino.observe(this, destinoObserver);
 
-        viewModel.setItinerario(getIntent().getStringExtra("itinerario"), paradaPartida, paradaDestino,
-                itinerarioPartida, itinerarioDestino);
-        horario = getIntent().getStringExtra("horario");
+            listHorarios = binding.listHorarios;
+            adapterHorarios = new HorarioItinerarioAdapter(viewModel.horarios.getValue(), this);
+            listHorarios.setAdapter(adapterHorarios);
+        } else{
+            itinerarioPartida = getIntent().getStringExtra("itinerarioPartida");
+            itinerarioDestino = getIntent().getStringExtra("itinerarioDestino");
 
-        viewModel.itinerario.observe(this, itinerarioObserver);
+            paradaPartida = getIntent().getStringExtra("paradaPartida");
+            paradaDestino = getIntent().getStringExtra("paradaDestino");
 
-        viewModel.partida.observe(this, partidaObserver);
-        viewModel.destino.observe(this, destinoObserver);
+            viewModel.setItinerario(getIntent().getStringExtra("itinerario"), paradaPartida, paradaDestino,
+                    itinerarioPartida, itinerarioDestino);
+            horario = getIntent().getStringExtra("horario");
 
-        listHorarios = binding.listHorarios;
-        adapterHorarios = new HorarioItinerarioAdapter(viewModel.horarios.getValue(), this);
-        listHorarios.setAdapter(adapterHorarios);
+            viewModel.itinerario.observe(this, itinerarioObserver);
+
+            viewModel.partida.observe(this, partidaObserver);
+            viewModel.destino.observe(this, destinoObserver);
+
+            listHorarios = binding.listHorarios;
+            adapterHorarios = new HorarioItinerarioAdapter(viewModel.horarios.getValue(), this);
+            listHorarios.setAdapter(adapterHorarios);
+        }
 
         bsd = new BottomSheetDialog(ctx);
         bsd.setCanceledOnTouchOutside(true);
@@ -344,6 +376,11 @@ public class DetalheItinerarioActivity extends BaseActivity {
             mFirebaseAnalytics.logEvent("mapa_oculto", bundle);
         }
 
+    }
+
+    public void inverteConsulta(View v){
+        inversao = true;
+        this.onCreate(getIntent().getExtras());
     }
 
     public void btnSecoesClick(View v){

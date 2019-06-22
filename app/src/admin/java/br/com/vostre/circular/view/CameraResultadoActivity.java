@@ -35,6 +35,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
+import java.time.DateTimeException;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -59,7 +62,7 @@ import br.com.vostre.circular.utils.TextGraphic;
 public class CameraResultadoActivity extends BaseActivity {
 
     ActivityCameraResultadoBinding binding;
-//    SobreViewModel viewModel;
+    //    SobreViewModel viewModel;
     Bitmap bitmap;
     GraphicOverlay mGraphicOverlay;
     Boolean processando = false;
@@ -310,6 +313,18 @@ public class CameraResultadoActivity extends BaseActivity {
             binding.checkBoxSegSex.setChecked(false);
             binding.checkBoxSabado.setChecked(false);
             binding.checkBoxDom.setChecked(false);
+        }
+
+        System.out.println(horarios);
+
+        for(HorarioItinerario h : horarios){
+
+            if(h.getObservacao() != null && !h.getObservacao().isEmpty()){
+                Toast.makeText(getApplicationContext(), h.getHorario()+" "+h.getObservacao(), Toast.LENGTH_SHORT).show();
+            } else{
+                Toast.makeText(getApplicationContext(), h.getHorario(), Toast.LENGTH_SHORT).show();
+            }
+
         }
 
     }

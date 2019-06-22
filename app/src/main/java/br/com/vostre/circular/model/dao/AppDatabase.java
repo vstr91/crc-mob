@@ -106,6 +106,7 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
             database.execSQL("CREATE TABLE IF NOT EXISTS 'ponto_interesse_sugestao' ('observacao' TEXT, 'pontoInteresse' TEXT, 'status' INTEGER NOT NULL, 'descricao' TEXT, 'latitude' REAL NOT NULL, 'longitude' REAL NOT NULL, 'imagem' TEXT, 'dataInicial' INTEGER, 'dataFinal' INTEGER, 'imagemEnviada' INTEGER NOT NULL, 'permanente' INTEGER NOT NULL, 'bairro' TEXT NOT NULL, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("ALTER TABLE 'acesso' ADD COLUMN 'versao' TEXT");
         }
     };
 

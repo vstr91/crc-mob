@@ -1,5 +1,6 @@
 package br.com.vostre.circular.view.form;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -72,22 +74,36 @@ public class FormMensagem extends FormBase {
 
         String id = PreferenceUtils.carregarUsuarioLogado(getContext().getApplicationContext());
 
-        if(id != null && !id.equals("")){
-            mensagem.setUsuarioCadastro(id);
-            mensagem.setUsuarioUltimaAlteracao(id);
-        }
-
         if(mensagem != null){
+            mensagem.setUsuarioUltimaAlteracao(id);
             viewModel.editarMensagem();
         } else{
-            viewModel.salvarMensagem();
+            viewModel.salvarMensagem(id);
         }
 
-        dismiss();
+        viewModel.retorno.observe(this, retornoObserver);
     }
 
     public void onClickFechar(View v){
         dismiss();
     }
+
+    Observer<Integer> retornoObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer retorno) {
+
+            if(retorno == 1){
+                Toast.makeText(getContext().getApplicationContext(), "Mensagem enviada! Obrigado!", Toast.LENGTH_SHORT).show();
+                viewModel.setMensagem(new Mensagem());
+                dismiss();
+            } else if(retorno == 0){
+                Toast.makeText(getContext().getApplicationContext(),
+                        "Dados necessários não informados. Por favor preencha " +
+                                "todos os dados obrigatórios!",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    };
 
 }

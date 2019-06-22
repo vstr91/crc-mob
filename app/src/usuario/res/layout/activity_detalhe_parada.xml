@@ -179,21 +179,21 @@
                             android:textColor="@color/branco" />
                     </LinearLayout>
 
-                    <ImageButton
+                    <android.support.v7.widget.AppCompatImageButton
                         android:id="@+id/imageButton3"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_marginRight="8dp"
                         android:layout_weight=".5"
                         android:background="@color/transparente"
-                        android:src="@drawable/ic_map_white_24dp"
+                        app:srcCompat="@drawable/ic_map_white_24dp"
                         android:onClick="onClickBtnMapa"
                         android:tooltipText="Ver parada no mapa"
                         android:contentDescription="Botão ver parada no mapa"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent" />
 
-                    <ImageButton
+                    <android.support.v7.widget.AppCompatImageButton
                         android:id="@+id/imageButton4"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
@@ -203,7 +203,7 @@
                         android:tooltipText="Adicionar parada aos favoritos"
                         android:onClick="@{view::onClickBtnFavorito}"
                         android:background="@color/transparente"
-                        android:src="@drawable/ic_star_white_24dp" />
+                        app:srcCompat="@drawable/ic_star_white_24dp" />
 
                 </LinearLayout>
 

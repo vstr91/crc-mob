@@ -184,6 +184,13 @@ public class ParadasSugeridasActivity extends BaseActivity {
         public void onChanged(List<ParadaSugestaoBairro> paradas) {
             adapterAceitas.paradas = paradas;
             adapterAceitas.notifyDataSetChanged();
+
+            if(paradas.size() > 0){
+                binding.textViewParadaAceitaVazia.setVisibility(View.GONE);
+            } else{
+                binding.textViewParadaAceitaVazia.setVisibility(View.VISIBLE);
+            }
+
         }
     };
 
@@ -192,6 +199,13 @@ public class ParadasSugeridasActivity extends BaseActivity {
         public void onChanged(List<ParadaSugestaoBairro> paradas) {
             adapterRejeitadas.paradas = paradas;
             adapterRejeitadas.notifyDataSetChanged();
+
+            if(paradas.size() > 0){
+                binding.textViewParadaRejeitadaVazia.setVisibility(View.GONE);
+            } else{
+                binding.textViewParadaRejeitadaVazia.setVisibility(View.VISIBLE);
+            }
+
         }
     };
 
@@ -217,6 +231,13 @@ public class ParadasSugeridasActivity extends BaseActivity {
         public void onChanged(List<PontoInteresseSugestaoBairro> pois) {
             adapterAceitasPois.pois = pois;
             adapterAceitasPois.notifyDataSetChanged();
+
+            if(pois.size() > 0){
+                binding.textViewPoiAceitaVazia.setVisibility(View.GONE);
+            } else{
+                binding.textViewPoiAceitaVazia.setVisibility(View.VISIBLE);
+            }
+
         }
     };
 
@@ -225,6 +246,13 @@ public class ParadasSugeridasActivity extends BaseActivity {
         public void onChanged(List<PontoInteresseSugestaoBairro> pois) {
             adapterRejeitadasPois.pois = pois;
             adapterRejeitadasPois.notifyDataSetChanged();
+
+            if(pois.size() > 0){
+                binding.textViewPoiRejeitadoVazia.setVisibility(View.GONE);
+            } else{
+                binding.textViewPoiRejeitadoVazia.setVisibility(View.VISIBLE);
+            }
+
         }
     };
 

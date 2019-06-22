@@ -14,7 +14,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/imagem_nao_disponivel_16_9" />
+        app:srcCompat="@drawable/novo_horario" />
 
     <TextView
         android:id="@+id/textView63"

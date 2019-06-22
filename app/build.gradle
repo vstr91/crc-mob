@@ -8,8 +8,8 @@ android {
         minSdkVersion 15
         targetSdkVersion 26
         multiDexEnabled true
-        versionCode 21
-        versionName "2.1.0"
+        versionCode 23
+        versionName "2.1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
 
@@ -48,7 +48,7 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix ".debug"
+            //applicationIdSuffix ".debug"
             versionNameSuffix '-SNAPSHOT'
         }
         release {

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "6058f49edb345fb561102b7a31853023",
+    "identityHash": "6cbb0990770d18a87bc2477d5ea6cb94",
     "entities": [
       {
         "tableName": "Pais",
@@ -2194,7 +2194,7 @@
       },
       {
         "tableName": "Acesso",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `identificadorUnico` TEXT NOT NULL, `dataCriacao` INTEGER NOT NULL, `dataValidacao` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `identificadorUnico` TEXT NOT NULL, `dataCriacao` INTEGER NOT NULL, `dataValidacao` INTEGER NOT NULL, `versao` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -2219,6 +2219,12 @@
             "columnName": "dataValidacao",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "versao",
+            "columnName": "versao",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -2379,7 +2385,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"6058f49edb345fb561102b7a31853023\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"6cbb0990770d18a87bc2477d5ea6cb94\")"
     ]
   }
 }

@@ -7,6 +7,8 @@
     <color name="transparente">#00000000</color>
 
     <color name="branco">#FFFFFF</color>
+    <color name="branco50">#77FFFFFF</color>
+
     <color name="ciano">#00EEE2</color>
     <color name="azul">#334BFF</color>
     <color name="vermelho">#DD0000</color>
@@ -16,6 +18,7 @@
     <color name="cinzaInativo">#E3E3E3</color>
     <color name="cinzaEscuro80">#DD333333</color>
 
+    <color name="cinzaEscuro50">#77333333</color>
     <color name="cianoEscuro">#25dcd2</color>
     <color name="cianoMedio">#07d7e6</color>
 

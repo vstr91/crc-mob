@@ -5,7 +5,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "br.com.vostre.circular"
-        minSdkVersion 15
+        minSdkVersion 19
         targetSdkVersion 28
         multiDexEnabled true
         versionCode 24
@@ -63,6 +63,7 @@ android {
 
     dataBinding {
         enabled = true
+        version = '3.3.2'
     }
 
     dexOptions {

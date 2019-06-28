@@ -315,17 +315,17 @@ public class CameraResultadoActivity extends BaseActivity {
             binding.checkBoxDom.setChecked(false);
         }
 
-        System.out.println(horarios);
-
-        for(HorarioItinerario h : horarios){
-
-            if(h.getObservacao() != null && !h.getObservacao().isEmpty()){
-                Toast.makeText(getApplicationContext(), h.getHorario()+" "+h.getObservacao(), Toast.LENGTH_SHORT).show();
-            } else{
-                Toast.makeText(getApplicationContext(), h.getHorario(), Toast.LENGTH_SHORT).show();
-            }
-
-        }
+//        System.out.println(horarios);
+//
+//        for(HorarioItinerario h : horarios){
+//
+//            if(h.getObservacao() != null && !h.getObservacao().isEmpty()){
+//                Toast.makeText(getApplicationContext(), h.getHorario()+" "+h.getObservacao(), Toast.LENGTH_SHORT).show();
+//            } else{
+//                Toast.makeText(getApplicationContext(), h.getHorario(), Toast.LENGTH_SHORT).show();
+//            }
+//
+//        }
 
     }
 

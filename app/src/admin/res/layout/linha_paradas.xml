@@ -48,7 +48,7 @@
                         android:text="@{parada.parada.nome}" />
 
                     <TextView
-                        android:id="@+id/textViewCidade"
+                        android:id="@+id/textViewTipo"
                         style="@style/texto_lista_menor"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

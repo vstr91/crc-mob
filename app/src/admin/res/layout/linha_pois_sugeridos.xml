@@ -53,7 +53,7 @@
                     tools:text="Nome" />
 
                 <TextView
-                    android:id="@+id/textViewCidade"
+                    android:id="@+id/textViewTipo"
                     style="@style/texto_lista_menor"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -117,7 +117,7 @@
                     android:textAppearance="@style/texto_azul"
                     android:textSize="12sp"
                     android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="@+id/textViewCidade"
+                    app:layout_constraintBottom_toBottomOf="@+id/textViewTipo"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="Pendente" />
@@ -152,7 +152,7 @@
                     android:text="@{parada.pontoInteresse.descricao}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/imageViewFoto"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewCidade"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewTipo"
                     tools:text="Descricao" />
 
                 <TextView

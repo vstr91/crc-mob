@@ -39,6 +39,7 @@ public class ToolbarUtils {
     static ImageButton imageButtonMsg;
     static ImageButton imageButtonExportar;
     static ImageButton imageButtonSync;
+    static ImageButton imageButtonProblemas;
     //    static ImageButton imageButtonImportar;
     static View.OnClickListener mListener;
     public static int NOVAS_MENSAGENS = 0;
@@ -65,6 +66,9 @@ public class ToolbarUtils {
         MenuItem itemSync = menu.findItem(R.id.icon_sync);
         MenuItemCompat.getActionView(itemSync).setOnClickListener(listener);
 
+        MenuItem itemProblemas = menu.findItem(R.id.icon_problemas);
+        MenuItemCompat.getActionView(itemProblemas).setOnClickListener(listener);
+
 //        MenuItem itemImport = menu.findItem(R.id.icon_import);
 //        MenuItemCompat.getActionView(itemImport).setOnClickListener(listener);
 
@@ -80,6 +84,9 @@ public class ToolbarUtils {
 
         imageButtonSync = MenuItemCompat.getActionView(itemSync).findViewById(R.id.imageButtonSync);
         imageButtonSync.setOnClickListener(mListener);
+
+        imageButtonProblemas = MenuItemCompat.getActionView(itemProblemas).findViewById(R.id.imageButtonProblemas);
+        imageButtonProblemas.setOnClickListener(mListener);
 
 //        imageButtonImportar = MenuItemCompat.getActionView(itemImport).findViewById(R.id.imageButtonImport);
 //        imageButtonImportar.setOnClickListener(mListener);
@@ -210,6 +217,13 @@ public class ToolbarUtils {
             case R.id.icon_msg:
                 Intent intent = new Intent(activity, MensagensActivity.class);
                 activity.startActivity(intent);
+                break;
+            case R.id.imageButtonProblemas:
+            case R.id.icon_problemas:
+            case R.id.problemas:
+
+                Toast.makeText(activity.getApplicationContext(), "Tela Problemas", Toast.LENGTH_SHORT).show();
+
                 break;
         }
     }

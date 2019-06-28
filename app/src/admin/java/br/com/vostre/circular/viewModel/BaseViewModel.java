@@ -203,7 +203,7 @@ public class BaseViewModel extends AndroidViewModel {
 
                 parametro.setIdentificadorUnico(identificadorUnico);
 
-                parametro.setDataUltimoAcesso(DateTimeFormat.forPattern("dd/mm/yyyy").parseDateTime("01/01/2000"));
+                parametro.setDataUltimoAcesso(DateTimeFormat.forPattern("dd/MM/yyyy").parseDateTime("01/06/2018"));
                 parametro.setUltimaAlteracao(DateTime.now());
 
                 db.parametroInternoDAO().inserir(parametro);

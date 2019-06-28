@@ -498,6 +498,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     try {
                         requisitaToken(parametroInterno.getIdentificadorUnico(), 1);
                         System.out.println("URL: "+call.request().url().url().toString());
+                        System.out.println("RESPONSE: "+response);
                         processaJson(response);
                     } catch (JSONException e) {
 
@@ -558,6 +559,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
         String dados = response.body();
         //System.out.println("RESPON: "+response.body());
+
+        System.out.println(dados);
 
         if(dados != null){
 

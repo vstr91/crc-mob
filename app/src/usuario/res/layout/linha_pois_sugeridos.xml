@@ -79,7 +79,7 @@
                     android:textAppearance="@style/texto_azul"
                     android:textSize="12sp"
                     android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="@+id/textViewCidade"
+                    app:layout_constraintBottom_toBottomOf="@+id/textViewTipo"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="Pendente" />
@@ -100,7 +100,7 @@
                     android:visibility="@{poi.pontoInteresse.observacao != null ? View.VISIBLE : View.GONE}"
                     app:layout_constraintEnd_toStartOf="@+id/textViewStatus"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewCidade" />
+                    app:layout_constraintTop_toBottomOf="@+id/textViewTipo" />
 
             </android.support.constraint.ConstraintLayout>
 

@@ -41,6 +41,16 @@
                     android:text="@{acesso.identificadorUnico}" />
 
                 <TextView
+                    android:id="@+id/textViewVersao"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="@{acesso.versao}"
+                    android:textAlignment="center"
+                    android:textSize="10sp" />
+
+                <TextView
                     android:id="@+id/textViewNumeroAcessos"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"

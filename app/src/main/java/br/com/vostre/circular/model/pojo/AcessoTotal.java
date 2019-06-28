@@ -7,6 +7,9 @@ public class AcessoTotal {
     @ColumnInfo(name = "identificadorUnico")
     String identificadorUnico;
 
+    @ColumnInfo(name = "versao")
+    String versao;
+
     @ColumnInfo(name = "totalAcessos")
     Integer totalAcessos;
 
@@ -25,4 +28,13 @@ public class AcessoTotal {
     public void setTotalAcessos(Integer totalAcessos) {
         this.totalAcessos = totalAcessos;
     }
+
+    public String getVersao() {
+        return versao;
+    }
+
+    public void setVersao(String versao) {
+        this.versao = versao;
+    }
+
 }

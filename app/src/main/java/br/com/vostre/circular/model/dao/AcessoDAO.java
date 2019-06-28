@@ -35,10 +35,10 @@ public interface AcessoDAO {
     @Query("SELECT COUNT(id) FROM acesso WHERE DATE(dataValidacao/1000, 'unixepoch', 'localtime') = :dia")
     LiveData<Integer> contarTodosDoDia(String dia);
 
-    @Query("SELECT identificadorUnico, COUNT(id) AS 'totalAcessos' FROM acesso WHERE DATE(dataValidacao/1000, 'unixepoch', 'localtime') = DATE('now','localtime') GROUP BY identificadorUnico ORDER BY COUNT(id) DESC")
+    @Query("SELECT identificadorUnico, versao, COUNT(id) AS 'totalAcessos' FROM acesso WHERE DATE(dataValidacao/1000, 'unixepoch', 'localtime') = DATE('now','localtime') GROUP BY identificadorUnico ORDER BY COUNT(id) DESC")
     LiveData<List<AcessoTotal>> contarAcessosPorIdentificadorPorDia();
 
-    @Query("SELECT identificadorUnico, COUNT(id) AS 'totalAcessos' FROM acesso WHERE DATE(dataValidacao/1000, 'unixepoch', 'localtime') = :dia GROUP BY identificadorUnico ORDER BY COUNT(id) DESC")
+    @Query("SELECT identificadorUnico, versao, COUNT(id) AS 'totalAcessos' FROM acesso WHERE DATE(dataValidacao/1000, 'unixepoch', 'localtime') = :dia GROUP BY identificadorUnico ORDER BY COUNT(id) DESC")
     LiveData<List<AcessoTotal>> contarAcessosPorIdentificadorPorDia(String dia);
 
     @Query("SELECT * FROM acesso WHERE identificadorUnico = :identificador ORDER BY DATE(dataValidacao/1000, 'unixepoch', 'localtime') DESC")

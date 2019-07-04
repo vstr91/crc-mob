@@ -81,6 +81,7 @@ public class HorariosItinerarioActivity extends BaseActivity {
 
     public void onClickBtnProcessarImagem(View v){
         Intent i = new Intent(getApplicationContext(), HorarioPorImagemActivity.class);
+        i.putExtra("itinerario", getIntent().getStringExtra("itinerario"));
         startActivity(i);
     }
 

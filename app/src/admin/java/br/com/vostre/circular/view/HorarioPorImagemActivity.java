@@ -71,6 +71,7 @@ public class HorarioPorImagemActivity extends BaseActivity {
     FirebaseVisionText resultadoOCR;
 
     GraphicOverlay mGraphicOverlay;
+    String itinerario;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,11 +87,17 @@ public class HorarioPorImagemActivity extends BaseActivity {
 
         listHorarios = binding.listHorarios;
 
+        adapter = new HorarioItinerarioAdapter(horarios, this, null, false);
+
 //        adapter = new HorarioAdapter(horarios, this);
 
         listHorarios.setAdapter(adapter);
 
         mGraphicOverlay = binding.graphicOverlay;
+
+        itinerario = getIntent().getStringExtra("itinerario");
+
+
 
         ocultaPrevia();
 
@@ -196,7 +203,13 @@ public class HorarioPorImagemActivity extends BaseActivity {
         Paint p2 = new Paint();
         p2.setColor(Color.RED);
         p2.setStyle(Paint.Style.STROKE);
-        p2.setStrokeWidth(10);
+        p2.setStrokeWidth(3);
+
+        Paint p3 = new Paint();
+        p3.setColor(Color.BLUE);
+        p3.setStyle(Paint.Style.STROKE);
+        p3.setStrokeWidth(1);
+        p3.setTextSize(0.2f);
 
         canvas.drawBitmap(bitmap, 0, 0, new Paint());
 
@@ -213,7 +226,7 @@ public class HorarioPorImagemActivity extends BaseActivity {
                     FirebaseVisionText.Element e = elements.get(k);
 
                     canvas.drawRect(e.getBoundingBox(), p2);
-                    canvas.drawText(e.getText(), -e.getBoundingBox().top, -e.getBoundingBox().left, new Paint());
+                    canvas.drawText(e.getText(), -e.getBoundingBox().top, -e.getBoundingBox().left, p3);
 
                 }
             }
@@ -231,7 +244,7 @@ public class HorarioPorImagemActivity extends BaseActivity {
 
         System.out.println("DIAS: "+segSex+" | "+sabado+" | "+domingo);
 
-        List<HorarioItinerario> hors = new ArrayList<>();
+        List<HorarioItinerarioNome> hors = new ArrayList<>();
 
         if(!segSex && !sabado && !domingo){
             Toast.makeText(getApplicationContext(), "Ao menos um dia/período deve ser escolhido!", Toast.LENGTH_SHORT).show();
@@ -265,36 +278,53 @@ public class HorarioPorImagemActivity extends BaseActivity {
                 }
             });
 
-            HorarioItinerario hi = null;
+            HorarioItinerarioNome hi = null;
 
             for(Bloco b : elementos){
-                System.out.println("BLOCO:"+b.getTexto()+" - "+b.getCoordenada());
+                System.out.println("BLOCO: "+b.getTexto()+" - "+b.getCoordenada());
 
                 if(hi == null){
-                    hi = new HorarioItinerario();
+                    hi = new HorarioItinerarioNome();
                 }
 
                 try{
                     DateTime hora = DateTimeFormat.forPattern("HH:mm").parseDateTime(b.getTexto());
 
-                    hi.setHorario(DateTimeFormat.forPattern("HH:mm").print(hora));
+                    if(hi.getHorarioItinerario().getHorario() != null){
+                        hors.add(hi);
+                        hi = new HorarioItinerarioNome();
+                    }
+
+                    hi.getHorarioItinerario().setHorario(DateTimeFormat.forPattern("HH:mm").print(hora));
+
+                    if(binding.checkBoxDom.isChecked()){
+                        hi.getHorarioItinerario().setDomingo(true);
+                    }
+
+                    if(binding.checkBoxSegSex.isChecked()){
+                        hi.getHorarioItinerario().setSegunda(true);
+                        hi.getHorarioItinerario().setTerca(true);
+                        hi.getHorarioItinerario().setQuarta(true);
+                        hi.getHorarioItinerario().setQuinta(true);
+                        hi.getHorarioItinerario().setSexta(true);
+                    }
+
+                    if(binding.checkBoxSabado.isChecked()){
+                        hi.getHorarioItinerario().setSabado(true);
+                    }
+
+                    hi.getHorarioItinerario().setItinerario(itinerario);
+
 
                 } catch(Exception e){
 
                     if(hi != null){
-                        hi.setObservacao(b.getTexto());
+                        hi.getHorarioItinerario().setObservacao(b.getTexto());
                         hors.add(hi);
                         hi = null;
                     }
 
-                } finally {
-                    if(hi != null){
-                        hors.add(hi);
-                        hi = null;
-                    }
                 }
-
-
 
             }
 
@@ -307,15 +337,18 @@ public class HorarioPorImagemActivity extends BaseActivity {
 
         System.out.println(horarios);
 
-        for(HorarioItinerario h : hors){
+        for(HorarioItinerarioNome h : hors){
 
-            if(h.getObservacao() != null && !h.getObservacao().isEmpty()){
-                Toast.makeText(getApplicationContext(), h.getHorario()+" "+h.getObservacao(), Toast.LENGTH_SHORT).show();
+            if(h.getHorarioItinerario().getObservacao() != null && !h.getHorarioItinerario().getObservacao().isEmpty()){
+                Toast.makeText(getApplicationContext(), h.getHorarioItinerario().getHorario()+" "+h.getHorarioItinerario().getObservacao(), Toast.LENGTH_SHORT).show();
             } else{
-                Toast.makeText(getApplicationContext(), h.getHorario(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), h.getHorarioItinerario().getHorario(), Toast.LENGTH_SHORT).show();
             }
 
         }
+
+        adapter.horarios = hors;
+        adapter.notifyDataSetChanged();
 
     }
 
@@ -324,6 +357,7 @@ public class HorarioPorImagemActivity extends BaseActivity {
         binding.cardView4.setVisibility(View.GONE);
         binding.imageView9.setVisibility(View.GONE);
         binding.graphicOverlay.setVisibility(View.GONE);
+        binding.btnCarregarFoto.setVisibility(View.GONE);
 
         // mostrando elementos comuns
         binding.listHorarios.setVisibility(View.VISIBLE);
@@ -336,6 +370,7 @@ public class HorarioPorImagemActivity extends BaseActivity {
         binding.cardView4.setVisibility(View.VISIBLE);
         binding.imageView9.setVisibility(View.VISIBLE);
         binding.graphicOverlay.setVisibility(View.VISIBLE);
+        binding.btnCarregarFoto.setVisibility(View.VISIBLE);
 
         // ocultando elementos comuns
         binding.listHorarios.setVisibility(View.GONE);

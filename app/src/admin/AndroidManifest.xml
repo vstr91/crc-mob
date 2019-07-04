@@ -17,14 +17,15 @@
 
     <application
         android:name=".App"
-        tools:replace="android:allowBackup"
         android:allowBackup="false"
         android:icon="@drawable/icon_gerenciador"
         android:label="@string/app_name"
         android:roundIcon="@drawable/icon_gerenciador"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".view.DetalheAcessoActivity"></activity>
+        android:theme="@style/AppTheme"
+        tools:replace="android:allowBackup">
+        <activity android:name=".view.HorarioPorImagemActivity"></activity>
+        <activity android:name=".view.DetalheAcessoActivity" />
         <activity android:name=".view.DashboardActivity" />
 
         <service android:name=".model.service.AuthenticatorService">
@@ -87,15 +88,9 @@
         <activity android:name=".view.AcessoDiaActivity" />
         <activity android:name=".view.CameraActivity" />
         <activity android:name=".view.CameraResultadoActivity" />
-
-        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/Base.Theme.AppCompat"/>
-
-        <!--<meta-data-->
-            <!--android:name="com.google.firebase.ml.vision.DEPENDENCIES"-->
-            <!--android:value="ocr" />-->
-        <!-- To use multiple models: android:value="ocr,model2,model3" -->
-
+        <activity
+            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat" />
     </application>
 
 </manifest>

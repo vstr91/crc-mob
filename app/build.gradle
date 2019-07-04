@@ -98,7 +98,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:16.2.0'
     implementation 'com.google.firebase:firebase-ml-vision:19.0.2'
 
-    implementation ('com.theartofdev.edmodo:android-image-cropper:2.4.0') {
+    implementation('com.theartofdev.edmodo:android-image-cropper:2.4.0') {
         exclude module: 'com.android.support:design:26.1.0'
     }
 

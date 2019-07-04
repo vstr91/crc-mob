@@ -17,6 +17,7 @@ import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.Problema;
 import br.com.vostre.circular.model.pojo.ProblemaTipo;
 import br.com.vostre.circular.view.adapter.MensagemAdapter;
+import br.com.vostre.circular.view.adapter.ProblemaAdapter;
 import br.com.vostre.circular.view.form.FormMensagem;
 import br.com.vostre.circular.viewModel.MensagensViewModel;
 import br.com.vostre.circular.viewModel.ProblemasViewModel;
@@ -41,8 +42,8 @@ public class ProblemasActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         viewModel = ViewModelProviders.of(this).get(ProblemasViewModel.class);
-        viewModel.abertos.observe(this, abertosObserver);
-        viewModel.resolvidos.observe(this, resolvidosObserver);
+        //viewModel.abertos.observe(this, abertosObserver);
+        //viewModel.resolvidos.observe(this, resolvidosObserver);
 
         binding.setView(this);
         setTitle("Problemas");
@@ -75,17 +76,17 @@ public class ProblemasActivity extends BaseActivity {
 
     }
 
-    Observer<List<Problema>> abertosObserver = new Observer<List<Problema>>() {
+    Observer<List<ProblemaTipo>> abertosObserver = new Observer<List<ProblemaTipo>>() {
         @Override
-        public void onChanged(List<Problema> problemas) {
+        public void onChanged(List<ProblemaTipo> problemas) {
             adapter.problemas = problemas;
             adapter.notifyDataSetChanged();
         }
     };
 
-    Observer<List<Problema>> resolvidosObserver = new Observer<List<Problema>>() {
+    Observer<List<ProblemaTipo>> resolvidosObserver = new Observer<List<ProblemaTipo>>() {
         @Override
-        public void onChanged(List<Problema> problemas) {
+        public void onChanged(List<ProblemaTipo> problemas) {
             adapterResolvidos.problemas = problemas;
             adapterResolvidos.notifyDataSetChanged();
         }

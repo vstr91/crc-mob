@@ -22,7 +22,10 @@ public interface HorarioDAO {
     List<Horario> listarTodosSync();
 
     @Query("SELECT * FROM horario WHERE ativo = 1")
-    List<Horario> listarTodosAtivos();
+    LiveData<List<Horario>> listarTodosAtivos();
+
+    @Query("SELECT * FROM horario WHERE ativo = 1")
+    List<Horario> listarTodosAtivosSync();
 
     @Query("SELECT * FROM horario WHERE enviado = 0")
     List<Horario> listarTodosAEnviar();
@@ -33,7 +36,7 @@ public interface HorarioDAO {
     @Query("SELECT * FROM horario WHERE id = :id")
     LiveData<Horario> carregarPorId(String id);
 
-    @Query("SELECT * FROM horario WHERE nome LIKE :nome LIMIT 1")
+    @Query("SELECT * FROM horario WHERE TIME(nome/1000, 'unixepoch', 'localtime') LIKE :nome LIMIT 1")
     Horario encontrarPorNome(String nome);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

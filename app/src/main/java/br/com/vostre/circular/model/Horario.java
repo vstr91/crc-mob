@@ -5,6 +5,7 @@ import android.arch.persistence.room.Index;
 import android.support.annotation.NonNull;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
 @Entity(indices = {@Index(value = {"nome"},
         unique = true)})
@@ -34,5 +35,11 @@ public class Horario extends EntidadeBase {
             return false;
         }
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        Horario h = (Horario) o;
+        return DateTimeFormat.forPattern("HH:mm").print(this.getNome()).equals(DateTimeFormat.forPattern("HH:mm").print(h.getNome()));
     }
 }

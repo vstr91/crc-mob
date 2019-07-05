@@ -1,5 +1,6 @@
 package br.com.vostre.circular.view;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -10,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -44,6 +46,7 @@ import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityHorarioPorImagemBinding;
+import br.com.vostre.circular.listener.HorarioCarregadoListener;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
@@ -61,6 +64,7 @@ public class HorarioPorImagemActivity extends BaseActivity {
 
     RecyclerView listHorarios;
     List<HorarioItinerarioNome> horarios;
+    List<Horario> todosHorarios;
     HorarioItinerarioAdapter adapter;
 
     boolean carregado = false;
@@ -72,6 +76,7 @@ public class HorarioPorImagemActivity extends BaseActivity {
 
     GraphicOverlay mGraphicOverlay;
     String itinerario;
+    List<HorarioItinerarioNome> hors;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +92,9 @@ public class HorarioPorImagemActivity extends BaseActivity {
 
         listHorarios = binding.listHorarios;
 
-        adapter = new HorarioItinerarioAdapter(horarios, this, null, false);
+        hors = new ArrayList<>();
+
+        adapter = new HorarioItinerarioAdapter(hors, this, null, false);
 
 //        adapter = new HorarioAdapter(horarios, this);
 
@@ -97,9 +104,12 @@ public class HorarioPorImagemActivity extends BaseActivity {
 
         itinerario = getIntent().getStringExtra("itinerario");
 
+        viewModel.horarios.observe(this, horariosObserver);
 
 
         ocultaPrevia();
+
+        binding.btnProcessarOCR.setEnabled(false);
 
     }
 
@@ -236,6 +246,21 @@ public class HorarioPorImagemActivity extends BaseActivity {
 
     }
 
+    public void onClickBtnComparar(View v){
+
+        for(HorarioItinerarioNome h : hors){
+            Toast.makeText(getApplicationContext(), DateTimeFormat.forPattern("HH:mm").print(h.getNomeHorario())+" | "
+                    +h.getHorarioItinerario().getDomingo()+", "
+                    +h.getHorarioItinerario().getSegunda()+", "
+                    +h.getHorarioItinerario().getTerca()+", "
+                    +h.getHorarioItinerario().getQuarta()+", "
+                    +h.getHorarioItinerario().getQuinta()+", "
+                    +h.getHorarioItinerario().getSexta()+", "
+                    +h.getHorarioItinerario().getSabado()+" | "+h.getHorarioItinerario().getObservacao(), Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
     public void onClickBtnProcessarOCR(View v){
 
         boolean segSex = binding.checkBoxSegSex.isChecked();
@@ -244,13 +269,11 @@ public class HorarioPorImagemActivity extends BaseActivity {
 
         System.out.println("DIAS: "+segSex+" | "+sabado+" | "+domingo);
 
-        List<HorarioItinerarioNome> hors = new ArrayList<>();
-
         if(!segSex && !sabado && !domingo){
             Toast.makeText(getApplicationContext(), "Ao menos um dia/período deve ser escolhido!", Toast.LENGTH_SHORT).show();
         } else{
 
-            Toast.makeText(getApplicationContext(), "Horários Encontrados", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "Horários Encontrados", Toast.LENGTH_SHORT).show();
 
             binding.imageView9.setImageBitmap(bitmap);
 
@@ -279,6 +302,10 @@ public class HorarioPorImagemActivity extends BaseActivity {
             });
 
             HorarioItinerarioNome hi = null;
+            int qtdBlocos = elementos.size();
+            int cont = 0;
+            boolean flagEdicao = false;
+            int index = -1;
 
             for(Bloco b : elementos){
                 System.out.println("BLOCO: "+b.getTexto()+" - "+b.getCoordenada());
@@ -291,11 +318,32 @@ public class HorarioPorImagemActivity extends BaseActivity {
                     DateTime hora = DateTimeFormat.forPattern("HH:mm").parseDateTime(b.getTexto());
 
                     if(hi.getHorarioItinerario().getHorario() != null){
-                        hors.add(hi);
+
+                        if(!flagEdicao){
+                            hors.add(hi);
+                        }
+
+
                         hi = new HorarioItinerarioNome();
                     }
 
-                    hi.getHorarioItinerario().setHorario(DateTimeFormat.forPattern("HH:mm").print(hora));
+                    Horario horario = new Horario();
+                    horario.setNome(hora);
+
+                    horario = todosHorarios.get(todosHorarios.indexOf(horario));
+
+                    hi.getHorarioItinerario().setHorario(horario.getId());
+                    hi.setNomeHorario(horario.getNome().getMillis());
+                    hi.setIdHorario(horario.getId());
+
+                    hi.getHorarioItinerario().setItinerario(itinerario);
+
+                    if(hors.indexOf(hi) > -1){
+                        hi = hors.get(hors.indexOf(hi));
+                        flagEdicao = true;
+                    } else{
+                        flagEdicao = false;
+                    }
 
                     if(binding.checkBoxDom.isChecked()){
                         hi.getHorarioItinerario().setDomingo(true);
@@ -313,18 +361,30 @@ public class HorarioPorImagemActivity extends BaseActivity {
                         hi.getHorarioItinerario().setSabado(true);
                     }
 
-                    hi.getHorarioItinerario().setItinerario(itinerario);
-
 
                 } catch(Exception e){
 
                     if(hi != null){
                         hi.getHorarioItinerario().setObservacao(b.getTexto());
-                        hors.add(hi);
+
+                        if(!flagEdicao){
+                            hors.add(hi);
+                        }
+
                         hi = null;
                     }
 
                 }
+
+                if(cont+1 == qtdBlocos && hi != null){
+
+                    if(!flagEdicao){
+                        hors.add(hi);
+                    }
+
+                }
+
+                cont++;
 
             }
 
@@ -335,17 +395,17 @@ public class HorarioPorImagemActivity extends BaseActivity {
             ocultaPrevia();
         }
 
-        System.out.println(horarios);
+//        for(HorarioItinerarioNome h : hors){
+//
+//            if(h.getHorarioItinerario().getObservacao() != null && !h.getHorarioItinerario().getObservacao().isEmpty()){
+//                Toast.makeText(getApplicationContext(), h.getHorarioItinerario().getHorario()+" "+h.getHorarioItinerario().getObservacao(), Toast.LENGTH_SHORT).show();
+//            } else{
+//                Toast.makeText(getApplicationContext(), h.getHorarioItinerario().getHorario(), Toast.LENGTH_SHORT).show();
+//            }
+//
+//        }
 
-        for(HorarioItinerarioNome h : hors){
-
-            if(h.getHorarioItinerario().getObservacao() != null && !h.getHorarioItinerario().getObservacao().isEmpty()){
-                Toast.makeText(getApplicationContext(), h.getHorarioItinerario().getHorario()+" "+h.getHorarioItinerario().getObservacao(), Toast.LENGTH_SHORT).show();
-            } else{
-                Toast.makeText(getApplicationContext(), h.getHorarioItinerario().getHorario(), Toast.LENGTH_SHORT).show();
-            }
-
-        }
+        //vinculaHorarios(hors);
 
         adapter.horarios = hors;
         adapter.notifyDataSetChanged();
@@ -377,5 +437,13 @@ public class HorarioPorImagemActivity extends BaseActivity {
         binding.btnProcessar.setVisibility(View.GONE);
         binding.btnAbrirCamera.setVisibility(View.GONE);
     }
+
+    Observer<List<Horario>> horariosObserver = new Observer<List<Horario>>() {
+        @Override
+        public void onChanged(List<Horario> hors) {
+            todosHorarios = hors;
+            binding.btnProcessarOCR.setEnabled(true);
+        }
+    };
 
 }

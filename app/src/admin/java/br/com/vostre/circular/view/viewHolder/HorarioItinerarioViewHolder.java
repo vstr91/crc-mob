@@ -112,8 +112,12 @@ public class HorarioItinerarioViewHolder extends RecyclerView.ViewHolder {
 
     @BindingAdapter("text")
     public static void setText(TextView view, Long date) {
-        String formatted = DateTimeFormat.forPattern("HH:mm").print(date);
-        view.setText(formatted);
+
+        if(date != null){
+            String formatted = DateTimeFormat.forPattern("HH:mm").print(date);
+            view.setText(formatted);
+        }
+
     }
 
 }

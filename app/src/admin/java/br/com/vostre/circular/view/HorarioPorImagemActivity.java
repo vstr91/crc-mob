@@ -44,6 +44,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityHorarioPorImagemBinding;
@@ -55,6 +57,7 @@ import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ocr.Bloco;
 import br.com.vostre.circular.utils.GraphicOverlay;
+import br.com.vostre.circular.utils.StringUtils;
 import br.com.vostre.circular.utils.TextGraphic;
 import br.com.vostre.circular.view.adapter.HorarioAdapter;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
@@ -322,6 +325,10 @@ public class HorarioPorImagemActivity extends BaseActivity {
             int cont = 0;
             boolean flagEdicao = false;
             int index = -1;
+            String horaString = "";
+            int contFind = 0;
+
+            Pattern MY_PATTERN = Pattern.compile("\\d{2}+:\\d{2}+");
 
             for(Bloco b : elementos){
                 System.out.println("BLOCO: "+b.getTexto()+" - "+b.getCoordenada());
@@ -331,56 +338,82 @@ public class HorarioPorImagemActivity extends BaseActivity {
                 }
 
                 try{
-                    DateTime hora = DateTimeFormat.forPattern("HH:mm").parseDateTime(b.getTexto());
 
-                    if(hi.getHorarioItinerario().getHorario() != null){
+                    if(b.getTexto().length() > 3){
 
-                        if(!flagEdicao){
-                            hors.add(hi);
+                        Matcher m = MY_PATTERN.matcher(b.getTexto());
+                        while (m.find() && contFind < 1) {
+                            horaString = m.group();
+                            contFind++;
                         }
 
+                        DateTime hora = DateTimeFormat.forPattern("HH:mm").parseDateTime(horaString);
 
-                        hi = new HorarioItinerarioNome();
-                    }
+                        if(hi.getHorarioItinerario().getHorario() != null){
 
-                    Horario horario = new Horario();
-                    horario.setNome(hora);
+                            if(!flagEdicao){
+                                hors.add(hi);
+                            }
 
-                    horario = todosHorarios.get(todosHorarios.indexOf(horario));
 
-                    hi.getHorarioItinerario().setHorario(horario.getId());
-                    hi.setNomeHorario(horario.getNome().getMillis());
-                    hi.setIdHorario(horario.getId());
+                            hi = new HorarioItinerarioNome();
+                        }
 
-                    hi.getHorarioItinerario().setItinerario(itinerario);
+                        Horario horario = new Horario();
+                        horario.setNome(hora);
 
-                    if(hors.indexOf(hi) > -1){
-                        hi = hors.get(hors.indexOf(hi));
-                        flagEdicao = true;
+                        horario = todosHorarios.get(todosHorarios.indexOf(horario));
+
+                        hi.getHorarioItinerario().setHorario(horario.getId());
+                        hi.setNomeHorario(horario.getNome().getMillis());
+                        hi.setIdHorario(horario.getId());
+
+                        hi.getHorarioItinerario().setItinerario(itinerario);
+
+                        if(hors.indexOf(hi) > -1){
+                            hi = hors.get(hors.indexOf(hi));
+                            flagEdicao = true;
+                        } else{
+                            flagEdicao = false;
+                        }
+
+                        if(binding.checkBoxDom.isChecked()){
+                            hi.getHorarioItinerario().setDomingo(true);
+                        }
+
+                        if(binding.checkBoxSegSex.isChecked()){
+                            hi.getHorarioItinerario().setSegunda(true);
+                            hi.getHorarioItinerario().setTerca(true);
+                            hi.getHorarioItinerario().setQuarta(true);
+                            hi.getHorarioItinerario().setQuinta(true);
+                            hi.getHorarioItinerario().setSexta(true);
+                        }
+
+                        if(binding.checkBoxSabado.isChecked()){
+                            hi.getHorarioItinerario().setSabado(true);
+                        }
+
+                        if(contFind > 0){
+                            contFind = 0;
+
+                            String obs = b.getTexto().replace(horaString, "").trim();
+
+                            if(!obs.isEmpty()){
+                                hi.getHorarioItinerario().setObservacao(obs);
+                            }
+
+                            horaString = "";
+
+                        }
+
                     } else{
-                        flagEdicao = false;
+                        DateTime hora = DateTimeFormat.forPattern("HH:mm").parseDateTime(horaString);
                     }
-
-                    if(binding.checkBoxDom.isChecked()){
-                        hi.getHorarioItinerario().setDomingo(true);
-                    }
-
-                    if(binding.checkBoxSegSex.isChecked()){
-                        hi.getHorarioItinerario().setSegunda(true);
-                        hi.getHorarioItinerario().setTerca(true);
-                        hi.getHorarioItinerario().setQuarta(true);
-                        hi.getHorarioItinerario().setQuinta(true);
-                        hi.getHorarioItinerario().setSexta(true);
-                    }
-
-                    if(binding.checkBoxSabado.isChecked()){
-                        hi.getHorarioItinerario().setSabado(true);
-                    }
-
 
                 } catch(Exception e){
 
-                    if(hi != null){
+                    if(hi != null && hi.getHorarioItinerario().getHorario() != null && !hi.getHorarioItinerario().getHorario().isEmpty()){
+
                         hi.getHorarioItinerario().setObservacao(b.getTexto());
 
                         if(!flagEdicao){
@@ -423,8 +456,55 @@ public class HorarioPorImagemActivity extends BaseActivity {
 
         //vinculaHorarios(hors);
 
-        adapter.horarios = hors;
-        adapter.notifyDataSetChanged();
+        List<HorarioItinerarioNome> horariosFiltrados = new ArrayList<>();
+
+        if(binding.editTextIgnorar.getText().toString().trim().length() > 0){
+
+            String filtro = binding.editTextIgnorar.getText().toString();
+            filtro = filtro.toLowerCase();
+            filtro = StringUtils.removeAcentos(filtro).trim();
+
+            for(HorarioItinerarioNome h : hors){
+
+                if(h.getHorarioItinerario().getObservacao() != null && !StringUtils.removeAcentos(h.getHorarioItinerario().getObservacao()).toLowerCase().endsWith(filtro)){
+                    horariosFiltrados.add(h);
+                }
+
+            }
+
+            if(horariosFiltrados.size() > 0){
+                adapter.horarios = horariosFiltrados;
+            } else{
+                adapter.horarios = hors;
+
+                Toast.makeText(getApplicationContext(), "Nenhum horário correspondente ao filtro foi encontrado. Utilizando lista original.", Toast.LENGTH_SHORT).show();
+            }
+
+
+
+            Collections.sort(adapter.horarios, new Comparator<HorarioItinerarioNome>() {
+                @Override
+                public int compare(HorarioItinerarioNome horarioItinerarioNome, HorarioItinerarioNome t1) {
+                    return horarioItinerarioNome.getNomeHorario().compareTo(t1.getNomeHorario());
+                }
+            });
+
+            adapter.notifyDataSetChanged();
+
+        } else{
+            adapter.horarios = hors;
+
+            Collections.sort(adapter.horarios, new Comparator<HorarioItinerarioNome>() {
+                @Override
+                public int compare(HorarioItinerarioNome horarioItinerarioNome, HorarioItinerarioNome t1) {
+                    return horarioItinerarioNome.getNomeHorario().compareTo(t1.getNomeHorario());
+                }
+            });
+
+            adapter.notifyDataSetChanged();
+        }
+
+
 
     }
 

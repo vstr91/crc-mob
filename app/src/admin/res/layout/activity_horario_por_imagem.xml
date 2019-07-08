@@ -199,7 +199,7 @@
             <ImageView
                 android:id="@+id/imageView9"
                 android:layout_width="0dp"
-                android:layout_height="250dp"
+                android:layout_height="200dp"
                 android:layout_marginTop="8dp"
                 android:scaleType="fitCenter"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -237,7 +237,7 @@
             <android.support.v7.widget.CardView
                 android:id="@+id/cardView4"
                 android:layout_width="0dp"
-                android:layout_height="70dp"
+                android:layout_height="150dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
@@ -249,6 +249,30 @@
                 <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/textInputLayout2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/checkBoxSabado">
+
+                        <android.support.design.widget.TextInputEditText
+                            android:id="@+id/editTextIgnorar"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ems="10"
+                            android:hint="Ignorar horários terminados em..."
+                            android:inputType="textPersonName"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </android.support.design.widget.TextInputLayout>
 
                     <TextView
                         android:id="@+id/textView35"

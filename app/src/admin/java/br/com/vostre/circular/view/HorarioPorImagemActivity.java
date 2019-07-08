@@ -37,6 +37,7 @@ import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.time.DateTimeException;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -49,7 +50,9 @@ import br.com.vostre.circular.databinding.ActivityHorarioPorImagemBinding;
 import br.com.vostre.circular.listener.HorarioCarregadoListener;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
+import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
+import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ocr.Bloco;
 import br.com.vostre.circular.utils.GraphicOverlay;
 import br.com.vostre.circular.utils.TextGraphic;
@@ -103,8 +106,10 @@ public class HorarioPorImagemActivity extends BaseActivity {
         mGraphicOverlay = binding.graphicOverlay;
 
         itinerario = getIntent().getStringExtra("itinerario");
+        viewModel.setItinerario(itinerario);
 
         viewModel.horarios.observe(this, horariosObserver);
+        viewModel.itinerario.observe(this, itinerarioObserver);
 
 
         ocultaPrevia();
@@ -246,18 +251,29 @@ public class HorarioPorImagemActivity extends BaseActivity {
 
     }
 
+    public void onClickBtnLimparLista(View v){
+        hors = new ArrayList<>();
+        adapter.horarios = hors;
+        adapter.notifyDataSetChanged();
+    }
+
     public void onClickBtnComparar(View v){
 
         for(HorarioItinerarioNome h : hors){
-            Toast.makeText(getApplicationContext(), DateTimeFormat.forPattern("HH:mm").print(h.getNomeHorario())+" | "
-                    +h.getHorarioItinerario().getDomingo()+", "
-                    +h.getHorarioItinerario().getSegunda()+", "
-                    +h.getHorarioItinerario().getTerca()+", "
-                    +h.getHorarioItinerario().getQuarta()+", "
-                    +h.getHorarioItinerario().getQuinta()+", "
-                    +h.getHorarioItinerario().getSexta()+", "
-                    +h.getHorarioItinerario().getSabado()+" | "+h.getHorarioItinerario().getObservacao(), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getApplicationContext(), DateTimeFormat.forPattern("HH:mm").print(h.getNomeHorario())+" | "
+//                    +h.getHorarioItinerario().getDomingo()+", "
+//                    +h.getHorarioItinerario().getSegunda()+", "
+//                    +h.getHorarioItinerario().getTerca()+", "
+//                    +h.getHorarioItinerario().getQuarta()+", "
+//                    +h.getHorarioItinerario().getQuinta()+", "
+//                    +h.getHorarioItinerario().getSexta()+", "
+//                    +h.getHorarioItinerario().getSabado()+" | "+h.getHorarioItinerario().getObservacao(), Toast.LENGTH_SHORT).show();
         }
+
+        Intent i = new Intent(getApplicationContext(), ComparaHorariosActivity.class);
+        i.putExtra("horariosProcessados", (Serializable) hors);
+        i.putExtra("itinerario", itinerario);
+        startActivity(i);
 
     }
 
@@ -423,6 +439,7 @@ public class HorarioPorImagemActivity extends BaseActivity {
         binding.listHorarios.setVisibility(View.VISIBLE);
         binding.btnProcessar.setVisibility(View.VISIBLE);
         binding.btnAbrirCamera.setVisibility(View.VISIBLE);
+        binding.btnLimparLista.setVisibility(View.VISIBLE);
     }
 
     private void mostraPrevia(){
@@ -436,6 +453,7 @@ public class HorarioPorImagemActivity extends BaseActivity {
         binding.listHorarios.setVisibility(View.GONE);
         binding.btnProcessar.setVisibility(View.GONE);
         binding.btnAbrirCamera.setVisibility(View.GONE);
+        binding.btnLimparLista.setVisibility(View.GONE);
     }
 
     Observer<List<Horario>> horariosObserver = new Observer<List<Horario>>() {
@@ -443,6 +461,13 @@ public class HorarioPorImagemActivity extends BaseActivity {
         public void onChanged(List<Horario> hors) {
             todosHorarios = hors;
             binding.btnProcessarOCR.setEnabled(true);
+        }
+    };
+
+    Observer<ItinerarioPartidaDestino> itinerarioObserver = new Observer<ItinerarioPartidaDestino>() {
+        @Override
+        public void onChanged(ItinerarioPartidaDestino itinerario) {
+            binding.setItinerario(itinerario);
         }
     };
 

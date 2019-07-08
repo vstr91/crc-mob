@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
         <variable
             name="view"
-            type="br.com.vostre.circular.view.HorarioPorImagemActivity" />
+            type="br.com.vostre.circular.view.ComparaHorariosActivity" />
         <variable
-            name="itinerario"
-            type="br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino" />
+            name="viewModel"
+            type="br.com.vostre.circular.viewModel.ComparaHorariosViewModel" />
         <variable
             name="viewAndroid"
             type="android.view.View" />
+        <variable
+            name="itinerario"
+            type="br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino" />
     </data>
 
     <android.support.v4.widget.DrawerLayout
@@ -23,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/gradiente"
-            tools:context="br.com.vostre.circular.view.HorarioPorImagemActivity">
+            tools:context="br.com.vostre.circular.view.ComparaHorariosActivity">
 
             <include
                 android:id="@+id/toolbar"
@@ -32,35 +36,19 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"></include>
 
-            <Button
-                android:id="@+id/btnProcessar"
-                style="@style/botao"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="16dp"
-                android:onClick="onClickBtnComparar"
-                android:padding="5dp"
-                android:text="Comparar Horários"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/listHorarios"
+            <TextView
+                android:id="@+id/textView25"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="8dp"
-                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-                app:layout_constraintBottom_toTopOf="@+id/btnAbrirCamera"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:gravity="center"
+                android:text="Horários Processados"
+                android:textAppearance="@style/texto_branco"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/guideline3"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/imageView9"
-                app:layout_constraintVertical_bias="0.0"
-                tools:listitem="@layout/linha_horarios" />
+                app:layout_constraintTop_toBottomOf="@+id/cardView2" />
 
             <android.support.v7.widget.CardView
                 android:id="@+id/cardView2"
@@ -186,157 +174,73 @@
 
             </android.support.v7.widget.CardView>
 
-            <br.com.vostre.circular.utils.GraphicOverlay
-                android:id="@+id/graphicOverlay"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentLeft="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/listHorarios" />
-
-            <ImageView
-                android:id="@+id/imageView9"
-                android:layout_width="0dp"
-                android:layout_height="250dp"
-                android:layout_marginTop="8dp"
-                android:scaleType="fitCenter"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cardView2" />
-
             <Button
-                android:id="@+id/btnAbrirCamera"
-                style="@style/botao_branco"
+                android:id="@+id/btnSubstituirHorarios"
+                style="@style/botao_principal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginBottom="16dp"
-                android:onClick="onClickBtnCamera"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:onClick="onClickBtnProcessarImagem"
                 android:padding="5dp"
-                android:text="Carregar Imagem"
+                android:text="Substituir Horários"
+                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
-            <Button
-                android:id="@+id/btnProcessarOCR"
-                style="@style/botao"
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/listHorarios"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:onClick="onClickBtnProcessarOCR"
-                android:padding="5dp"
-                android:text="Processar Imagem"
-                android:textAllCaps="false"
-                android:textSize="12sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cardView4" />
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                app:layout_constraintBottom_toTopOf="@+id/btnSubstituirHorarios"
+                app:layout_constraintEnd_toStartOf="@+id/guideline3"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView25"
+                app:layout_constraintVertical_bias="0.0"
+                tools:listitem="@layout/linha_horarios_itinerarios_reduzida" />
 
-            <android.support.v7.widget.CardView
-                android:id="@+id/cardView4"
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/listHorariosAtuais"
                 android:layout_width="0dp"
-                android:layout_height="70dp"
+                android:layout_height="0dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                app:cardCornerRadius="10dp"
+                android:layout_marginBottom="8dp"
+                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                app:layout_constraintBottom_toTopOf="@+id/btnSubstituirHorarios"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageView9">
+                app:layout_constraintStart_toStartOf="@+id/guideline3"
+                app:layout_constraintTop_toBottomOf="@+id/textView25"
+                app:layout_constraintVertical_bias="0.0"
+                tools:listitem="@layout/linha_horarios_itinerarios_reduzida" />
 
-                <android.support.constraint.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <TextView
-                        android:id="@+id/textView35"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginRight="8dp"
-                        android:gravity="center"
-                        android:text="Dias da Semana"
-                        android:textColor="@color/azul"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <CheckBox
-                        android:id="@+id/checkBoxSegSex"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginTop="8dp"
-                        android:text="Seg. a Sex."
-                        app:layout_constraintEnd_toStartOf="@+id/checkBoxSabado"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textView35" />
-
-                    <CheckBox
-                        android:id="@+id/checkBoxSabado"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginTop="8dp"
-                        android:text="Sábado"
-                        app:layout_constraintEnd_toStartOf="@+id/checkBoxDom"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toEndOf="@+id/checkBoxSegSex"
-                        app:layout_constraintTop_toBottomOf="@+id/textView35" />
-
-                    <CheckBox
-                        android:id="@+id/checkBoxDom"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:text="Domingo"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toEndOf="@+id/checkBoxSabado"
-                        app:layout_constraintTop_toBottomOf="@+id/textView35" />
-
-                </android.support.constraint.ConstraintLayout>
-
-            </android.support.v7.widget.CardView>
-
-            <Button
-                android:id="@+id/btnCarregarFoto"
-                style="@style/botao_branco"
-                android:layout_width="0dp"
+            <android.support.constraint.Guideline
+                android:id="@+id/guideline3"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:onClick="onClickBtnCamera"
-                android:padding="5dp"
-                android:text="Carregar Outra Foto"
-                android:textAllCaps="false"
-                android:textSize="12sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/btnProcessarOCR" />
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="180dp" />
 
-            <Button
-                android:id="@+id/btnLimparLista"
+            <TextView
+                android:id="@+id/textView37"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginBottom="16dp"
-                android:text="Limpar Lista"
-                android:textAllCaps="false"
-                android:textSize="12sp"
-                android:onClick="onClickBtnLimparLista"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/btnProcessar"
-                app:layout_constraintStart_toEndOf="@+id/btnAbrirCamera" />
+                android:text="Horários Atuais"
+                android:textAlignment="center"
+                android:textAppearance="@style/texto_branco"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/guideline3"
+                app:layout_constraintTop_toBottomOf="@+id/cardView2" />
 
         </android.support.constraint.ConstraintLayout>
 

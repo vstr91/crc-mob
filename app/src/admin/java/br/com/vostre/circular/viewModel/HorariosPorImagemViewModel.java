@@ -30,6 +30,14 @@ public class HorariosPorImagemViewModel extends AndroidViewModel {
 
     public static MutableLiveData<Integer> retorno;
 
+    public LiveData<ItinerarioPartidaDestino> getItinerario() {
+        return itinerario;
+    }
+
+    public void setItinerario(String itinerario) {
+        this.itinerario = appDatabase.itinerarioDAO().carregar(itinerario);
+    }
+
     public HorarioItinerarioNome getHorario() {
         return horario;
     }
@@ -62,25 +70,6 @@ public class HorariosPorImagemViewModel extends AndroidViewModel {
 
         retorno = new MutableLiveData<>();
         retorno.setValue(-1);
-    }
-
-    public List<HorarioItinerarioNome> vincularHorarios(List<HorarioItinerarioNome> horarios){
-
-        List<HorarioItinerarioNome> hors = horarios;
-
-        for(HorarioItinerarioNome h : horarios){
-            Horario ho = carregarPorNome(h);
-            h.getHorarioItinerario().setHorario(ho.getId());
-            h.setNomeHorario(ho.getNome().getMillis());
-        }
-
-        return hors;
-
-    }
-
-    public Horario carregarPorNome(HorarioItinerarioNome h){
-        String hora = h.getHorarioItinerario().getHorario()+":00";
-        return appDatabase.horarioDAO().encontrarPorNome(hora);
     }
 
 }

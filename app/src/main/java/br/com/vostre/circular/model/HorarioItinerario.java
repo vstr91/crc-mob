@@ -4,9 +4,11 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Index;
 import android.support.annotation.NonNull;
 
+import java.io.Serializable;
+
 @Entity(indices = {@Index(value = {"horario", "itinerario"},
         unique = true)}, tableName = "horario_itinerario")
-public class HorarioItinerario extends EntidadeBase {
+public class HorarioItinerario extends EntidadeBase implements Serializable {
 
     @NonNull
     private String horario;

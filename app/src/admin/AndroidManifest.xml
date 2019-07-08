@@ -88,6 +88,7 @@
         <activity android:name=".view.AcessoDiaActivity" />
         <activity android:name=".view.CameraActivity" />
         <activity android:name=".view.CameraResultadoActivity" />
+        <activity android:name=".view.ComparaHorariosActivity" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />

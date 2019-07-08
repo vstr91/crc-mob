@@ -4,10 +4,12 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Ignore;
 
+import java.io.Serializable;
+
 import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.Parada;
 
-public class HorarioItinerarioNome {
+public class HorarioItinerarioNome implements Serializable {
 
     @Embedded
     HorarioItinerario horarioItinerario;

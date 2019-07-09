@@ -21,15 +21,17 @@ public class HorarioItinerarioReduzidoAdapter extends RecyclerView.Adapter<Horar
     HorariosItinerarioViewModel viewModel;
     boolean clickListener = false;
     public List<HorarioItinerarioNome> horariosAtuais;
+    boolean isHorariosAtuais = false;
 
     public HorarioItinerarioReduzidoAdapter(List<HorarioItinerarioNome> horarios, AppCompatActivity context,
                                             HorariosItinerarioViewModel viewModel, boolean clickListener,
-                                            List<HorarioItinerarioNome> horariosAtuais){
+                                            List<HorarioItinerarioNome> horariosAtuais, boolean isHorariosAtuais){
         this.horarios = horarios;
         ctx = context;
         this.viewModel = viewModel;
         this.clickListener = clickListener;
         this.horariosAtuais = horariosAtuais;
+        this.isHorariosAtuais = isHorariosAtuais;
     }
 
     @Override
@@ -46,9 +48,9 @@ public class HorarioItinerarioReduzidoAdapter extends RecyclerView.Adapter<Horar
         HorarioItinerarioNome horario = horarios.get(position);
 
         if(horariosAtuais != null && horariosAtuais.indexOf(horario) > -1){
-            holder.bind(horario, true);
+            holder.bind(horario, true, isHorariosAtuais);
         } else{
-            holder.bind(horario, false);
+            holder.bind(horario, false, isHorariosAtuais);
         }
 
     }

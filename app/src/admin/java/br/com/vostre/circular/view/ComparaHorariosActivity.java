@@ -62,7 +62,7 @@ public class ComparaHorariosActivity extends BaseActivity {
 
         ctx = this;
 
-        adapterAtuais = new HorarioItinerarioReduzidoAdapter(viewModel.horariosAtuais.getValue(), this, null, false, null);
+        adapterAtuais = new HorarioItinerarioReduzidoAdapter(viewModel.horariosAtuais.getValue(), this, null, false, null, true);
 
         viewModel.itinerario.observe(this, itinerarioObserver);
         viewModel.horariosAtuais.observe(this, horariosObserver);
@@ -97,12 +97,16 @@ public class ComparaHorariosActivity extends BaseActivity {
     Observer<List<HorarioItinerarioNome>> horariosObserver = new Observer<List<HorarioItinerarioNome>>() {
         @Override
         public void onChanged(List<HorarioItinerarioNome> horarios) {
-            adapterAtuais.horarios = horarios;
 
-            adapterProcessados = new HorarioItinerarioReduzidoAdapter(horariosProcessados, ctx, null, false, horarios);
+            //adapterAtuais.horarios = horarios;
+
+            adapterProcessados = new HorarioItinerarioReduzidoAdapter(horariosProcessados, ctx, null, false, horarios, false);
             listHorariosProcessados.setAdapter(adapterProcessados);
 
-            adapterAtuais.notifyDataSetChanged();
+            adapterAtuais = new HorarioItinerarioReduzidoAdapter(horarios, ctx, null, false, horariosProcessados, true);
+            listHorariosAtuais.setAdapter(adapterAtuais);
+
+//            adapterAtuais.notifyDataSetChanged();
         }
     };
 

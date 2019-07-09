@@ -237,7 +237,7 @@
             <android.support.v7.widget.CardView
                 android:id="@+id/cardView4"
                 android:layout_width="0dp"
-                android:layout_height="150dp"
+                android:layout_height="160dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
@@ -255,7 +255,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
                         android:layout_marginEnd="8dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -266,7 +265,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:ems="10"
-                            android:hint="Ignorar horários terminados em..."
+                            android:hint="Ignorar horários com observações terminadas em..."
                             android:inputType="textPersonName"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -328,6 +327,18 @@
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toEndOf="@+id/checkBoxSabado"
                         app:layout_constraintTop_toBottomOf="@+id/textView35" />
+
+                    <CheckBox
+                        android:id="@+id/checkBoxDesconsiderarObservacoes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="Desconsiderar observações ao processar"
+                        android:textSize="12sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
 
                 </android.support.constraint.ConstraintLayout>
 

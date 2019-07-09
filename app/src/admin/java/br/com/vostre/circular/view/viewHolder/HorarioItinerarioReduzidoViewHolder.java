@@ -35,7 +35,7 @@ public class HorarioItinerarioReduzidoViewHolder extends RecyclerView.ViewHolder
         this.clickListener = clickListener;
     }
 
-    public void bind(final HorarioItinerarioNome horarioItinerario, boolean existe) {
+    public void bind(final HorarioItinerarioNome horarioItinerario, boolean existe, boolean isHorariosAtuais) {
 
         if(horarioItinerario.getHorarioItinerario() == null){
             horarioItinerario.setHorarioItinerario(new HorarioItinerario());
@@ -93,11 +93,22 @@ public class HorarioItinerarioReduzidoViewHolder extends RecyclerView.ViewHolder
             });
         }
 
-        if(existe){
-            binding.cardview.setCardBackgroundColor(ctx.getResources().getColor(R.color.verde));
+        // destaca com vermelhos os atuais nao existentes nos processados, com verde os processados ja existentes nos atuais e vice-versa e com amarelo os processados nao existentes nos atuais
+        if(isHorariosAtuais){
+            if(existe){
+                binding.cardview.setCardBackgroundColor(ctx.getResources().getColor(R.color.verde));
+            } else{
+                binding.cardview.setCardBackgroundColor(ctx.getResources().getColor(R.color.vermelho));
+            }
         } else{
-            binding.cardview.setCardBackgroundColor(ctx.getResources().getColor(R.color.branco));
+            if(existe){
+                binding.cardview.setCardBackgroundColor(ctx.getResources().getColor(R.color.verde));
+            } else{
+                binding.cardview.setCardBackgroundColor(ctx.getResources().getColor(R.color.amarelo));
+            }
         }
+
+
 
         binding.executePendingBindings();
     }

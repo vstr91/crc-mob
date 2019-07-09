@@ -421,6 +421,8 @@ public class HorarioPorImagemActivity extends BaseActivity {
                         }
 
                         hi = null;
+                    } else{
+                        hi = null;
                     }
 
                 }
@@ -466,7 +468,8 @@ public class HorarioPorImagemActivity extends BaseActivity {
 
             for(HorarioItinerarioNome h : hors){
 
-                if(h.getHorarioItinerario().getObservacao() != null && !StringUtils.removeAcentos(h.getHorarioItinerario().getObservacao()).toLowerCase().endsWith(filtro)){
+                if((h.getHorarioItinerario().getObservacao() != null && !StringUtils.removeAcentos(h.getHorarioItinerario().getObservacao()).toLowerCase().endsWith(filtro)) ||
+                        h.getHorarioItinerario().getObservacao() == null){
                     horariosFiltrados.add(h);
                 }
 
@@ -480,7 +483,9 @@ public class HorarioPorImagemActivity extends BaseActivity {
                 Toast.makeText(getApplicationContext(), "Nenhum horário correspondente ao filtro foi encontrado. Utilizando lista original.", Toast.LENGTH_SHORT).show();
             }
 
-
+            if(binding.checkBoxDesconsiderarObservacoes.isChecked()){
+                apagaObservacoes(adapter.horarios);
+            }
 
             Collections.sort(adapter.horarios, new Comparator<HorarioItinerarioNome>() {
                 @Override
@@ -494,6 +499,10 @@ public class HorarioPorImagemActivity extends BaseActivity {
         } else{
             adapter.horarios = hors;
 
+            if(binding.checkBoxDesconsiderarObservacoes.isChecked()){
+                apagaObservacoes(adapter.horarios);
+            }
+
             Collections.sort(adapter.horarios, new Comparator<HorarioItinerarioNome>() {
                 @Override
                 public int compare(HorarioItinerarioNome horarioItinerarioNome, HorarioItinerarioNome t1) {
@@ -505,6 +514,14 @@ public class HorarioPorImagemActivity extends BaseActivity {
         }
 
 
+
+    }
+
+    private void apagaObservacoes(List<HorarioItinerarioNome> horarios){
+
+        for(HorarioItinerarioNome h : horarios){
+            h.getHorarioItinerario().setObservacao("");
+        }
 
     }
 

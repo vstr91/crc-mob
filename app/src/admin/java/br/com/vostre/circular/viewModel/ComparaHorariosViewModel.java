@@ -67,12 +67,20 @@ public class ComparaHorariosViewModel extends AndroidViewModel {
         retorno.setValue(-1);
     }
 
-    public void editarHorario(){
+    public void atualizaHorarios(List<HorarioItinerarioNome> horarios, Itinerario itinerario){
+
+        new invalidaHorariosAsyncTask(appDatabase).execute(itinerario);
+
+        for(HorarioItinerarioNome h : horarios){
+            editarHorario(h);
+        }
+
+    }
+
+    public void editarHorario(HorarioItinerarioNome horario){
 
         if(horario.getHorarioItinerario().valida(horario.getHorarioItinerario())){
             edit(horario.getHorarioItinerario());
-        } else{
-            retorno.setValue(0);
         }
 
     }
@@ -87,8 +95,6 @@ public class ComparaHorariosViewModel extends AndroidViewModel {
 
         horario.setUltimaAlteracao(new DateTime());
         horario.setEnviado(false);
-
-        //new invalidaHorariosAsyncTask(appDatabase).execute(itinerario.getValue().getItinerario());
 
         new editAsyncTask(appDatabase).execute(horario);
     }

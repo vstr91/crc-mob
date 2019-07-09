@@ -10,6 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TabHost;
+import android.widget.Toast;
+
+import org.joda.time.format.DateTimeFormat;
 
 import java.util.List;
 
@@ -37,6 +40,7 @@ public class ComparaHorariosActivity extends BaseActivity {
     HorarioItinerarioReduzidoAdapter adapterAtuais;
 
     AppCompatActivity ctx;
+    Itinerario itinerario;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +54,7 @@ public class ComparaHorariosActivity extends BaseActivity {
 
         viewModel = ViewModelProviders.of(this).get(ComparaHorariosViewModel.class);
 
-        Itinerario itinerario = new Itinerario();
+        itinerario = new Itinerario();
         itinerario.setId(getIntent().getStringExtra("itinerario"));
         viewModel.setItinerario(itinerario.getId());
 
@@ -71,9 +75,14 @@ public class ComparaHorariosActivity extends BaseActivity {
     }
 
     public void onClickBtnProcessarImagem(View v){
-        Intent i = new Intent(getApplicationContext(), HorarioPorImagemActivity.class);
-        i.putExtra("itinerario", getIntent().getStringExtra("itinerario"));
-        startActivity(i);
+
+        viewModel.atualizaHorarios(horariosProcessados, itinerario);
+
+        for(HorarioItinerarioNome h : horariosProcessados){
+            Toast.makeText(getApplicationContext(), DateTimeFormat.forPattern("HH:mm").print(h.getNomeHorario()),
+                    Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     Observer<ItinerarioPartidaDestino> itinerarioObserver = new Observer<ItinerarioPartidaDestino>() {

@@ -126,7 +126,7 @@
                                     android:layout_weight="5"
                                     android:gravity="center_vertical"
                                     android:paddingLeft="10dp"
-                                    android:paddingBottom="10dp"
+                                    android:paddingBottom="5dp"
                                     android:text="@{itinerario.nomeCidadePartida}" />
                             </LinearLayout>
 
@@ -163,7 +163,7 @@
                                     android:layout_weight="5"
                                     android:gravity="center_vertical"
                                     android:paddingLeft="10dp"
-                                    android:paddingBottom="10dp"
+                                    android:paddingBottom="5dp"
                                     android:text="@{itinerario.nomeCidadeDestino}" />
                             </LinearLayout>
 
@@ -178,6 +178,7 @@
                             android:paddingBottom="10dp"
                             android:text="@{itinerario.itinerario.observacao}"
                             android:textAppearance="@style/texto_azul"
+                            android:textSize="14sp"
                             android:visibility="@{itinerario.itinerario.observacao != null ? viewAndroid.VISIBLE : viewAndroid.GONE}" />
 
                     </LinearLayout>
@@ -199,7 +200,7 @@
             <ImageView
                 android:id="@+id/imageView9"
                 android:layout_width="0dp"
-                android:layout_height="200dp"
+                android:layout_height="180dp"
                 android:layout_marginTop="8dp"
                 android:scaleType="fitCenter"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -237,7 +238,7 @@
             <android.support.v7.widget.CardView
                 android:id="@+id/cardView4"
                 android:layout_width="0dp"
-                android:layout_height="160dp"
+                android:layout_height="140dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
@@ -267,6 +268,7 @@
                             android:ems="10"
                             android:hint="Ignorar horários com observações terminadas em..."
                             android:inputType="textPersonName"
+                            android:textSize="12sp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -278,13 +280,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:layout_marginLeft="8dp"
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="8dp"
-                        android:layout_marginRight="8dp"
                         android:gravity="center"
                         android:text="Dias da Semana"
                         android:textColor="@color/azul"
+                        android:textSize="14sp"
                         android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -295,9 +296,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginTop="8dp"
                         android:text="Seg. a Sex."
+                        android:textSize="12sp"
                         app:layout_constraintEnd_toStartOf="@+id/checkBoxSabado"
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toStartOf="parent"
@@ -308,9 +308,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginTop="8dp"
                         android:text="Sábado"
+                        android:textSize="12sp"
                         app:layout_constraintEnd_toStartOf="@+id/checkBoxDom"
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toEndOf="@+id/checkBoxSegSex"
@@ -321,8 +320,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
                         android:text="Domingo"
+                        android:textSize="12sp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toEndOf="@+id/checkBoxSabado"

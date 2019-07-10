@@ -477,6 +477,7 @@ public class HorarioPorImagemActivity extends BaseActivity {
 
             if(horariosFiltrados.size() > 0){
                 adapter.horarios = horariosFiltrados;
+                hors = horariosFiltrados;
             } else{
                 adapter.horarios = hors;
 

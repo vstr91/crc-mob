@@ -78,10 +78,12 @@ public class ComparaHorariosActivity extends BaseActivity {
 
         viewModel.atualizaHorarios(horariosProcessados, itinerario);
 
-        for(HorarioItinerarioNome h : horariosProcessados){
-            Toast.makeText(getApplicationContext(), DateTimeFormat.forPattern("HH:mm").print(h.getNomeHorario()),
-                    Toast.LENGTH_SHORT).show();
-        }
+        Toast.makeText(getApplicationContext(), "Substituindo horários...", Toast.LENGTH_SHORT).show();
+
+//        for(HorarioItinerarioNome h : horariosProcessados){
+//            Toast.makeText(getApplicationContext(), DateTimeFormat.forPattern("HH:mm").print(h.getNomeHorario()),
+//                    Toast.LENGTH_SHORT).show();
+//        }
 
     }
 

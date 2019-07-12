@@ -29,6 +29,7 @@ import br.com.vostre.circular.model.EntidadeBase;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.view.MensagensActivity;
 import br.com.vostre.circular.view.MenuActivity;
+import br.com.vostre.circular.view.ProblemasActivity;
 
 /**
  * Created by Almir on 16/12/2015.
@@ -221,9 +222,8 @@ public class ToolbarUtils {
             case R.id.imageButtonProblemas:
             case R.id.icon_problemas:
             case R.id.problemas:
-
-                Toast.makeText(activity.getApplicationContext(), "Tela Problemas", Toast.LENGTH_SHORT).show();
-
+                Intent i = new Intent(activity, ProblemasActivity.class);
+                activity.startActivity(i);
                 break;
         }
     }

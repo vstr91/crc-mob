@@ -61,17 +61,20 @@ public class ProblemasActivity extends BaseActivity {
 
         listResolvidos.setAdapter(adapterResolvidos);
 
+        viewModel.abertos.observe(this, abertosObserver);
+        viewModel.resolvidos.observe(this, resolvidosObserver);
+
         tabHost = binding.tabs;
         tabHost.setup();
 
-        TabHost.TabSpec spec = tabHost.newTabSpec("Problemas em Aberto");
+        TabHost.TabSpec spec = tabHost.newTabSpec("Em Aberto");
         spec.setContent(R.id.tab1);
-        spec.setIndicator("Problemas em Aberto");
+        spec.setIndicator("Em Aberto");
         tabHost.addTab(spec);
 
-        TabHost.TabSpec spec2 = tabHost.newTabSpec("Problemas Resolvidos");
+        TabHost.TabSpec spec2 = tabHost.newTabSpec("Resolvidos");
         spec2.setContent(R.id.tab2);
-        spec2.setIndicator("Problemas Resolvidos");
+        spec2.setIndicator("Resolvidos");
         tabHost.addTab(spec2);
 
     }

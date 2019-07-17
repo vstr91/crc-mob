@@ -50,6 +50,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
@@ -57,6 +58,8 @@ import java.util.TimeZone;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityMenuBinding;
 import br.com.vostre.circular.model.ParametroInterno;
+import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
+import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.DBUtils;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
@@ -90,6 +93,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     int permissionStorage;
 
     static int PICK_FILE = 174;
+
+    AppCompatActivity ctx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,6 +163,11 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
 
         viewModel.parametrosInternos.observe(this, parametrosInternosObserver);
+
+        viewModel.buscarParadasProximas(getApplicationContext(), null);
+        viewModel.paradas.observe(this, paradasObserver);
+
+        ctx = this;
 
     }
 
@@ -299,6 +309,36 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             }
 
 
+
+        }
+    };
+
+    Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {
+        @Override
+        public void onChanged(List<ParadaBairro> paradas) {
+
+            List<String> listParadas = new ArrayList<>();
+
+            for(ParadaBairro p : paradas){
+
+                listParadas.add(p.getParada().getId());
+
+                System.out.println("PARADAS: "+p.getParada().getId()+" | "+p.getParada().getNome()+" - "+p.getNomeBairroComCidade());
+            }
+
+            viewModel.listarTodosAtivosProximosPoi(listParadas);
+            viewModel.itinerarios.observe(ctx, itinerariosObserver);
+
+        }
+    };
+
+    Observer<List<ItinerarioPartidaDestino>> itinerariosObserver = new Observer<List<ItinerarioPartidaDestino>>() {
+        @Override
+        public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
+
+            for(ItinerarioPartidaDestino i : itinerarios){
+                System.out.println("ITINERARIOS: "+i.getItinerario().getId()+" | "+i.getNomePartida()+", "+i.getNomeBairroPartida()+" - "+i.getNomeDestino()+", "+i.getNomeBairroDestino());
+            }
 
         }
     };

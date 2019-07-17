@@ -4,7 +4,9 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Context;
 import android.databinding.ObservableField;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
@@ -33,7 +35,10 @@ import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
+import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
+import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.Crypt;
+import br.com.vostre.circular.utils.LocationUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.Unique;
 import retrofit2.Call;
@@ -53,6 +58,9 @@ public class BaseViewModel extends AndroidViewModel {
 
     public LiveData<List<ParametroInterno>> parametrosInternos;
 
+    public LiveData<List<ParadaBairro>> paradas;
+    public LiveData<List<ItinerarioPartidaDestino>> itinerarios;
+
     public ObservableField<String> getId() {
         return id;
     }
@@ -69,8 +77,22 @@ public class BaseViewModel extends AndroidViewModel {
         mensagensNaoLidas = appDatabase.mensagemDAO().listarTodosNaoLidosServidor();
         parametrosInternos = appDatabase.parametroInternoDAO().listarTodos();
 
+        //paradas = appDatabase.paradaDAO().listarTodosComBairroPorCidade("");
+
         usuarioValidado = new MutableLiveData<>();
         usuarioValidado.postValue(false);
+    }
+
+    public void buscarParadasProximas(Context ctx, Location location){
+
+        paradas = LocationUtils.buscaParadasProximas(ctx, location, 100);
+
+    }
+
+    public void listarTodosAtivosProximosPoi(List<String> paradas){
+
+        itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosProximosPoi(paradas);
+
     }
 
     public void atualizarMensagens() {

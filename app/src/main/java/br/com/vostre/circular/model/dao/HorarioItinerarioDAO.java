@@ -133,7 +133,8 @@ public interface HorarioItinerarioDAO {
     @Query("SELECT hi.* FROM horario_itinerario hi WHERE hi.horario = :horario AND hi.itinerario = :itinerario")
     HorarioItinerario checaDuplicidade(String horario, String itinerario);
 
-    @Query("UPDATE horario_itinerario SET ativo = 0 WHERE itinerario = :itinerario")
+    @Query("UPDATE horario_itinerario SET domingo = 0, segunda = 0, terca = 0, quarta = 0, quinta = 0, sexta = 0, sabado = 0, ultima_alteracao = datetime('now'), enviado = 0 " +
+            "WHERE itinerario = :itinerario")
     void invalidaTodosPorItinerario(String itinerario);
 
     @Query("SELECT * FROM horario_itinerario WHERE id IN (:ids)")

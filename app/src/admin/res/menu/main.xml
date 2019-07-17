@@ -16,10 +16,10 @@
         <!--app:actionLayout="@layout/toolbar_import_icon"-->
         <!--app:showAsAction="always" />-->
 
-    <item android:id="@+id/icon_problemas"
-        android:title="Problemas Enviados"
-        app:actionLayout="@layout/toolbar_problemas_icon"
-        app:showAsAction="always" />
+    <!--<item android:id="@+id/icon_problemas"-->
+        <!--android:title="Problemas Enviados"-->
+        <!--app:actionLayout="@layout/toolbar_problemas_icon"-->
+        <!--app:showAsAction="always" />-->
 
     <item android:id="@+id/icon_sync"
         android:title="Sincronizar"

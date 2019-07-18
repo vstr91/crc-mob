@@ -11,7 +11,8 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/transparente">
+        android:background="@color/transparente"
+        android:padding="5dp">
 
         <!--<br.com.vostre.circleview.CircleView-->
         <!--android:id="@+id/circleView2"-->
@@ -35,7 +36,7 @@
             android:id="@+id/cardView2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
             app:cardCornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -44,7 +45,10 @@
 
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:paddingRight="8dp"
+                android:paddingBottom="8dp">
 
                 <TextView
                     android:id="@+id/textView19"
@@ -63,35 +67,25 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
                     android:text="@{itinerario.nomeBairroDestino}"
                     android:textColor="@color/cinzaEscuro"
                     android:textSize="10sp"
-                    app:layout_constraintStart_toStartOf="@+id/guideline4"
-                    app:layout_constraintTop_toBottomOf="@+id/textView16"
+                    app:layout_constraintStart_toEndOf="@+id/imageView20"
+                    app:layout_constraintTop_toTopOf="parent"
                     tools:text="Bairro" />
-
-                <TextView
-                    android:id="@+id/textView5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:text="Partida"
-                    android:textAppearance="@style/texto_azul"
-                    android:textSize="10sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/textView12"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
                     android:text="@{itinerario.nomeBairroPartida}"
                     android:textColor="@color/cinzaEscuro"
                     android:textSize="10sp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView5"
+                    app:layout_constraintTop_toTopOf="parent"
                     tools:text="Bairro" />
 
                 <TextView
@@ -105,25 +99,6 @@
                     app:layout_constraintStart_toEndOf="@+id/textView12"
                     app:layout_constraintTop_toTopOf="@+id/textView12"
                     tools:text="Cidade" />
-
-                <android.support.constraint.Guideline
-                    android:id="@+id/guideline4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintGuide_begin="192dp" />
-
-                <TextView
-                    android:id="@+id/textView16"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:text="Destino"
-                    android:textAppearance="@style/texto_azul"
-                    android:textSize="10sp"
-                    app:layout_constraintStart_toStartOf="@+id/guideline4"
-                    app:layout_constraintTop_toTopOf="parent" />
 
                 <!--<ImageView-->
                 <!--android:id="@+id/imageView9"-->
@@ -140,17 +115,25 @@
                     android:id="@+id/textViewObservacao"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
                     android:gravity="center"
                     android:text="TextView"
                     android:textAppearance="@style/texto_azul"
-                    android:textSize="8sp"
+                    android:textSize="7sp"
                     android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView18" />
+                    app:layout_constraintEnd_toEndOf="@+id/textView19"
+                    app:layout_constraintStart_toStartOf="@+id/textView12"
+                    app:layout_constraintTop_toBottomOf="@+id/textView12" />
+
+                <ImageView
+                    android:id="@+id/imageView20"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    app:layout_constraintBottom_toTopOf="@+id/textViewObservacao"
+                    app:layout_constraintStart_toEndOf="@+id/textView15"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_keyboard_forward_black_24dp" />
 
                 <!--<ImageView-->
                 <!--android:id="@+id/imageView10"-->

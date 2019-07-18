@@ -84,7 +84,7 @@ import br.com.vostre.circular.viewModel.EmpresasViewModel;
 import br.com.vostre.circular.viewModel.ParadasSugeridasViewModel;
 import br.com.vostre.circular.viewModel.ParadasViewModel;
 import br.com.vostre.circular.viewModel.PontosInteresseViewModel;
-import br.com.vostre.circular.viewModel.ProblemasViewModel;
+//import br.com.vostre.circular.viewModel.ProblemasViewModel;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -140,8 +140,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
     List<? extends EntidadeBase> pontosInteresseSugestoes;
 
-    List<? extends EntidadeBase> tiposProblema;
-    List<? extends EntidadeBase> problemas;
+//    List<? extends EntidadeBase> tiposProblema;
+//    List<? extends EntidadeBase> problemas;
 
     br.com.vostre.circular.utils.Crypt crypt;
 
@@ -1351,8 +1351,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             pontosInteresseSugestoes = appDatabase.pontoInteresseSugestaoDAO().listarTodosAEnviar();
 
-            tiposProblema = appDatabase.tipoProblemaDAO().listarTodosAEnviar();
-            problemas = appDatabase.problemaDAO().listarTodosAEnviar();
+//            tiposProblema = appDatabase.tipoProblemaDAO().listarTodosAEnviar();
+//            problemas = appDatabase.problemaDAO().listarTodosAEnviar();
 
             return null;
         }
@@ -1384,14 +1384,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             String strPontosInteresseSugestoes = "\"pontos_interesse_sugestoes\": "+JsonUtils.toJson((List<EntidadeBase>) pontosInteresseSugestoes);
 
-            String strTiposProblema = "\"tipos_problema\": "+JsonUtils.toJson((List<EntidadeBase>) tiposProblema);
-            String strProblemas = "\"problemas\": "+JsonUtils.toJson((List<EntidadeBase>) problemas);
+//            String strTiposProblema = "\"tipos_problema\": "+JsonUtils.toJson((List<EntidadeBase>) tiposProblema);
+//            String strProblemas = "\"problemas\": "+JsonUtils.toJson((List<EntidadeBase>) problemas);
 
             String json = "{"+strPaises+","+strEmpresas+","+strOnibus+","+strEstados+","+strCidades+","
                     +strBairros+","+strParadas+","+strItinerarios+","+strHorarios+","+strParadasItinerarios+","
                     +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
                     +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+","+strPreferencias+","+strHistoricos+","
-                    +strPontosInteresseSugestoes+","+strTiposProblema+","+strProblemas+"}";
+                    +strPontosInteresseSugestoes+"}";
 
              //System.out.println("JSON: "+json);
 
@@ -1416,8 +1416,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             int registros = paises.size()+empresas.size()+onibus.size()+estados.size()+cidades.size()
                     +bairros.size()+paradas.size()+itinerarios.size()+horarios.size()+paradasItinerario.size()
                     +secoesItinerarios.size()+horariosItinerarios.size()+mensagens.size()+parametros.size()+pontosInteresse.size()
-                    +usuarios.size()+paradaSugestoes.size()+preferencias.size()+historicos.size()+pontosInteresseSugestoes.size()
-                    +tiposProblema.size()+problemas.size();
+                    +usuarios.size()+paradaSugestoes.size()+preferencias.size()+historicos.size()+pontosInteresseSugestoes.size();
 
             if(registros > 0){
                 chamaAPI(registros, json, 0, baseUrl, token);
@@ -1738,48 +1737,48 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             }
 
-            for(final Problema problema : problemas){
-
-                File imagem = new File(getContext().getApplicationContext().getFilesDir(),  problema.getImagem());
-
-                RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
-                MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
-                RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
-
-                CircularAPI api = retrofit.create(CircularAPI.class);
-                Call<String> call = api.enviaImagem(body, name, tokenImagem);
-                call.enqueue(new Callback<String>() {
-                    @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
-
-                        if(response.code() == 200){
-                            problema.setImagemEnviada(true);
-                            ProblemasViewModel.editProblema(problema, getContext().getApplicationContext());
-                        } else{
-
-                            if(mostraToast){
-                                Toast.makeText(getContext().getApplicationContext(),
-                                        "Erro "+response.code()+" ("+response.message()+") ao enviar imagem de "+problema.getDescricao()+" para o servidor",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onFailure(Call<String> call, Throwable t) {
-
-                        if(mostraToast){
-                            Toast.makeText(getContext().getApplicationContext(),
-                                    "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+problema.getDescricao()+" para o servidor",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-                });
-
-            }
+//            for(final Problema problema : problemas){
+//
+//                File imagem = new File(getContext().getApplicationContext().getFilesDir(),  problema.getImagem());
+//
+//                RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
+//                MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
+//                RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
+//
+//                CircularAPI api = retrofit.create(CircularAPI.class);
+//                Call<String> call = api.enviaImagem(body, name, tokenImagem);
+//                call.enqueue(new Callback<String>() {
+//                    @Override
+//                    public void onResponse(Call<String> call, Response<String> response) {
+//
+//                        if(response.code() == 200){
+//                            problema.setImagemEnviada(true);
+//                            ProblemasViewModel.editProblema(problema, getContext().getApplicationContext());
+//                        } else{
+//
+//                            if(mostraToast){
+//                                Toast.makeText(getContext().getApplicationContext(),
+//                                        "Erro "+response.code()+" ("+response.message()+") ao enviar imagem de "+problema.getDescricao()+" para o servidor",
+//                                        Toast.LENGTH_SHORT).show();
+//                            }
+//
+//                        }
+//
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<String> call, Throwable t) {
+//
+//                        if(mostraToast){
+//                            Toast.makeText(getContext().getApplicationContext(),
+//                                    "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+problema.getDescricao()+" para o servidor",
+//                                    Toast.LENGTH_SHORT).show();
+//                        }
+//
+//                    }
+//                });
+//
+//            }
 
         }
     }

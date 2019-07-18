@@ -21,6 +21,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.DrawableWrapper;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -31,6 +32,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DrawableUtils;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -107,6 +109,8 @@ import br.com.vostre.circular.utils.SignInActivity;
 import br.com.vostre.circular.utils.tasks.PreferenceDownloadAsyncTask;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
+import br.com.vostre.circular.view.adapter.ItinerarioCompactoAdapter;
+import br.com.vostre.circular.view.adapter.ItinerarioFavoritoAdapter;
 import br.com.vostre.circular.view.adapter.ParadaAdapter;
 import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
 import br.com.vostre.circular.view.form.FormParada;
@@ -115,6 +119,7 @@ import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.view.utils.InfoWindowParada;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
+import br.com.vostre.circular.viewModel.InfoWindowPOIViewModel;
 import br.com.vostre.circular.viewModel.MapaViewModel;
 
 public class MapaActivity extends BaseActivity {
@@ -122,6 +127,7 @@ public class MapaActivity extends BaseActivity {
     ActivityMapaBinding binding;
     MapaViewModel viewModel;
     BaseViewModel baseViewModel;
+    InfoWindowPOIViewModel viewModelPoi;
     ParadaAdapter adapter;
     ItinerarioAdapter adapterItinerarios;
 
@@ -652,6 +658,19 @@ public class MapaActivity extends BaseActivity {
                                 textViewDescricao.setVisibility(View.GONE);
                             }
 
+                            //itinerarios poi
+                            viewModelPoi = ViewModelProviders.of(ctx).get(InfoWindowPOIViewModel.class);
+                            viewModelPoi.setPontoInteresse(poi);
+
+                            Location l = new Location(LocationManager.NETWORK_PROVIDER);
+                            l.setLatitude(poi.getLatitude());
+                            l.setLongitude(poi.getLongitude());
+
+                            viewModelPoi.buscarParadasProximas(ctx, l);
+                            viewModelPoi.paradas.observe(ctx, paradasPoiObserver);
+
+                            //fim tinerarios poi
+
                             ImageView img = bsdPoi.findViewById(R.id.imageView3);
 
                             File f = null;
@@ -678,7 +697,7 @@ public class MapaActivity extends BaseActivity {
                             // fim bottom menu
 
                             mapController.animateTo(marker.getPosition());
-                            bsdPoi.show();
+                            //bsdPoi.show();
                         }
 
                         return true;
@@ -1306,5 +1325,43 @@ public class MapaActivity extends BaseActivity {
         binding.progressBar.setIndeterminate(true);
         binding.progressBar.setVisibility(View.GONE);
     }
+
+    Observer<List<ParadaBairro>> paradasPoiObserver = new Observer<List<ParadaBairro>>() {
+        @Override
+        public void onChanged(List<ParadaBairro> paradas) {
+
+            List<String> listParadas = new ArrayList<>();
+
+            for(ParadaBairro p : paradas){
+
+                listParadas.add(p.getParada().getId());
+
+                System.out.println("PARADAS: "+p.getParada().getId()+" | "+p.getParada().getNome()+" - "+p.getNomeBairroComCidade());
+            }
+
+            viewModelPoi.listarTodosAtivosProximosPoi(listParadas);
+            viewModelPoi.itinerarios.observe(ctx, itinerariosPoiObserver);
+
+        }
+    };
+
+    Observer<List<ItinerarioPartidaDestino>> itinerariosPoiObserver = new Observer<List<ItinerarioPartidaDestino>>() {
+        @Override
+        public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
+
+            ItinerarioCompactoAdapter adapter = new ItinerarioCompactoAdapter(itinerarios, ctx);
+            RecyclerView listItinerarios = bsdPoi.findViewById(R.id.listItinerarios);
+            listItinerarios.setAdapter(adapter);
+
+            listItinerarios.setLayoutManager(new GridLayoutManager(ctx, 1));
+
+            for(ItinerarioPartidaDestino i : itinerarios){
+                System.out.println("ITINERARIOS: "+i.getItinerario().getId()+" | "+i.getNomePartida()+", "+i.getNomeBairroPartida()+" - "+i.getNomeDestino()+", "+i.getNomeBairroDestino());
+            }
+
+            bsdPoi.show();
+
+        }
+    };
 
 }

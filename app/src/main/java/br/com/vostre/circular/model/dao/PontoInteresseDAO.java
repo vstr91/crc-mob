@@ -11,6 +11,7 @@ import android.arch.persistence.room.Update;
 import java.util.List;
 
 import br.com.vostre.circular.model.PontoInteresse;
+import br.com.vostre.circular.model.pojo.PontoInteresseBairro;
 
 @Dao
 public interface PontoInteresseDAO {
@@ -39,6 +40,12 @@ public interface PontoInteresseDAO {
 
     @Query("SELECT * FROM ponto_interesse WHERE id = :id")
     PontoInteresse carregarSync(String id);
+
+    @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
+            "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM ponto_interesse p " +
+            "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
+            "estado e ON e.id = c.estado WHERE p.id = :poi")
+    LiveData<PontoInteresseBairro> carregarComBairro(String poi);
 
     @Query("SELECT * FROM ponto_interesse WHERE nome LIKE :nome LIMIT 1")
     PontoInteresse encontrarPorNome(String nome);

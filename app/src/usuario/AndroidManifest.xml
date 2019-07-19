@@ -116,6 +116,7 @@
         <activity android:name=".view.HorariosItinerarioActivity" android:screenOrientation="portrait" />
         <activity android:name=".view.SobreActivity" android:screenOrientation="portrait" />
         <activity android:name=".view.OpcoesActivity" android:screenOrientation="portrait" />
+        <activity android:name=".view.DetalhePontoInteresseActivity" android:screenOrientation="portrait" />
         <activity android:name=".view.QRCodeActivity" android:screenOrientation="portrait"
             android:noHistory="true"></activity>
         <meta-data

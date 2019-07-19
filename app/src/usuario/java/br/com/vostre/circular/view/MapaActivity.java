@@ -659,15 +659,15 @@ public class MapaActivity extends BaseActivity {
                             }
 
                             //itinerarios poi
-                            viewModelPoi = ViewModelProviders.of(ctx).get(InfoWindowPOIViewModel.class);
-                            viewModelPoi.setPontoInteresse(poi);
-
-                            Location l = new Location(LocationManager.NETWORK_PROVIDER);
-                            l.setLatitude(poi.getLatitude());
-                            l.setLongitude(poi.getLongitude());
-
-                            viewModelPoi.buscarParadasProximas(ctx, l);
-                            viewModelPoi.paradas.observe(ctx, paradasPoiObserver);
+//                            viewModelPoi = ViewModelProviders.of(ctx).get(InfoWindowPOIViewModel.class);
+//                            viewModelPoi.setPontoInteresse(poi);
+//
+//                            Location l = new Location(LocationManager.NETWORK_PROVIDER);
+//                            l.setLatitude(poi.getLatitude());
+//                            l.setLongitude(poi.getLongitude());
+//
+//                            viewModelPoi.buscarParadasProximas(ctx, l);
+//                            viewModelPoi.paradas.observe(ctx, paradasPoiObserver);
 
                             //fim tinerarios poi
 
@@ -694,10 +694,19 @@ public class MapaActivity extends BaseActivity {
                                 }
                             });
 
+                            bsdPoi.findViewById(R.id.btnDetalhes).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent i = new Intent(ctx, DetalhePontoInteresseActivity.class);
+                                    i.putExtra("poi", poi.getId());
+                                    ctx.startActivity(i);
+                                }
+                            });
+
                             // fim bottom menu
 
                             mapController.animateTo(marker.getPosition());
-                            //bsdPoi.show();
+                            bsdPoi.show();
                         }
 
                         return true;
@@ -1326,42 +1335,42 @@ public class MapaActivity extends BaseActivity {
         binding.progressBar.setVisibility(View.GONE);
     }
 
-    Observer<List<ParadaBairro>> paradasPoiObserver = new Observer<List<ParadaBairro>>() {
-        @Override
-        public void onChanged(List<ParadaBairro> paradas) {
-
-            List<String> listParadas = new ArrayList<>();
-
-            for(ParadaBairro p : paradas){
-
-                listParadas.add(p.getParada().getId());
-
-                System.out.println("PARADAS: "+p.getParada().getId()+" | "+p.getParada().getNome()+" - "+p.getNomeBairroComCidade());
-            }
-
-            viewModelPoi.listarTodosAtivosProximosPoi(listParadas);
-            viewModelPoi.itinerarios.observe(ctx, itinerariosPoiObserver);
-
-        }
-    };
-
-    Observer<List<ItinerarioPartidaDestino>> itinerariosPoiObserver = new Observer<List<ItinerarioPartidaDestino>>() {
-        @Override
-        public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
-
-            ItinerarioCompactoAdapter adapter = new ItinerarioCompactoAdapter(itinerarios, ctx);
-            RecyclerView listItinerarios = bsdPoi.findViewById(R.id.listItinerarios);
-            listItinerarios.setAdapter(adapter);
-
-            listItinerarios.setLayoutManager(new GridLayoutManager(ctx, 1));
-
-            for(ItinerarioPartidaDestino i : itinerarios){
-                System.out.println("ITINERARIOS: "+i.getItinerario().getId()+" | "+i.getNomePartida()+", "+i.getNomeBairroPartida()+" - "+i.getNomeDestino()+", "+i.getNomeBairroDestino());
-            }
-
-            bsdPoi.show();
-
-        }
-    };
+//    Observer<List<ParadaBairro>> paradasPoiObserver = new Observer<List<ParadaBairro>>() {
+//        @Override
+//        public void onChanged(List<ParadaBairro> paradas) {
+//
+//            List<String> listParadas = new ArrayList<>();
+//
+//            for(ParadaBairro p : paradas){
+//
+//                listParadas.add(p.getParada().getId());
+//
+//                System.out.println("PARADAS: "+p.getParada().getId()+" | "+p.getParada().getNome()+" - "+p.getNomeBairroComCidade());
+//            }
+//
+//            viewModelPoi.listarTodosAtivosProximosPoi(listParadas);
+//            viewModelPoi.itinerarios.observe(ctx, itinerariosPoiObserver);
+//
+//        }
+//    };
+//
+//    Observer<List<ItinerarioPartidaDestino>> itinerariosPoiObserver = new Observer<List<ItinerarioPartidaDestino>>() {
+//        @Override
+//        public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
+//
+//            ItinerarioCompactoAdapter adapter = new ItinerarioCompactoAdapter(itinerarios, ctx);
+//            RecyclerView listItinerarios = bsdPoi.findViewById(R.id.listItinerarios);
+//            listItinerarios.setAdapter(adapter);
+//
+//            listItinerarios.setLayoutManager(new GridLayoutManager(ctx, 1));
+//
+//            for(ItinerarioPartidaDestino i : itinerarios){
+//                System.out.println("ITINERARIOS: "+i.getItinerario().getId()+" | "+i.getNomePartida()+", "+i.getNomeBairroPartida()+" - "+i.getNomeDestino()+", "+i.getNomeBairroDestino());
+//            }
+//
+//            bsdPoi.show();
+//
+//        }
+//    };
 
 }

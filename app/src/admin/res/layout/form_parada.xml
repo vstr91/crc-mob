@@ -61,7 +61,7 @@
                 android:digits="0123456789,."
                 android:ems="10"
                 android:hint="Taxa de Embarque"
-                android:inputType="numberDecimal | number"
+                android:inputType="numberDecimal|number"
                 android:text="@={viewModel.parada.parada.taxaDeEmbarque}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -170,7 +170,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:onItemSelected="@{view::onItemSelectedSpinnerBairro}"
-            app:entries="@{viewModel.bairros}"
+            app:entriesParada="@{viewModel.bairros}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView8" />

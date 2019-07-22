@@ -172,6 +172,8 @@ public class FormPontoInteresse extends FormPOIBase {
             flagInicioEdicao = true;
         }
 
+        ctx = this.getActivity().getApplication();
+
         return binding.getRoot();
 
     }

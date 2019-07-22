@@ -26,6 +26,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -61,6 +64,7 @@ import br.com.vostre.circular.model.ParametroInterno;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.DBUtils;
+import br.com.vostre.circular.utils.DestaqueUtils;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
 public class MenuActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -164,10 +168,41 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         viewModel.parametrosInternos.observe(this, parametrosInternosObserver);
 
-        viewModel.buscarParadasProximas(getApplicationContext(), null);
-        viewModel.paradas.observe(this, paradasObserver);
+//        viewModel.buscarParadasProximas(getApplicationContext(), null);
+//        viewModel.paradas.observe(this, paradasObserver);
 
         ctx = this;
+
+//        DestaqueUtils.geraDestaqueUnico(this, binding.button, "Outro", "Teste modular", new TapTargetView.Listener(){
+//            @Override
+//            public void onTargetClick(TapTargetView view) {
+//                super.onTargetClick(view);
+//                onClickBtnPaises(view);
+//            }
+//        });
+
+        List<TapTarget> targets = new ArrayList<>();
+
+        targets.add(DestaqueUtils.geraTapTarget(binding.button2, "Novo teste!", "Pressione esta opção para ter acesso a outros dados!"));
+        targets.add(DestaqueUtils.geraTapTarget(binding.button3, "Botao 3", "Botao tres texto"));
+        targets.add(DestaqueUtils.geraTapTarget(binding.button4, "Botao 4", "Botao quatro texto"));
+
+        DestaqueUtils.geraSequenciaDestaques(this, targets, new TapTargetSequence.Listener() {
+            @Override
+            public void onSequenceFinish() {
+                Toast.makeText(getApplicationContext(), "Terminou!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+                Toast.makeText(getApplicationContext(), "Um passo", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSequenceCanceled(TapTarget lastTarget) {
+                Toast.makeText(getApplicationContext(), "Cancelou...", Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
@@ -313,35 +348,35 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         }
     };
 
-    Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {
-        @Override
-        public void onChanged(List<ParadaBairro> paradas) {
-
-            List<String> listParadas = new ArrayList<>();
-
-            for(ParadaBairro p : paradas){
-
-                listParadas.add(p.getParada().getId());
-
-                System.out.println("PARADAS: "+p.getParada().getId()+" | "+p.getParada().getNome()+" - "+p.getNomeBairroComCidade());
-            }
-
-            viewModel.listarTodosAtivosProximosPoi(listParadas);
-            viewModel.itinerarios.observe(ctx, itinerariosObserver);
-
-        }
-    };
-
-    Observer<List<ItinerarioPartidaDestino>> itinerariosObserver = new Observer<List<ItinerarioPartidaDestino>>() {
-        @Override
-        public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
-
-            for(ItinerarioPartidaDestino i : itinerarios){
-                System.out.println("ITINERARIOS: "+i.getItinerario().getId()+" | "+i.getNomePartida()+", "+i.getNomeBairroPartida()+" - "+i.getNomeDestino()+", "+i.getNomeBairroDestino());
-            }
-
-        }
-    };
+//    Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {
+//        @Override
+//        public void onChanged(List<ParadaBairro> paradas) {
+//
+//            List<String> listParadas = new ArrayList<>();
+//
+//            for(ParadaBairro p : paradas){
+//
+//                listParadas.add(p.getParada().getId());
+//
+//                System.out.println("PARADAS: "+p.getParada().getId()+" | "+p.getParada().getNome()+" - "+p.getNomeBairroComCidade());
+//            }
+//
+//            viewModel.listarTodosAtivosProximosPoi(listParadas);
+//            viewModel.itinerarios.observe(ctx, itinerariosObserver);
+//
+//        }
+//    };
+//
+//    Observer<List<ItinerarioPartidaDestino>> itinerariosObserver = new Observer<List<ItinerarioPartidaDestino>>() {
+//        @Override
+//        public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
+//
+//            for(ItinerarioPartidaDestino i : itinerarios){
+//                System.out.println("ITINERARIOS: "+i.getItinerario().getId()+" | "+i.getNomePartida()+", "+i.getNomeBairroPartida()+" - "+i.getNomeDestino()+", "+i.getNomeBairroDestino());
+//            }
+//
+//        }
+//    };
 
     private void requisitaAtualizacao(){
         Bundle settingsBundle = new Bundle();

@@ -274,7 +274,7 @@ public class FormParada extends FormBase {
         binding.btnFoto.setVisibility(View.GONE);
     }
 
-    @BindingAdapter("entries")
+    @BindingAdapter("entriesParada")
     public static void setSpinnerEntries(Spinner spinner, LiveData<List<BairroCidade>> bairros){
 
         if(bairros.getValue() != null){

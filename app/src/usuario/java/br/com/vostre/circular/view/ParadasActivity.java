@@ -9,9 +9,12 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.joda.time.DateTime;
@@ -139,6 +142,24 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
         public void onChanged(List<CidadeEstado> cidades) {
             adapter.cidades = cidades;
             adapter.notifyDataSetChanged();
+
+            binding.textView14.getViewTreeObserver().addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    YoYo.with(Techniques.Bounce)
+                            .duration(700)
+                            .repeat(1)
+                            .playOn(findViewById(R.id.textView14));
+
+//                    View v = findViewById(R.id.textView66);
+//
+//                    YoYo.with(Techniques.Flash)
+//                            .delay(500)
+//                            .duration(500)
+//                            .playOn(findViewById(R.id.textView66));
+                }
+            });
+
         }
     };
 

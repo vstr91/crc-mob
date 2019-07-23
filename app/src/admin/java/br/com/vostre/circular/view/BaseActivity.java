@@ -55,13 +55,14 @@ import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.utils.ToolbarUtils;
+import br.com.vostre.circular.view.listener.GpsListener;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
 import br.com.vostre.circular.databinding.DrawerHeaderBinding;
 
 import static br.com.vostre.circular.utils.ToolbarUtils.PICK_FILE;
 
-public class BaseActivity extends AppCompatActivity implements View.OnClickListener {
+public class BaseActivity extends AppCompatActivity implements View.OnClickListener, GpsListener {
 
     public Toolbar toolbar;
     Menu menu;
@@ -71,6 +72,20 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     IntentFilter filter;
 
     public FirebaseUser account;
+
+    LocationManager locationManager;
+    boolean gpsAtivo = false;
+
+    private BroadcastReceiver mGpsSwitchStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (LocationManager.PROVIDERS_CHANGED_ACTION.equals(intent.getAction())) {
+                gpsAtivo = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                onGpsChanged(gpsAtivo);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +132,9 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
         filter.addAction(LocationManager.PROVIDERS_CHANGED_ACTION);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(receiver, filter);
+
+        locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        gpsAtivo = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
     }
 
@@ -171,12 +189,14 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         registerReceiver(receiver, filter);
+        registerReceiver(mGpsSwitchStateReceiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         unregisterReceiver(receiver);
+        unregisterReceiver(mGpsSwitchStateReceiver);
     }
 
     @Override
@@ -579,6 +599,11 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     protected void onPostResume() {
         super.onPostResume();
         this.supportInvalidateOptionsMenu();
+    }
+
+    @Override
+    public void onGpsChanged(boolean ativo) {
+
     }
 
     Observer<List<Mensagem>> mensagensObserver = new Observer<List<Mensagem>>() {

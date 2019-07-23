@@ -225,7 +225,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@color/azul"
-            android:text="Pressione para fazer login e sugerir novas paradas e pontos de interesse!"
+            android:text="Pressione aqui para fazer login e sugerir novas paradas e pontos de interesse!"
             android:textAllCaps="false"
             android:textColor="@color/branco"
             android:textSize="12sp"

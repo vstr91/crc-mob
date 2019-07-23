@@ -13,12 +13,12 @@ public class LocationUtils {
 
     public static LiveData<List<ParadaBairro>> buscaParadasProximas(Context context, Location local, int raioEmMetros){
 
-        //double latitude = local.getLatitude();
-        //double longitude = local.getLongitude();
+        double latitude = local.getLatitude();
+        double longitude = local.getLongitude();
 
         // Centro - Barra do Pirai
-        double latitude = -22.470612;
-        double longitude = -43.8263613;
+        //double latitude = -22.470612;
+        //double longitude = -43.8263613;
 
 // 6378000 Size of the Earth (in meters)
         double longitudeD = (Math.asin(raioEmMetros / (6378000 * Math.cos(Math.PI*latitude/180))))*180/Math.PI;

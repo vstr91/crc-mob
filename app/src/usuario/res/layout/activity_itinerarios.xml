@@ -78,6 +78,7 @@
             android:clickable="true"
             android:elevation="20dp"
             android:orientation="vertical"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -133,10 +134,17 @@
                     android:id="@+id/textView14"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="10dp"
                     android:paddingTop="10dp"
+                    android:paddingBottom="0dp"
                     android:text="De qual cidade você sairá?"
                     android:textAppearance="@style/texto_azul" />
+
+                <TextView
+                    android:id="@+id/textView67"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Escolha uma opção abaixo, pressionando o brasão ou o nome da cidade"
+                    android:textSize="8sp" />
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/listCidadesPartida"
@@ -274,10 +282,17 @@
                     android:id="@+id/textView2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="10dp"
+                    android:paddingBottom="0dp"
                     android:paddingTop="10dp"
                     android:text="Qual será o seu destino?"
                     android:textAppearance="@style/texto_azul" />
+
+                <TextView
+                    android:id="@+id/textView68"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Escolha uma opção abaixo, pressionando o brasão ou o nome da cidade"
+                    android:textSize="8sp" />
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/listCidades"

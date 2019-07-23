@@ -21,8 +21,12 @@ public class DestaqueUtils {
         new TapTargetSequence(ctx).targets(targets).listener(listener).start();
     }
 
-    public static TapTarget geraTapTarget(View v, String titulo, String descricao){
-        return TapTarget.forView(v, titulo, descricao).outerCircleColor(R.color.azul);
+    public static TapTarget geraTapTarget(View v, String titulo, String descricao, boolean cancelavel){
+
+        return TapTarget.forView(v, titulo, descricao).outerCircleColor(R.color.azul).cancelable(cancelavel);
+
+
+
     }
 
 }

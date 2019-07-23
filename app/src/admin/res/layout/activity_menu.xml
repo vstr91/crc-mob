@@ -317,6 +317,18 @@
                 app:layout_constraintStart_toEndOf="@+id/circleView"
                 app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
+            <TextView
+                android:id="@+id/textViewBairroAtual"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/rounded_corner_button_branco"
+                android:padding="5dp"
+                android:text="Bairro"
+                app:layout_constraintEnd_toEndOf="@+id/circleView"
+                app:layout_constraintStart_toStartOf="@+id/circleView"
+                app:layout_constraintTop_toTopOf="@+id/circleView" />
+
         </android.support.constraint.ConstraintLayout>
 
         <android.support.design.widget.NavigationView

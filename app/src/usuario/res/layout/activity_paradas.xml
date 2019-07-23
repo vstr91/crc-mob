@@ -56,10 +56,16 @@
                     android:id="@+id/textView14"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="10dp"
+                    android:paddingBottom="0dp"
                     android:paddingTop="10dp"
                     android:text="Escolha uma cidade abaixo"
                     android:textAppearance="@style/texto_azul" />
+
+                <TextView
+                    android:id="@+id/textView65"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="TextView" />
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/listCidades"

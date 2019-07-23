@@ -10,12 +10,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.joda.time.DateTime;
@@ -314,6 +317,22 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         public void onChanged(List<CidadeEstado> cidades) {
             adapter.cidades = cidades;
             adapter.notifyDataSetChanged();
+
+            binding.textView14.getViewTreeObserver().addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    YoYo.with(Techniques.Bounce)
+                            .duration(700)
+                            .repeat(1)
+                            .playOn(findViewById(R.id.textView14));
+
+                    YoYo.with(Techniques.Flash)
+                            .delay(500)
+                            .duration(500)
+                            .playOn(findViewById(R.id.textView67));
+                }
+            });
+
         }
     };
 
@@ -322,6 +341,21 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         public void onChanged(List<CidadeEstado> cidades) {
             adapterDestino.cidades = cidades;
             adapterDestino.notifyDataSetChanged();
+
+            binding.textView2.getViewTreeObserver().addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    YoYo.with(Techniques.Bounce)
+                            .duration(700)
+                            .repeat(1)
+                            .playOn(findViewById(R.id.textView2));
+
+                    YoYo.with(Techniques.Flash)
+                            .delay(500)
+                            .duration(500)
+                            .playOn(findViewById(R.id.textView68));
+                }
+            });
         }
     };
 

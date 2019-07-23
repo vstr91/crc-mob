@@ -63,7 +63,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/btnFechar"
-            app:layout_constraintTop_toBottomOf="@+id/textViewBairro" />
+            app:layout_constraintTop_toBottomOf="@+id/textViewBairroAtual" />
 
         <Button
             android:id="@+id/btnFechar"
@@ -82,7 +82,7 @@
             app:layout_constraintEnd_toStartOf="@+id/btnEditar"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewBairro" />
+            app:layout_constraintTop_toBottomOf="@+id/textViewBairroAtual" />
 
         <ImageView
             android:id="@+id/imageView3"

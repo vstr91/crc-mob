@@ -7,8 +7,14 @@ import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.databinding.ObservableField;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -61,6 +67,12 @@ public class BaseViewModel extends AndroidViewModel {
     public LiveData<List<ParadaBairro>> paradas;
     public LiveData<List<ItinerarioPartidaDestino>> itinerarios;
 
+    public MutableLiveData<Location> localAtual;
+    public FusedLocationProviderClient mFusedLocationClient;
+    public LocationCallback mLocationCallback;
+
+    public boolean isRunningNearPlaces = false;
+
     public ObservableField<String> getId() {
         return id;
     }
@@ -77,15 +89,44 @@ public class BaseViewModel extends AndroidViewModel {
         mensagensNaoLidas = appDatabase.mensagemDAO().listarTodosNaoLidosServidor();
         parametrosInternos = appDatabase.parametroInternoDAO().listarTodos();
 
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplication());
+
         //paradas = appDatabase.paradaDAO().listarTodosComBairroPorCidade("");
 
         usuarioValidado = new MutableLiveData<>();
         usuarioValidado.postValue(false);
+
+        localAtual = new MutableLiveData<>();
+        localAtual.postValue(new Location(LocationManager.GPS_PROVIDER));
+    }
+
+    public void iniciarAtualizacoesPosicao(){
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+
+                    if(location.getAccuracy() <= 20){
+                        localAtual.postValue(location);
+
+                        if(localAtual.getValue() != null){
+                            localAtual.getValue().setLatitude(localAtual.getValue().getLatitude());
+                            localAtual.getValue().setLongitude(localAtual.getValue().getLongitude());
+                        }
+
+                    }
+
+                }
+            }
+        };
     }
 
     public void buscarParadasProximas(Context ctx, Location location){
 
-        paradas = LocationUtils.buscaParadasProximas(ctx, location, 100);
+        paradas = LocationUtils.buscaParadasProximas(ctx, location, 500);
 
     }
 

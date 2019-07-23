@@ -3,16 +3,20 @@ package br.com.vostre.circular.view;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -24,11 +28,15 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.getkeepsafe.taptargetview.TapTargetView;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -100,6 +108,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
     AppCompatActivity ctx;
 
+    Location localAnterior;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_menu);
@@ -168,9 +178,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         viewModel.parametrosInternos.observe(this, parametrosInternosObserver);
 
-//        viewModel.buscarParadasProximas(getApplicationContext(), null);
-//        viewModel.paradas.observe(this, paradasObserver);
-
         ctx = this;
 
 //        DestaqueUtils.geraDestaqueUnico(this, binding.button, "Outro", "Teste modular", new TapTargetView.Listener(){
@@ -181,28 +188,49 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 //            }
 //        });
 
-        List<TapTarget> targets = new ArrayList<>();
+//        List<TapTarget> targets = new ArrayList<>();
+//
+//        targets.add(DestaqueUtils.geraTapTarget(binding.button2, "Novo teste!", "Pressione esta opção para ter acesso a outros dados!", false));
+//        targets.add(DestaqueUtils.geraTapTarget(binding.button3, "Botao 3", "Botao tres texto", false));
+//        targets.add(DestaqueUtils.geraTapTarget(binding.button4, "Botao 4", "Botao quatro texto", false));
+//
+//        DestaqueUtils.geraSequenciaDestaques(this, targets, new TapTargetSequence.Listener() {
+//            @Override
+//            public void onSequenceFinish() {
+//                Toast.makeText(getApplicationContext(), "Terminou!", Toast.LENGTH_SHORT).show();
+//            }
+//
+//            @Override
+//            public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+//                Toast.makeText(getApplicationContext(), "Um passo", Toast.LENGTH_SHORT).show();
+//            }
+//
+//            @Override
+//            public void onSequenceCanceled(TapTarget lastTarget) {
+//                Toast.makeText(getApplicationContext(), "Cancelou...", Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
-        targets.add(DestaqueUtils.geraTapTarget(binding.button2, "Novo teste!", "Pressione esta opção para ter acesso a outros dados!"));
-        targets.add(DestaqueUtils.geraTapTarget(binding.button3, "Botao 3", "Botao tres texto"));
-        targets.add(DestaqueUtils.geraTapTarget(binding.button4, "Botao 4", "Botao quatro texto"));
+        viewModel.localAtual.observe(this, localObserver);
+        viewModel.iniciarAtualizacoesPosicao();
+        localAnterior = new Location(LocationManager.GPS_PROVIDER);
 
-        DestaqueUtils.geraSequenciaDestaques(this, targets, new TapTargetSequence.Listener() {
+        if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED){
+            startLocationUpdates();
+        }
+
+        binding.imageView2.getViewTreeObserver().addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
-            public void onSequenceFinish() {
-                Toast.makeText(getApplicationContext(), "Terminou!", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
-                Toast.makeText(getApplicationContext(), "Um passo", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onSequenceCanceled(TapTarget lastTarget) {
-                Toast.makeText(getApplicationContext(), "Cancelou...", Toast.LENGTH_SHORT).show();
+            public void onGlobalLayout() {
+                YoYo.with(Techniques.SlideInDown)
+                        .duration(700)
+                        .pivot(findViewById(R.id.imageView2).getX()/2,findViewById(R.id.imageView2).getY()/2)
+                        .playOn(findViewById(R.id.imageView2));
             }
         });
+
+
 
     }
 
@@ -348,24 +376,21 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         }
     };
 
-//    Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {
-//        @Override
-//        public void onChanged(List<ParadaBairro> paradas) {
-//
-//            List<String> listParadas = new ArrayList<>();
-//
-//            for(ParadaBairro p : paradas){
-//
-//                listParadas.add(p.getParada().getId());
-//
-//                System.out.println("PARADAS: "+p.getParada().getId()+" | "+p.getParada().getNome()+" - "+p.getNomeBairroComCidade());
-//            }
-//
-//            viewModel.listarTodosAtivosProximosPoi(listParadas);
-//            viewModel.itinerarios.observe(ctx, itinerariosObserver);
-//
-//        }
-//    };
+    Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {
+        @Override
+        public void onChanged(List<ParadaBairro> paradas) {
+
+            if(paradas.size() > 0){
+                binding.textViewBairroAtual.setText(paradas.get(0).getNomeBairroComCidade());
+                binding.textViewBairroAtual.setVisibility(View.VISIBLE);
+            } else{
+                binding.textViewBairroAtual.setVisibility(View.GONE);
+            }
+
+
+
+        }
+    };
 //
 //    Observer<List<ItinerarioPartidaDestino>> itinerariosObserver = new Observer<List<ItinerarioPartidaDestino>>() {
 //        @Override
@@ -377,6 +402,23 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 //
 //        }
 //    };
+
+    Observer<Location> localObserver = new Observer<Location>() {
+        @Override
+        public void onChanged(Location local) {
+
+            if(local.getLatitude() != 0.0 && local.getLongitude() != 0.0 && local.distanceTo(localAnterior) > 20){
+                localAnterior = local;
+
+                if(!viewModel.isRunningNearPlaces){
+                    viewModel.buscarParadasProximas(getApplicationContext(), local);
+                    viewModel.paradas.observe(ctx, paradasObserver);
+                }
+
+            }
+
+        }
+    };
 
     private void requisitaAtualizacao(){
         Bundle settingsBundle = new Bundle();
@@ -424,6 +466,68 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                 Exception error = result.getError();
             }
         }
+
+    }
+
+    private boolean checarPermissoes(){
+        return ContextCompat.checkSelfPermission(getApplicationContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @Override
+    public void onGpsChanged(boolean ativo) {
+
+        if(ativo){
+            //binding.textViewBairroAtual.setVisibility(View.VISIBLE);
+            viewModel.buscarParadasProximas(getApplicationContext(), localAnterior);
+        } else{
+            binding.textViewBairroAtual.setVisibility(View.GONE);
+        }
+
+    }
+
+    @SuppressLint("MissingPermission")
+    private void startLocationUpdates() {
+
+        if(checarPermissoes()){
+
+            LocationRequest locationRequest = new LocationRequest();
+            locationRequest.setInterval(3000);
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            locationRequest.setMaxWaitTime(5000);
+
+            if(viewModel != null){
+                viewModel.mFusedLocationClient.requestLocationUpdates(locationRequest,
+                        viewModel.mLocationCallback,
+                        null);
+            }
+
+        }
+
+    }
+
+    private void stopLocationUpdates() {
+
+        if(viewModel != null && viewModel.mFusedLocationClient != null){
+            viewModel.mFusedLocationClient.removeLocationUpdates(viewModel.mLocationCallback);
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED){
+            startLocationUpdates();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdates();
 
     }
 

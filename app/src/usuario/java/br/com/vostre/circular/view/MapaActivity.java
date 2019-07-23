@@ -37,6 +37,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -44,6 +45,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -345,6 +348,23 @@ public class MapaActivity extends BaseActivity {
         }
 
         configuraMapa();
+
+        binding.textViewGps.getViewTreeObserver().addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                YoYo.with(Techniques.Swing)
+                        .duration(700)
+                        .repeat(1)
+                        .playOn(findViewById(R.id.textViewGps));
+
+//                    View v = findViewById(R.id.textView66);
+//
+//                    YoYo.with(Techniques.Flash)
+//                            .delay(500)
+//                            .duration(500)
+//                            .playOn(findViewById(R.id.textView66));
+            }
+        });
     }
 
     private void checaLogin() {
@@ -537,7 +557,7 @@ public class MapaActivity extends BaseActivity {
                             // bottom menu
 
                             TextView textViewReferencia = bsd.findViewById(R.id.textViewReferencia);
-                            TextView textViewBairro = bsd.findViewById(R.id.textViewBairro);
+                            TextView textViewBairro = bsd.findViewById(R.id.textViewBairroAtual);
 
                             textViewReferencia.setText(pb.getParada().getNome());
                             textViewBairro.setText(pb.getNomeBairroComCidade());
@@ -762,7 +782,7 @@ public class MapaActivity extends BaseActivity {
                             listItinerarios.setAdapter(adapterItinerarios);
 
                             TextView textViewReferencia = bsd.findViewById(R.id.textViewReferencia);
-                            TextView textViewBairro = bsd.findViewById(R.id.textViewBairro);
+                            TextView textViewBairro = bsd.findViewById(R.id.textViewBairroAtual);
 
                             bsd.findViewById(R.id.textView32).setVisibility(View.GONE);
                             bsd.findViewById(R.id.textView33).setVisibility(View.GONE);

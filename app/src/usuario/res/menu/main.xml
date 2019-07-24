@@ -11,17 +11,16 @@
         android:title="@string/action_config"
         app:showAsAction="always" />-->
 
+    <item android:id="@+id/icon_ajuda"
+        android:title="Alerta"
+        app:actionLayout="@layout/toolbar_ajuda_icon"
+        android:contentDescription="Ícone de Ajuda"
+        app:showAsAction="always" />
+
     <item android:id="@+id/icon_sync"
         android:title="Sincronização"
         app:actionLayout="@layout/toolbar_sync_icon"
         android:contentDescription="Ícone de sincronização"
-        app:showAsAction="always" />
-
-    <item android:id="@+id/icon_alerta"
-        android:title="Alerta"
-        android:visible="false"
-        app:actionLayout="@layout/toolbar_alerta_icon"
-        android:contentDescription="Ícone de Alerta"
         app:showAsAction="always" />
 
     <item android:id="@+id/icon_favoritos"

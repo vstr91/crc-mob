@@ -35,10 +35,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -99,6 +103,7 @@ import br.com.vostre.circular.model.ParametroInterno;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.DBUtils;
+import br.com.vostre.circular.utils.DestaqueUtils;
 import br.com.vostre.circular.utils.JsonUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.ToolbarUtils;
@@ -164,6 +169,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         binding = DataBindingUtil.setContentView(this, R.layout.activity_menu);
         super.onCreate(savedInstanceState);
         binding.setView(this);
+
+        setViewAtual(binding.getRoot());
 
         carregaImagens();
         mAuth = FirebaseAuth.getInstance();
@@ -990,4 +997,52 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                 });
     }
 
+    @Override
+    public void onToolbarItemSelected(View v) {
+        List<TapTarget> targets = criaTour();
+        exibeTour(targets, new TapTargetSequence.Listener(){
+
+            @Override
+            public void onSequenceFinish() {
+                Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+
+            }
+
+            @Override
+            public void onSequenceCanceled(TapTarget lastTarget) {
+                Toast.makeText(getApplicationContext(), "Tour cancelado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onToolbarInflated() {
+
+        DestaqueUtils.geraDestaqueUnico(ctx, menu.getItem(0).getActionView().findViewById(R.id.imageButtonAjuda), "Opção de Ajuda!",
+                "Bateu aquela dúvida na hora de utilizar o aplicativo? Não se preocupe! Pressione aqui e o " +
+                        "sistema mostrará as principais ações da tela que estiver aberta!", new TapTargetView.Listener(){
+                    @Override
+                    public void onTargetClick(TapTargetView view) {
+                        super.onTargetClick(view);
+                    }
+                });
+    }
+
+    @Override
+    public List<TapTarget> criaTour() {
+        List<TapTarget> targets = new ArrayList<>();
+
+        targets.add(DestaqueUtils.geraTapTarget(binding.button, "Itinerários", "Aqui você pode consultar itinerários, informando os locais de partida e destino!",
+                true, true));
+        targets.add(DestaqueUtils.geraTapTarget(binding.button2, "Paradas", "Aqui você pode consultar pontos de parada e rodoviárias, " +
+                "com dados sobre os itinerários, como próximas saídas!", true, true));
+        targets.add(DestaqueUtils.geraTapTarget(binding.button3, "Mapa", "Aqui você pode consultar os dados através de um mapa. " +
+                "Veja os pontos de parada e de interesse próximos à sua localização atual!", true, true));
+
+        return targets;
+    }
 }

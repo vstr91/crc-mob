@@ -20,6 +20,7 @@ import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.Mensagem;
+import br.com.vostre.circular.view.BaseActivity;
 import br.com.vostre.circular.view.FavoritosActivity;
 import br.com.vostre.circular.view.MensagensActivity;
 import br.com.vostre.circular.viewModel.BaseViewModel;
@@ -32,7 +33,7 @@ public class ToolbarUtils {
 
     static TextView textViewBadgeMsg;
     static ImageButton imageButtonMsg;
-    static ImageButton imageButtonAlerta;
+    static ImageButton imageButtonAjuda;
     static ImageButton imageButtonFavoritos;
     static ImageButton imageButtonSync;
     static View.OnClickListener mListener;
@@ -55,8 +56,8 @@ public class ToolbarUtils {
         itemMsg = menu.findItem(R.id.icon_msg);
         MenuItemCompat.getActionView(itemMsg).setOnClickListener(listener);
 
-        MenuItem itemAlerta = menu.findItem(R.id.icon_alerta);
-        MenuItemCompat.getActionView(itemAlerta).setOnClickListener(listener);
+        MenuItem itemAjuda = menu.findItem(R.id.icon_ajuda);
+        MenuItemCompat.getActionView(itemAjuda).setOnClickListener(listener);
 
         MenuItem itemFavoritos = menu.findItem(R.id.icon_favoritos);
         MenuItemCompat.getActionView(itemFavoritos).setOnClickListener(listener);
@@ -69,8 +70,8 @@ public class ToolbarUtils {
         imageButtonMsg = MenuItemCompat.getActionView(itemMsg).findViewById(R.id.imageButtonMsg);
         imageButtonMsg.setOnClickListener(mListener);
 
-        imageButtonAlerta = MenuItemCompat.getActionView(itemAlerta).findViewById(R.id.imageButtonAlerta);
-        imageButtonAlerta.setOnClickListener(mListener);
+        imageButtonAjuda = MenuItemCompat.getActionView(itemAjuda).findViewById(R.id.imageButtonAjuda);
+        imageButtonAjuda.setOnClickListener(mListener);
 
         imageButtonFavoritos = MenuItemCompat.getActionView(itemFavoritos).findViewById(R.id.imageButtonFavoritos);
         imageButtonFavoritos.setOnClickListener(mListener);
@@ -85,7 +86,7 @@ public class ToolbarUtils {
 
     }
 
-    public static void onMenuItemClick(View v, Activity activity){
+    public static void onMenuItemClick(View v, BaseActivity activity){
         switch(v.getId()){
             case android.R.id.home:
                 activity.onBackPressed();
@@ -96,10 +97,10 @@ public class ToolbarUtils {
                 Intent intent = new Intent(activity, MensagensActivity.class);
                 activity.startActivity(intent);
                 break;
-            case R.id.imageButtonAlerta:
-            case R.id.alerta:
-            case R.id.icon_alerta:
-                Toast.makeText(activity, "Alerta!!", Toast.LENGTH_SHORT).show();
+            case R.id.imageButtonAjuda:
+            case R.id.ajuda:
+            case R.id.icon_ajuda:
+                activity.onToolbarItemSelected(v);
                 break;
             case R.id.imageButtonFavoritos:
             case R.id.favoritos:

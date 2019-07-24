@@ -19,6 +19,8 @@ import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.joda.time.DateTime;
@@ -27,6 +29,7 @@ import org.joda.time.format.DateTimeFormat;
 
 import java.io.File;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -38,6 +41,7 @@ import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.utils.DataHoraUtils;
+import br.com.vostre.circular.utils.DestaqueUtils;
 import br.com.vostre.circular.view.adapter.CidadeAdapter;
 import br.com.vostre.circular.view.adapter.ItinerarioResultadoAdapter;
 import br.com.vostre.circular.view.form.FormBairro;
@@ -655,4 +659,42 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         mFirebaseAnalytics.logEvent("consulta_itinerario_data_mod", bundle);
 
     }
+
+    @Override
+    public void onToolbarItemSelected(View v) {
+        List<TapTarget> targets = criaTour();
+        exibeTour(targets, new TapTargetSequence.Listener(){
+
+            @Override
+            public void onSequenceFinish() {
+                Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+
+            }
+
+            @Override
+            public void onSequenceCanceled(TapTarget lastTarget) {
+                Toast.makeText(getApplicationContext(), "Tour cancelado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public List<TapTarget> criaTour() {
+        List<TapTarget> targets = new ArrayList<>();
+
+        targets.add(DestaqueUtils.geraTapTarget(binding.listCidadesPartida.getChildAt(0).findViewById(R.id.circleView2), "Itinerários",
+                "Aqui você pode consultar itinerários, informando os locais de partida e destino!",
+                true, true));
+//        targets.add(DestaqueUtils.geraTapTarget(binding.button2, "Paradas", "Aqui você pode consultar pontos de parada e rodoviárias, " +
+//                "com dados sobre os itinerários, como próximas saídas!", true, true));
+//        targets.add(DestaqueUtils.geraTapTarget(binding.button3, "Mapa", "Aqui você pode consultar os dados através de um mapa. " +
+//                "Veja os pontos de parada e de interesse próximos à sua localização atual!", true, true));
+
+        return targets;
+    }
+
 }

@@ -17,6 +17,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.util.JsonUtils;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -56,10 +58,12 @@ import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.utils.Constants;
+import br.com.vostre.circular.utils.DestaqueUtils;
 import br.com.vostre.circular.utils.NotificacaoUtils;
 import br.com.vostre.circular.utils.ToolbarUtils;
 import br.com.vostre.circular.view.listener.GpsListener;
 import br.com.vostre.circular.view.listener.HoraListener;
+import br.com.vostre.circular.view.listener.ToolbarListener;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
 import br.com.vostre.circular.databinding.DrawerHeaderBinding;
@@ -67,7 +71,7 @@ import io.fabric.sdk.android.Fabric;
 
 import static br.com.vostre.circular.utils.ToolbarUtils.PICK_FILE;
 
-public class BaseActivity extends AppCompatActivity implements View.OnClickListener, HoraListener, GpsListener {
+public class BaseActivity extends AppCompatActivity implements View.OnClickListener, HoraListener, GpsListener, ToolbarListener {
 
     public Toolbar toolbar;
     Menu menu;
@@ -83,6 +87,16 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     FirebaseAnalytics mFirebaseAnalytics;
 
     String CHANNEL_ID = "987";
+
+    View viewAtual;
+
+    public View getViewAtual() {
+        return viewAtual;
+    }
+
+    public void setViewAtual(View viewAtual) {
+        this.viewAtual = viewAtual;
+    }
 
     private BroadcastReceiver mGpsSwitchStateReceiver = new BroadcastReceiver() {
         @Override
@@ -168,6 +182,7 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
         viewModel.mensagensNaoLidas.observe(this, mensagensObserver);
         viewModel.atualizarMensagens();
 
+        onToolbarInflated();
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -190,6 +205,11 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.textViewBadgeMsg:
             case R.id.msg:
             case R.id.icon_msg:
+                break;
+            case R.id.imageButtonAjuda:
+            case R.id.ajuda:
+            case R.id.icon_ajuda:
+                onToolbarItemSelected(viewAtual);
                 break;
         }
 
@@ -640,4 +660,24 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     public void onGpsChanged(boolean ativo) {
 
     }
+
+    @Override
+    public void onToolbarItemSelected(View v) {
+        System.out.println(v);
+    }
+
+    @Override
+    public void onToolbarInflated() {
+
+    }
+
+    public List<TapTarget> criaTour(){
+        List<TapTarget> targets = new ArrayList<>();
+        return targets;
+    }
+
+    public void exibeTour(List<TapTarget> targets, TapTargetSequence.Listener listener){
+        DestaqueUtils.geraSequenciaDestaques(this, targets, listener);
+    }
+
 }

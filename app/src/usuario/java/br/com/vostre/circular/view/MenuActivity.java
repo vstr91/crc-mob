@@ -350,22 +350,10 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         FirebaseUser account = FirebaseAuth.getInstance().getCurrentUser();
         updateUI(account);
 
-//        SignInButton btnLogin = drawer.findViewById(R.id.btnLogin);
-//
-//        btnLogin.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Toast.makeText(ctx, "Login!", Toast.LENGTH_SHORT).show();
-//            }
-//        });
 
     }
 
     private void configuraActivity(){
-
-//        if(PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), "tela_inicial")){
-//            onClickBtnMapa(null);
-//        }
 
         viewModel.localAtual.observe(this, localObserver);
         viewModel.iniciarAtualizacoesPosicao();
@@ -1004,7 +992,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
             @Override
             public void onSequenceFinish() {
-                Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -1022,26 +1010,44 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     public void onToolbarInflated() {
 
-        DestaqueUtils.geraDestaqueUnico(ctx, menu.getItem(0).getActionView().findViewById(R.id.imageButtonAjuda), "Opção de Ajuda!",
-                "Bateu aquela dúvida na hora de utilizar o aplicativo? Não se preocupe! Pressione aqui e o " +
-                        "sistema mostrará as principais ações da tela que estiver aberta!", new TapTargetView.Listener(){
-                    @Override
-                    public void onTargetClick(TapTargetView view) {
-                        super.onTargetClick(view);
-                    }
-                });
+        if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_ajuda")){
+
+            DestaqueUtils.geraDestaqueUnico(ctx, menu.getItem(0).getActionView().findViewById(R.id.imageButtonAjuda), "Opção de Ajuda!",
+                    "Bateu aquela dúvida na hora de utilizar o aplicativo? Não se preocupe! Pressione aqui e o " +
+                            "sistema mostrará as principais ações da tela que estiver aberta!", new TapTargetView.Listener(){
+                        @Override
+                        public void onTargetClick(TapTargetView view) {
+                            super.onTargetClick(view);
+                        }
+                    }, true, false);
+
+            PreferenceUtils.salvarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_ajuda", true);
+
+        }
+
+
     }
 
     @Override
     public List<TapTarget> criaTour() {
         List<TapTarget> targets = new ArrayList<>();
 
+        targets.add(DestaqueUtils.geraTapTarget(binding.circleView, "Logo/Paradas Próximas", "Aqui aparecerão as paradas próximas à sua localização quando o GPS estiver ativado!",
+                false, true, 1, 100));
         targets.add(DestaqueUtils.geraTapTarget(binding.button, "Itinerários", "Aqui você pode consultar itinerários, informando os locais de partida e destino!",
-                true, true));
+                false, true, 2));
         targets.add(DestaqueUtils.geraTapTarget(binding.button2, "Paradas", "Aqui você pode consultar pontos de parada e rodoviárias, " +
-                "com dados sobre os itinerários, como próximas saídas!", true, true));
+                "com dados sobre os itinerários, como próximas saídas!", false, true, 3));
         targets.add(DestaqueUtils.geraTapTarget(binding.button3, "Mapa", "Aqui você pode consultar os dados através de um mapa. " +
-                "Veja os pontos de parada e de interesse próximos à sua localização atual!", true, true));
+                "Veja os pontos de parada e de interesse próximos à sua localização atual!", false, true, 4));
+
+        targets.add(DestaqueUtils.geraTapTarget(binding.toolbar.findViewById(R.id.imageButtonSync), "Atualizar Dados", "Realiza a conexão com o servidor para baixar dados atualizados. " +
+                        "A atualização também ocorre automaticamente de forma periódica!",
+                false, true, 5, 100));
+        targets.add(DestaqueUtils.geraTapTarget(binding.toolbar.findViewById(R.id.imageButtonFavoritos), "Favoritos", "Permite consultar os registros (itinerários e paradas) marcados como favoritos.",
+                false, true, 6));
+        targets.add(DestaqueUtils.geraTapTarget(binding.toolbar.findViewById(R.id.imageButtonMsg), "Mensagens", "Aqui você pode consultar as mensagens enviadas pelo sistema e enviar sua sugestão!",
+                false, true, 7));
 
         return targets;
     }

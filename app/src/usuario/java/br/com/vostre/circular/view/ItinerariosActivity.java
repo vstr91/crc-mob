@@ -4,8 +4,10 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +23,7 @@ import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetSequence;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.joda.time.DateTime;
@@ -78,6 +81,10 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     Bundle bundle;
     ProgressBar progressBar;
+
+    FormBairro formBairro;
+
+    boolean exibindoTour = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -259,27 +266,27 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         @Override
         public void onChanged(final List<ItinerarioPartidaDestino> itinerarios) {
 
-            if(itinerarios != null && itinerarios.size() > 0){
+            if (itinerarios != null && itinerarios.size() > 0) {
                 binding.cardViewListDestino.setVisibility(View.GONE);
                 binding.listResultados.setVisibility(View.VISIBLE);
                 binding.cardViewResultadoVazio.setVisibility(View.GONE);
                 binding.btnInverter.setVisibility(View.VISIBLE);
                 binding.textViewResultado.setVisibility(View.VISIBLE);
 
-                if(itinerarios.size() == 1){
+                if (itinerarios.size() == 1) {
                     binding.textViewSubResultado.setVisibility(View.GONE);
-                } else{
+                } else {
                     binding.textViewSubResultado.setVisibility(View.VISIBLE);
                 }
 
                 adapterResultado.itinerarios = itinerarios;
 
-                bundle.putString("partida", bairroPartida.getBairro().getNome()+", "+bairroPartida.getNomeCidadeComEstado());
-                bundle.putString("destino", bairroDestino.getBairro().getNome()+", "+bairroDestino.getNomeCidadeComEstado());
+                bundle.putString("partida", bairroPartida.getBairro().getNome() + ", " + bairroPartida.getNomeCidadeComEstado());
+                bundle.putString("destino", bairroDestino.getBairro().getNome() + ", " + bairroDestino.getNomeCidadeComEstado());
 
-                bundle.putString("partida_destino", bairroPartida.getBairro().getNome()+", "
-                        +bairroPartida.getNomeCidadeComEstado()+" x "
-                        +bairroDestino.getBairro().getNome()+", "+bairroDestino.getNomeCidadeComEstado());
+                bundle.putString("partida_destino", bairroPartida.getBairro().getNome() + ", "
+                        + bairroPartida.getNomeCidadeComEstado() + " x "
+                        + bairroDestino.getBairro().getNome() + ", " + bairroDestino.getNomeCidadeComEstado());
 
                 bundle.putInt("itinerarios", itinerarios.size());
                 bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
@@ -287,7 +294,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
                 mFirebaseAnalytics.logEvent("consulta_itinerario", bundle);
 
-            } else{
+            } else {
                 binding.listResultados.setVisibility(View.GONE);
                 binding.cardViewResultadoVazio.setVisibility(View.VISIBLE);
                 binding.btnInverter.setVisibility(View.GONE);
@@ -296,12 +303,12 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
                 adapterResultado.itinerarios = null;
 
-                bundle.putString("partida", bairroPartida.getBairro().getNome()+", "+bairroPartida.getNomeCidadeComEstado());
-                bundle.putString("destino", bairroDestino.getBairro().getNome()+", "+bairroDestino.getNomeCidadeComEstado());
+                bundle.putString("partida", bairroPartida.getBairro().getNome() + ", " + bairroPartida.getNomeCidadeComEstado());
+                bundle.putString("destino", bairroDestino.getBairro().getNome() + ", " + bairroDestino.getNomeCidadeComEstado());
 
-                bundle.putString("partida_destino", bairroPartida.getBairro().getNome()+", "
-                        +bairroPartida.getNomeCidadeComEstado()+" x "
-                        +bairroDestino.getBairro().getNome()+", "+bairroDestino.getNomeCidadeComEstado());
+                bundle.putString("partida_destino", bairroPartida.getBairro().getNome() + ", "
+                        + bairroPartida.getNomeCidadeComEstado() + " x "
+                        + bairroDestino.getBairro().getNome() + ", " + bairroDestino.getNomeCidadeComEstado());
 
                 bundle.putInt("itinerarios", 0);
                 bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
@@ -313,6 +320,23 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
             adapterResultado.notifyDataSetChanged();
             listResultados.scrollToPosition(0);
             ocultaModalLoading();
+
+            if(exibindoTour){
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        DestaqueUtils.geraDestaqueUnico(ctx, binding.listResultados.getChildAt(0).findViewById(R.id.textViewHorario),
+                                "Consulta concluída", "Pronto, você concluiu a consulta! Aqui está o próximo horário de partida do itinerário pesquisado!",
+                                l5, false, false);
+                    }
+                }, 300);
+
+                exibindoTour = false;
+            }
+
+
+
+
         }
     };
 
@@ -500,7 +524,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     @Override
     public String onSelected(String id) {
 
-        FormBairro formBairro = new FormBairro();
+        formBairro = new FormBairro();
 
         Bundle bundle = new Bundle();
         bundle.putString("cidade", id);
@@ -662,37 +686,97 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     @Override
     public void onToolbarItemSelected(View v) {
-        List<TapTarget> targets = criaTour();
-        exibeTour(targets, new TapTargetSequence.Listener(){
-
-            @Override
-            public void onSequenceFinish() {
-                Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
-
-            }
-
-            @Override
-            public void onSequenceCanceled(TapTarget lastTarget) {
-                Toast.makeText(getApplicationContext(), "Tour cancelado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
-            }
-        });
+        onClickBtnEditarPartida(v);
+        criaTour();
+        exibindoTour = true;
     }
+
+    TapTargetView.Listener l2 = new TapTargetView.Listener(){
+        @Override
+        public void onTargetClick(TapTargetView view) {
+            super.onTargetClick(view);
+
+            ((RecyclerView) formBairro.getView().findViewById(R.id.listBairros)).findViewHolderForAdapterPosition(1).itemView.findViewById(R.id.textViewNome).performClick();
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    DestaqueUtils.geraDestaqueUnico(ctx, binding.listCidades.getChildAt(1).findViewById(R.id.circleView2),
+                            "Escolha a cidade de destino", "Depois, escolha a cidade que será o destino da sua viagem!", l3, false, true);
+                }
+            }, 300);
+
+        }
+    };
+
+    TapTargetView.Listener l3 = new TapTargetView.Listener(){
+        @Override
+        public void onTargetClick(TapTargetView view) {
+            super.onTargetClick(view);
+
+            binding.listCidades.findViewHolderForAdapterPosition(1).itemView.findViewById(R.id.circleView2).performClick();
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    DestaqueUtils.geraDestaqueUnico(formBairro.getDialog(), ((RecyclerView) formBairro.getView()
+                                    .findViewById(R.id.listBairros)).findViewHolderForAdapterPosition(1).itemView.findViewById(R.id.textViewNome),
+                            "Escolha o bairro de destino", "Por fim, escolha o bairro de destino!", l4, false, false);
+                }
+            }, 300);
+
+        }
+    };
+
+    TapTargetView.Listener l4 = new TapTargetView.Listener(){
+        @Override
+        public void onTargetClick(TapTargetView view) {
+            super.onTargetClick(view);
+            ((RecyclerView) formBairro.getView().findViewById(R.id.listBairros)).findViewHolderForAdapterPosition(1).itemView.findViewById(R.id.textViewNome).performClick();
+        }
+    };
+
+    TapTargetView.Listener l5 = new TapTargetView.Listener(){
+        @Override
+        public void onTargetClick(TapTargetView view) {
+            super.onTargetClick(view);
+
+//            YoYo.with(Techniques.Swing)
+//                    .duration(5000)
+//                    .repeat(1)
+//                    .playOn(findViewById(R.id.textViewHorario));
+        }
+    };
+
+
 
     @Override
     public List<TapTarget> criaTour() {
-        List<TapTarget> targets = new ArrayList<>();
 
-        targets.add(DestaqueUtils.geraTapTarget(binding.listCidadesPartida.getChildAt(0).findViewById(R.id.circleView2), "Itinerários",
-                "Aqui você pode consultar itinerários, informando os locais de partida e destino!",
-                true, true));
-//        targets.add(DestaqueUtils.geraTapTarget(binding.button2, "Paradas", "Aqui você pode consultar pontos de parada e rodoviárias, " +
-//                "com dados sobre os itinerários, como próximas saídas!", true, true));
-//        targets.add(DestaqueUtils.geraTapTarget(binding.button3, "Mapa", "Aqui você pode consultar os dados através de um mapa. " +
-//                "Veja os pontos de parada e de interesse próximos à sua localização atual!", true, true));
+        DestaqueUtils.geraDestaqueUnico(this, binding.listCidadesPartida.getChildAt(1).findViewById(R.id.circleView2), "Escolha a cidade de partida",
+                "Escolha primeiro a cidade da qual você vai iniciar a sua viagem!", new TapTargetView.Listener(){
+            @Override
+            public void onTargetClick(TapTargetView view) {
+                super.onTargetClick(view);
+
+                binding.listCidadesPartida.findViewHolderForAdapterPosition(1).itemView.findViewById(R.id.circleView2).performClick();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        DestaqueUtils.geraDestaqueUnico(formBairro.getDialog(), ((RecyclerView) formBairro.getView().findViewById(R.id.listBairros)).findViewHolderForAdapterPosition(1)
+                                        .itemView.findViewById(R.id.textViewNome),
+                                "Escolha o bairro de partida", "Escolha então o bairro de partida. Se houver apenas uma opção, o sistema escolherá automaticamente!", l2,
+                                false, false);
+                    }
+                }, 300);
+
+            }
+        }, false, true);
+
+        List<TapTarget> targets = new ArrayList<>();
 
         return targets;
     }

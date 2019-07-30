@@ -47,6 +47,8 @@ import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -105,6 +107,7 @@ import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaSugestaoBairro;
 import br.com.vostre.circular.model.pojo.PontoInteresseSugestaoBairro;
+import br.com.vostre.circular.utils.DestaqueUtils;
 import br.com.vostre.circular.utils.DialogUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SessionUtils;
@@ -1061,6 +1064,8 @@ public class MapaActivity extends BaseActivity {
             formParada.setCtx(getApplication());
             formParada.show(getSupportFragmentManager(), "formParada");
 
+            fechaSubmenu();
+
             bundle = new Bundle();
             mFirebaseAnalytics.logEvent("clicou_fab_parada_mapa", bundle);
         } else{
@@ -1078,6 +1083,8 @@ public class MapaActivity extends BaseActivity {
             //formParada.setParada(new ParadaSugestao());
             formPoi.setCtx(getApplication());
             formPoi.show(getSupportFragmentManager(), "formPoi");
+
+            fechaSubmenu();
 
             bundle = new Bundle();
             mFirebaseAnalytics.logEvent("clicou_fab_poi_mapa", bundle);
@@ -1353,6 +1360,84 @@ public class MapaActivity extends BaseActivity {
         binding.textViewCarregando.setVisibility(View.GONE);
         binding.progressBar.setIndeterminate(true);
         binding.progressBar.setVisibility(View.GONE);
+    }
+
+    TapTargetView.Listener l2 = new TapTargetView.Listener(){
+        @Override
+        public void onTargetClick(TapTargetView view) {
+            super.onTargetClick(view);
+            DestaqueUtils.geraDestaqueUnico(ctx, binding.fabParada, "Faça sua sugestão de parada ou " +
+                            "ponto de interesse",
+                    "Primeiro, pressione aqui para mostrar as opções!",
+                    new TapTargetView.Listener(){
+                        @Override
+                        public void onTargetClick(TapTargetView view) {
+                            super.onTargetClick(view);
+                            onFabAddClick(view);
+
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    DestaqueUtils.geraDestaqueUnico(ctx, binding.fabParadaSug,
+                                            "Escolha a opção desejada", "Depois, escolha a opção desejada. " +
+                                                    "Você pode sugerir tanto paradas quanto pontos de interesse!",
+                                            l3, false, true);
+                                }
+                            }, 300);
+
+                        }
+                    }, false, true);
+        }
+    };
+
+    TapTargetView.Listener l3 = new TapTargetView.Listener(){
+        @Override
+        public void onTargetClick(TapTargetView view) {
+            super.onTargetClick(view);
+            binding.fabParadaSug.performClick();
+        }
+    };
+
+    @Override
+    public void onToolbarItemSelected(View v) {
+        criaTour();
+    }
+
+    @Override
+    public List<TapTarget> criaTour() {
+
+        if(SessionUtils.estaLogado(getApplicationContext())){
+
+            if(gpsAtivo){
+
+                DestaqueUtils.geraDestaqueUnico(this, binding.fabMeuLocal, "Botão \"Meu local\"",
+                        "Pressione para centralizar o mapa na sua posição atual. Mantenha pressionado " +
+                                "para ligar ou desligar a centralização automática!",
+                        l2, false, true);
+            } else{
+                Toast.makeText(getApplicationContext(),
+                        "Por favor, ative o GPS para que o mapa funcione corretamente.", Toast.LENGTH_SHORT).show();
+            }
+
+        } else{
+            DestaqueUtils.geraDestaqueUnico(this, binding.btnLogin, "Faça login para mais opções",
+                    "Faça login e descubra novas funções no mapa, como sugerir novas paradas e pontos de interesse!",
+                    new TapTargetView.Listener(){
+                        @Override
+                        public void onTargetClick(TapTargetView view) {
+                            super.onTargetClick(view);
+                            onClickBtnLogin(view);
+
+                        }
+                    }, false, true);
+        }
+
+
+
+        List<TapTarget> targets = new ArrayList<>();
+
+        return targets;
     }
 
 //    Observer<List<ParadaBairro>> paradasPoiObserver = new Observer<List<ParadaBairro>>() {

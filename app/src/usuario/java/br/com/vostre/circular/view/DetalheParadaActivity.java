@@ -12,6 +12,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +24,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.joda.time.DateTime;
@@ -48,6 +51,7 @@ import br.com.vostre.circular.databinding.ActivityDetalheParadaBinding;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.DestaqueUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SnackbarHelper;
 import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
@@ -76,6 +80,7 @@ public class DetalheParadaActivity extends BaseActivity {
     LocationManager locationManager;
 
     Bundle bundle;
+    boolean exibindoTour = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -398,5 +403,45 @@ public class DetalheParadaActivity extends BaseActivity {
             adapterPois.notifyDataSetChanged();
         }
     };
+
+    @Override
+    public void onToolbarItemSelected(View v) {
+        criaTour();
+        exibindoTour = true;
+    }
+
+    @Override
+    public List<TapTarget> criaTour() {
+
+//        if(binding.textView15.getVisibility() == View.VISIBLE){
+//            DestaqueUtils.geraDestaqueUnico(this, binding.textView15, "Pontos de Interesse",
+//                    "Lista os pontos de interesse, como hospitais, escolas e pontos de encontro próximos à parada!", new TapTargetView.Listener(){
+//                        @Override
+//                        public void onTargetClick(TapTargetView view) {
+//                            super.onTargetClick(view);
+//
+//                            binding.listCidadesPartida.findViewHolderForAdapterPosition(1).itemView.findViewById(R.id.circleView2).performClick();
+//
+//                            new Handler().postDelayed(new Runnable() {
+//                                @Override
+//                                public void run() {
+//
+//                                    DestaqueUtils.geraDestaqueUnico(formBairro.getDialog(), ((RecyclerView) formBairro.getView().findViewById(R.id.listBairros)).findViewHolderForAdapterPosition(1)
+//                                                    .itemView.findViewById(R.id.textViewNome),
+//                                            "Escolha o bairro de partida", "Escolha então o bairro de partida. Se houver apenas uma opção, o sistema escolherá automaticamente!", l2,
+//                                            false, false);
+//                                }
+//                            }, 300);
+//
+//                        }
+//                    }, false, true);
+//        } else{
+//
+//        }
+
+        List<TapTarget> targets = new ArrayList<>();
+
+        return targets;
+    }
 
 }

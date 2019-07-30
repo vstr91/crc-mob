@@ -1043,11 +1043,12 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         targets.add(DestaqueUtils.geraTapTarget(binding.toolbar.findViewById(R.id.imageButtonSync), "Atualizar Dados", "Realiza a conexão com o servidor para baixar dados atualizados. " +
                         "A atualização também ocorre automaticamente de forma periódica!",
-                false, true, 5, 100));
+                false, true, 5, 30));
         targets.add(DestaqueUtils.geraTapTarget(binding.toolbar.findViewById(R.id.imageButtonFavoritos), "Favoritos", "Permite consultar os registros (itinerários e paradas) marcados como favoritos.",
-                false, true, 6));
-        targets.add(DestaqueUtils.geraTapTarget(binding.toolbar.findViewById(R.id.imageButtonMsg), "Mensagens", "Aqui você pode consultar as mensagens enviadas pelo sistema e enviar sua sugestão!",
-                false, true, 7));
+                false, true, 6, 30));
+        targets.add(DestaqueUtils.geraTapTarget(binding.toolbar.findViewById(R.id.imageButtonMsg), "Mensagens",
+                "Aqui você pode consultar as mensagens enviadas pelo sistema e enviar suas sugestões!",
+                false, true, 7, 30));
 
         return targets;
     }

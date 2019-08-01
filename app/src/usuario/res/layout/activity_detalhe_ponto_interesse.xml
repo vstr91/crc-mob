@@ -142,7 +142,7 @@
                             android:layout_height="0dp"
                             android:layout_weight="1"
                             android:gravity="top"
-                            android:text="@{poi.pontoInteresse.bairro}"
+                            android:text="@{poi.nomeBairro}"
                             android:textColor="@color/branco" />
                     </LinearLayout>
 
@@ -187,11 +187,12 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView17"
-            tools:listitem="@layout/linha_itinerarios">
+            tools:listitem="@layout/linha_itinerarios_compacta">
 
         </android.support.v7.widget.RecyclerView>
 

@@ -13,6 +13,7 @@ import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageButton;
@@ -28,6 +29,7 @@ import java.util.List;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityDetalheParadaBinding;
 import br.com.vostre.circular.databinding.ActivityDetalhePontoInteresseBinding;
+import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
@@ -46,15 +48,12 @@ public class DetalhePontoInteresseActivity extends BaseActivity {
     ActivityDetalhePontoInteresseBinding binding;
     DetalhesPontoInteresseViewModel viewModel;
     ItinerarioCompactoAdapter adapter;
-    PontosInteresseAdapter adapterPois;
 
-    RecyclerView listItinerarios;
     AppCompatActivity ctx;
 
     String idPoi;
 
     Uri link = null;
-    LocationManager locationManager;
 
     Bundle bundle;
 
@@ -64,7 +63,7 @@ public class DetalhePontoInteresseActivity extends BaseActivity {
         binding.setView(this);
         binding.setLifecycleOwner(this);
         super.onCreate(savedInstanceState);
-        setTitle("Detalhe Ponto de Interesse");
+        setTitle("Ponto de Interesse");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
@@ -98,7 +97,11 @@ public class DetalhePontoInteresseActivity extends BaseActivity {
         } else{
             idPoi = getIntent().getStringExtra("poi");
 
-            adapter = new ItinerarioCompactoAdapter(new ArrayList<ItinerarioPartidaDestino>(), ctx);
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+            linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+            binding.listItinerarios.setLayoutManager(linearLayoutManager);
+
+            adapter = new ItinerarioCompactoAdapter(viewModel.itinerarios.getValue(), this);
             binding.listItinerarios.setAdapter(adapter);
 
             viewModel.setPontoInteresse(idPoi);
@@ -229,19 +232,17 @@ public class DetalhePontoInteresseActivity extends BaseActivity {
         @Override
         public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
 
-//            ItinerarioCompactoAdapter adapter = new ItinerarioCompactoAdapter(itinerarios, ctx);
-//            RecyclerView listItinerarios = binding.listItinerarios;
-//            listItinerarios.setAdapter(adapter);
-
             adapter.itinerarios = itinerarios;
 
             adapter.notifyDataSetChanged();
 
-            listItinerarios.setLayoutManager(new GridLayoutManager(ctx, 1));
+            binding.listItinerarios.invalidate();
 
-//            for(ItinerarioPartidaDestino i : itinerarios){
-//                System.out.println("ITINERARIOS: "+i.getItinerario().getId()+" | "+i.getNomePartida()+", "+i.getNomeBairroPartida()+" - "+i.getNomeDestino()+", "+i.getNomeBairroDestino());
-//            }
+            binding.listItinerarios.setLayoutManager(new GridLayoutManager(ctx, 2));
+
+            for(ItinerarioPartidaDestino i : itinerarios){
+                System.out.println("ITINERARIOS: "+i.getItinerario().getId()+" | "+i.getNomePartida()+", "+i.getNomeBairroPartida()+" - "+i.getNomeDestino()+", "+i.getNomeBairroDestino());
+            }
 
             ocultaModalLoading();
 

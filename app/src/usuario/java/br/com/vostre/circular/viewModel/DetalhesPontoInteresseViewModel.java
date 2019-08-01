@@ -81,6 +81,7 @@ public class DetalhesPontoInteresseViewModel extends AndroidViewModel {
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         poi = appDatabase.pontoInteresseDAO().carregarComBairro("");
         localAtual = new MutableLiveData<>();
+        itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosPorEmpresa("");
     }
 
     @BindingAdapter("srcCompat")

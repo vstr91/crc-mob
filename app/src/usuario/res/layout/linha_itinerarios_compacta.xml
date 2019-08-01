@@ -35,10 +35,9 @@
         <android.support.v7.widget.CardView
             android:id="@+id/cardView2"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="80dp"
             android:layout_marginEnd="8dp"
             app:cardCornerRadius="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -53,8 +52,9 @@
                 <TextView
                     android:id="@+id/textView19"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
                     android:layout_marginStart="4dp"
+                    android:gravity="center"
                     android:text="@{itinerario.nomeCidadeDestino}"
                     android:textSize="8sp"
                     app:layout_constraintBottom_toBottomOf="@+id/textView18"
@@ -65,20 +65,19 @@
                 <TextView
                     android:id="@+id/textView18"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
                     android:text="@{itinerario.nomeBairroDestino}"
                     android:textColor="@color/cinzaEscuro"
                     android:textSize="10sp"
-                    app:layout_constraintStart_toEndOf="@+id/imageView20"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/imageView20"
                     tools:text="Bairro" />
 
                 <TextView
                     android:id="@+id/textView12"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:text="@{itinerario.nomeBairroPartida}"
@@ -91,8 +90,9 @@
                 <TextView
                     android:id="@+id/textView15"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
                     android:layout_marginStart="4dp"
+                    android:gravity="center"
                     android:text="@{itinerario.nomeCidadePartida}"
                     android:textSize="8sp"
                     app:layout_constraintBottom_toBottomOf="@+id/textView12"
@@ -115,7 +115,7 @@
                     android:id="@+id/textViewObservacao"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="4dp"
                     android:gravity="center"
                     android:text="TextView"
                     android:textAppearance="@style/texto_azul"
@@ -123,16 +123,18 @@
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="@+id/textView19"
                     app:layout_constraintStart_toStartOf="@+id/textView12"
-                    app:layout_constraintTop_toBottomOf="@+id/textView12" />
+                    app:layout_constraintTop_toBottomOf="@+id/textView18" />
 
                 <ImageView
                     android:id="@+id/imageView20"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    app:layout_constraintBottom_toTopOf="@+id/textViewObservacao"
-                    app:layout_constraintStart_toEndOf="@+id/textView15"
-                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginEnd="8dp"
+                    android:rotation="90"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView12"
                     app:srcCompat="@drawable/ic_keyboard_forward_black_24dp" />
 
                 <!--<ImageView-->

@@ -18,12 +18,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import br.com.vostre.circular.R;
@@ -56,6 +59,8 @@ public class DetalhePontoInteresseActivity extends BaseActivity {
     Uri link = null;
 
     Bundle bundle;
+
+    PontoInteresseBairro pontoInteresse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +126,13 @@ public class DetalhePontoInteresseActivity extends BaseActivity {
 
 //        geraModalLoading();
 
+//        binding.imageButton3.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                onClickBtnMapa(view);
+//            }
+//        });
+
     }
 
     private void geraModalLoading() {
@@ -140,13 +152,15 @@ public class DetalhePontoInteresseActivity extends BaseActivity {
     public void onClickBtnMapa(View v){
         FormMapa formMapa = new FormMapa();
         formMapa.setPontoInteresse(binding.getPoi().getPontoInteresse());
-        formMapa.setParada(null);
-        formMapa.setCtx(ctx.getApplication());
-        formMapa.show(ctx.getSupportFragmentManager(), "formMapa");
+        formMapa.setParada(new ParadaBairro());
+        formMapa.setCtx(this.getApplication());
+        formMapa.show(this.getSupportFragmentManager(), "formMapa");
+
+        Toast.makeText(ctx.getApplication(), "Clicou Mapa POI", Toast.LENGTH_SHORT).show();
 
         bundle = new Bundle();
         bundle.putString("poi", binding.getPoi().getPontoInteresse().getNome());
-        mFirebaseAnalytics.logEvent("consulta_mapa_parada", bundle);
+        mFirebaseAnalytics.logEvent("consulta_mapa_poi", bundle);
     }
 
     @BindingAdapter("app:textDistancia")
@@ -181,6 +195,7 @@ public class DetalhePontoInteresseActivity extends BaseActivity {
 
             if(poi != null){
                 binding.setPoi(poi);
+                pontoInteresse = poi;
 
                 geraModalLoading();
 
@@ -193,6 +208,12 @@ public class DetalhePontoInteresseActivity extends BaseActivity {
                     binding.imageView9.setImageDrawable(Drawable.createFromPath(getApplicationContext().getFilesDir()+"/"+poi.getPontoInteresse().getImagem()));
                 } else{
                     binding.imageView9.setImageDrawable(getResources().getDrawable(R.drawable.imagem_nao_disponivel_16_9));
+                }
+
+                if(poi.getPontoInteresse().getDescricao() != null && !poi.getPontoInteresse().getDescricao().isEmpty()){
+                    binding.textView73.setVisibility(View.VISIBLE);
+                } else{
+                    binding.textView73.setVisibility(View.GONE);
                 }
 
                 Location location = new Location(LocationManager.NETWORK_PROVIDER);
@@ -232,17 +253,38 @@ public class DetalhePontoInteresseActivity extends BaseActivity {
         @Override
         public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
 
+            Location poiLocation = new Location(LocationManager.GPS_PROVIDER);
+            poiLocation.setLatitude(pontoInteresse.getPontoInteresse().getLatitude());
+            poiLocation.setLongitude(pontoInteresse.getPontoInteresse().getLongitude());
+
+            for(ItinerarioPartidaDestino i : itinerarios){
+                Location paradaLocation = new Location(LocationManager.GPS_PROVIDER);
+                paradaLocation.setLatitude(i.getLatitudeParadaReferencia());
+                paradaLocation.setLongitude(i.getLongitudeParadaReferencia());
+
+                i.setDistanciaPoi(paradaLocation.distanceTo(poiLocation));
+            }
+
+            Collections.sort(itinerarios, new Comparator<ItinerarioPartidaDestino>() {
+                @Override
+                public int compare(ItinerarioPartidaDestino itinerarioPartidaDestino, ItinerarioPartidaDestino t1) {
+                    return itinerarioPartidaDestino.getDistanciaPoi() > t1.getDistanciaPoi() ? 1 : -1;
+                }
+            });
+
             adapter.itinerarios = itinerarios;
 
             adapter.notifyDataSetChanged();
 
-            binding.listItinerarios.invalidate();
 
-            binding.listItinerarios.setLayoutManager(new GridLayoutManager(ctx, 2));
 
-            for(ItinerarioPartidaDestino i : itinerarios){
-                System.out.println("ITINERARIOS: "+i.getItinerario().getId()+" | "+i.getNomePartida()+", "+i.getNomeBairroPartida()+" - "+i.getNomeDestino()+", "+i.getNomeBairroDestino());
-            }
+            //binding.listItinerarios.invalidate();
+
+            //binding.listItinerarios.setLayoutManager(new GridLayoutManager(ctx, 2));
+
+//            for(ItinerarioPartidaDestino i : itinerarios){
+//                System.out.println("ITINERARIOS: "+i.getItinerario().getId()+" | "+i.getNomePartida()+", "+i.getNomeBairroPartida()+" - "+i.getNomeDestino()+", "+i.getNomeBairroDestino());
+//            }
 
             ocultaModalLoading();
 

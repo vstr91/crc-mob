@@ -147,7 +147,7 @@ public class DetalhesPontoInteresseViewModel extends AndroidViewModel {
 
     public void buscarParadasProximas(Context ctx, Location location){
 
-        paradas = LocationUtils.buscaParadasProximas(ctx, location, 100);
+        paradas = LocationUtils.buscaParadasProximas(ctx, location, 200);
 
     }
 

@@ -84,7 +84,7 @@ public interface ParadaItinerarioDAO {
     @Query("SELECT pi.* FROM parada_itinerario pi WHERE pi.parada = :parada AND pi.itinerario = :itinerario")
     ParadaItinerario checaDuplicidade(String parada, String itinerario);
 
-    @Query("UPDATE parada_itinerario SET ativo = 0 WHERE itinerario = :itinerario")
+    @Query("UPDATE parada_itinerario SET ativo = 0, ultima_alteracao = datetime('now'), enviado = 0 WHERE itinerario = :itinerario")
     void invalidaTodosPorItinerario(String itinerario);
 
     @Query("SELECT pi.*, pi.itinerario AS idItinerario, p.id AS idParada, p.nome AS nomeParada, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade " +

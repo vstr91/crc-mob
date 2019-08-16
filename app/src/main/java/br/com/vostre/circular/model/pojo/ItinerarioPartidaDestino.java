@@ -4,6 +4,7 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Relation;
+import android.support.annotation.Nullable;
 
 import org.joda.time.DateTime;
 
@@ -111,6 +112,18 @@ public class ItinerarioPartidaDestino {
     @ColumnInfo(name = "totalHorarios")
     Integer totalHorarios;
 
+    @ColumnInfo(name = "idParadaReferencia")
+    String idParadaReferencia;
+
+    @ColumnInfo(name = "nomeParadaReferencia")
+    String nomeParadaReferencia;
+
+    @ColumnInfo(name = "latitudeParadaReferencia")
+    Float latitudeParadaReferencia;
+
+    @ColumnInfo(name = "longitudeParadaReferencia")
+    Float longitudeParadaReferencia;
+
     @Ignore
     public boolean selecionado;
 
@@ -125,6 +138,9 @@ public class ItinerarioPartidaDestino {
 
     @Ignore
     public String horarioEstimado;
+
+    @Ignore
+    public Float distanciaPoi;
 
     public String getHorarioEstimado() {
         return horarioEstimado;
@@ -425,6 +441,46 @@ public class ItinerarioPartidaDestino {
 
     public void setTotalHorarios(Integer totalHorarios) {
         this.totalHorarios = totalHorarios;
+    }
+
+    public String getIdParadaReferencia() {
+        return idParadaReferencia;
+    }
+
+    public void setIdParadaReferencia(String idParadaReferencia) {
+        this.idParadaReferencia = idParadaReferencia;
+    }
+
+    public Float getLatitudeParadaReferencia() {
+        return latitudeParadaReferencia;
+    }
+
+    public void setLatitudeParadaReferencia(Float latitudeParadaReferencia) {
+        this.latitudeParadaReferencia = latitudeParadaReferencia;
+    }
+
+    public Float getLongitudeParadaReferencia() {
+        return longitudeParadaReferencia;
+    }
+
+    public void setLongitudeParadaReferencia(Float longitudeParadaReferencia) {
+        this.longitudeParadaReferencia = longitudeParadaReferencia;
+    }
+
+    public Float getDistanciaPoi() {
+        return distanciaPoi;
+    }
+
+    public void setDistanciaPoi(Float distanciaPoi) {
+        this.distanciaPoi = distanciaPoi;
+    }
+
+    public String getNomeParadaReferencia() {
+        return nomeParadaReferencia;
+    }
+
+    public void setNomeParadaReferencia(String nomeParadaReferencia) {
+        this.nomeParadaReferencia = nomeParadaReferencia;
     }
 
     @Override

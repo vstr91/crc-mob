@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import java.text.NumberFormat;
+
 import br.com.vostre.circular.databinding.LinhaItinerariosCompactaBinding;
 import br.com.vostre.circular.databinding.LinhaItinerariosFavoritosBinding;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
@@ -30,6 +32,11 @@ public class ItinerarioCompactoViewHolder extends RecyclerView.ViewHolder {
         } else{
             binding.textViewObservacao.setVisibility(View.GONE);
         }
+
+        NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setMaximumFractionDigits(0);
+
+        binding.textViewDistancia.setText("a ~"+nf.format(itinerario.getDistanciaPoi())+" metros");
 
 //        if(!itinerario.getItinerario().getAcessivel()){
 //            binding.imageView12.setVisibility(View.GONE);

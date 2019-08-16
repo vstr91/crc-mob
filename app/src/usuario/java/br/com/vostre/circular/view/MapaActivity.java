@@ -560,7 +560,7 @@ public class MapaActivity extends BaseActivity {
                             // bottom menu
 
                             TextView textViewReferencia = bsd.findViewById(R.id.textViewReferencia);
-                            TextView textViewBairro = bsd.findViewById(R.id.textViewBairroAtual);
+                            TextView textViewBairro = bsd.findViewById(R.id.textViewBairro);
 
                             textViewReferencia.setText(pb.getParada().getNome());
                             textViewBairro.setText(pb.getNomeBairroComCidade());
@@ -785,7 +785,7 @@ public class MapaActivity extends BaseActivity {
                             listItinerarios.setAdapter(adapterItinerarios);
 
                             TextView textViewReferencia = bsd.findViewById(R.id.textViewReferencia);
-                            TextView textViewBairro = bsd.findViewById(R.id.textViewBairroAtual);
+                            TextView textViewBairro = bsd.findViewById(R.id.textViewBairro);
 
                             bsd.findViewById(R.id.textView32).setVisibility(View.GONE);
                             bsd.findViewById(R.id.textView33).setVisibility(View.GONE);

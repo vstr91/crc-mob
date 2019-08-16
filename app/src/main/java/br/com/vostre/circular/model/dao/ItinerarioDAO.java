@@ -226,13 +226,14 @@ public interface ItinerarioDAO {
             "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
             "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
             "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
-            ") AS 'cidadeDestino', i.observacao " +
+            ") AS 'cidadeDestino', i.observacao, p.id AS 'idParadaReferencia', p.nome AS 'nomeParadaReferencia', " +
+            "p.latitude AS 'latitudeParadaReferencia', p.longitude AS 'longitudeParadaReferencia' " +
             "FROM parada_itinerario pi INNER JOIN itinerario i ON i.id = pi.itinerario INNER JOIN parada p ON p.id = pi.parada " +
             "WHERE (parada IN (:paradas) " +
             "AND ((SELECT parada FROM parada_itinerario pi WHERE pi.ordem = " +
             "            (SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) " +
             "NOT IN (:paradas) ) )" +
-            "AND i.ativo = 1 " +
+            "AND i.ativo = 1 AND pi.ativo = 1 " +
             "ORDER BY parada, pi.itinerario")
     LiveData<List<ItinerarioPartidaDestino>> listarTodosAtivosProximosPoi(List<String> paradas);
 
@@ -260,7 +261,7 @@ public interface ItinerarioDAO {
             "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
             ") AS 'cidadeDestino', (SELECT COUNT(DISTINCT hi.id) FROM horario_itinerario hi WHERE hi.itinerario = i.id " +
             "AND (domingo = 1 OR segunda = 1 OR terca = 1 OR quarta = 1 OR quinta = 1 OR sexta = 1 OR sabado = 1)) AS 'totalHorarios' " +
-            "FROM parada_itinerario pit INNER JOIN itinerario i ON i.id = pit.itinerario " +
+            " FROM parada_itinerario pit INNER JOIN itinerario i ON i.id = pit.itinerario " +
             "WHERE i.ativo = 1 " +
             "ORDER BY i.ativo DESC, " +
             "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
@@ -315,7 +316,8 @@ public interface ItinerarioDAO {
     List<ItinerarioPartidaDestino> listarTodosAtivosSync();
 
     @Query("SELECT i.*, b.id AS 'idBairroPartida', p.id AS 'idPartida', p.nome AS 'nomePartida', b.nome AS 'bairroPartida', c.nome AS 'cidadePartida', " +
-            "b2.id AS 'idBairroDestino', p2.id AS 'idDestino', p2.nome AS 'nomeDestino', b2.nome AS 'bairroDestino', c2.nome AS 'cidadeDestino', 1 AS 'flagTrecho' " +
+            "b2.id AS 'idBairroDestino', p2.id AS 'idDestino', p2.nome AS 'nomeDestino', b2.nome AS 'bairroDestino', " +
+            "c2.nome AS 'cidadeDestino', 1 AS 'flagTrecho' " +
             "FROM itinerario i INNER JOIN parada_itinerario pi ON pi.itinerario = i.id INNER JOIN parada p ON p.id = pi.parada INNER JOIN " +
             "bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade " +
             "INNER JOIN parada_itinerario pi2 ON pi2.itinerario = i.id INNER JOIN parada p2 ON p2.id = pi2.parada INNER JOIN bairro b2 ON b2.id = p2.bairro INNER JOIN cidade c2 ON c2.id = b2.cidade " +
@@ -415,7 +417,8 @@ public interface ItinerarioDAO {
             "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
             "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id" +
             ") AS 'cidadeDestino', e.nome AS nomeEmpresa, (SELECT COUNT(DISTINCT hi.id) FROM horario_itinerario hi WHERE hi.itinerario = i.id " +
-            "AND (domingo = 1 OR segunda = 1 OR terca = 1 OR quarta = 1 OR quinta = 1 OR sexta = 1 OR sabado = 1)) AS 'totalHorarios' FROM parada_itinerario pit INNER JOIN " +
+            "AND (domingo = 1 OR segunda = 1 OR terca = 1 OR quarta = 1 OR quinta = 1 OR sexta = 1 OR sabado = 1)) AS 'totalHorarios' " +
+            " FROM parada_itinerario pit INNER JOIN " +
             "itinerario i ON i.id = pit.itinerario INNER JOIN empresa e ON e.id = i.empresa " +
             "WHERE i.ativo = 1 AND i.empresa = :empresa " +
             "ORDER BY i.ativo DESC, " +

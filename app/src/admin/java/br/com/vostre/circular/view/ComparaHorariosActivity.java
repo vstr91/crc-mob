@@ -18,6 +18,7 @@ import java.util.List;
 
 import br.com.vostre.circular.R;
 //import br.com.vostre.circular.databinding.ActivityComparaHorariosBinding;
+import br.com.vostre.circular.databinding.ActivityComparaHorariosBinding;
 import br.com.vostre.circular.databinding.ActivityHorariosItinerarioBinding;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
@@ -29,7 +30,7 @@ import br.com.vostre.circular.viewModel.HorariosItinerarioViewModel;
 
 public class ComparaHorariosActivity extends BaseActivity {
 
-    //ActivityComparaHorariosBinding binding;
+    ActivityComparaHorariosBinding binding;
     ComparaHorariosViewModel viewModel;
 
     RecyclerView listHorariosProcessados;
@@ -44,11 +45,11 @@ public class ComparaHorariosActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //binding = DataBindingUtil.setContentView(this, R.layout.activity_compara_horarios);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_compara_horarios);
         super.onCreate(savedInstanceState);
 
-//        binding.setView(this);
-//        binding.setViewModel(viewModel);
+        binding.setView(this);
+        binding.setViewModel(viewModel);
         setTitle("Horários Itinerário");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
@@ -92,7 +93,7 @@ public class ComparaHorariosActivity extends BaseActivity {
         public void onChanged(ItinerarioPartidaDestino itinerario) {
 //            Toast.makeText(getApplicationContext(), viewModel.itinerario.getValue().getNomeBairroPartida()+" | AAAAAAAAAAAAA >> "
 //                    +binding.textViewBairroPartida.getText(), Toast.LENGTH_SHORT).show();
-           // binding.setItinerario(itinerario);
+            binding.setItinerario(itinerario);
         }
     };
 

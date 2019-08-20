@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ProgressBar;
@@ -138,8 +139,18 @@ public class LoginActivity extends BaseActivity {
         }
 
 
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
 
+        boolean retorno = super.onCreateOptionsMenu(menu);
+
+        if(menu != null){
+            menu.getItem(0).setVisible(false);
+        }
+
+        return retorno;
     }
 
     @Override

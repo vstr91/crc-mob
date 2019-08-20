@@ -234,6 +234,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                                     Bundle bundle = new Bundle();
                                     bundle.putString("permissoes", "0");
 
+                                    geraAvisoAjuda();
+
                                     Toast.makeText(getApplicationContext(), "Acesso ao GPS e Armazenamento são necessários para aproveitar ao máximo as funções do Circular!", Toast.LENGTH_LONG).show();
                                 }
 
@@ -362,6 +364,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED){
             startLocationUpdates();
+            geraAvisoAjuda();
         }
 
     }
@@ -1009,7 +1012,10 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
     @Override
     public void onToolbarInflated() {
+        //geraAvisoAjuda();
+    }
 
+    private void geraAvisoAjuda() {
         if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_ajuda")){
 
             DestaqueUtils.geraDestaqueUnico(ctx, menu.getItem(0).getActionView().findViewById(R.id.imageButtonAjuda), "Opção de Ajuda!",
@@ -1024,8 +1030,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             PreferenceUtils.salvarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_ajuda", true);
 
         }
-
-
     }
 
     @Override

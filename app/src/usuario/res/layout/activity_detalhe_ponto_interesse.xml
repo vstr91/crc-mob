@@ -162,19 +162,19 @@
                             android:textColor="@color/branco" />
                     </LinearLayout>
 
-                    <android.support.v7.widget.AppCompatImageButton
-                        android:id="@+id/imageButton3"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginRight="8dp"
-                        android:layout_weight=".5"
-                        android:background="@color/transparente"
-                        android:contentDescription="Botão ver ponto de interesse no mapa"
-                        android:onClick="@{view::onClickBtnMapa}"
-                        android:tooltipText="Ver ponto de interesse no mapa"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:srcCompat="@drawable/ic_map_white_24dp" />
+                    <!--<android.support.v7.widget.AppCompatImageButton-->
+                        <!--android:id="@+id/imageButton3"-->
+                        <!--android:layout_width="0dp"-->
+                        <!--android:layout_height="match_parent"-->
+                        <!--android:layout_marginRight="8dp"-->
+                        <!--android:layout_weight=".5"-->
+                        <!--android:background="@color/transparente"-->
+                        <!--android:contentDescription="Botão ver ponto de interesse no mapa"-->
+                        <!--android:onClick="@{view::onClickBtnMapa}"-->
+                        <!--android:tooltipText="Ver ponto de interesse no mapa"-->
+                        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+                        <!--app:layout_constraintEnd_toEndOf="parent"-->
+                        <!--app:srcCompat="@drawable/ic_map_white_24dp" />-->
 
                 </LinearLayout>
 

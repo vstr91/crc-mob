@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -307,6 +308,30 @@ public class ParadasActivity extends BaseActivity {
             adapter.paradas = paradas;
             adapter.notifyDataSetChanged();
 
+//            int cont = 0;
+//            final Handler handler = new Handler();
+//            int segundos = 20;
+//
+//            for(final ParadaBairro p : paradas){
+//
+//                if((p.getParada().getRua() == null || p.getParada().getRua().isEmpty()) && cont < 50){
+//
+//                    segundos = segundos+(cont+5);
+//
+//                    handler.postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            viewModel.buscarRua(p.getParada());
+//                        }
+//                    }, segundos*1000);
+//
+//                    cont++;
+//                }
+//
+//
+//
+//            }
+
 //            List<Overlay> ov = map.getOverlays().;
 //            System.out.println(ov.size());
         }
@@ -356,6 +381,7 @@ public class ParadasActivity extends BaseActivity {
                 Marker m = new Marker(map);
                 m.setPosition(new GeoPoint(p.getParada().getLatitude(), p.getParada().getLongitude()));
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                m.setDragOffset(10);
                 m.setTitle(p.getParada().getNome());
 
                 switch(p.getParada().getSentido()){
@@ -399,6 +425,7 @@ public class ParadasActivity extends BaseActivity {
                     public void onMarkerDragEnd(Marker marker) {
 
                         ParadaBairro pb = getParadaFromMarker(marker, paradas);
+                        viewModel.buscarRua(pb.getParada());
                         viewModel.setParada(pb);
                         viewModel.editarParada();
                         Toast.makeText(getApplicationContext(), "Parada alterada", Toast.LENGTH_SHORT).show();

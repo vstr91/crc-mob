@@ -26,6 +26,10 @@ public class Parada extends EntidadeSlug {
 
     private int sentido = -1; // 0 = esquerda | 1 = direita | 2 = ambas | -1 = nao mostra
 
+    private String rua;
+
+    private String cep;
+
     public int getSentido() {
         return sentido;
     }
@@ -84,6 +88,22 @@ public class Parada extends EntidadeSlug {
 
     public void setImagemEnviada(@NonNull boolean imagemEnviada) {
         this.imagemEnviada = imagemEnviada;
+    }
+
+    public String getRua() {
+        return rua;
+    }
+
+    public void setRua(String rua) {
+        this.rua = rua;
+    }
+
+    public String getCep() {
+        return cep;
+    }
+
+    public void setCep(String cep) {
+        this.cep = cep;
     }
 
     public boolean valida(Parada parada) {

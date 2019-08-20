@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "afa7065d829b8ff8b35014c4d7f12714",
+    "identityHash": "d026b66e0bf90eca9f1d4ed16406eef6",
     "entities": [
       {
         "tableName": "Pais",
@@ -846,7 +846,7 @@
       },
       {
         "tableName": "Parada",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `taxaDeEmbarque` REAL, `imagem` TEXT, `bairro` TEXT NOT NULL, `imagemEnviada` INTEGER NOT NULL, `sentido` INTEGER NOT NULL, `nome` TEXT NOT NULL, `slug` TEXT NOT NULL, `id` TEXT NOT NULL, `ativo` INTEGER NOT NULL, `enviado` INTEGER NOT NULL, `data_cadastro` INTEGER NOT NULL, `usuario_cadastro` TEXT, `ultima_alteracao` INTEGER NOT NULL, `usuario_ultima_alteracao` TEXT, `programado_para` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `taxaDeEmbarque` REAL, `imagem` TEXT, `bairro` TEXT NOT NULL, `imagemEnviada` INTEGER NOT NULL, `sentido` INTEGER NOT NULL, `rua` TEXT, `cep` TEXT, `nome` TEXT NOT NULL, `slug` TEXT NOT NULL, `id` TEXT NOT NULL, `ativo` INTEGER NOT NULL, `enviado` INTEGER NOT NULL, `data_cadastro` INTEGER NOT NULL, `usuario_cadastro` TEXT, `ultima_alteracao` INTEGER NOT NULL, `usuario_ultima_alteracao` TEXT, `programado_para` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "latitude",
@@ -889,6 +889,18 @@
             "columnName": "sentido",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "rua",
+            "columnName": "rua",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "cep",
+            "columnName": "cep",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "nome",
@@ -1809,7 +1821,7 @@
       },
       {
         "tableName": "parada_sugestao",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`observacao` TEXT, `parada` TEXT, `status` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `taxaDeEmbarque` REAL, `imagem` TEXT, `bairro` TEXT NOT NULL, `imagemEnviada` INTEGER NOT NULL, `sentido` INTEGER NOT NULL, `nome` TEXT NOT NULL, `slug` TEXT NOT NULL, `id` TEXT NOT NULL, `ativo` INTEGER NOT NULL, `enviado` INTEGER NOT NULL, `data_cadastro` INTEGER NOT NULL, `usuario_cadastro` TEXT, `ultima_alteracao` INTEGER NOT NULL, `usuario_ultima_alteracao` TEXT, `programado_para` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`observacao` TEXT, `parada` TEXT, `status` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `taxaDeEmbarque` REAL, `imagem` TEXT, `bairro` TEXT NOT NULL, `imagemEnviada` INTEGER NOT NULL, `sentido` INTEGER NOT NULL, `rua` TEXT, `cep` TEXT, `nome` TEXT NOT NULL, `slug` TEXT NOT NULL, `id` TEXT NOT NULL, `ativo` INTEGER NOT NULL, `enviado` INTEGER NOT NULL, `data_cadastro` INTEGER NOT NULL, `usuario_cadastro` TEXT, `ultima_alteracao` INTEGER NOT NULL, `usuario_ultima_alteracao` TEXT, `programado_para` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "observacao",
@@ -1870,6 +1882,18 @@
             "columnName": "sentido",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "rua",
+            "columnName": "rua",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "cep",
+            "columnName": "cep",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "nome",
@@ -2572,7 +2596,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"afa7065d829b8ff8b35014c4d7f12714\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"d026b66e0bf90eca9f1d4ed16406eef6\")"
     ]
   }
 }

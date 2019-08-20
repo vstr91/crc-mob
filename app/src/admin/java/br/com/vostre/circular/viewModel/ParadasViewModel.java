@@ -13,6 +13,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -21,6 +22,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.joda.time.DateTime;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osmdroid.util.GeoPoint;
 
 import java.io.File;
@@ -35,11 +38,17 @@ import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.Parada;
+import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.ImageUtils;
 import br.com.vostre.circular.utils.StringUtils;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ParadasViewModel extends AndroidViewModel {
 
@@ -332,6 +341,53 @@ public class ParadasViewModel extends AndroidViewModel {
                 }
             }
         };
+    }
+
+    public void buscarRua(final Parada parada){
+        Retrofit retrofit = new Retrofit.Builder()
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .baseUrl("https://nominatim.openstreetmap.org/")
+                .build();
+
+        CircularAPI api = retrofit.create(CircularAPI.class);
+
+        Call<String> call = api.carregaRua("json", parada.getLatitude(), parada.getLongitude(), 18, 3);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+
+                try {
+                    JSONObject obj = new JSONObject(response.body());
+
+                    if(obj != null){
+                        JSONObject dadosRua = obj.getJSONObject("address");
+
+                        String rua = dadosRua.optString("road", "");
+                        String cep = dadosRua.optString("postcode", "");
+
+                        System.out.println("RUA: "+rua+", "+cep);
+
+                        parada.setRua(rua);
+                        parada.setCep(cep);
+
+                        edit(parada);
+
+                    } else{
+                        System.out.println("RUA: ERRO > "+response.code());
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(getApplication().getApplicationContext(), "Erro ao buscar rua. "+t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 }

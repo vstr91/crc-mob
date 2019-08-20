@@ -206,6 +206,11 @@ public class FormParada extends FormBase {
         formCalendario.show(getActivity().getSupportFragmentManager(), "formCalendario");
     }
 
+    public void onClickBtnBuscaRua(View v){
+        Toast.makeText(ctx, "Atualizando endereço...", Toast.LENGTH_SHORT).show();
+        viewModel.buscarRua(parada.getParada());
+    }
+
     public void onSwitchProgramadoChange(CompoundButton btn, boolean ativo){
 
         if(flagInicioEdicao && parada.getParada().getProgramadoPara() != null){

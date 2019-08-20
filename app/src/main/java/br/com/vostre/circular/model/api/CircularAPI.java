@@ -16,6 +16,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface CircularAPI {
 
@@ -45,5 +46,8 @@ public interface CircularAPI {
 
     @GET("route/v1/driving/{partida};{destino}?overview=false")
     Call<String> carregaDistancia(@Path("partida") String partida, @Path("destino") String destino);
+
+    @GET("reverse")
+    Call<String> carregaRua(@Query("format") String format, @Query("lat") Double latitude, @Query("lon") Double longitude, @Query("zoom") Integer zoom, @Query("addressdetails") Integer details);
 
 }

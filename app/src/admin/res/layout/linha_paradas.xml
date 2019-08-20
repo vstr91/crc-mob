@@ -48,6 +48,17 @@
                         android:text="@{parada.parada.nome}" />
 
                     <TextView
+                        android:id="@+id/textViewRua"
+                        style="@style/texto_lista_menor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingTop="10dp"
+                        android:textSize="12sp"
+                        android:text="@{parada.parada.rua+` - `+parada.parada.cep}" />
+
+                    <TextView
                         android:id="@+id/textViewTipo"
                         style="@style/texto_lista_menor"
                         android:layout_width="match_parent"

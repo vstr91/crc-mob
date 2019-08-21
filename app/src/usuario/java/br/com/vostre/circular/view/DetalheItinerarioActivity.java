@@ -19,6 +19,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.joda.time.DateTime;
@@ -46,6 +48,7 @@ import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.Legenda;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.CustomLayoutManager;
+import br.com.vostre.circular.utils.DestaqueUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SnackbarHelper;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
@@ -101,7 +104,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
         if(!inversao){
             super.onCreate(savedInstanceState);
-            setTitle("Detalhe Itinerário");
+            setTitle("Horários");
             getSupportActionBar().setDisplayShowTitleEnabled(true);
 
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
@@ -692,6 +695,51 @@ public class DetalheItinerarioActivity extends BaseActivity {
         binding.textViewCarregando.setVisibility(View.GONE);
         binding.progressBar.setIndeterminate(true);
         binding.progressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onToolbarItemSelected(View v) {
+        List<TapTarget> targets = criaTour();
+        exibeTour(targets, new TapTargetSequence.Listener(){
+
+            @Override
+            public void onSequenceFinish() {
+                //Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+
+            }
+
+            @Override
+            public void onSequenceCanceled(TapTarget lastTarget) {
+                Toast.makeText(getApplicationContext(), "Tour cancelado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    @Override
+    public List<TapTarget> criaTour() {
+
+        List<TapTarget> targets = new ArrayList<>();
+
+        targets.add(DestaqueUtils.geraTapTarget(binding.imageButton4, "Favoritos", "Aqui você pode adicionar ou remover o itinerário dos favoritos!",
+                false, true, 1));
+
+        if(binding.imageButton5.getVisibility() == View.VISIBLE){
+            targets.add(DestaqueUtils.geraTapTarget(binding.imageButton5, "Seções", "Lista as seções do itinerário e suas respectivas tarifas!",
+                    false, true, 2));
+        }
+
+        targets.add(DestaqueUtils.geraTapTarget(binding.imageButton6, "Compartilhar", "Aqui você pode compartilhar o quadro de horários com seus contatos!",
+                false, true, 3));
+
+        targets.add(DestaqueUtils.geraTapTarget(binding.listHorarios.findViewHolderForAdapterPosition(0).itemView.findViewById(R.id.textViewNome),
+                "Horários", "Aqui você verá o quadro de horários do itinerário escolhido!", false, true, 4));
+
+        return targets;
     }
 
 }

@@ -8,6 +8,7 @@ import android.databinding.DataBindingUtil;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
 
@@ -46,6 +47,18 @@ public class SobreActivity extends BaseActivity {
             binding.setParametros(parametros);
         }
     };
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        boolean retorno = super.onCreateOptionsMenu(menu);
+
+        if(menu != null){
+            menu.getItem(0).setVisible(false);
+        }
+
+        return retorno;
+    }
 
     @BindingAdapter("app:dataAcesso")
     public static void setDataAcesso(TextView textView, DateTime l){

@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -406,40 +407,45 @@ public class DetalheParadaActivity extends BaseActivity {
 
     @Override
     public void onToolbarItemSelected(View v) {
-        criaTour();
+        List<TapTarget> targets = criaTour();
+        exibeTour(targets, new TapTargetSequence.Listener(){
+
+            @Override
+            public void onSequenceFinish() {
+                exibindoTour = false;
+                //Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+
+            }
+
+            @Override
+            public void onSequenceCanceled(TapTarget lastTarget) {
+                Toast.makeText(getApplicationContext(), "Tour cancelado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+                exibindoTour = false;
+            }
+        });
         exibindoTour = true;
     }
 
     @Override
     public List<TapTarget> criaTour() {
 
-//        if(binding.textView15.getVisibility() == View.VISIBLE){
-//            DestaqueUtils.geraDestaqueUnico(this, binding.textView15, "Pontos de Interesse",
-//                    "Lista os pontos de interesse, como hospitais, escolas e pontos de encontro próximos à parada!", new TapTargetView.Listener(){
-//                        @Override
-//                        public void onTargetClick(TapTargetView view) {
-//                            super.onTargetClick(view);
-//
-//                            binding.listCidadesPartida.findViewHolderForAdapterPosition(1).itemView.findViewById(R.id.circleView2).performClick();
-//
-//                            new Handler().postDelayed(new Runnable() {
-//                                @Override
-//                                public void run() {
-//
-//                                    DestaqueUtils.geraDestaqueUnico(formBairro.getDialog(), ((RecyclerView) formBairro.getView().findViewById(R.id.listBairros)).findViewHolderForAdapterPosition(1)
-//                                                    .itemView.findViewById(R.id.textViewNome),
-//                                            "Escolha o bairro de partida", "Escolha então o bairro de partida. Se houver apenas uma opção, o sistema escolherá automaticamente!", l2,
-//                                            false, false);
-//                                }
-//                            }, 300);
-//
-//                        }
-//                    }, false, true);
-//        } else{
-//
-//        }
-
         List<TapTarget> targets = new ArrayList<>();
+
+        if(binding.textView15.getVisibility() == View.VISIBLE){
+            targets.add(DestaqueUtils.geraTapTarget(binding.textView15, "Pontos de Interesse", "Lista os pontos de interesse, como hospitais, escolas e pontos de encontro próximos à parada!",
+                    false, true, 1));
+        }
+
+        targets.add(DestaqueUtils.geraTapTarget(binding.imageButton3, "Mapa", "Aqui você pode visualizar no mapa a localização da parada!",
+                false, true, 2));
+        targets.add(DestaqueUtils.geraTapTarget(binding.imageButton4, "Favoritos", "Aqui você pode adicionar ou remover a parada dos favoritos!",
+                false, true, 3));
+        targets.add(DestaqueUtils.geraTapTarget(binding.listItinerarios.findViewHolderForAdapterPosition(0).itemView.findViewById(R.id.textView23),
+                "Próximas Saídas", "Aqui você verá os próximos itinerários que sairão ou passarão pela parada!", false, true, 4));
 
         return targets;
     }

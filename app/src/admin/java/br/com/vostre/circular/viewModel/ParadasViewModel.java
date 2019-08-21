@@ -365,7 +365,7 @@ public class ParadasViewModel extends AndroidViewModel {
                         String rua = dadosRua.optString("road", "");
                         String cep = dadosRua.optString("postcode", "");
 
-                        System.out.println("RUA: "+rua+", "+cep);
+                        //System.out.println("RUA: "+rua+", "+cep);
 
                         parada.setRua(rua);
                         parada.setCep(cep);
@@ -373,7 +373,7 @@ public class ParadasViewModel extends AndroidViewModel {
                         edit(parada);
 
                     } else{
-                        System.out.println("RUA: ERRO > "+response.code());
+                        Toast.makeText(getApplication().getApplicationContext(), "Erro ao buscar rua. "+response.message(), Toast.LENGTH_SHORT).show();
                     }
 
 

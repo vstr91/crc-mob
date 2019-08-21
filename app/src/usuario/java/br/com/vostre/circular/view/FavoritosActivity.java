@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
 import android.view.View;
 import android.widget.TabHost;
 
@@ -84,6 +85,18 @@ public class FavoritosActivity extends BaseActivity {
         spec2.setIndicator("Paradas");
         tabHost.addTab(spec2);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        boolean retorno = super.onCreateOptionsMenu(menu);
+
+        if(menu != null){
+            menu.getItem(0).setVisible(false);
+        }
+
+        return retorno;
     }
 
     Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {

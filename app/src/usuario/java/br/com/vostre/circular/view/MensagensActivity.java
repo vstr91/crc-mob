@@ -10,15 +10,20 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TabHost;
+import android.widget.Toast;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityMensagensBinding;
 import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.utils.Constants;
+import br.com.vostre.circular.utils.DestaqueUtils;
 import br.com.vostre.circular.utils.NotificacaoUtils;
 import br.com.vostre.circular.view.adapter.MensagemAdapter;
 import br.com.vostre.circular.view.form.FormMensagem;
@@ -148,5 +153,51 @@ public class MensagensActivity extends BaseActivity {
             adapterRecebidas.notifyDataSetChanged();
         }
     };
+
+    @Override
+    public void onToolbarItemSelected(View v) {
+        List<TapTarget> targets = criaTour();
+        exibeTour(targets, new TapTargetSequence.Listener(){
+
+            @Override
+            public void onSequenceFinish() {
+                //Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+
+            }
+
+            @Override
+            public void onSequenceCanceled(TapTarget lastTarget) {
+                Toast.makeText(getApplicationContext(), "Tour cancelado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    @Override
+    public List<TapTarget> criaTour() {
+
+        List<TapTarget> targets = new ArrayList<>();
+
+        targets.add(DestaqueUtils.geraTapTarget(tabHost.getTabWidget().getChildAt(0).findViewById(android.R.id.title), "Mensagens Recebidas", "Aqui você pode visualizar as mensagens recebidas, " +
+                        "sempre com informações relevantes, como suspensão ou alteração de serviços!",
+                false, true, 1));
+        targets.add(DestaqueUtils.geraTapTarget(tabHost.getTabWidget().getChildAt(1).findViewById(android.R.id.title), "Mensagens Enviadas", "Aqui você pode visualizar as mensagens que você nos enviou!",
+                false, true, 2));
+
+        if(binding.listMensagensRecebidas.findViewHolderForAdapterPosition(0) != null){
+            targets.add(DestaqueUtils.geraTapTarget(binding.listMensagensRecebidas.findViewHolderForAdapterPosition(0).itemView.findViewById(R.id.textViewTitulo),
+                    "Ler Mensagem", "Toque sobre uma mensagem para abrí-la!", false, true, 3));
+        }
+
+        targets.add(DestaqueUtils.geraTapTarget(binding.fabNovaMensagem,
+                "Enviar Mensagem", "Ao pressionar o botão, você poderá nos enviar sua sugestão, elogio ou crítica! Participe e torne o projeto cada vez melhor!",
+                false, true, 4));
+
+        return targets;
+    }
 
 }

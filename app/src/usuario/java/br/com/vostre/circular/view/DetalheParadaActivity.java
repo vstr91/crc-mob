@@ -367,6 +367,14 @@ public class DetalheParadaActivity extends BaseActivity {
                     binding.imageView9.setImageDrawable(getResources().getDrawable(R.drawable.imagem_nao_disponivel_16_9));
                 }
 
+                if(parada.getParada().getRua() != null && !parada.getParada().getRua().isEmpty()){
+                    binding.textViewRua.setVisibility(View.VISIBLE);
+                    binding.linearLayout2.invalidate();
+                } else{
+                    binding.textViewRua.setVisibility(View.GONE);
+                    binding.linearLayout2.invalidate();
+                }
+
                 adapterPois = new PontosInteresseAdapter(viewModel.pois.getValue(), ctx, parada, bsd);
                 listPois.setAdapter(adapterPois);
 

@@ -1,5 +1,6 @@
 package br.com.vostre.circular.view.viewHolder;
 
+import android.content.Intent;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +12,7 @@ import br.com.vostre.circular.databinding.LinhaSecoesBinding;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.view.DetalhePontoInteresseActivity;
 import br.com.vostre.circular.view.form.FormMapa;
 
 public class PontoInteresseViewHolder extends RecyclerView.ViewHolder {
@@ -42,6 +44,15 @@ public class PontoInteresseViewHolder extends RecyclerView.ViewHolder {
         } else{
             binding.textView42.setVisibility(View.VISIBLE);
         }
+
+        binding.root.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(ctx.getApplicationContext(), DetalhePontoInteresseActivity.class);
+                i.putExtra("poi", poi.getId());
+                ctx.getApplicationContext().startActivity(i);
+            }
+        });
 
         binding.btnVerMapa.setOnClickListener(new View.OnClickListener() {
             @Override

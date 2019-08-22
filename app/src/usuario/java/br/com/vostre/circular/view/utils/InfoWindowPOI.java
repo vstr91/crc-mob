@@ -2,6 +2,7 @@ package br.com.vostre.circular.view.utils;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
@@ -25,6 +26,7 @@ import br.com.vostre.circular.databinding.InfowindowPoiParadaBinding;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.view.DetalhePontoInteresseActivity;
 import br.com.vostre.circular.view.adapter.ItinerarioFavoritoAdapter;
 import br.com.vostre.circular.view.form.FormBase;
 import br.com.vostre.circular.viewModel.InfoWindowPOIViewModel;
@@ -120,6 +122,12 @@ public class InfoWindowPOI extends FormBase {
         dismiss();
     }
 
+    public void onClickVerDetalhes(View v){
+        Intent i = new Intent(getActivity().getApplicationContext(), DetalhePontoInteresseActivity.class);
+        i.putExtra("poi", pontoInteresse.getId());
+        getActivity().getApplicationContext().startActivity(i);
+    }
+
     @BindingAdapter("srcCompat")
     public static void setImagemFoto(ImageView imageView, Bitmap bitmap){
 
@@ -139,11 +147,23 @@ public class InfoWindowPOI extends FormBase {
 
                 listParadas.add(p.getParada().getId());
 
-                System.out.println("PARADAS: "+p.getParada().getId()+" | "+p.getParada().getNome()+" - "+p.getNomeBairroComCidade());
+                //System.out.println("PARADAS: "+p.getParada().getId()+" | "+p.getParada().getNome()+" - "+p.getNomeBairroComCidade());
             }
 
             viewModel.listarTodosAtivosProximosPoi(listParadas);
-            viewModel.itinerarios.observe(ctx, itinerariosObserver);
+
+            if(viewModel.itinerarios != null && ctx != null){
+                viewModel.itinerarios.observe(ctx, itinerariosObserver);
+                binding.listItinerarios.setVisibility(View.VISIBLE);
+                binding.textView66.setVisibility(View.VISIBLE);
+                binding.btnVerDetalhes.setVisibility(View.GONE);
+            } else{
+                binding.listItinerarios.setVisibility(View.GONE);
+                binding.textView66.setVisibility(View.GONE);
+                binding.btnVerDetalhes.setVisibility(View.VISIBLE);
+            }
+
+
 
         }
     };
@@ -155,9 +175,9 @@ public class InfoWindowPOI extends FormBase {
             ItinerarioFavoritoAdapter adapter = new ItinerarioFavoritoAdapter(itinerarios, getCtx());
             binding.listItinerarios.setAdapter(adapter);
 
-            for(ItinerarioPartidaDestino i : itinerarios){
-                System.out.println("ITINERARIOS: "+i.getItinerario().getId()+" | "+i.getNomePartida()+", "+i.getNomeBairroPartida()+" - "+i.getNomeDestino()+", "+i.getNomeBairroDestino());
-            }
+//            for(ItinerarioPartidaDestino i : itinerarios){
+//                System.out.println("ITINERARIOS: "+i.getItinerario().getId()+" | "+i.getNomePartida()+", "+i.getNomeBairroPartida()+" - "+i.getNomeDestino()+", "+i.getNomeBairroDestino());
+//            }
 
         }
     };

@@ -128,9 +128,10 @@ public class FormBairro extends FormBase implements SelectListener {
 
         listBairros = binding.listBairros;
 
-        adapter.setListener(this);
-
-        listBairros.setAdapter(adapter);
+        if(adapter != null){
+            adapter.setListener(this);
+            listBairros.setAdapter(adapter);
+        }
 
         return binding.getRoot();
 

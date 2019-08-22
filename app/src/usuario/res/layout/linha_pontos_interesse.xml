@@ -9,6 +9,7 @@
     </data>
 
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -16,11 +17,11 @@
             android:id="@+id/textViewNome"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="24dp"
-            android:layout_marginRight="8dp"
             android:layout_marginStart="24dp"
+            android:layout_marginLeft="24dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
             android:text="@{pontoInteresse.nome}"
             android:textAppearance="@style/texto_azul"
             android:textColor="@color/cinzaEscuro"
@@ -34,12 +35,12 @@
             android:id="@+id/imageView11"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
-            app:srcCompat="@drawable/ic_place_blue_24dp"
+            android:layout_marginLeft="8dp"
             app:layout_constraintBottom_toBottomOf="@+id/btnVerMapa"
             app:layout_constraintStart_toStartOf="@+id/guideline6"
-            app:layout_constraintTop_toTopOf="@+id/btnVerMapa" />
+            app:layout_constraintTop_toTopOf="@+id/btnVerMapa"
+            app:srcCompat="@drawable/ic_place_blue_24dp" />
 
         <Button
             android:id="@+id/btnVerMapa"
@@ -73,12 +74,9 @@
             android:id="@+id/textView42"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginLeft="24dp"
-            android:layout_marginRight="24dp"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="8dp"
             android:text="@{pontoInteresse.descricao}"
             android:textAppearance="@style/texto_azul"
             android:textColor="@color/cinzaEscuro"
@@ -86,7 +84,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewObservacao"
+            app:layout_constraintTop_toBottomOf="@+id/textView41"
             tools:text="Venha participar da festa do bairro. Diversas atrações todos os dias!" />
 
         <android.support.constraint.Guideline

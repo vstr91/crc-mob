@@ -14,6 +14,8 @@
         <variable
             name="umaParada"
             type="br.com.vostre.circular.model.pojo.ParadaBairro" />
+
+        <import type="android.view.View"/>
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -70,6 +72,7 @@
             android:clickable="true"
             android:elevation="20dp"
             android:orientation="vertical"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -140,7 +143,7 @@
                 <LinearLayout
                     android:id="@+id/linearLayout4"
                     android:layout_width="0dp"
-                    android:layout_height="50dp"
+                    android:layout_height="60dp"
                     android:background="@drawable/dia_rounded_corner_azul"
                     android:orientation="horizontal"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -163,20 +166,38 @@
                             android:id="@+id/textViewNome"
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
+                            android:layout_gravity="center_vertical"
                             android:layout_weight="1"
-                            android:gravity="bottom|center_vertical"
+                            android:gravity="center_vertical"
                             android:text="@={umaParada.parada.nome}"
                             android:textColor="@color/branco"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            tools:text="AAA" />
+
+                        <TextView
+                            android:id="@+id/textViewRua"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight=".7"
+                            android:paddingTop="0dp"
+                            android:text="@={umaParada.parada.rua}"
+                            android:textColor="@color/branco"
+                            android:textSize="10sp"
+                            android:visibility="gone"
+                            tools:text="BBB" />
 
                         <TextView
                             android:id="@+id/textViewBairro"
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
+                            android:layout_gravity="center_vertical"
                             android:layout_weight="1"
-                            android:gravity="top"
+                            android:gravity="center_vertical"
+                            android:paddingBottom="5dp"
                             android:text="@{umaParada.nomeBairro+` - `+umaParada.nomeCidade}"
-                            android:textColor="@color/branco" />
+                            android:textColor="@color/branco"
+                            tools:text="CCC" />
                     </LinearLayout>
 
                     <android.support.v7.widget.AppCompatImageButton
@@ -186,12 +207,12 @@
                         android:layout_marginRight="8dp"
                         android:layout_weight=".5"
                         android:background="@color/transparente"
-                        app:srcCompat="@drawable/ic_map_white_24dp"
+                        android:contentDescription="Botão ver parada no mapa"
                         android:onClick="onClickBtnMapa"
                         android:tooltipText="Ver parada no mapa"
-                        android:contentDescription="Botão ver parada no mapa"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:srcCompat="@drawable/ic_map_white_24dp" />
 
                     <android.support.v7.widget.AppCompatImageButton
                         android:id="@+id/imageButton4"
@@ -199,10 +220,10 @@
                         android:layout_height="match_parent"
                         android:layout_marginRight="10dp"
                         android:layout_weight=".5"
-                        android:contentDescription="Botão adicionar aos favoritos"
-                        android:tooltipText="Adicionar parada aos favoritos"
-                        android:onClick="@{view::onClickBtnFavorito}"
                         android:background="@color/transparente"
+                        android:contentDescription="Botão adicionar aos favoritos"
+                        android:onClick="@{view::onClickBtnFavorito}"
+                        android:tooltipText="Adicionar parada aos favoritos"
                         app:srcCompat="@drawable/ic_star_white_24dp" />
 
                 </LinearLayout>

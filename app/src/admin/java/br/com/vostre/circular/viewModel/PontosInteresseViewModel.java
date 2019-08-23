@@ -57,6 +57,8 @@ public class PontosInteresseViewModel extends AndroidViewModel {
 
     public Bitmap foto;
 
+    public static MutableLiveData<Integer> retorno;
+
     public Bitmap getFoto() {
         return foto;
     }
@@ -129,6 +131,9 @@ public class PontosInteresseViewModel extends AndroidViewModel {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplication());
         localAtual = new MutableLiveData<>();
         localAtual.setValue(new Location(LocationManager.GPS_PROVIDER));
+
+        retorno = new MutableLiveData<>();
+        retorno.setValue(-1);
     }
 
     public void salvarPontoInteresse(){
@@ -142,7 +147,7 @@ public class PontosInteresseViewModel extends AndroidViewModel {
         if(pontoInteresse.valida(pontoInteresse)){
             add(pontoInteresse);
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -160,7 +165,7 @@ public class PontosInteresseViewModel extends AndroidViewModel {
         if(pontoInteresse.valida(pontoInteresse)){
             edit(pontoInteresse);
         } else{
-            System.out.println("Faltou algo a ser digitado!");
+            retorno.setValue(0);
         }
 
     }
@@ -246,6 +251,11 @@ public class PontosInteresseViewModel extends AndroidViewModel {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
+        }
+
     }
 
     // fim adicionar
@@ -294,6 +304,11 @@ public class PontosInteresseViewModel extends AndroidViewModel {
         protected Void doInBackground(final PontoInteresse... params) {
             db.pontoInteresseDAO().editar((params[0]));
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
         }
 
     }

@@ -130,13 +130,13 @@ public class LoginActivity extends BaseActivity {
             DBUtils.populaBancoDeDados(this);
         }
 
-        if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), "novidades_210")){
-            FormNovidades formNovidades = new FormNovidades();
-            formNovidades.setVersao(BuildConfig.VERSION_NAME);
-            formNovidades.show(this.getSupportFragmentManager(), "formNovidades");
-
-            PreferenceUtils.salvarPreferencia(getApplicationContext(), "novidades_210", true);
-        }
+//        if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), "novidades_210")){
+//            FormNovidades formNovidades = new FormNovidades();
+//            formNovidades.setVersao(BuildConfig.VERSION_NAME);
+//            formNovidades.show(this.getSupportFragmentManager(), "formNovidades");
+//
+//            PreferenceUtils.salvarPreferencia(getApplicationContext(), "novidades_210", true);
+//        }
 
 
     }

@@ -501,6 +501,8 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
             ocultaModalLoading();
 
+            binding.listHorarios.scheduleLayoutAnimation();
+
 //            CustomLayoutManager customLayoutManager = new CustomLayoutManager(getApplicationContext());
 //            binding.listHorarios.setLayoutManager(customLayoutManager);
 ////            manager.scrollToPositionWithOffset(adapterHorarios.buscaPosicaoHorarioInt(horario), 0);

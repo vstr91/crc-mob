@@ -19,6 +19,7 @@ import br.com.vostre.circular.databinding.FormNovidadesBinding;
 import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.view.utils.CustomPagerAdapter;
+import br.com.vostre.circular.view.utils.PagerModel;
 import br.com.vostre.circular.viewModel.MensagensViewModel;
 import me.relex.circleindicator.CircleIndicator;
 
@@ -57,11 +58,17 @@ public class FormNovidades extends FormBase {
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity().getApplicationContext());
 
-        binding.btnEntendi.setVisibility(View.INVISIBLE);
-
         ViewPager viewPager = binding.viewPager;
         final CustomPagerAdapter adapter = new CustomPagerAdapter(this.getActivity());
         viewPager.setAdapter(adapter);
+
+        if(adapter.getCount() == 1){
+            binding.btnEntendi.setVisibility(View.VISIBLE);
+            binding.btnFechar.setVisibility(View.INVISIBLE);
+        } else{
+            binding.btnEntendi.setVisibility(View.INVISIBLE);
+            binding.btnFechar.setVisibility(View.VISIBLE);
+        }
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override

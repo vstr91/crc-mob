@@ -378,7 +378,7 @@ public class ParadasViewModel extends AndroidViewModel {
 
 
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    Toast.makeText(getApplication().getApplicationContext(), "Erro ao processar retorno. "+e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
 
             }

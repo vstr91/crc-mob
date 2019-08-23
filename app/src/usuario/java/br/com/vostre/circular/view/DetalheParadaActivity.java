@@ -346,6 +346,7 @@ public class DetalheParadaActivity extends BaseActivity {
             adapter.itinerarios = itinerarios;
             adapter.notifyDataSetChanged();
             ocultaModalLoading();
+            binding.listItinerarios.scheduleLayoutAnimation();
         }
     };
 

@@ -63,6 +63,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -107,8 +109,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     static int PICK_FILE = 174;
 
     AppCompatActivity ctx;
-
-    Location localAnterior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -220,15 +220,15 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             startLocationUpdates();
         }
 
-        binding.imageView2.getViewTreeObserver().addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                YoYo.with(Techniques.SlideInDown)
-                        .duration(700)
-                        .pivot(findViewById(R.id.imageView2).getX()/2,findViewById(R.id.imageView2).getY()/2)
-                        .playOn(findViewById(R.id.imageView2));
-            }
-        });
+//        binding.imageView2.getViewTreeObserver().addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
+//            @Override
+//            public void onGlobalLayout() {
+//                YoYo.with(Techniques.SlideInDown)
+//                        .duration(700)
+//                        .pivot(findViewById(R.id.imageView2).getX()/2,findViewById(R.id.imageView2).getY()/2)
+//                        .playOn(findViewById(R.id.imageView2));
+//            }
+//        });
 
 
 
@@ -381,6 +381,28 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         public void onChanged(List<ParadaBairro> paradas) {
 
             if(paradas.size() > 0){
+
+                Location poiLocation = new Location(LocationManager.GPS_PROVIDER);
+                poiLocation.setLatitude(localAnterior.getLatitude());
+                poiLocation.setLongitude(localAnterior.getLongitude());
+
+                for(ParadaBairro i : paradas){
+                    Location paradaLocation = new Location(LocationManager.GPS_PROVIDER);
+                    paradaLocation.setLatitude(i.getParada().getLatitude());
+                    paradaLocation.setLongitude(i.getParada().getLongitude());
+
+                    i.setDistancia(paradaLocation.distanceTo(poiLocation));
+                }
+
+                Collections.sort(paradas, new Comparator<ParadaBairro>() {
+                    @Override
+                    public int compare(ParadaBairro itinerarioPartidaDestino, ParadaBairro t1) {
+                        return itinerarioPartidaDestino.getDistancia() > t1.getDistancia() ? 1 : -1;
+                    }
+                });
+
+
+
                 binding.textViewBairroAtual.setText(paradas.get(0).getNomeBairroComCidade());
                 binding.textViewBairroAtual.setVisibility(View.VISIBLE);
             } else{

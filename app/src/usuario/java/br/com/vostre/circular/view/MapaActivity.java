@@ -561,8 +561,17 @@ public class MapaActivity extends BaseActivity {
 
                             TextView textViewReferencia = bsd.findViewById(R.id.textViewReferencia);
                             TextView textViewBairro = bsd.findViewById(R.id.textViewBairro);
+                            TextView textViewRua = bsd.findViewById(R.id.textViewRua);
 
                             textViewReferencia.setText(pb.getParada().getNome());
+
+                            if(pb.getParada().getRua() != null && !pb.getParada().getRua().equals("")){
+                                textViewRua.setText(pb.getParada().getRua());
+                                textViewRua.setVisibility(View.VISIBLE);
+                            } else{
+                                textViewRua.setVisibility(View.GONE);
+                            }
+
                             textViewBairro.setText(pb.getNomeBairroComCidade());
 
                             bsd.findViewById(R.id.textView32).setVisibility(View.VISIBLE);

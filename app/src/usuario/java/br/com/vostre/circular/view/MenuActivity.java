@@ -352,6 +352,14 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         FirebaseUser account = FirebaseAuth.getInstance().getCurrentUser();
         updateUI(account);
 
+        //TODO: voltar trava para exibir so uma vez
+        if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), "novidades_220")){
+            FormNovidades formNovidades = new FormNovidades();
+            formNovidades.setVersao(BuildConfig.VERSION_NAME);
+            formNovidades.show(this.getSupportFragmentManager(), "formNovidades");
+
+            PreferenceUtils.salvarPreferencia(getApplicationContext(), "novidades_220", true);
+        }
 
     }
 

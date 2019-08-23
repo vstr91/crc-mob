@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -188,7 +189,7 @@ public class FormPontoInteresse extends FormPOIBase {
             viewModel.salvarPontoInteresse();
         }
 
-        dismiss();
+        viewModel.retorno.observe(this, retornoObserver);
     }
 
     public void onClickFechar(View v){
@@ -368,6 +369,24 @@ public class FormPontoInteresse extends FormPOIBase {
         }
 
     }
+
+    Observer<Integer> retornoObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer retorno) {
+
+            if(retorno == 1){
+                Toast.makeText(getContext().getApplicationContext(), "Ponto de Interesse cadastrado!", Toast.LENGTH_SHORT).show();
+                viewModel.setPontoInteresse(new PontoInteresse());
+                dismiss();
+            } else if(retorno == 0){
+                Toast.makeText(getContext().getApplicationContext(),
+                        "Dados necessários não informados. Por favor preencha " +
+                                "todos os dados obrigatórios!",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    };
 
     public void onItemSelectedSpinnerBairro (AdapterView<?> adapterView, View view, int i, long l){
         viewModel.bairro = viewModel.bairros.getValue().get(i);

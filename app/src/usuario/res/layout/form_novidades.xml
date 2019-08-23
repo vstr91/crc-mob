@@ -82,7 +82,7 @@
             android:background="@color/azul"
             android:gravity="center"
             android:paddingBottom="10dp"
-            android:text="2.1.0"
+            android:text="2.2.0"
             android:textColor="@color/branco"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.databinding.DataBindingUtil;
 import android.location.GpsStatus;
+import android.location.Location;
 import android.location.LocationManager;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
@@ -75,6 +76,8 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
     LocationManager locationManager;
     boolean gpsAtivo = false;
+
+    Location localAnterior;
 
     private BroadcastReceiver mGpsSwitchStateReceiver = new BroadcastReceiver() {
         @Override

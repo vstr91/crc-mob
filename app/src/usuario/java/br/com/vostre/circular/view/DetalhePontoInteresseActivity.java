@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -133,6 +134,18 @@ public class DetalhePontoInteresseActivity extends BaseActivity {
 //            }
 //        });
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        boolean retorno = super.onCreateOptionsMenu(menu);
+
+        if(menu != null){
+            menu.getItem(0).setVisible(false);
+        }
+
+        return retorno;
     }
 
     private void geraModalLoading() {

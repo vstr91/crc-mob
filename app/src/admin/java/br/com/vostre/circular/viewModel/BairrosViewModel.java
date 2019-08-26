@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Context;
 import android.os.AsyncTask;
 
 import org.joda.time.DateTime;
@@ -18,7 +19,7 @@ import br.com.vostre.circular.utils.StringUtils;
 
 public class BairrosViewModel extends AndroidViewModel {
 
-    private AppDatabase appDatabase;
+    private static AppDatabase appDatabase;
 
     public LiveData<List<BairroCidade>> bairros;
     public BairroCidade bairro;
@@ -102,6 +103,20 @@ public class BairrosViewModel extends AndroidViewModel {
         new addAsyncTask(appDatabase).execute(bairro);
     }
 
+    public static void addEstatico(final Bairro bairro, Context context) {
+
+        if(appDatabase == null){
+            appDatabase = AppDatabase.getAppDatabase(context);
+        }
+
+        bairro.setDataCadastro(new DateTime());
+        bairro.setUltimaAlteracao(new DateTime());
+        bairro.setEnviado(false);
+        bairro.setSlug(StringUtils.toSlug(bairro.getNome()));
+
+        new addAsyncTask(appDatabase).execute(bairro);
+    }
+
     private static class addAsyncTask extends AsyncTask<Bairro, Void, Void> {
 
         private AppDatabase db;
@@ -118,7 +133,11 @@ public class BairrosViewModel extends AndroidViewModel {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            retorno.setValue(1);
+
+            if(retorno != null){
+                retorno.setValue(1);
+            }
+
         }
 
     }

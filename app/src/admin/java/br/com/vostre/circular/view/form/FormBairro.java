@@ -52,6 +52,8 @@ public class FormBairro extends FormBase {
 
     static Application ctx;
 
+    CidadeEstado cidadeDetalhada;
+
     public Application getCtx() {
         return ctx;
     }
@@ -74,6 +76,14 @@ public class FormBairro extends FormBase {
 
     public void setAdapter(CidadeAdapterSpinner adapter) {
         this.adapter = adapter;
+    }
+
+    public CidadeEstado getCidadeDetalhada() {
+        return cidadeDetalhada;
+    }
+
+    public void setCidadeDetalhada(CidadeEstado cidadeDetalhada) {
+        this.cidadeDetalhada = cidadeDetalhada;
     }
 
     @Override
@@ -209,6 +219,13 @@ public class FormBairro extends FormBase {
             if(bairro != null){
                 CidadeEstado cidade = new CidadeEstado();
                 cidade.getCidade().setId(bairro.getIdCidade());
+                int i = viewModel.cidades.getValue().indexOf(cidade);
+                binding.spinnerCidade.setSelection(i);
+            }
+
+            if(cidadeDetalhada != null){
+                CidadeEstado cidade = new CidadeEstado();
+                cidade.getCidade().setId(cidadeDetalhada.getCidade().getId());
                 int i = viewModel.cidades.getValue().indexOf(cidade);
                 binding.spinnerCidade.setSelection(i);
             }

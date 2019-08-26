@@ -36,7 +36,7 @@ public interface BairroDAO {
     LiveData<List<BairroCidade>> listarTodosComCidade();
 
     @Query("SELECT b.*, c.id AS idCidade, c.nome AS nomeCidade, c.brasao AS brasao, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado FROM bairro b " +
-            "INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado WHERE b.cidade = :cidade")
+            "INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado WHERE b.cidade = :cidade ORDER BY b.nome COLLATE LOCALIZED ASC")
     LiveData<List<BairroCidade>> listarTodosComCidadePorCidade(String cidade);
 
     @Query("SELECT DISTINCT b.*, c.id AS idCidade, c.nome AS nomeCidade, c.brasao AS brasao, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado FROM bairro b " +

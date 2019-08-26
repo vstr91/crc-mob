@@ -1,5 +1,6 @@
 package br.com.vostre.circular.view.viewHolder;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -9,6 +10,7 @@ import org.joda.time.format.DateTimeFormat;
 
 import br.com.vostre.circular.databinding.LinhaBairrosBinding;
 import br.com.vostre.circular.model.pojo.BairroCidade;
+import br.com.vostre.circular.view.DetalhesBairroActivity;
 import br.com.vostre.circular.view.form.FormBairro;
 
 public class BairroViewHolder extends RecyclerView.ViewHolder {
@@ -37,6 +39,15 @@ public class BairroViewHolder extends RecyclerView.ViewHolder {
         } else{
             binding.btnProgramado.setVisibility(View.GONE);
         }
+
+        binding.cardview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(ctx, DetalhesBairroActivity.class);
+                i.putExtra("bairro", bairro.getBairro().getId());
+                ctx.startActivity(i);
+            }
+        });
 
         binding.cardview.setOnLongClickListener(new View.OnLongClickListener() {
             @Override

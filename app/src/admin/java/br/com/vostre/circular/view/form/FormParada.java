@@ -175,6 +175,10 @@ public class FormParada extends FormBase {
             flagInicioEdicao = true;
         }
 
+        if(parada.getParada().getRua() == null || parada.getParada().getRua().isEmpty()){
+            viewModel.buscarRua(parada.getParada());
+        }
+
         return binding.getRoot();
 
     }

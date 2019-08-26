@@ -240,6 +240,20 @@ public class ParadasViewModel extends AndroidViewModel {
         new addAsyncTask(appDatabase).execute(parada);
     }
 
+    public static void addEstatico(final Parada parada, Context context) {
+
+        parada.setDataCadastro(new DateTime());
+        parada.setUltimaAlteracao(new DateTime());
+        parada.setEnviado(false);
+        parada.setSlug(StringUtils.toSlug(parada.getNome()));
+
+        if(appDatabase == null){
+            appDatabase = AppDatabase.getAppDatabase(context.getApplicationContext());
+        }
+
+        new addAsyncTask(appDatabase).execute(parada);
+    }
+
     private static class addAsyncTask extends AsyncTask<Parada, Void, Void> {
 
         private AppDatabase db;
@@ -256,7 +270,11 @@ public class ParadasViewModel extends AndroidViewModel {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            retorno.setValue(1);
+
+            if(retorno != null){
+                retorno.setValue(1);
+            }
+
         }
 
     }

@@ -48,6 +48,12 @@ public interface ParadaDAO {
             "estado e ON e.id = c.estado INNER JOIN parada_itinerario pi ON pi.parada = p.id WHERE c.id = :cidade ORDER BY b.nome, p.nome")
     LiveData<List<ParadaBairro>> listarTodosAtivosComBairroPorCidade(String cidade);
 
+    @Query("SELECT DISTINCT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
+            "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada p " +
+            "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
+            "estado e ON e.id = c.estado INNER JOIN parada_itinerario pi ON pi.parada = p.id WHERE b.id = :bairro ORDER BY b.nome, p.nome")
+    LiveData<List<ParadaBairro>> listarTodosAtivosComBairroPorBairro(String bairro);
+
     @Query("SELECT DISTINCT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, " +
             "e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_itinerario pi INNER JOIN parada p ON pi.parada = p.id " +

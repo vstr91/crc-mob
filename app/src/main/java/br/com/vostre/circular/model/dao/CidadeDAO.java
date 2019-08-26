@@ -58,7 +58,7 @@ public interface CidadeDAO {
     @Query("SELECT * FROM cidade WHERE imagemEnviada = 0 AND brasao IS NOT NULL")
     List<Cidade> listarTodosImagemAEnviar();
 
-    @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado, (SELECT COUNT(DISTINCT id) FROM bairro b2 WHERE b2.cidade = c.id) AS 'totalBairros' " +
+    @Query("SELECT c.*, e.id AS idEstado, e.nome AS nomeEstado, (SELECT COUNT(DISTINCT id) FROM bairro b2 WHERE b2.cidade = c.id AND b2.ativo = 1) AS 'totalBairros' " +
             "FROM cidade c INNER JOIN estado e ON e.id = c.estado ORDER BY c.nome")
     LiveData<List<CidadeEstado>> listarTodosComEstado();
 

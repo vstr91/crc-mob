@@ -58,6 +58,7 @@ import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityParadasBinding;
+import br.com.vostre.circular.listener.ParadaListener;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
@@ -69,7 +70,7 @@ import br.com.vostre.circular.view.form.FormParada;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.viewModel.ParadasViewModel;
 
-public class ParadasActivity extends BaseActivity {
+public class ParadasActivity extends BaseActivity implements ParadaListener {
 
     ActivityParadasBinding binding;
     MapView map;
@@ -140,6 +141,7 @@ public class ParadasActivity extends BaseActivity {
             listParadas = binding.listParadas;
 
             adapter = new ParadaAdapter(paradas, this);
+            adapter.setListener(this);
 
             listParadas.setAdapter(adapter);
 
@@ -367,6 +369,8 @@ public class ParadasActivity extends BaseActivity {
 
         if(paradas != null){
 
+            this.paradas = paradas;
+
             RadiusMarkerClusterer poiMarkers = new RadiusMarkerClusterer(this);
             poiMarkers.setRadius(200);
 
@@ -384,20 +388,46 @@ public class ParadasActivity extends BaseActivity {
                 m.setDragOffset(10);
                 m.setTitle(p.getParada().getNome());
 
-                switch(p.getParada().getSentido()){
-                    case 0:
-                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_backspace_black_24dp));
-                        break;
-                    case 1:
-                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
-                        break;
-                    case 2:
-                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
-                        break;
-                    default:
-                        m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
-                        break;
+                if(p.getParada().getAtivo()){
+
+                    switch(p.getParada().getSentido()){
+                        case 0:
+                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_backspace_black_24dp));
+                            break;
+                        case 1:
+                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
+                            break;
+                        case 2:
+                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
+                            break;
+                        default:
+                            m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
+                            break;
+                    }
+
+                } else{
+
+                    switch(p.getParada().getSentido()){
+                        case 0:
+                            m.setIcon(DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
+                                    mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_backspace_black_24dp).mutate()));
+                            break;
+                        case 1:
+                            m.setIcon(DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
+                                    mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp).mutate()));
+                            break;
+                        case 2:
+                            m.setIcon(DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
+                                    mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp).mutate()));
+                            break;
+                        default:
+                            m.setIcon(DrawableUtils.convertToGrayscale(getApplicationContext().getResources().getDrawable(R.drawable.marker).mutate()));
+                            break;
+                    }
+
                 }
+
+
 
                 m.setDraggable(true);
                 m.setId(p.getParada().getId());
@@ -458,6 +488,19 @@ public class ParadasActivity extends BaseActivity {
         return pb;
     }
 
+    @NonNull
+    private ParadaBairro getParadaPorId(String id) {
+        List<Overlay> overlays = map.getOverlays();
+
+        ParadaBairro p = new ParadaBairro();
+        p.getParada().setId(id);
+
+        p = paradas.get(paradas.indexOf(p));
+
+        return p;
+
+    }
+
     @BindingAdapter("center")
     public static void setMapCenter(MapView map, GeoPoint geoPoint){
 
@@ -490,4 +533,12 @@ public class ParadasActivity extends BaseActivity {
 
     }
 
+    @Override
+    public void onSelected(String id) {
+        ParadaBairro parada = getParadaPorId(id);
+
+        GeoPoint g = new GeoPoint(parada.getParada().getLatitude(), parada.getParada().getLongitude());
+
+        mapController.animateTo(g);
+    }
 }

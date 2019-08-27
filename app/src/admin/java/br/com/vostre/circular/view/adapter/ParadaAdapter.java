@@ -9,6 +9,7 @@ import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaEstadosBinding;
 import br.com.vostre.circular.databinding.LinhaParadasBinding;
+import br.com.vostre.circular.listener.ParadaListener;
 import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
@@ -18,6 +19,16 @@ public class ParadaAdapter extends RecyclerView.Adapter<ParadaViewHolder> {
 
     public List<ParadaBairro> paradas;
     AppCompatActivity ctx;
+
+    ParadaListener listener;
+
+    public ParadaListener getListener() {
+        return listener;
+    }
+
+    public void setListener(ParadaListener listener) {
+        this.listener = listener;
+    }
 
     public ParadaAdapter(List<ParadaBairro> paradas, AppCompatActivity context){
         this.paradas = paradas;
@@ -30,7 +41,14 @@ public class ParadaAdapter extends RecyclerView.Adapter<ParadaViewHolder> {
                 LayoutInflater.from(parent.getContext());
         LinhaParadasBinding itemBinding =
                 LinhaParadasBinding.inflate(layoutInflater, parent, false);
-        return new ParadaViewHolder(itemBinding, ctx);
+
+        if(listener != null){
+            return new ParadaViewHolder(itemBinding, ctx, listener);
+        } else{
+            return new ParadaViewHolder(itemBinding, ctx);
+        }
+
+
     }
 
     @Override

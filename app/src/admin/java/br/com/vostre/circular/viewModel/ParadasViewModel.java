@@ -247,11 +247,19 @@ public class ParadasViewModel extends AndroidViewModel {
         parada.setEnviado(false);
         parada.setSlug(StringUtils.toSlug(parada.getNome()));
 
-        if(appDatabase == null){
-            appDatabase = AppDatabase.getAppDatabase(context.getApplicationContext());
+        if(parada.valida(parada)){
+            if(appDatabase == null){
+                appDatabase = AppDatabase.getAppDatabase(context);
+            }
+
+            System.out.println("PARADA: nome "+parada.getNome()+" | ativo: "+parada.getAtivo()+" | latitude: "+parada.getLatitude()+" | longitude: "+parada.getLongitude()+" | bairro: "+parada.getBairro());
+
+            new addAsyncTask(appDatabase).execute(parada);
+        } else{
+            Toast.makeText(context, "A parada "+parada.getNome()+" contém dados que precisam ser informados.", Toast.LENGTH_SHORT).show();
         }
 
-        new addAsyncTask(appDatabase).execute(parada);
+
     }
 
     private static class addAsyncTask extends AsyncTask<Parada, Void, Void> {

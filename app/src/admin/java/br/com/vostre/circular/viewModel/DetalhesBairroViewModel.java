@@ -9,11 +9,9 @@ import org.joda.time.DateTime;
 
 import java.util.List;
 
-import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.BairroCidade;
-import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 
 public class DetalhesBairroViewModel extends AndroidViewModel {
@@ -38,11 +36,11 @@ public class DetalhesBairroViewModel extends AndroidViewModel {
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         parada = new ParadaBairro();
         bairro = appDatabase.bairroDAO().carregar("");
-        paradas = appDatabase.paradaDAO().listarTodosAtivosComBairroPorBairro("");
+        paradas = appDatabase.paradaDAO().listarTodosComBairroPorBairro("");
     }
 
     public void carregarParadas(String bairro){
-        paradas = appDatabase.paradaDAO().listarTodosAtivosComBairroPorBairro(bairro);
+        paradas = appDatabase.paradaDAO().listarTodosComBairroPorBairro(bairro);
     }
 
     public void salvarMensagem(){

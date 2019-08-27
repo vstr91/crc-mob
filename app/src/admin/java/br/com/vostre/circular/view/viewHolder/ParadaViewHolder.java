@@ -9,6 +9,7 @@ import org.joda.time.format.DateTimeFormat;
 
 import br.com.vostre.circular.databinding.LinhaBairrosBinding;
 import br.com.vostre.circular.databinding.LinhaParadasBinding;
+import br.com.vostre.circular.listener.ParadaListener;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.view.form.FormParada;
@@ -17,11 +18,19 @@ public class ParadaViewHolder extends RecyclerView.ViewHolder {
 
     private final LinhaParadasBinding binding;
     AppCompatActivity ctx;
+    ParadaListener listener;
 
     public ParadaViewHolder(LinhaParadasBinding binding, AppCompatActivity context) {
         super(binding.getRoot());
         this.binding = binding;
         this.ctx = context;
+    }
+
+    public ParadaViewHolder(LinhaParadasBinding binding, AppCompatActivity context, ParadaListener listener) {
+        super(binding.getRoot());
+        this.binding = binding;
+        this.ctx = context;
+        this.listener = listener;
     }
 
     public void bind(final ParadaBairro parada) {
@@ -40,11 +49,22 @@ public class ParadaViewHolder extends RecyclerView.ViewHolder {
             binding.btnProgramado.setVisibility(View.GONE);
         }
 
+        if(listener != null){
+            binding.cardview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onSelected(parada.getParada().getId());
+                }
+            });
+        }
+
         binding.cardview.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 FormParada formParada = new FormParada();
                 formParada.setParada(parada);
+                formParada.setLatitude(parada.getParada().getLatitude());
+                formParada.setLongitude(parada.getParada().getLongitude());
                 formParada.setCtx(ctx.getApplication());
                 formParada.flagInicioEdicao = true;
                 formParada.show(ctx.getSupportFragmentManager(), "formParada");

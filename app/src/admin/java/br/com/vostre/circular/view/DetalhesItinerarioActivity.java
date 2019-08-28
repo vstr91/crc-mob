@@ -66,6 +66,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+
 public class DetalhesItinerarioActivity extends BaseActivity {
 
     ActivityDetalhesItinerarioBinding binding;
@@ -84,6 +86,9 @@ public class DetalhesItinerarioActivity extends BaseActivity {
     MapEventsOverlay overlayEvents;
 
     DetalhesItinerarioViewModel viewModel;
+
+    boolean mapaOculto = false;
+    int tamanhoOriginalMapa = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -204,7 +209,22 @@ public class DetalhesItinerarioActivity extends BaseActivity {
 //        mapController.setCenter(startPoint);
 
         map.setMaxZoomLevel(19d);
-        map.setMinZoomLevel(15d);
+        map.setMinZoomLevel(9d);
+    }
+
+    public void ocultarMapa(View v){
+
+        if(mapaOculto){
+            binding.map.setVisibility(View.VISIBLE);
+            binding.cardView.getLayoutParams().height = tamanhoOriginalMapa;
+            mapaOculto = false;
+        } else{
+            tamanhoOriginalMapa = binding.cardView.getLayoutParams().height;
+            binding.map.setVisibility(View.GONE);
+            binding.cardView.getLayoutParams().height = WRAP_CONTENT;
+            mapaOculto = true;
+        }
+
     }
 
     public void onClickBtnSalvar(View v){

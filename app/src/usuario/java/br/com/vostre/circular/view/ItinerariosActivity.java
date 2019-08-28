@@ -570,6 +570,10 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
         viewModel.escolhaAtual = 0;
 
+//        int idRadio = binding.radioGroupConsulta.getCheckedRadioButtonId();
+//
+//        viewModel.setTodos(R.id.radioButtonTodos == idRadio);
+
         viewModel.carregaResultado(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte, diaAnterior, false);
 
         viewModel.itinerario.observe(this, itinerarioObserver);
@@ -662,6 +666,10 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         viewModel.escolhaAtual = 0;
 
         String hora = DateTimeFormat.forPattern("HH:mm:00").print(data.getTimeInMillis());
+
+//        int idRadio = binding.radioGroupConsulta.getCheckedRadioButtonId();
+//
+//        viewModel.setTodos(R.id.radioButtonTodos == idRadio);
 
         viewModel.carregaResultado(hora, DataHoraUtils.getDiaSelecionado(data), DataHoraUtils.getDiaSeguinteSelecionado(data),
                 DataHoraUtils.getDiaAnteriorSelecionado(data), inversao);

@@ -137,6 +137,9 @@ public interface HorarioItinerarioDAO {
             "WHERE itinerario = :itinerario")
     void invalidaTodosPorItinerario(String itinerario);
 
+    @Query("UPDATE horario_itinerario SET ultima_alteracao = datetime('now'), enviado = 0")
+    void marcaTodosParaEnvio();
+
     @Query("SELECT * FROM horario_itinerario WHERE id IN (:ids)")
     List<HorarioItinerario> carregarTodosPorIds(int[] ids);
 

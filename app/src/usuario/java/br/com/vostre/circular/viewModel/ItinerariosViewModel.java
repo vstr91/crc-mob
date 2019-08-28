@@ -82,6 +82,16 @@ public class ItinerariosViewModel extends AndroidViewModel {
     public List<ItinerarioPartidaDestino> itinerarios;
     public MutableLiveData<List<ItinerarioPartidaDestino>> resultadosItinerarios;
 
+    boolean todos = true;
+
+    public boolean isTodos() {
+        return todos;
+    }
+
+    public void setTodos(boolean todos) {
+        this.todos = todos;
+    }
+
     public CidadeEstado getCidadePartida() {
         return cidadePartida;
     }
@@ -173,7 +183,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                 .appendMinutes().toFormatter();
 
                 SimpleSQLiteQuery queryOpcoes = new SimpleSQLiteQuery(
-                        geraQueryItinerarios(myPartida.getBairro().getId(), myDestino.getBairro().getId()));
+                        geraQueryItinerarios(myPartida.getBairro().getId(), myDestino.getBairro().getId(), todos));
 
                 List<String> opcoes = appDatabase.itinerarioDAO()
                         .carregarOpcoesPorPartidaEDestinoSync(queryOpcoes);
@@ -418,7 +428,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                 }
 
                                 SimpleSQLiteQuery queryIti = new SimpleSQLiteQuery(
-                                        geraQueryItinerarios(bairroAnterior.getBairro().getId(), b.getBairro().getId()));
+                                        geraQueryItinerarios(bairroAnterior.getBairro().getId(), b.getBairro().getId(), todos));
 
                                 List<String> itis = appDatabase.itinerarioDAO()
                                         .carregarOpcoesPorPartidaEDestinoSync(queryIti);
@@ -626,7 +636,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                 .appendMinutes().toFormatter();
 
                 SimpleSQLiteQuery queryOpcoes = new SimpleSQLiteQuery(
-                        geraQueryItinerarios(myPartida.getBairro().getId(), myDestino.getBairro().getId()));
+                        geraQueryItinerarios(myPartida.getBairro().getId(), myDestino.getBairro().getId(), todos));
 
                 List<String> opcoes = appDatabase.itinerarioDAO()
                         .carregarOpcoesPorPartidaEDestinoSync(queryOpcoes);
@@ -873,7 +883,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                 }
 
                                 SimpleSQLiteQuery queryIti = new SimpleSQLiteQuery(
-                                        geraQueryItinerarios(bairroAnterior.getBairro().getId(), b.getBairro().getId()));
+                                        geraQueryItinerarios(bairroAnterior.getBairro().getId(), b.getBairro().getId(), todos));
 
                                 List<String> itis = appDatabase.itinerarioDAO()
                                         .carregarOpcoesPorPartidaEDestinoSync(queryIti);
@@ -1084,15 +1094,38 @@ public class ItinerariosViewModel extends AndroidViewModel {
 //                .carregar(itinerario.getValue().getHorarioItinerario().getItinerario());
 //    }
 
-    public static String geraQueryItinerarios(String bairroPartida, String bairroDestino){
+    public static String geraQueryItinerarios(String bairroPartida, String bairroDestino, boolean todos){
+
+//        if(todos){
+//            return "SELECT i.id FROM itinerario i INNER JOIN " +
+//                    "parada_itinerario pi ON pi.itinerario = i.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+//                    "bairro bp ON bp.id = pp.bairro INNER JOIN parada_itinerario pi2 ON pi2.itinerario = i.id INNER JOIN " +
+//                    "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+//                    "WHERE i.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem " +
+//                    //"AND ((pi.destaque = 1 OR pi.ordem = 1) AND (pi2.destaque = 1 " +
+//                    //"OR pi2.ordem = (SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = i.id) )) " +
+//                    "AND bp.id = '" + bairroPartida + "' AND bd.id = '" + bairroDestino + "' ORDER BY i.id";
+//        } else{
+//            return "SELECT i.id FROM itinerario i INNER JOIN " +
+//                    "parada_itinerario pi ON pi.itinerario = i.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
+//                    "bairro bp ON bp.id = pp.bairro INNER JOIN parada_itinerario pi2 ON pi2.itinerario = i.id INNER JOIN " +
+//                    "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
+//                    "WHERE i.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem " +
+//                    "AND ((pi.destaque = 1 OR pi.ordem = 1) AND (pi2.destaque = 1 " +
+//                    "OR pi2.ordem = (SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = i.id) )) " +
+//                    "AND bp.id = '" + bairroPartida + "' AND bd.id = '" + bairroDestino + "' ORDER BY i.id";
+//        }
+
         return "SELECT i.id FROM itinerario i INNER JOIN " +
                 "parada_itinerario pi ON pi.itinerario = i.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro bp ON bp.id = pp.bairro INNER JOIN parada_itinerario pi2 ON pi2.itinerario = i.id INNER JOIN " +
                 "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                "WHERE i.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND " +
-                "((pi.destaque = 1 OR pi.ordem = 1) AND (pi2.destaque = 1 " +
+                "WHERE i.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem " +
+                "AND ((pi.destaque = 1 OR pi.ordem = 1) AND (pi2.destaque = 1 " +
                 "OR pi2.ordem = (SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = i.id) )) " +
                 "AND bp.id = '" + bairroPartida + "' AND bd.id = '" + bairroDestino + "' ORDER BY i.id";
+
+
     }
 
     private String geraQueryResultado(String bairroPartida, String bairroDestino,
@@ -1166,7 +1199,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
                 "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
                 "AND bp.id = '"+bairroPartida+"' " +
-                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'paradaPartida', " +
+                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id, pi.ordem) AS 'paradaPartida', " +
 
                 "(SELECT pd.id FROM itinerario i2 INNER JOIN " +
                 "parada_itinerario pi ON pi.itinerario = i2.id INNER JOIN " +
@@ -1175,7 +1208,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
                 "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
                 "AND bp.id = '"+bairroPartida+"' " +
-                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'paradaDestino', " +
+                "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id ASC, pi2.ordem DESC) AS 'paradaDestino', " +
 
                 "'"+bairroPartida+"' AS 'bairroConsultaPartida', " +
                 "'"+bairroDestino+"' AS 'bairroConsultaDestino'," +

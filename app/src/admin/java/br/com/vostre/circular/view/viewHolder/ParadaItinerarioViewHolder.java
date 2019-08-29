@@ -9,6 +9,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 
 import br.com.vostre.circular.databinding.LinhaParadasItinerariosBinding;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
@@ -23,6 +27,7 @@ public class ParadaItinerarioViewHolder extends RecyclerView.ViewHolder {
     AppCompatActivity ctx;
     AndroidViewModel viewModel;
     public Boolean edicaoItinerario = false;
+    DateTimeFormatter nfTempo;
 
     public ParadaItinerarioViewHolder(LinhaParadasItinerariosBinding binding, AppCompatActivity context,
                                       @Nullable Boolean edicaoItinerario) {
@@ -37,6 +42,7 @@ public class ParadaItinerarioViewHolder extends RecyclerView.ViewHolder {
             viewModel = ViewModelProviders.of(ctx).get(ItinerariosViewModel.class);
         }
 
+        nfTempo = DateTimeFormat.forPattern("HH:mm:ss");
 
     }
 
@@ -60,8 +66,25 @@ public class ParadaItinerarioViewHolder extends RecyclerView.ViewHolder {
             binding.textViewAnterior.setText("-");
         }
 
-        if(parada.getParadaItinerario().getValorAnterior() == null){
+        if(parada.getParadaItinerario().getValorSeguinte() == null){
             binding.textViewProximo.setText("-");
+        }
+
+        if(parada.getParadaItinerario().getDistanciaSeguinte() == null){
+            binding.textViewDistancia.setText("-");
+        } else{
+            try{
+                String valor = String.valueOf(parada.getParadaItinerario().getDistanciaSeguinte()).replace(".", ",");
+                binding.textViewDistancia.setText(valor+" Km");
+            } catch(NumberFormatException e){
+                binding.textViewDistancia.setText("0 Km");
+            }
+        }
+
+        if(parada.getParadaItinerario().getTempoSeguinte() == null){
+            binding.textViewTempo.setText("-");
+        } else{
+            binding.textViewTempo.setText(nfTempo.print(parada.getParadaItinerario().getTempoSeguinte()));
         }
 
         binding.btnEditar.setOnClickListener(new View.OnClickListener() {

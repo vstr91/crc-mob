@@ -2,7 +2,12 @@ package br.com.vostre.circular.utils;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeFieldType;
+import org.joda.time.Duration;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 
 import java.util.Calendar;
 
@@ -335,7 +340,26 @@ public class DataHoraUtils {
         String h = hours < 10 ? "0"+hours : String.valueOf(hours);
         String m = minutes < 10 ? "0"+minutes : String.valueOf(minutes);
 
-        return h+":"+m;
+        Duration duration = new Duration(segundos * 1000);
+        PeriodFormatter formatter = new PeriodFormatterBuilder()
+                .appendHours()
+                .appendSuffix(":").printZeroAlways()
+                .appendMinutes().printZeroAlways()
+                .appendSuffix(":")
+                .appendSeconds().printZeroAlways()
+                .toFormatter();
+
+        Period period = duration.toPeriod();
+        Period dayTimePeriod = period.normalizedStandard(PeriodType.dayTime());
+        String formattedString = formatter.print(dayTimePeriod);
+
+        if(period.getHours() == 0){
+            return "00:"+formattedString;
+        } else{
+            return formattedString;
+        }
+
+
     }
 
 }

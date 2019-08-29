@@ -206,9 +206,16 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
                 PeriodFormatter parser =
                         new PeriodFormatterBuilder()
                                 .appendHours().appendLiteral(":")
-                                .appendMinutes().toFormatter();
+                                .appendMinutes().appendLiteral(":").appendSeconds().toFormatter();
 
                 PeriodFormatter printer =
+                        new PeriodFormatterBuilder()
+                                .printZeroAlways().minimumPrintedDigits(2)
+                                //.appendDays().appendLiteral(" dia(s) ")
+                                .appendHours().appendLiteral(":")
+                                .appendMinutes().appendLiteral(":").appendSeconds().toFormatter();
+
+                PeriodFormatter printerFinal =
                         new PeriodFormatterBuilder()
                                 .printZeroAlways().minimumPrintedDigits(2)
                                 //.appendDays().appendLiteral(" dia(s) ")
@@ -229,26 +236,26 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
                     for(ParadaItinerario p : paradas){
 
                         if(p != null && p.getTempoSeguinte() != null){
-                            String tempo = DateTimeFormat.forPattern("HH:mm").print(p.getTempoSeguinte().getMillis());
+                            String tempo = DateTimeFormat.forPattern("HH:mm:ss").print(p.getTempoSeguinte().getMillis());
                             period = period.plus(parser.parsePeriod(tempo));
                         }
 
                     }
 
-                    tempoTotal = DateTimeFormat.forPattern("HH:mm")
+                    tempoTotal = DateTimeFormat.forPattern("HH:mm:ss")
                             .parseDateTime(printer.print(period.normalizedStandard(PeriodType.time())));
 
                     i.setTempoAcumulado(tempoTotal);
 
-                    String proxHorario = i.getProximoHorario();
+                    String proxHorario = i.getProximoHorario()+":00";
 
                     Period per = Period.ZERO;
                     per = per.plus(parser.parsePeriod(proxHorario));
 
-                    per = per.plus(parser.parsePeriod(DateTimeFormat.forPattern("HH:mm")
+                    per = per.plus(parser.parsePeriod(DateTimeFormat.forPattern("HH:mm:ss")
                             .print(tempoTotal)));
 
-                    i.setHorarioEstimado(printer.print(per.normalizedStandard(PeriodType.time())));
+                    i.setHorarioEstimado(printerFinal.print(per.normalizedStandard(PeriodType.time())));
 
                 }
 

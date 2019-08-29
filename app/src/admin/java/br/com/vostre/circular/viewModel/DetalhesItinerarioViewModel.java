@@ -9,6 +9,7 @@ import android.databinding.ObservableField;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -67,6 +68,8 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
     public ObservableField<ItinerarioPartidaDestino> iti;
 
     public LiveData<List<HistoricoItinerario>> historicoItinerario;
+
+    int umMinuto = 60;
 
     public ObservableField<ItinerarioPartidaDestino> getIti() {
         return iti;
@@ -158,37 +161,42 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
                     public void onResponse(Call<String> call, Response<String> response) {
                         System.out.println(response);
                         try {
-                            JSONObject obj = new JSONObject(response.body().toString());
-                            JSONArray routes = obj.getJSONArray("routes");
-                            JSONObject objDados = routes.getJSONObject(0);
 
-                            String distancia = objDados.getString("distance");
-                            int tempo = objDados.getInt("duration");
+                            if(response.body() != null){
+                                JSONObject obj = new JSONObject(response.body().toString());
+                                JSONArray routes = obj.getJSONArray("routes");
+                                JSONObject objDados = routes.getJSONObject(0);
 
-                            Double distanciaKm = Double.parseDouble(distancia) / 1000;
-                            String tempoFormatado = DataHoraUtils.segundosParaHoraFormatado(tempo);
+                                String distancia = objDados.getString("distance");
+                                int tempo = objDados.getInt("duration");
 
-                            long distKm = (long) distanciaKm.doubleValue();
+                                Double distanciaKm = Double.parseDouble(distancia) / 1000;
+                                String tempoFormatado = DataHoraUtils.segundosParaHoraFormatado(tempo);
 
-                            if(distKm > 0){
-                                finalParadaAnterior.getParadaItinerario()
-                                        .setDistanciaSeguinte(Double.parseDouble(String.valueOf(distKm)));
-                            }
+                                long distKm = (long) distanciaKm.doubleValue();
 
-                            if(tempoFormatado != null){
-                                finalParadaAnterior.getParadaItinerario()
-                                        .setTempoSeguinte(DateTimeFormat.forPattern("HH:mm")
-                                                .parseDateTime(tempoFormatado));
-                            }
-
-                            AsyncTask.execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    finalParadaAnterior.getParadaItinerario().setEnviado(false);
-                                    finalParadaAnterior.getParadaItinerario().setUltimaAlteracao(DateTime.now());
-                                    appDatabase.paradaItinerarioDAO().editar(finalParadaAnterior.getParadaItinerario());
+                                if(distKm > 0){
+                                    finalParadaAnterior.getParadaItinerario()
+                                            .setDistanciaSeguinte(Double.parseDouble(String.valueOf(distKm)));
                                 }
-                            });
+
+                                if(tempoFormatado != null){
+                                    finalParadaAnterior.getParadaItinerario()
+                                            .setTempoSeguinte(DateTimeFormat.forPattern("HH:mm:ss")
+                                                    .parseDateTime(tempoFormatado));
+                                }
+
+                                AsyncTask.execute(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        finalParadaAnterior.getParadaItinerario().setEnviado(false);
+                                        finalParadaAnterior.getParadaItinerario().setUltimaAlteracao(DateTime.now());
+                                        appDatabase.paradaItinerarioDAO().editar(finalParadaAnterior.getParadaItinerario());
+                                    }
+                                });
+                            } else{
+                                Toast.makeText(getApplication().getApplicationContext(), "Erro ao buscar distâncias das paradas! "+response.message(), Toast.LENGTH_SHORT).show();
+                            }
 
 //                            viewModel.editarItinerario();
 
@@ -330,6 +338,8 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
                 paradaItinerario.setValorAnterior(pi.getValorAnterior());
                 paradaItinerario.setValorSeguinte(pi.getValorSeguinte());
                 paradaItinerario.setEnviado(false);
+                paradaItinerario.setDistanciaSeguinte(pi.getDistanciaSeguinte());
+                paradaItinerario.setTempoSeguinte(pi.getTempoSeguinte());
                 paradaItinerario.setUltimaAlteracao(DateTime.now());
 
                 db.paradaItinerarioDAO().editar(paradaItinerario);
@@ -445,31 +455,44 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
             public void onResponse(Call<String> call, Response<String> response) {
 
                 try {
-                    JSONObject obj = new JSONObject(response.body().toString());
-                    JSONArray routes = obj.getJSONArray("routes");
-                    JSONObject objDados = routes.getJSONObject(0);
 
-                    String distancia = objDados.getString("distance");
-                    int tempo = objDados.getInt("duration");
+                    if(response.body() != null){
+                        JSONObject obj = new JSONObject(response.body().toString());
+                        JSONArray routes = obj.getJSONArray("routes");
+                        JSONObject objDados = routes.getJSONObject(0);
 
-                    Double distanciaKm = Double.parseDouble(distancia) / 1000;
-                    String tempoFormatado = DataHoraUtils.segundosParaHoraFormatado(tempo);
+                        String distancia = objDados.getString("distance");
+                        int tempo = objDados.getInt("duration");
 
-                    long distKm = (long) distanciaKm.doubleValue();
+                        if(tempo > umMinuto && tempo <= umMinuto * 10){
+                            //tempo += 60;
+                        } else if(tempo > umMinuto * 10){
+                            tempo += umMinuto * (tempo % 5);
+                        }
 
-                    if(distKm > 0){
-                        itinerario.getValue().getItinerario()
-                                .setDistancia(Double.parseDouble(String.valueOf(distKm)));
+                        Double distanciaKm = Double.parseDouble(distancia) / 1000;
+                        String tempoFormatado = DataHoraUtils.segundosParaHoraFormatado(tempo);
+
+                        long distKm = (long) distanciaKm.doubleValue();
+
+                        if(distKm > 0){
+                            itinerario.getValue().getItinerario()
+                                    .setDistancia(Double.parseDouble(String.valueOf(distKm)));
+                        }
+
+                        if(tempoFormatado != null){
+                            itinerario.getValue().getItinerario()
+                                    .setTempo(DateTimeFormat.forPattern("HH:mm:ss").parseDateTime(tempoFormatado));
+                        }
+
+                        if(!isEdicao){
+                            editarItinerario();
+                        }
+                    } else{
+                        Toast.makeText(getApplication().getApplicationContext(), "Erro ao buscar distância do itinerário! "+response.message(), Toast.LENGTH_SHORT).show();
                     }
 
-                    if(tempoFormatado != null){
-                        itinerario.getValue().getItinerario()
-                                .setTempo(DateTimeFormat.forPattern("HH:mm").parseDateTime(tempoFormatado));
-                    }
 
-                    if(!isEdicao){
-                        editarItinerario();
-                    }
 
                     //System.out.println(obj);
                 } catch (JSONException e) {

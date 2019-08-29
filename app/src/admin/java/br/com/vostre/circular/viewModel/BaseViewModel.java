@@ -99,12 +99,12 @@ public class BaseViewModel extends AndroidViewModel {
         localAtual = new MutableLiveData<>();
         localAtual.postValue(new Location(LocationManager.GPS_PROVIDER));
 
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                appDatabase.horarioItinerarioDAO().marcaTodosParaEnvio();
-            }
-        });
+//        AsyncTask.execute(new Runnable() {
+//            @Override
+//            public void run() {
+//                appDatabase.horarioItinerarioDAO().marcaTodosParaEnvio();
+//            }
+//        });
 
     }
 

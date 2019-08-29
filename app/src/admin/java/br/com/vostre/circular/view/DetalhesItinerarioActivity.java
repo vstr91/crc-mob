@@ -429,7 +429,7 @@ public class DetalhesItinerarioActivity extends BaseActivity {
     public static void setText(TextView view, DateTime date) {
 
         if(date != null){
-            String formatted = DateTimeFormat.forPattern("HH:mm").print(date);
+            String formatted = DateTimeFormat.forPattern("HH:mm:ss").print(date);
             view.setText(formatted);
         } else{
             view.setText("-");

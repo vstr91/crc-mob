@@ -78,7 +78,6 @@
             android:clickable="true"
             android:elevation="20dp"
             android:orientation="vertical"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -141,7 +140,7 @@
                     android:id="@+id/textView67"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Escolha uma opção abaixo, pressionando o brasão ou o nome da cidade"
+                    android:text="Escolha a cidade na qual você iniciará a viagem, pressionando o brasão ou o nome da cidade abaixo"
                     android:textSize="8sp" />
 
                 <android.support.v7.widget.RecyclerView
@@ -286,7 +285,7 @@
                     android:id="@+id/textView68"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Escolha uma opção abaixo, pressionando o brasão ou o nome da cidade"
+                    android:text="Escolha a cidade de destino, pressionando o brasão ou o nome da cidade abaixo"
                     android:textSize="8sp" />
 
                 <android.support.v7.widget.RecyclerView

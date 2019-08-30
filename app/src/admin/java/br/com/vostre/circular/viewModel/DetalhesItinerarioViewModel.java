@@ -152,6 +152,12 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
             if(paradaAnterior != null){
 
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
                 Call<String> call = api.carregaDistancia(paradaAnterior.getLongitude()+","
                         +paradaAnterior.getLatitude(),pb.getLongitude()+","+pb.getLatitude());
 

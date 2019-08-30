@@ -11,6 +11,7 @@ import android.databinding.DataBindingUtil;
 import android.databinding.InverseBindingAdapter;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -43,6 +44,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.TimerTask;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.HistoricoItinerario;

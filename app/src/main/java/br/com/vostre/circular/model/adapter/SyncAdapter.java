@@ -1395,7 +1395,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
              //System.out.println("JSON: "+json);
 
-            System.out.println("PROBLEMAS A ENV: "+strParadasSugestoes);
+            System.out.println("PROBLEMAS A ENV: "+strParadasItinerarios);
             // EXPORTA ARQUIVO DE DADOS
             /*
             File caminho = Environment.getExternalStorageDirectory();

@@ -671,10 +671,12 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 //
 //        viewModel.setTodos(R.id.radioButtonTodos == idRadio);
 
+        geraModalLoading();
+
         viewModel.carregaResultado(hora, DataHoraUtils.getDiaSelecionado(data), DataHoraUtils.getDiaSeguinteSelecionado(data),
                 DataHoraUtils.getDiaAnteriorSelecionado(data), inversao);
         adapterResultado.setDia(DataHoraUtils.getDiaSelecionadoFormatado(data));
-        adapterResultado.setHora(DateTimeFormat.forPattern("HH:mm").print(data.getTimeInMillis()));
+        adapterResultado.setHora(DateTimeFormat.forPattern("HH:mm:ss").print(data.getTimeInMillis()));
 
         //log
         bundle = new Bundle();

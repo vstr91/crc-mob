@@ -173,14 +173,16 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 PeriodFormatter parser =
                         new PeriodFormatterBuilder()
                                 .appendHours().appendLiteral(":")
-                                .appendMinutes().toFormatter();
+                                .appendMinutes().appendLiteral(":")
+                                .appendSeconds().toFormatter();
 
                 PeriodFormatter printer =
                         new PeriodFormatterBuilder()
                                 .printZeroAlways().minimumPrintedDigits(2)
                                 //.appendDays().appendLiteral(" dia(s) ")
                                 .appendHours().appendLiteral(":")
-                                .appendMinutes().toFormatter();
+                                .appendMinutes().appendLiteral(":")
+                                .appendSeconds().toFormatter();
 
                 SimpleSQLiteQuery queryOpcoes = new SimpleSQLiteQuery(
                         geraQueryItinerarios(myPartida.getBairro().getId(), myDestino.getBairro().getId(), todos));
@@ -227,13 +229,13 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                 }
 
                                 if(pi.getTempoSeguinte() != null){
-                                    String tempo = DateTimeFormat.forPattern("HH:mm").print(pi.getTempoSeguinte().getMillis());
+                                    String tempo = DateTimeFormat.forPattern("HH:mm:ss").print(pi.getTempoSeguinte().getMillis());
                                     period = period.plus(parser.parsePeriod(tempo));
                                 }
 
                             }
 
-                            tempoTotal = DateTimeFormat.forPattern("HH:mm").parseDateTime(printer.print(period.normalizedStandard(PeriodType.time())));
+                            tempoTotal = DateTimeFormat.forPattern("HH:mm:ss").parseDateTime(printer.print(period.normalizedStandard(PeriodType.time())));
 
                             if(total > 0){
                                 itinerario.setTarifaTrecho(total);
@@ -294,13 +296,13 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                     }
 
                                     if(pi.getTempoSeguinte() != null){
-                                        String tempo = DateTimeFormat.forPattern("HH:mm").print(pi.getTempoSeguinte().getMillis());
+                                        String tempo = DateTimeFormat.forPattern("HH:mm:ss").print(pi.getTempoSeguinte().getMillis());
                                         period = period.plus(parser.parsePeriod(tempo));
                                     }
 
                                 }
 
-                                tempoTotal = DateTimeFormat.forPattern("HH:mm").parseDateTime(printer.print(period.normalizedStandard(PeriodType.time())));
+                                tempoTotal = DateTimeFormat.forPattern("HH:mm:ss").parseDateTime(printer.print(period.normalizedStandard(PeriodType.time())));
 
                                 if(total > 0){
                                     itinerario.setTarifaTrecho(total);
@@ -416,7 +418,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                                 if(itinerarioAnterior != null){
                                     String proximoHorario = itinerarioAnterior.getProximoHorario();
-                                    String tempo = DateTimeFormat.forPattern("HH:mm").print(itinerarioAnterior.getItinerario().getTempo().getMillis());
+                                    String tempo = DateTimeFormat.forPattern("HH:mm:ss").print(itinerarioAnterior.getItinerario().getTempo().getMillis());
 
                                     period = period.plus(parser.parsePeriod(proximoHorario));
                                     period = period.plus(parser.parsePeriod(tempo));
@@ -468,13 +470,13 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                             }
 
                                             if(pi.getTempoSeguinte() != null){
-                                                String tempo = DateTimeFormat.forPattern("HH:mm").print(pi.getTempoSeguinte().getMillis());
+                                                String tempo = DateTimeFormat.forPattern("HH:mm:ss").print(pi.getTempoSeguinte().getMillis());
                                                 per = per.plus(parser.parsePeriod(tempo));
                                             }
 
                                         }
 
-                                        tempoTotal = DateTimeFormat.forPattern("HH:mm").parseDateTime(printer.print(per.normalizedStandard(PeriodType.time())));
+                                        tempoTotal = DateTimeFormat.forPattern("HH:mm:ss").parseDateTime(printer.print(per.normalizedStandard(PeriodType.time())));
 
                                         if(total > 0){
                                             itinerario.setTarifaTrecho(total);
@@ -535,13 +537,13 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                                 }
 
                                                 if(pi.getTempoSeguinte() != null){
-                                                    String tempo = DateTimeFormat.forPattern("HH:mm").print(pi.getTempoSeguinte().getMillis());
+                                                    String tempo = DateTimeFormat.forPattern("HH:mm:ss").print(pi.getTempoSeguinte().getMillis());
                                                     per = per.plus(parser.parsePeriod(tempo));
                                                 }
 
                                             }
 
-                                            tempoTotal = DateTimeFormat.forPattern("HH:mm").parseDateTime(printer.print(per.normalizedStandard(PeriodType.time())));
+                                            tempoTotal = DateTimeFormat.forPattern("HH:mm:ss").parseDateTime(printer.print(per.normalizedStandard(PeriodType.time())));
 
                                             if(total > 0){
                                                 itinerario.setTarifaTrecho(total);
@@ -626,14 +628,16 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 PeriodFormatter parser =
                         new PeriodFormatterBuilder()
                                 .appendHours().appendLiteral(":")
-                                .appendMinutes().toFormatter();
+                                .appendMinutes().appendLiteral(":")
+                                .appendSeconds().toFormatter();
 
                 PeriodFormatter printer =
                         new PeriodFormatterBuilder()
                                 .printZeroAlways().minimumPrintedDigits(2)
                                 //.appendDays().appendLiteral(" dia(s) ")
                                 .appendHours().appendLiteral(":")
-                                .appendMinutes().toFormatter();
+                                .appendMinutes().appendLiteral(":")
+                                .appendSeconds().toFormatter();
 
                 SimpleSQLiteQuery queryOpcoes = new SimpleSQLiteQuery(
                         geraQueryItinerarios(myPartida.getBairro().getId(), myDestino.getBairro().getId(), todos));
@@ -680,13 +684,13 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                 }
 
                                 if(pi.getTempoSeguinte() != null){
-                                    String tempo = DateTimeFormat.forPattern("HH:mm").print(pi.getTempoSeguinte().getMillis());
+                                    String tempo = DateTimeFormat.forPattern("HH:mm:ss").print(pi.getTempoSeguinte().getMillis());
                                     period = period.plus(parser.parsePeriod(tempo));
                                 }
 
                             }
 
-                            tempoTotal = DateTimeFormat.forPattern("HH:mm").parseDateTime(printer.print(period.normalizedStandard(PeriodType.time())));
+                            tempoTotal = DateTimeFormat.forPattern("HH:mm:ss").parseDateTime(printer.print(period.normalizedStandard(PeriodType.time())));
 
                             if(total > 0){
                                 itinerario.setTarifaTrecho(total);
@@ -747,13 +751,13 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                     }
 
                                     if(pi.getTempoSeguinte() != null){
-                                        String tempo = DateTimeFormat.forPattern("HH:mm").print(pi.getTempoSeguinte().getMillis());
+                                        String tempo = DateTimeFormat.forPattern("HH:mm:ss").print(pi.getTempoSeguinte().getMillis());
                                         period = period.plus(parser.parsePeriod(tempo));
                                     }
 
                                 }
 
-                                tempoTotal = DateTimeFormat.forPattern("HH:mm").parseDateTime(printer.print(period.normalizedStandard(PeriodType.time())));
+                                tempoTotal = DateTimeFormat.forPattern("HH:mm:ss").parseDateTime(printer.print(period.normalizedStandard(PeriodType.time())));
 
                                 if(total > 0){
                                     itinerario.setTarifaTrecho(total);
@@ -871,7 +875,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                                 if(itinerarioAnterior != null){
                                     String proximoHorario = itinerarioAnterior.getProximoHorario();
-                                    String tempo = DateTimeFormat.forPattern("HH:mm").print(itinerarioAnterior.getItinerario().getTempo().getMillis());
+                                    String tempo = DateTimeFormat.forPattern("HH:mm:ss").print(itinerarioAnterior.getItinerario().getTempo().getMillis());
 
                                     period = period.plus(parser.parsePeriod(proximoHorario));
                                     period = period.plus(parser.parsePeriod(tempo));
@@ -923,13 +927,13 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                             }
 
                                             if(pi.getTempoSeguinte() != null){
-                                                String tempo = DateTimeFormat.forPattern("HH:mm").print(pi.getTempoSeguinte().getMillis());
+                                                String tempo = DateTimeFormat.forPattern("HH:mm:ss").print(pi.getTempoSeguinte().getMillis());
                                                 per = per.plus(parser.parsePeriod(tempo));
                                             }
 
                                         }
 
-                                        tempoTotal = DateTimeFormat.forPattern("HH:mm").parseDateTime(printer.print(per.normalizedStandard(PeriodType.time())));
+                                        tempoTotal = DateTimeFormat.forPattern("HH:mm:ss").parseDateTime(printer.print(per.normalizedStandard(PeriodType.time())));
 
                                         if(total > 0){
                                             itinerario.setTarifaTrecho(total);
@@ -990,13 +994,13 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                                 }
 
                                                 if(pi.getTempoSeguinte() != null){
-                                                    String tempo = DateTimeFormat.forPattern("HH:mm").print(pi.getTempoSeguinte().getMillis());
+                                                    String tempo = DateTimeFormat.forPattern("HH:mm:ss").print(pi.getTempoSeguinte().getMillis());
                                                     per = per.plus(parser.parsePeriod(tempo));
                                                 }
 
                                             }
 
-                                            tempoTotal = DateTimeFormat.forPattern("HH:mm").parseDateTime(printer.print(per.normalizedStandard(PeriodType.time())));
+                                            tempoTotal = DateTimeFormat.forPattern("HH:mm:ss").parseDateTime(printer.print(per.normalizedStandard(PeriodType.time())));
 
                                             if(total > 0){
                                                 itinerario.setTarifaTrecho(total);

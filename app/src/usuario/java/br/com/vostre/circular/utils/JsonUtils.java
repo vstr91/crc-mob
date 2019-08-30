@@ -27,7 +27,7 @@ public class JsonUtils {
         @Override
         public JsonElement serialize(DateTime src, Type typeOfSrc, JsonSerializationContext
                 context) {
-            return src == null ? null : new JsonPrimitive(DateTimeFormat.forPattern("dd-MM-yyyy HH:mm").print(src));
+            return src == null ? null : new JsonPrimitive(DateTimeFormat.forPattern("dd-MM-yyyy HH:mm:ss").print(src));
         }
     };
 
@@ -39,7 +39,7 @@ public class JsonUtils {
             try{
                 Long.parseLong(json.getAsString());
             } catch (NumberFormatException e){
-                return DateTimeFormat.forPattern("dd-MM-yyyy HH:mm").parseDateTime(json.getAsString());
+                return DateTimeFormat.forPattern("dd-MM-yyyy HH:mm:ss").parseDateTime(json.getAsString());
             }
 
             return json == null ? null : new DateTime(json.getAsLong());

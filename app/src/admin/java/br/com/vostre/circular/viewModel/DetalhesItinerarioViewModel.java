@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Context;
 import android.database.Observable;
 import android.databinding.ObservableField;
 import android.location.Location;
@@ -21,7 +22,15 @@ import org.joda.time.format.DateTimeFormat;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.bonuspack.kml.KmlDocument;
+import org.osmdroid.bonuspack.routing.OSRMRoadManager;
+import org.osmdroid.bonuspack.routing.Road;
+import org.osmdroid.bonuspack.routing.RoadManager;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Polyline;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -512,5 +521,51 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
             }
         });
     }
+
+    public void carregaDirections(MapView map, List<ParadaBairro> paradas) {
+
+        new directionsAsyncTask(map, paradas, getApplication().getApplicationContext()).execute();
+    }
+
+    private static class directionsAsyncTask extends AsyncTask<String, Void, Void> {
+
+        MapView map;
+        List<ParadaBairro> paradas;
+        Polyline rota;
+        Context ctx;
+
+        directionsAsyncTask(MapView map, List<ParadaBairro> paradas, Context ctx) {
+            this.map = map;
+            this.paradas = paradas;
+            this.ctx = ctx;
+        }
+
+        @Override
+        protected Void doInBackground(final String... params) {
+            RoadManager roadManager = new OSRMRoadManager(ctx);
+
+            ArrayList<GeoPoint> points = new ArrayList<>();
+            points.add(new GeoPoint(paradas.get(0).getParada().getLatitude(), paradas.get(0).getParada().getLongitude()));
+            points.add(new GeoPoint(paradas.get(paradas.size()-1).getParada().getLatitude(), paradas.get(paradas.size()-1).getParada().getLongitude()));
+
+            Road road = roadManager.getRoad(points);
+            rota = RoadManager.buildRoadOverlay(road);
+
+            KmlDocument kml = new KmlDocument();
+            kml.mKmlRoot.addOverlay(rota, kml);
+            File localFile = kml.getDefaultPathForAndroid("kml_teste.kml");
+            kml.saveAsKML(localFile);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            map.getOverlays().add(rota);
+            map.invalidate();
+        }
+    }
+
 
 }

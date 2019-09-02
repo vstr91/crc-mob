@@ -467,6 +467,8 @@ public class DetalhesItinerarioActivity extends BaseActivity {
             map.getOverlays().add(overlayEvents);
             atualizarParadasMapa(paradas);
 
+            //viewModel.carregaDirections(map, paradas);
+
 //            List<Overlay> ov = map.getOverlays().;
 //            System.out.println(ov.size());
         }
@@ -483,7 +485,7 @@ public class DetalhesItinerarioActivity extends BaseActivity {
     Observer<List<HistoricoItinerario>> historicoItinerarioObserver = new Observer<List<HistoricoItinerario>>() {
         @Override
         public void onChanged(List<HistoricoItinerario> historico) {
-            System.out.println(historico);
+            //System.out.println(historico);
         }
     };
 

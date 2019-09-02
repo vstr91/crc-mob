@@ -72,9 +72,10 @@ public interface HorarioItinerarioDAO {
             "horario h ON h.id = hi.horario " +
             "WHERE i.ativo = 1 AND hi.ativo = 1 AND (domingo = 1 OR segunda = 1 OR terca = 1 OR quarta = 1 OR quinta = 1 OR sexta = 1 OR sabado = 1) AND pp.id <> pd.id " +
             "AND pi.ordem < pi2.ordem " +
+            "AND pi.ativo = 1 AND pi2.ativo = 1 " +
             "AND (pi.destaque = 1 OR pi.ordem = 1) " +
             "AND (pi2.destaque = 1 OR pi2.ordem = " +
-            "                 (SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = i.id))" +
+            "                 (SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = i.id)) " +
             "AND bp.id = :partida AND bd.id = :destino ORDER BY h.nome")
     List<HorarioItinerarioNome> listarApenasAtivosPorPartidaEDestinoSync(String partida, String destino);
 
@@ -90,8 +91,8 @@ public interface HorarioItinerarioDAO {
             "WHERE h.ativo = 1 AND (domingo = 1 OR segunda = 1 OR terca = 1 OR quarta = 1 OR quinta = 1 OR sexta = 1 OR sabado = 1) " +
             "AND hi.ativo = 1 AND hi.itinerario IN (SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada WHERE itinerario IN " +
             "(SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada " +
-            "WHERE p.bairro = (SELECT b.id FROM parada p INNER JOIN bairro b ON b.id = p.bairro WHERE b.id = :partida) AND pi.ordem = 1)" +
-            " AND p.bairro = (SELECT b.id FROM parada p INNER JOIN bairro b ON b.id = p.bairro WHERE b.id = :destino) AND pi.ordem > 1) " +
+            "WHERE p.bairro = (SELECT b.id FROM parada p INNER JOIN bairro b ON b.id = p.bairro WHERE b.id = :partida) AND pi.ordem = 1 AND pi.ativo = 1)" +
+            " AND p.bairro = (SELECT b.id FROM parada p INNER JOIN bairro b ON b.id = p.bairro WHERE b.id = :destino) AND pi.ordem > 1 AND pi.ativo = 1) " +
             "AND hi.itinerario <> :itinerarioARemover " +
             "ORDER BY h.nome")
     List<HorarioItinerarioNome> listarApenasAtivosPorPartidaEDestinoFiltradoSync(String partida, String destino, String itinerarioARemover);

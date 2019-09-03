@@ -72,8 +72,8 @@ public class ItinerariosViewModel extends AndroidViewModel {
     public boolean partidaEscolhida = false;
     public boolean destinoEscolhido = false;
 
-    BairroCidade myPartida = null;
-    BairroCidade myDestino = null;
+    public BairroCidade myPartida = null;
+    public BairroCidade myDestino = null;
 
     public LiveData<ItinerarioPartidaDestino> itinerarioResultado;
 
@@ -417,7 +417,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                 Period period = Period.ZERO;
 
                                 if(itinerarioAnterior != null){
-                                    String proximoHorario = itinerarioAnterior.getProximoHorario();
+                                    String proximoHorario = itinerarioAnterior.getProximoHorario()+":00";
                                     String tempo = DateTimeFormat.forPattern("HH:mm:ss").print(itinerarioAnterior.getItinerario().getTempo().getMillis());
 
                                     period = period.plus(parser.parsePeriod(proximoHorario));
@@ -877,7 +877,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                     String proximoHorario = itinerarioAnterior.getProximoHorario();
                                     String tempo = DateTimeFormat.forPattern("HH:mm:ss").print(itinerarioAnterior.getItinerario().getTempo().getMillis());
 
-                                    period = period.plus(parser.parsePeriod(proximoHorario));
+                                    period = period.plus(parser.parsePeriod(proximoHorario+":00"));
                                     period = period.plus(parser.parsePeriod(tempo));
 
                                     hora = printer.print(period.normalizedStandard(PeriodType.time()));

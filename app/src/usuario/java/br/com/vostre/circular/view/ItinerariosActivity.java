@@ -219,6 +219,9 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         String diaSeguinte = DataHoraUtils.getDiaSeguinte();
         String diaAnterior = DataHoraUtils.getDiaAnterior();
 
+        viewModel.myPartida = bairroPartida;
+        viewModel.myDestino = bairroDestino;
+
         viewModel.carregaResultadoInvertido(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte, diaAnterior);
 
         geraModalLoading();
@@ -551,6 +554,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
             viewModel.bairroPartida.observe(this, bairroObserver);
             viewModel.partidaEscolhida = true;
         } else{
+            //viewModel.setBairroPartida(bairroPartida);
             viewModel.setBairroDestino(bairroCidade);
             bairroDestino = bairroCidade;
             viewModel.bairroDestino.observe(this, bairroDestinoObserver);

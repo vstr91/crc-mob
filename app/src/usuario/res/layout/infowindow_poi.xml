@@ -36,7 +36,7 @@
             android:id="@+id/textViewReferencia"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="#55333333"
+            android:background="#77333333"
             android:padding="5dp"
             android:text="@{poi.nome}"
             android:textAppearance="@style/texto_branco"

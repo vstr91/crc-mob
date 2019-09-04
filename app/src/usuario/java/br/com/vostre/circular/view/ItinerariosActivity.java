@@ -532,6 +532,10 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         Bundle bundle = new Bundle();
         bundle.putString("cidade", id);
 
+        if(bairroPartida != null){
+            formBairro.setBairroPartida(bairroPartida);
+        }
+
         formBairro.setArguments(bundle);
         formBairro.setCtx(ctx.getApplication());
         formBairro.setListener(this);

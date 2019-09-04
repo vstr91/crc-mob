@@ -107,7 +107,14 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
     public void setCidadeDestino(CidadeEstado cidadeDestino) {
         this.cidadeDestino = cidadeDestino;
-        bairrosDestino = appDatabase.bairroDAO().listarTodosAtivosComCidadePorCidadeFiltro(cidadeDestino.getCidade().getId(), bairroPartida.getValue().getBairro().getId());
+
+        if(this.bairroPartida.getValue() == null){
+            bairrosDestino = appDatabase.bairroDAO().listarTodosAtivosComCidadePorCidadeFiltro(cidadeDestino.getCidade().getId(), myPartida.getBairro().getId());
+        } else{
+            bairrosDestino = appDatabase.bairroDAO().listarTodosAtivosComCidadePorCidadeFiltro(cidadeDestino.getCidade().getId(), bairroPartida.getValue().getBairro().getId());
+        }
+
+
     }
 
     public LiveData<BairroCidade> getBairroDestino() {
@@ -123,7 +130,11 @@ public class ItinerariosViewModel extends AndroidViewModel {
     }
 
     public void setBairroPartida(BairroCidade umBairroPartida) {
-        this.bairroPartida = appDatabase.bairroDAO().carregar(umBairroPartida.getBairro().getId());
+
+        if(this.bairroPartida.getValue() == null || this.bairroPartida.getValue().getBairro().getId() != umBairroPartida.getBairro().getId()){
+            this.bairroPartida = appDatabase.bairroDAO().carregar(umBairroPartida.getBairro().getId());
+        }
+
         this.cidadesDestino = appDatabase.cidadeDAO().listarTodosAtivasComEstadoFiltro(umBairroPartida.getBairro().getId());
     }
 
@@ -161,8 +172,16 @@ public class ItinerariosViewModel extends AndroidViewModel {
     public void carregaResultado(final String horaEscolhida, final String dia, final String diaSeguinte,
                                  final String diaAnterior, boolean inversao){
 
-        if(!inversao){
+//        if(!inversao){
+//            myPartida = bairroPartida.getValue();
+//            myDestino = bairroDestino.getValue();
+//        }
+
+        if(bairroPartida.getValue() != null){
             myPartida = bairroPartida.getValue();
+        }
+
+        if(bairroDestino.getValue() != null){
             myDestino = bairroDestino.getValue();
         }
 
@@ -389,7 +408,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                     Algorithm.SearchResult result = Hipster.createDijkstra(p).search(myDestino.getBairro().getId());
 
-                    System.out.println("RES: "+result);
+                    //System.out.println("RES: "+result);
 
                     List<List> caminhos = result.getOptimalPaths();
 
@@ -418,7 +437,16 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                                 if(itinerarioAnterior != null){
                                     String proximoHorario = itinerarioAnterior.getProximoHorario()+":00";
-                                    String tempo = DateTimeFormat.forPattern("HH:mm:ss").print(itinerarioAnterior.getItinerario().getTempo().getMillis());
+
+                                    String tempo = "";
+
+                                    if(itinerarioAnterior.getTempoTrecho() != null){
+                                        tempo = DateTimeFormat.forPattern("HH:mm:ss").print(itinerarioAnterior.getTempoTrecho().getMillis());
+                                    } else{
+                                        tempo = DateTimeFormat.forPattern("HH:mm:ss").print(itinerarioAnterior.getItinerario().getTempo().getMillis());
+                                    }
+
+//                                    String tempo = DateTimeFormat.forPattern("HH:mm:ss").print(itinerarioAnterior.getItinerario().getTempo().getMillis());
 
                                     period = period.plus(parser.parsePeriod(proximoHorario));
                                     period = period.plus(parser.parsePeriod(tempo));
@@ -617,9 +645,12 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
     public void carregaResultadoInvertido(final String horaEscolhida, final String dia, final String diaSeguinte, final String diaAnterior){
 
-        final BairroCidade bairro = myPartida;
-        myPartida = myDestino;
-        myDestino = bairro;
+//        final BairroCidade bairro = myPartida;
+//        myPartida = myDestino;
+//        myDestino = bairro;
+
+        setBairroPartida(myPartida);
+        setBairroDestino(myDestino);
 
         AsyncTask.execute(new Runnable() {
             @Override
@@ -875,7 +906,14 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                                 if(itinerarioAnterior != null){
                                     String proximoHorario = itinerarioAnterior.getProximoHorario();
-                                    String tempo = DateTimeFormat.forPattern("HH:mm:ss").print(itinerarioAnterior.getItinerario().getTempo().getMillis());
+
+                                    String tempo = "";
+
+                                    if(itinerarioAnterior.getTempoTrecho() != null){
+                                        tempo = DateTimeFormat.forPattern("HH:mm:ss").print(itinerarioAnterior.getTempoTrecho().getMillis());
+                                    } else{
+                                        tempo = DateTimeFormat.forPattern("HH:mm:ss").print(itinerarioAnterior.getItinerario().getTempo().getMillis());
+                                    }
 
                                     period = period.plus(parser.parsePeriod(proximoHorario+":00"));
                                     period = period.plus(parser.parsePeriod(tempo));

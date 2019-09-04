@@ -75,7 +75,7 @@ public interface HorarioItinerarioDAO {
             "AND pi.ativo = 1 AND pi2.ativo = 1 " +
             "AND (pi.destaque = 1 OR pi.ordem = 1) " +
             "AND (pi2.destaque = 1 OR pi2.ordem = " +
-            "                 (SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = i.id)) " +
+            "                 (SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = i.id AND pi3.ativo = 1)) " +
             "AND bp.id = :partida AND bd.id = :destino ORDER BY h.nome")
     List<HorarioItinerarioNome> listarApenasAtivosPorPartidaEDestinoSync(String partida, String destino);
 
@@ -132,7 +132,7 @@ public interface HorarioItinerarioDAO {
             " AND pd.bairro = :destino" +
             " AND pi2.ordem > pi.ordem " +
             " AND (pi.destaque = 1 OR pi.ordem = 1)" +
-            " AND (pi2.destaque = 1 OR pi2.ordem = (SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = i.id)) " +
+            " AND (pi2.destaque = 1 OR pi2.ordem = (SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = i.id AND pi3.ativo = 1)) " +
             "ORDER BY h.nome")
     List<ItinerarioPartidaDestino> contaItinerariosPorPartidaEDestinoSync(String partida, String destino);
 
@@ -167,8 +167,8 @@ public interface HorarioItinerarioDAO {
             "INNER JOIN horario h ON h.id = hi.horario WHERE itinerario IN (SELECT pi.itinerario " +
             "FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada WHERE itinerario IN " +
             "(SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada " +
-            "WHERE p.bairro = :idPartida AND pi.ordem = 1) " +
-            "AND p.bairro = :idDestino AND pi.ordem > 1) " +
+            "WHERE p.bairro = :idPartida AND pi.ordem = 1 AND pi.ativo = 1) " +
+            "AND p.bairro = :idDestino AND pi.ordem > 1 AND pi.ativo = 1) " +
             "AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= :hora AND hi.ativo = 1 " +
             " ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1")
     LiveData<HorarioItinerarioNome> carregarProximoPorPartidaEDestino(String idPartida, String idDestino,
@@ -189,8 +189,8 @@ public interface HorarioItinerarioDAO {
             "INNER JOIN horario h ON h.id = hi.horario WHERE itinerario IN (SELECT pi.itinerario " +
             "FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada WHERE itinerario IN " +
             "(SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada " +
-            "WHERE p.bairro = :idPartida AND pi.ordem = 1) " +
-            "AND p.bairro = :idDestino AND pi.ordem > 1) " +
+            "WHERE p.bairro = :idPartida AND pi.ordem = 1 AND pi.ativo = 1) " +
+            "AND p.bairro = :idDestino AND pi.ordem > 1 AND pi.ativo = 1) " +
             "AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= :hora AND hi.ativo = 1 " +
             " ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1")
     LiveData<HorarioItinerarioNome> carregarPrimeiroPorPartidaEDestino(String idPartida, String idDestino,
@@ -200,8 +200,8 @@ public interface HorarioItinerarioDAO {
             "INNER JOIN horario h ON h.id = hi.horario WHERE itinerario IN (SELECT pi.itinerario " +
             "FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada WHERE itinerario IN " +
             "(SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada " +
-            "WHERE p.bairro = :idPartida AND pi.ordem = 1) " +
-            "AND p.bairro = :idDestino AND pi.ordem > 1) " +
+            "WHERE p.bairro = :idPartida AND pi.ordem = 1 AND pi.ativo = 1) " +
+            "AND p.bairro = :idDestino AND pi.ordem > 1 AND pi.ativo = 1) " +
             "AND TIME(h.nome/1000, 'unixepoch', 'localtime') > :hora AND hi.ativo = 1 " +
             " ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1")
     LiveData<HorarioItinerarioNome> carregarSeguintePorPartidaEDestino(String idPartida, String idDestino,
@@ -211,8 +211,8 @@ public interface HorarioItinerarioDAO {
             "INNER JOIN horario h ON h.id = hi.horario WHERE itinerario IN (SELECT pi.itinerario " +
             "FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada WHERE itinerario IN " +
             "(SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada " +
-            "WHERE p.bairro = :idPartida AND pi.ordem = 1) " +
-            "AND p.bairro = :idDestino AND pi.ordem > 1) " +
+            "WHERE p.bairro = :idPartida AND pi.ordem = 1 AND pi.ativo = 1) " +
+            "AND p.bairro = :idDestino AND pi.ordem > 1 AND pi.ativo = 1) " +
             "AND TIME(h.nome/1000, 'unixepoch', 'localtime') < :hora AND hi.ativo = 1 " +
             " ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1")
     LiveData<HorarioItinerarioNome> carregarAnteriorPorPartidaEDestino(String idPartida, String idDestino,

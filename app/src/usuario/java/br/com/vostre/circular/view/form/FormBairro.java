@@ -55,6 +55,16 @@ public class FormBairro extends FormBase implements SelectListener {
     CidadeEstado cidade;
     ItemListener listener;
 
+    BairroCidade bairroPartida;
+
+    public BairroCidade getBairroPartida() {
+        return bairroPartida;
+    }
+
+    public void setBairroPartida(BairroCidade bairroPartida) {
+        this.bairroPartida = bairroPartida;
+    }
+
     public ItemListener getListener() {
         return listener;
     }
@@ -119,6 +129,11 @@ public class FormBairro extends FormBase implements SelectListener {
                 adapter = new BairroAdapter(viewModel.bairros.getValue(), ctx.getApplicationContext());
                 //viewModel.escolhaAtual = 1;
             } else if(!viewModel.destinoEscolhido){
+
+                if(bairroPartida != null){
+                    viewModel.setBairroPartida(bairroPartida);
+                }
+
                 viewModel.setCidadeDestino(cidade);
                 viewModel.bairrosDestino.observe(this, bairrosObserver);
                 adapter = new BairroAdapter(viewModel.bairrosDestino.getValue(), ctx.getApplicationContext());

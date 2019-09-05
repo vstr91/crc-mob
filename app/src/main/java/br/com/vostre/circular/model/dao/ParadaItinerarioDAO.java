@@ -130,4 +130,7 @@ public interface ParadaItinerarioDAO {
     @Query("DELETE FROM parada_itinerario")
     void deletarTodos();
 
+    @Query("DELETE FROM parada_itinerario WHERE ativo = 0")
+    void deletarInativos();
+
 }

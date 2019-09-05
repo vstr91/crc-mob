@@ -82,4 +82,7 @@ public interface BairroDAO {
     @Query("DELETE FROM bairro")
     void deletarTodos();
 
+    @Query("DELETE FROM bairro WHERE ativo = 0")
+    void deletarInativos();
+
 }

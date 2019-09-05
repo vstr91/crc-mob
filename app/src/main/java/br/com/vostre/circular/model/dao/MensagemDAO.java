@@ -58,4 +58,7 @@ public interface MensagemDAO {
     @Query("DELETE FROM mensagem")
     void deletarTodos();
 
+    @Query("DELETE FROM mensagem WHERE ativo = 0")
+    void deletarInativos();
+
 }

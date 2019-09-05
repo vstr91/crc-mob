@@ -68,4 +68,7 @@ public interface PontoInteresseDAO {
     @Query("DELETE FROM ponto_interesse")
     void deletarTodos();
 
+    @Query("DELETE FROM ponto_interesse WHERE ativo = 0")
+    void deletarInativos();
+
 }

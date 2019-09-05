@@ -49,4 +49,7 @@ public interface TipoProblemaDAO {
     @Query("DELETE FROM tipo_problema")
     void deletarTodos();
 
+    @Query("DELETE FROM tipo_problema WHERE ativo = 0")
+    void deletarInativos();
+
 }

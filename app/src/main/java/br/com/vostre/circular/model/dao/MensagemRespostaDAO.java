@@ -46,4 +46,7 @@ public interface MensagemRespostaDAO {
     @Query("DELETE FROM mensagem_resposta")
     void deletarTodos();
 
+    @Query("DELETE FROM mensagem_resposta WHERE ativo = 0")
+    void deletarInativos();
+
 }

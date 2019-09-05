@@ -44,4 +44,7 @@ public interface HistoricoParadaDAO {
     @Query("DELETE FROM historico_parada")
     void deletarTodos();
 
+    @Query("DELETE FROM historico_parada WHERE ativo = 0")
+    void deletarInativos();
+
 }

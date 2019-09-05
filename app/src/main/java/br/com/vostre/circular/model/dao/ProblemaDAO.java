@@ -53,4 +53,7 @@ public interface ProblemaDAO {
     @Query("DELETE FROM problema")
     void deletarTodos();
 
+    @Query("DELETE FROM problema WHERE ativo = 0")
+    void deletarInativos();
+
 }

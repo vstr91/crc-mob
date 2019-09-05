@@ -60,4 +60,7 @@ public interface EmpresaDAO {
     @Query("DELETE FROM empresa")
     void deletarTodos();
 
+    @Query("DELETE FROM empresa WHERE ativo = 0")
+    void deletarInativos();
+
 }

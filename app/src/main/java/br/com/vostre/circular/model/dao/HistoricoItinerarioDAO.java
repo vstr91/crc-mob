@@ -44,4 +44,7 @@ public interface HistoricoItinerarioDAO {
     @Query("DELETE FROM historico_itinerario")
     void deletarTodos();
 
+    @Query("DELETE FROM historico_itinerario WHERE ativo = 0")
+    void deletarInativos();
+
 }

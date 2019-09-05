@@ -490,6 +490,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 e.printStackTrace();
             }
 
+            final String idFinal = id;
 
             Call<String> call = api.recebeDados(token, data, id);
             call.enqueue(new Callback<String>() {
@@ -505,7 +506,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         requisitaToken(parametroInterno.getIdentificadorUnico(), 1);
                         System.out.println("URL: "+call.request().url().url().toString());
                         System.out.println("RESPONSE: "+response);
-                        processaJson(response);
+
+                        if(idFinal.equals("admin")){
+                            processaJson(response, true);
+                        } else{
+                            processaJson(response, false);
+                        }
+
+
                     } catch (JSONException e) {
 
                         //System.out.println("ERRO ACESSOS: "+e.getMessage());
@@ -561,7 +569,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
     }
 
-    private void processaJson(Response<String> response) throws JSONException {
+    private void processaJson(Response<String> response, final boolean admin) throws JSONException {
 
         String dados = response.body();
         //System.out.println("RESPON: "+response.body());
@@ -1230,6 +1238,18 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 }
 
+                if(!admin){
+
+                    AsyncTask.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            excluiRegistrosInativos();
+                        }
+                    });
+
+
+                }
+
                 Handler mainHandler = new Handler(Looper.getMainLooper());
 
                 Runnable runnable = new Runnable() {
@@ -1293,6 +1313,21 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             atualizaDataAcesso(response);
         }
 
+    }
+
+    private void excluiRegistrosInativos(){
+        System.out.println("===== EXCLUINDO INATIVOS =====");
+        appDatabase.paisDAO().deletarInativos();
+        appDatabase.estadoDAO().deletarInativos();
+        appDatabase.cidadeDAO().deletarInativos();
+        appDatabase.bairroDAO().deletarInativos();
+        appDatabase.horarioDAO().deletarInativos();
+        appDatabase.paradaDAO().deletarInativos();
+        appDatabase.itinerarioDAO().deletarInativos();
+        appDatabase.empresaDAO().deletarInativos();
+        appDatabase.paradaItinerarioDAO().deletarInativos();
+        appDatabase.horarioItinerarioDAO().deletarInativos();
+        appDatabase.pontoInteresseDAO().deletarInativos();
     }
 
     private void atualizaDataAcesso(Response response){
@@ -1395,7 +1430,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
              //System.out.println("JSON: "+json);
 
-            //System.out.println("PROBLEMAS A ENV: "+strParadasItinerarios);
+            System.out.println("PARADAS ENV: "+strParadasSugestoes);
+            System.out.println("POIS ENV: "+strPontosInteresseSugestoes);
             // EXPORTA ARQUIVO DE DADOS
             /*
             File caminho = Environment.getExternalStorageDirectory();

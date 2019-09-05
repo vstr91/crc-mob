@@ -96,4 +96,7 @@ public interface PontoInteresseSugestaoDAO {
     @Query("DELETE FROM ponto_interesse_sugestao WHERE status <> 0 AND usuario_cadastro = :id")
     void deletarTodosNaoPendentesPorUsuarioLogado(String id);
 
+    @Query("DELETE FROM ponto_interesse_sugestao WHERE ativo = 0")
+    void deletarInativos();
+
 }

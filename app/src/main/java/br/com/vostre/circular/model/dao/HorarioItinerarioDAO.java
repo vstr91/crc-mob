@@ -233,4 +233,7 @@ public interface HorarioItinerarioDAO {
     @Query("DELETE FROM horario_itinerario")
     void deletarTodos();
 
+    @Query("DELETE FROM horario_itinerario WHERE ativo = 0")
+    void deletarInativos();
+
 }

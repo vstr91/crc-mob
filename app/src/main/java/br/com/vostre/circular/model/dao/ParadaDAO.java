@@ -134,4 +134,7 @@ public interface ParadaDAO {
     @Query("DELETE FROM parada")
     void deletarTodos();
 
+    @Query("DELETE FROM parada WHERE ativo = 0")
+    void deletarInativos();
+
 }

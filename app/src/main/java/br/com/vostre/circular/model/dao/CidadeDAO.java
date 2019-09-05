@@ -86,4 +86,7 @@ public interface CidadeDAO {
     @Query("DELETE FROM cidade")
     void deletarTodos();
 
+    @Query("DELETE FROM cidade WHERE ativo = 0")
+    void deletarInativos();
+
 }

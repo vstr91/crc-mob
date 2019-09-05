@@ -550,4 +550,7 @@ public interface ItinerarioDAO {
     @Query("DELETE FROM itinerario")
     void deletarTodos();
 
+    @Query("DELETE FROM itinerario WHERE ativo = 0")
+    void deletarInativos();
+
 }

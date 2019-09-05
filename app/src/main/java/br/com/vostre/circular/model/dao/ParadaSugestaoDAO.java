@@ -99,4 +99,7 @@ public interface ParadaSugestaoDAO {
     @Query("DELETE FROM parada_sugestao WHERE status <> 0 AND usuario_cadastro = :id")
     void deletarTodosNaoPendentesPorUsuarioLogado(String id);
 
+    @Query("DELETE FROM parada_sugestao WHERE ativo = 0")
+    void deletarInativos();
+
 }

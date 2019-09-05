@@ -43,4 +43,7 @@ public interface UsuarioPreferenciaDAO {
     @Query("DELETE FROM usuario_preferencia")
     void deletarTodos();
 
+    @Query("DELETE FROM usuario_preferencia WHERE ativo = 0")
+    void deletarInativos();
+
 }

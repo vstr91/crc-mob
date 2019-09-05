@@ -80,4 +80,7 @@ public interface SecaoItinerarioDAO {
     @Query("DELETE FROM secao_itinerario")
     void deletarTodos();
 
+    @Query("DELETE FROM secao_itinerario WHERE ativo = 0")
+    void deletarInativos();
+
 }

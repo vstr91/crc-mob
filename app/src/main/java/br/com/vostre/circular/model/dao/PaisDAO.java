@@ -54,4 +54,7 @@ public interface PaisDAO {
     @Query("DELETE FROM pais")
     void deletarTodos();
 
+    @Query("DELETE FROM pais WHERE ativo = 0")
+    void deletarInativos();
+
 }

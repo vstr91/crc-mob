@@ -21,6 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TabHost;
@@ -151,6 +152,18 @@ public class ParadasSugeridasActivity extends BaseActivity {
         spec3.setIndicator("Rejeitadas");
         tabHost.addTab(spec3);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        boolean retorno = super.onCreateOptionsMenu(menu);
+
+        if(menu != null){
+            menu.getItem(0).setVisible(false);
+        }
+
+        return retorno;
     }
 
     @Override

@@ -51,4 +51,7 @@ public interface UsuarioDAO {
     @Query("DELETE FROM usuario")
     void deletarTodos();
 
+    @Query("DELETE FROM usuario WHERE ativo = 0")
+    void deletarInativos();
+
 }

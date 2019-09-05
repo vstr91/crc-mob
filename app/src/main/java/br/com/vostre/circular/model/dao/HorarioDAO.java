@@ -54,4 +54,7 @@ public interface HorarioDAO {
     @Query("DELETE FROM horario")
     void deletarTodos();
 
+    @Query("DELETE FROM horario WHERE ativo = 0")
+    void deletarInativos();
+
 }

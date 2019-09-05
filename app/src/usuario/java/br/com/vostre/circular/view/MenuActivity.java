@@ -1026,16 +1026,18 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     private void geraAvisoAjuda() {
         if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_ajuda")){
 
-            DestaqueUtils.geraDestaqueUnico(ctx, menu.getItem(0).getActionView().findViewById(R.id.imageButtonAjuda), "Opção de Ajuda!",
-                    "Bateu aquela dúvida na hora de utilizar o aplicativo? Não se preocupe! Pressione aqui e o " +
-                            "sistema mostrará as principais ações da tela que estiver aberta!", new TapTargetView.Listener(){
-                        @Override
-                        public void onTargetClick(TapTargetView view) {
-                            super.onTargetClick(view);
-                        }
-                    }, true, false);
+            if(menu != null){
+                DestaqueUtils.geraDestaqueUnico(ctx, menu.getItem(0).getActionView().findViewById(R.id.imageButtonAjuda), "Opção de Ajuda!",
+                        "Bateu aquela dúvida na hora de utilizar o aplicativo? Não se preocupe! Pressione aqui e o " +
+                                "sistema mostrará as principais ações da tela que estiver aberta!", new TapTargetView.Listener(){
+                            @Override
+                            public void onTargetClick(TapTargetView view) {
+                                super.onTargetClick(view);
+                            }
+                        }, true, false);
 
-            PreferenceUtils.salvarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_ajuda", true);
+                PreferenceUtils.salvarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_ajuda", true);
+            }
 
         }
     }

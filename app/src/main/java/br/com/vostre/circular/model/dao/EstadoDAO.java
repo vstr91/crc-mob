@@ -51,4 +51,7 @@ public interface EstadoDAO {
     @Query("DELETE FROM estado")
     void deletarTodos();
 
+    @Query("DELETE FROM estado WHERE ativo = 0")
+    void deletarInativos();
+
 }

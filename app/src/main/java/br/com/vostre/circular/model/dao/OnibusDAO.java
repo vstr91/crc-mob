@@ -48,4 +48,7 @@ public interface OnibusDAO {
     @Query("DELETE FROM onibus")
     void deletarTodos();
 
+    @Query("DELETE FROM onibus WHERE ativo = 0")
+    void deletarInativos();
+
 }

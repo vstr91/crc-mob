@@ -55,4 +55,7 @@ public interface ParametroDAO {
     @Query("DELETE FROM parametro")
     void deletarTodos();
 
+    @Query("DELETE FROM parametro WHERE ativo = 0")
+    void deletarInativos();
+
 }

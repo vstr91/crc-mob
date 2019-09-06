@@ -158,7 +158,7 @@
                             android:layout_height="0dp"
                             android:layout_weight="1"
                             android:gravity="top"
-                            android:text="@{poi.nomeBairro}"
+                            android:text="@{poi.nomeBairro+` - `+poi.nomeCidade}"
                             android:textColor="@color/branco" />
                     </LinearLayout>
 

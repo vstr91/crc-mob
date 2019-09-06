@@ -1162,7 +1162,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "parada_itinerario pi ON pi.itinerario = i.id INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro bp ON bp.id = pp.bairro INNER JOIN parada_itinerario pi2 ON pi2.itinerario = i.id INNER JOIN " +
                 "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                "WHERE i.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem " +
+                "WHERE i.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND pi.ativo = 1 AND pi2.ativo = 1 " +
                 "AND ((pi.destaque = 1 OR pi.ordem = 1) AND (pi2.destaque = 1 " +
                 "OR pi2.ordem = (SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = i.id) )) " +
                 "AND bp.id = '" + bairroPartida + "' AND bd.id = '" + bairroDestino + "' ORDER BY i.id";
@@ -1196,7 +1196,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "               pi3.itinerario = pi4.itinerario " +
                 "               AND bd2.id = '"+bairroDestino+"') < COUNT(*)" +
                 "               FROM   parada_itinerario pi4 " +
-                "               WHERE  pi4.itinerario = i.id" +
+                "               WHERE  pi4.itinerario = i.id AND pi4.ativo = 1" +
                 "            ) OR " +
                 "            (" +
                 "               SELECT (SELECT pi3.ordem " +
@@ -1209,7 +1209,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "               pi3.itinerario = pi4.itinerario " +
                 "               AND bd2.id = '"+bairroPartida+"') > 1 " +
                 "               FROM   parada_itinerario pi4 " +
-                "               WHERE  pi4.itinerario = i.id" +
+                "               WHERE  pi4.itinerario = i.id AND pi4.ativo = 1" +
                 "            )" +
                 "        ) AS 'flagTrecho',  " +
 
@@ -1219,7 +1219,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "bairro bp ON bp.id = pp.bairro INNER JOIN " +
                 "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
                 "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem = pi2.ordem-1 AND i2.id = i.id " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem = pi2.ordem-1 AND pi.ativo = 1 AND pi2.ativo = 1 AND i2.id = i.id " +
                 "AND bp.id = '"+bairroPartida+"' " +
                 "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'distanciaTrecho', " +
 
@@ -1229,7 +1229,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "bairro bp ON bp.id = pp.bairro INNER JOIN " +
                 "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
                 "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem = pi2.ordem-1 AND i2.id = i.id " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem = pi2.ordem-1 AND pi.ativo = 1 AND pi2.ativo = 1 AND i2.id = i.id " +
                 "AND bp.id = '"+bairroPartida+"' " +
                 "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'tempoTrecho', " +
 
@@ -1239,7 +1239,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "bairro bp ON bp.id = pp.bairro INNER JOIN " +
                 "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
                 "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND pi.ativo = 1 AND pi2.ativo = 1 AND i2.id = i.id " +
                 "AND bp.id = '"+bairroPartida+"' " +
                 "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id, pi.ordem) AS 'paradaPartida', " +
 
@@ -1248,7 +1248,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "parada pp ON pp.id = pi.parada INNER JOIN bairro bp ON bp.id = pp.bairro INNER JOIN " +
                 "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
                 "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND pi.ativo = 1 AND pi2.ativo = 1 AND i2.id = i.id " +
                 "AND bp.id = '"+bairroPartida+"' " +
                 "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id ASC, pi2.ordem DESC) AS 'paradaDestino', " +
 
@@ -1335,34 +1335,34 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "ORDER BY h2.nome LIMIT 1 ) ) AS observacaoHorarioSeguinte, " +
 
                 "( SELECT pp.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
-                "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-                "AND pi.itinerario = i.id ) AS 'idPartida', " +
+                "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1 ) " +
+                "AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'idPartida', " +
                 "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
-                "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-                "AND pi.itinerario = i.id ) AS 'nomePartida', " +
+                "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1 ) " +
+                "AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'nomePartida', " +
                 "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
                 "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'nomeDestino', " +
+                "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'nomeDestino', " +
                 "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'idBairroPartida', " +
+                "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'idBairroPartida', " +
                 "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'idBairroDestino', " +
+                "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'idBairroDestino', " +
                 "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'bairroPartida', " +
+                "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'bairroPartida', " +
                 "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'bairroDestino', " +
+                "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'bairroDestino', " +
                 "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
                 "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'cidadePartida', " +
+                "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'cidadePartida', " +
                 "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
-                "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-                "AND pi.itinerario = i.id ) AS 'cidadeDestino' " +
+                "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1 ) " +
+                "AND pi.itinerario = i.id AND pi.ativo = 1      ) AS 'cidadeDestino' " +
                 "FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario INNER JOIN " +
                 "itinerario i ON i.id = hi.itinerario INNER JOIN empresa e ON e.id = i.empresa " +
                 "WHERE hi.itinerario IN ('" + itinerariosDisponiveis + "') AND " + dia + " = 1 " +
@@ -1378,7 +1378,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "bairro bp ON bp.id = pp.bairro INNER JOIN " +
                 "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
                 "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem = pi2.ordem-1 AND i2.id = i.id " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem = pi2.ordem-1 AND pi.ativo = 1 AND pi2.ativo = 1 AND i2.id = i.id " +
                 "AND bp.id = '"+bairroPartida+"' " +
                 "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'tarifaTrecho', " +
 
@@ -1394,7 +1394,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "               pi3.itinerario = pi4.itinerario " +
                 "               AND bd2.id = '"+bairroDestino+"') < COUNT(*)" +
                 "               FROM   parada_itinerario pi4 " +
-                "               WHERE  pi4.itinerario = i.id" +
+                "               WHERE  pi4.itinerario = i.id AND pi4.ativo = 1" +
                 "            ) OR " +
                 "            (" +
                 "               SELECT (SELECT pi3.ordem " +
@@ -1407,7 +1407,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "               pi3.itinerario = pi4.itinerario " +
                 "               AND bd2.id = '"+bairroPartida+"') > 1 " +
                 "               FROM   parada_itinerario pi4 " +
-                "               WHERE  pi4.itinerario = i.id" +
+                "               WHERE  pi4.itinerario = i.id AND pi4.ativo = 1" +
                 "            )" +
                 "        ) AS 'flagTrecho',  " +
 
@@ -1417,7 +1417,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "bairro bp ON bp.id = pp.bairro INNER JOIN " +
                 "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
                 "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem = pi2.ordem-1 AND i2.id = i.id " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem = pi2.ordem-1 AND pi.ativo = 1 AND pi2.ativo = 1 AND i2.id = i.id " +
                 "AND bp.id = '"+bairroPartida+"' " +
                 "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'distanciaTrecho', " +
 
@@ -1427,7 +1427,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "bairro bp ON bp.id = pp.bairro INNER JOIN " +
                 "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
                 "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem = pi2.ordem-1 AND i2.id = i.id " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem = pi2.ordem-1 AND pi.ativo = 1 AND pi2.ativo = 1 AND i2.id = i.id " +
                 "AND bp.id = '"+bairroPartida+"' " +
                 "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'tempoTrecho', " +
 
@@ -1437,7 +1437,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "bairro bp ON bp.id = pp.bairro INNER JOIN " +
                 "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
                 "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND pi.ativo = 1 AND pi2.ativo = 1 AND i2.id = i.id " +
                 "AND bp.id = '"+bairroPartida+"' " +
                 "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'paradaPartida', " +
 
@@ -1446,7 +1446,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "parada pp ON pp.id = pi.parada INNER JOIN bairro bp ON bp.id = pp.bairro INNER JOIN " +
                 "parada_itinerario pi2 ON pi2.itinerario = i2.id INNER JOIN " +
                 "parada pd ON pd.id = pi2.parada INNER JOIN bairro bd ON bd.id = pd.bairro " +
-                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND i2.id = i.id " +
+                "WHERE i2.ativo = 1 AND pp.id <> pd.id AND pi.ordem < pi2.ordem AND pi.ativo = 1 AND pi2.ativo = 1 AND i2.id = i.id " +
                 "AND bp.id = '"+bairroPartida+"' " +
                 "AND bd.id = '"+bairroDestino+"' ORDER BY i2.id) AS 'paradaDestino', " +
 
@@ -1533,34 +1533,34 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "ORDER BY h2.nome LIMIT 1 ) ) AS observacaoHorarioSeguinte, " +
 
                 "( SELECT pp.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
-                "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-                "AND pi.itinerario = i.id ) AS 'idPartida', " +
+                "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1 ) " +
+                "AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'idPartida', " +
                 "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
-                "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-                "AND pi.itinerario = i.id ) AS 'nomePartida', " +
+                "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1 ) " +
+                "AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'nomePartida', " +
                 "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
                 "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'nomeDestino', " +
+                "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'nomeDestino', " +
                 "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'idBairroPartida', " +
+                "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'idBairroPartida', " +
                 "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'idBairroDestino', " +
+                "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'idBairroDestino', " +
                 "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'bairroPartida', " +
+                "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'bairroPartida', " +
                 "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'bairroDestino', " +
+                "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'bairroDestino', " +
                 "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
                 "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                "WHERE itinerario = i.id ) AND pi.itinerario = i.id ) AS 'cidadePartida', " +
+                "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'cidadePartida', " +
                 "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
-                "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id ) " +
-                "AND pi.itinerario = i.id ) AS 'cidadeDestino' " +
+                "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1 ) " +
+                "AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'cidadeDestino' " +
                 "FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario INNER JOIN " +
                 "itinerario i ON i.id = hi.itinerario INNER JOIN empresa e ON e.id = i.empresa " +
                 "WHERE hi.itinerario IN ('" + itinerariosDisponiveis + "') AND " + diaAt + " = 1 ORDER BY proximoHorario LIMIT 1";

@@ -203,6 +203,7 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
                     mFirebaseAnalytics.logEvent("paradas_consultadas", bundle);
                 }
 
+                binding.imageButton.setVisibility(View.VISIBLE);
 
             }
 

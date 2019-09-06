@@ -1074,6 +1074,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         parada.setImagemEnviada(true);
 
                         lstParadas.add(parada);
+                        System.out.println("SUGESTOES PARADA: "+parada.getNome()+" - "+parada.getObservacao());
 
                         if(parada.getImagem() != null && !parada.getImagem().isEmpty()){
                             File imagem = new File(getContext().getApplicationContext().getFilesDir(), parada.getImagem());
@@ -1107,6 +1108,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         poi.setImagemEnviada(true);
 
                         lstPois.add(poi);
+                        System.out.println("SUGESTOES POI: "+poi.getNome()+" - "+poi.getObservacao());
 
                         if(poi.getImagem() != null && !poi.getImagem().isEmpty()){
                             File imagem = new File(getContext().getApplicationContext().getFilesDir(), poi.getImagem());

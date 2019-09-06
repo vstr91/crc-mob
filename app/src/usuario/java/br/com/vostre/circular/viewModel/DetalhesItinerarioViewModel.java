@@ -179,7 +179,7 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
                 System.out.println("TEMPO INICIAL ITI: "+iniIti);
 
                 qtdItinerarios = db.horarioItinerarioDAO()
-                        .contaItinerariosPorPartidaEDestinoSync(bairroPartida, bairroDestino);
+                        .contaItinerariosPorPartidaEDestinoSimplificadoSync(bairroPartida, bairroDestino);
 
                 Long finIti = System.nanoTime();
                 Long totIti = finIti - iniIti;

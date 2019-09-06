@@ -74,8 +74,8 @@ public interface HorarioItinerarioDAO {
             "AND pi.ordem < pi2.ordem " +
             "AND pi.ativo = 1 AND pi2.ativo = 1 " +
             "AND (pi.destaque = 1 OR pi.ordem = 1) " +
-            "AND (pi2.destaque = 1 OR pi2.ordem = " +
-            "                 (SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = i.id AND pi3.ativo = 1)) " +
+            "/*AND (pi2.destaque = 1 OR pi2.ordem = " +
+            "                 (SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = i.id AND pi3.ativo = 1))*/ " +
             "AND bp.id = :partida AND bd.id = :destino ORDER BY h.nome")
     List<HorarioItinerarioNome> listarApenasAtivosPorPartidaEDestinoSync(String partida, String destino);
 
@@ -107,21 +107,21 @@ public interface HorarioItinerarioDAO {
 
     @Query("SELECT DISTINCT i.*, " +
             "(SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
-            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'nomePartida', " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'nomePartida', " +
             "(SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
-            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'nomeDestino', " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'nomeDestino', " +
             "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
             "INNER JOIN bairro b ON b.id = pp.bairro WHERE pi.ordem = " +
-            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'bairroPartida', " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'bairroPartida', " +
             "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
             "INNER JOIN bairro b ON b.id = pp.bairro WHERE pi.ordem = " +
-            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'bairroDestino', " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'bairroDestino', " +
             "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
             "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
-            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'cidadePartida', " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'cidadePartida', " +
             "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
             "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
-            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id) AND pi.itinerario = i.id) AS 'cidadeDestino', " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'cidadeDestino', " +
             "'' AS nomeEmpresa " +
             "FROM horario h INNER JOIN horario_itinerario hi ON hi.horario = h.id INNER JOIN itinerario i ON i.id = hi.itinerario " +
             "INNER JOIN parada_itinerario pi ON pi.itinerario = i.id INNER JOIN parada_itinerario pi2 ON pi2.itinerario = i.id " +
@@ -132,9 +132,38 @@ public interface HorarioItinerarioDAO {
             " AND pd.bairro = :destino" +
             " AND pi2.ordem > pi.ordem " +
             " AND (pi.destaque = 1 OR pi.ordem = 1)" +
-            " AND (pi2.destaque = 1 OR pi2.ordem = (SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = i.id AND pi3.ativo = 1)) " +
+            " /*AND (pi2.destaque = 1 OR pi2.ordem = (SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = i.id AND pi3.ativo = 1))*/ " +
             "ORDER BY h.nome")
     List<ItinerarioPartidaDestino> contaItinerariosPorPartidaEDestinoSync(String partida, String destino);
+
+    @Query("SELECT DISTINCT i.id, i.observacao, " +
+            "'' AS 'nomePartida', " +
+            "'' AS 'nomeDestino', " +
+            "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'bairroPartida', " +
+            "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'bairroDestino', " +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'cidadePartida', " +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'cidadeDestino', " +
+            "'' AS nomeEmpresa " +
+            "FROM horario h INNER JOIN horario_itinerario hi ON hi.horario = h.id INNER JOIN itinerario i ON i.id = hi.itinerario " +
+            "INNER JOIN parada_itinerario pi ON pi.itinerario = i.id INNER JOIN parada_itinerario pi2 ON pi2.itinerario = i.id " +
+            "INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN parada pd ON pd.id = pi2.parada " +
+            "            WHERE h.ativo = 1 AND (domingo = 1 OR segunda = 1 OR terca = 1 OR quarta = 1 OR quinta = 1 OR sexta = 1 OR sabado = 1) " +
+            "            AND hi.ativo = 1 " +
+            " AND pp.bairro = :partida " +
+            " AND pd.bairro = :destino" +
+            " AND pi2.ordem > pi.ordem " +
+            " AND (pi.destaque = 1 OR pi.ordem = 1)" +
+            " /*AND (pi2.destaque = 1 OR pi2.ordem = (SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = i.id AND pi3.ativo = 1))*/ " +
+            "ORDER BY h.nome")
+    List<ItinerarioPartidaDestino> contaItinerariosPorPartidaEDestinoSimplificadoSync(String partida, String destino);
 
     @Query("SELECT hi.* FROM horario_itinerario hi WHERE hi.horario = :horario AND hi.itinerario = :itinerario")
     HorarioItinerario checaDuplicidade(String horario, String itinerario);

@@ -270,6 +270,12 @@ public class DetalhePontoInteresseActivity extends BaseActivity {
             poiLocation.setLatitude(pontoInteresse.getPontoInteresse().getLatitude());
             poiLocation.setLongitude(pontoInteresse.getPontoInteresse().getLongitude());
 
+            if(itinerarios.size() > 0){
+                binding.textViewListaVazia.setVisibility(View.GONE);
+            } else{
+                binding.textViewListaVazia.setVisibility(View.VISIBLE);
+            }
+
             for(ItinerarioPartidaDestino i : itinerarios){
                 Location paradaLocation = new Location(LocationManager.GPS_PROVIDER);
                 paradaLocation.setLatitude(i.getLatitudeParadaReferencia());

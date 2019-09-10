@@ -181,6 +181,9 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
 
                 bundle = new Bundle();
                 bundle.putString("cidade", cidade.getCidade().getNome());
+
+                binding.imageButton.setVisibility(View.VISIBLE);
+                binding.imageButton.setImageResource(R.drawable.ic_edit_blue_24dp);
             }
 
         }
@@ -202,8 +205,6 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
 
                     mFirebaseAnalytics.logEvent("paradas_consultadas", bundle);
                 }
-
-                binding.imageButton.setVisibility(View.VISIBLE);
 
             }
 

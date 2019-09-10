@@ -279,6 +279,22 @@ public class ItinerariosActivity extends BaseActivity {
 
     }
 
+    public void onClickZoomIn(View v){
+
+        if(mapController != null){
+            mapController.zoomTo(18, 1000L);
+        }
+
+    }
+
+    public void onClickZoomOut(View v){
+
+        if(mapController != null){
+            mapController.zoomTo(10, 1000L);
+        }
+
+    }
+
     public void onClickTarifas(View v){
         Intent i = new Intent(getApplicationContext(), TarifasActivity.class);
         startActivity(i);

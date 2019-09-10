@@ -504,8 +504,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     try {
                         requisitaToken(parametroInterno.getIdentificadorUnico(), 1);
-                        System.out.println("URL: "+call.request().url().url().toString());
-                        System.out.println("RESPONSE: "+response);
+                        //System.out.println("URL: "+call.request().url().url().toString());
+                        //System.out.println("RESPONSE: "+response);
 
                         if(idFinal.equals("admin")){
                             processaJson(response, true);
@@ -574,7 +574,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         String dados = response.body();
         //System.out.println("RESPON: "+response.body());
 
-        System.out.println(dados);
+        //System.out.println(dados);
 
         if(dados != null){
 
@@ -1063,7 +1063,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     int total = paradasSugestoes.length();
                     List<ParadaSugestao> lstParadas = new ArrayList<>();
 
-                    System.out.println("SUGESTOES: "+paradasSugestoes.toString());
+                    //System.out.println("SUGESTOES: "+paradasSugestoes.toString());
 
                     for(int i = 0; i < total; i++){
                         ParadaSugestao parada;
@@ -1074,7 +1074,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         parada.setImagemEnviada(true);
 
                         lstParadas.add(parada);
-                        System.out.println("SUGESTOES PARADA: "+parada.getNome()+" - "+parada.getObservacao());
+                        //System.out.println("SUGESTOES PARADA: "+parada.getNome()+" - "+parada.getObservacao());
 
                         if(parada.getImagem() != null && !parada.getImagem().isEmpty()){
                             File imagem = new File(getContext().getApplicationContext().getFilesDir(), parada.getImagem());
@@ -1097,7 +1097,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     int total = pontosInteresseSugestoes.length();
                     List<PontoInteresseSugestao> lstPois = new ArrayList<>();
 
-                    System.out.println("SUGESTOES POI: "+pontosInteresseSugestoes.toString());
+                    //System.out.println("SUGESTOES POI: "+pontosInteresseSugestoes.toString());
 
                     for(int i = 0; i < total; i++){
                         PontoInteresseSugestao poi;
@@ -1108,7 +1108,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         poi.setImagemEnviada(true);
 
                         lstPois.add(poi);
-                        System.out.println("SUGESTOES POI: "+poi.getNome()+" - "+poi.getObservacao());
+                        //System.out.println("SUGESTOES POI: "+poi.getNome()+" - "+poi.getObservacao());
 
                         if(poi.getImagem() != null && !poi.getImagem().isEmpty()){
                             File imagem = new File(getContext().getApplicationContext().getFilesDir(), poi.getImagem());
@@ -1214,7 +1214,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     int total = problemas.length();
                     List<Problema> lstProblemas = new ArrayList<>();
 
-                    System.out.println("PROBLEMAS: "+problemas.toString());
+                    //System.out.println("PROBLEMAS: "+problemas.toString());
 
                     for(int i = 0; i < total; i++){
                         Problema problema;
@@ -1318,7 +1318,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     }
 
     private void excluiRegistrosInativos(){
-        System.out.println("===== EXCLUINDO INATIVOS =====");
+        //System.out.println("===== EXCLUINDO INATIVOS =====");
         appDatabase.paisDAO().deletarInativos();
         appDatabase.estadoDAO().deletarInativos();
         appDatabase.cidadeDAO().deletarInativos();
@@ -1432,8 +1432,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
              //System.out.println("JSON: "+json);
 
-            System.out.println("PARADAS ENV: "+strParadasSugestoes);
-            System.out.println("POIS ENV: "+strPontosInteresseSugestoes);
+            //System.out.println("PARADAS ENV: "+strParadasSugestoes);
+            //System.out.println("POIS ENV: "+strPontosInteresseSugestoes);
             // EXPORTA ARQUIVO DE DADOS
             /*
             File caminho = Environment.getExternalStorageDirectory();

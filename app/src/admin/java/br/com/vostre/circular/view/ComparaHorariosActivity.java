@@ -68,8 +68,8 @@ public class ComparaHorariosActivity extends BaseActivity {
         viewModel.itinerario.observe(this, itinerarioObserver);
         viewModel.horariosAtuais.observe(this, horariosObserver);
 
-//        listHorariosProcessados = binding.listHorarios;
-//        listHorariosAtuais = binding.listHorariosAtuais;
+        listHorariosProcessados = binding.listHorarios;
+        listHorariosAtuais = binding.listHorariosAtuais;
 
         listHorariosAtuais.setAdapter(adapterAtuais);
 

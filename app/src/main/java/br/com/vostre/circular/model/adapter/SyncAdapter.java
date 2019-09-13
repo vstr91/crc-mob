@@ -16,6 +16,12 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.cloudinary.android.MediaManager;
+import com.cloudinary.android.UploadRequest;
+import com.cloudinary.android.callback.ErrorInfo;
+import com.cloudinary.android.callback.UploadCallback;
+import com.cloudinary.android.callback.UploadResult;
+import com.cloudinary.android.policy.TimeWindow;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -39,6 +45,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -150,6 +157,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
     boolean mostraToast;
     String CHANNEL_ID = "987";
+
+    static String IMAGE_BASE_URL = "https://res.cloudinary.com/";
 
     /**
      * Set up the sync adapter
@@ -1432,7 +1441,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
              //System.out.println("JSON: "+json);
 
-            //System.out.println("PARADAS ENV: "+strParadasSugestoes);
+            //System.out.println("POI ENV: "+strPontosInteresse);
             //System.out.println("POIS ENV: "+strPontosInteresseSugestoes);
             // EXPORTA ARQUIVO DE DADOS
             /*
@@ -1502,14 +1511,52 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(baseUrl)
-                    .addConverterFactory(ScalarsConverterFactory.create())
-                    .build();
+//            Retrofit retrofit = new Retrofit.Builder()
+//                    .baseUrl(baseUrl)
+//                    .addConverterFactory(ScalarsConverterFactory.create())
+//                    .build();
 
             for(final Cidade cidade : cidades){
 
                 File imagem = new File(getContext().getApplicationContext().getFilesDir(),  cidade.getBrasao());
+
+                imageUpload(imagem.getAbsolutePath(), new UploadCallback() {
+                    @Override
+                    public void onStart(String requestId) {
+                        //System.out.println("INICIANDO ENVIO IMG: "+requestId);
+                    }
+
+                    @Override
+                    public void onProgress(String requestId, long bytes, long totalBytes) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(String requestId, Map resultData) {
+                        cidade.setImagemEnviada(true);
+                        CidadesViewModel.edit(cidade, getContext().getApplicationContext());
+                    }
+
+                    @Override
+                    public void onError(String requestId, ErrorInfo error) {
+
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+error.getDescription()+" ("+error.getCode()+") ao enviar imagem de "+cidade.getNome()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        PreferenceUtils.gravaMostraToast(ctx, false);
+                        //System.out.println("ERRO ENVIO IMG: "+error.getDescription());
+                    }
+
+                    @Override
+                    public void onReschedule(String requestId, ErrorInfo error) {
+
+                    }
+                });
+
+                /*
 
                 RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
                 MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
@@ -1553,6 +1600,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     }
                 });
+                */
 
             }
 
@@ -1560,6 +1608,43 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 File imagem = new File(getContext().getApplicationContext().getFilesDir(),  empresa.getLogo());
 
+                imageUpload(imagem.getAbsolutePath(), new UploadCallback() {
+                    @Override
+                    public void onStart(String requestId) {
+                        //System.out.println("INICIANDO ENVIO IMG: "+requestId);
+                    }
+
+                    @Override
+                    public void onProgress(String requestId, long bytes, long totalBytes) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(String requestId, Map resultData) {
+                        empresa.setImagemEnviada(true);
+                        EmpresasViewModel.editEmpresa(empresa, getContext().getApplicationContext());
+                    }
+
+                    @Override
+                    public void onError(String requestId, ErrorInfo error) {
+
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+error.getDescription()+" ("+error.getCode()+") ao enviar imagem de "+empresa.getNome()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        PreferenceUtils.gravaMostraToast(ctx, false);
+                        //System.out.println("ERRO ENVIO IMG: "+error.getDescription());
+                    }
+
+                    @Override
+                    public void onReschedule(String requestId, ErrorInfo error) {
+
+                    }
+                });
+
+                /*
                 RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
                 MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
                 RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
@@ -1600,6 +1685,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     }
                 });
+                */
 
             }
 
@@ -1607,6 +1693,43 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 File imagem = new File(getContext().getApplicationContext().getFilesDir(),  parada.getImagem());
 
+                imageUpload(imagem.getAbsolutePath(), new UploadCallback() {
+                    @Override
+                    public void onStart(String requestId) {
+                        //System.out.println("INICIANDO ENVIO IMG: "+requestId);
+                    }
+
+                    @Override
+                    public void onProgress(String requestId, long bytes, long totalBytes) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(String requestId, Map resultData) {
+                        parada.setImagemEnviada(true);
+                        ParadasViewModel.edit(parada, getContext().getApplicationContext());
+                    }
+
+                    @Override
+                    public void onError(String requestId, ErrorInfo error) {
+
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+error.getDescription()+" ("+error.getCode()+") ao enviar imagem de "+parada.getNome()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        PreferenceUtils.gravaMostraToast(ctx, false);
+                        //System.out.println("ERRO ENVIO IMG: "+error.getDescription());
+                    }
+
+                    @Override
+                    public void onReschedule(String requestId, ErrorInfo error) {
+
+                    }
+                });
+
+                /*
                 RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
                 MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
                 RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
@@ -1643,12 +1766,49 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     }
                 });
+                */
 
             }
 
             for(final PontoInteresse pontoInteresse : pontosInteresse){
 
                 File imagem = new File(getContext().getApplicationContext().getFilesDir(),  pontoInteresse.getImagem());
+
+                imageUpload(imagem.getAbsolutePath(), new UploadCallback() {
+                    @Override
+                    public void onStart(String requestId) {
+                        //System.out.println("INICIANDO ENVIO IMG: "+requestId);
+                    }
+
+                    @Override
+                    public void onProgress(String requestId, long bytes, long totalBytes) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(String requestId, Map resultData) {
+                        pontoInteresse.setImagemEnviada(true);
+                        PontosInteresseViewModel.edit(pontoInteresse, getContext().getApplicationContext());
+                        //System.out.println("ENVIO IMG: "+resultData.keySet().toString());
+                    }
+
+                    @Override
+                    public void onError(String requestId, ErrorInfo error) {
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+error.getDescription()+" ("+error.getCode()+") ao enviar imagem de "+pontoInteresse.getNome()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        //System.out.println("ERRO ENVIO IMG: "+error.getDescription());
+                    }
+
+                    @Override
+                    public void onReschedule(String requestId, ErrorInfo error) {
+
+                    }
+                });
+
+                /*
 
                 RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
                 MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
@@ -1686,6 +1846,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     }
                 });
+                */
 
             }
 
@@ -1693,6 +1854,43 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 File imagem = new File(getContext().getApplicationContext().getFilesDir(),  paradaSugestao.getImagem());
 
+                imageUpload(imagem.getAbsolutePath(), new UploadCallback() {
+                    @Override
+                    public void onStart(String requestId) {
+                        //System.out.println("INICIANDO ENVIO IMG: "+requestId);
+                    }
+
+                    @Override
+                    public void onProgress(String requestId, long bytes, long totalBytes) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(String requestId, Map resultData) {
+                        paradaSugestao.setImagemEnviada(true);
+                        ParadasSugeridasViewModel.edit(paradaSugestao, getContext().getApplicationContext());
+                    }
+
+                    @Override
+                    public void onError(String requestId, ErrorInfo error) {
+
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+error.getDescription()+" ("+error.getCode()+") ao enviar imagem de "+paradaSugestao.getNome()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        PreferenceUtils.gravaMostraToast(ctx, false);
+                        //System.out.println("ERRO ENVIO IMG: "+error.getDescription());
+                    }
+
+                    @Override
+                    public void onReschedule(String requestId, ErrorInfo error) {
+
+                    }
+                });
+
+                /*
                 RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
                 MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
                 RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
@@ -1729,12 +1927,51 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     }
                 });
+                */
 
             }
 
             for(final PontoInteresseSugestao pontoInteresseSugestao : pontosInteresseSugestoes){
 
                 File imagem = new File(getContext().getApplicationContext().getFilesDir(),  pontoInteresseSugestao.getImagem());
+
+                imageUpload(imagem.getAbsolutePath(), new UploadCallback() {
+                    @Override
+                    public void onStart(String requestId) {
+                        //System.out.println("INICIANDO ENVIO IMG: "+requestId);
+                    }
+
+                    @Override
+                    public void onProgress(String requestId, long bytes, long totalBytes) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(String requestId, Map resultData) {
+                        pontoInteresseSugestao.setImagemEnviada(true);
+                        ParadasSugeridasViewModel.editPoi(pontoInteresseSugestao, getContext().getApplicationContext());
+                    }
+
+                    @Override
+                    public void onError(String requestId, ErrorInfo error) {
+
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+error.getDescription()+" ("+error.getCode()+") ao enviar imagem de "+pontoInteresseSugestao.getNome()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        PreferenceUtils.gravaMostraToast(ctx, false);
+                        //System.out.println("ERRO ENVIO IMG: "+error.getDescription());
+                    }
+
+                    @Override
+                    public void onReschedule(String requestId, ErrorInfo error) {
+
+                    }
+                });
+
+                /*
 
                 RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
                 MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
@@ -1772,6 +2009,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     }
                 });
+                */
 
             }
 
@@ -2003,14 +2241,25 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
     // fim adicionar
 
+    public static void imageUpload(final String imagem, UploadCallback callback){
+        //System.out.println("CHAMOU UPLOAD");
+        MediaManager.get().upload(imagem).callback(callback).unsigned("ml_default").startNow(ctx);
+    }
+
     public static void imageDownload(String baseUrl, final String imagem){
+
+        baseUrl = IMAGE_BASE_URL;
+
         Retrofit retrofit = new Retrofit.Builder()
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .baseUrl(baseUrl)
                 .build();
 
         CircularAPI api = retrofit.create(CircularAPI.class);
-        Call<ResponseBody> call = api.recebeImagem(imagem.replace(".png", ""));
+        Call<ResponseBody> call = api.recebeImagem(imagem);
+
+        //System.out.println("CALL: "+call.request().url().toString());
+
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -2049,13 +2298,19 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     }
 
     public static void imageDownload(String baseUrl, final String imagem, final Context ctx){
+
+        baseUrl = IMAGE_BASE_URL;
+
         Retrofit retrofit = new Retrofit.Builder()
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .baseUrl(baseUrl)
                 .build();
 
         CircularAPI api = retrofit.create(CircularAPI.class);
-        Call<ResponseBody> call = api.recebeImagem(imagem.replace(".png", ""));
+        Call<ResponseBody> call = api.recebeImagem(imagem);
+
+        //System.out.println("CALL: "+call.request().url().toString());
+
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

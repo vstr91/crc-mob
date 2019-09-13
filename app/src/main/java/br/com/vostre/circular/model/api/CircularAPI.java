@@ -27,7 +27,12 @@ public interface CircularAPI {
     @POST("api/envia-imagem/{token}")
     Call<String> enviaImagem(@Part MultipartBody.Part image, @Part("name") RequestBody name, @Path("token") String id);
 
-    @GET("api/recebe-imagem/{imagem}")
+    // API site Circular
+//    @GET("api/recebe-imagem/{imagem}")
+//    Call<ResponseBody> recebeImagem(@Path("imagem") String imagem);
+
+    // API Cloudinary - CDN
+    @GET("vostre/image/upload/v1568376445/circular/{imagem}")
     Call<ResponseBody> recebeImagem(@Path("imagem") String imagem);
 
     @Headers("Content-Type: application/json")

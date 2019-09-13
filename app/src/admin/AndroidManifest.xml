@@ -24,6 +24,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
+        <meta-data
+            android:name="CLOUDINARY_URL"
+            android:value="cloudinary://@vostre"/>
         <activity android:name=".view.HorarioPorImagemActivity"></activity>
         <activity android:name=".view.DetalheAcessoActivity" />
         <activity android:name=".view.DashboardActivity" />

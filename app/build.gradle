@@ -48,7 +48,7 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix ".debug"
+            //applicationIdSuffix ".debug"
             versionNameSuffix '-SNAPSHOT'
         }
         release {
@@ -146,6 +146,8 @@ dependencies {
 
     implementation 'com.daimajia.easing:library:2.0@aar'
     implementation 'com.daimajia.androidanimations:library:2.3@aar'
+
+    implementation group: 'com.cloudinary', name: 'cloudinary-android', version: '1.25.0'
 
     implementation 'me.relex:circleindicator:1.2.2'
 //    implementation 'androidx.cardview:cardview:1.0.0'

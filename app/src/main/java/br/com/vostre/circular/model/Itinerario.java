@@ -27,8 +27,12 @@ public class Itinerario extends EntidadeBase {
 
     private String observacao;
 
+    @NonNull
+    private Boolean mostraRuas;
+
     public Itinerario(){
         this.setAcessivel(false);
+        this.setMostraRuas(false);
     }
 
     public String getSigla() {
@@ -90,9 +94,18 @@ public class Itinerario extends EntidadeBase {
         this.observacao = observacao;
     }
 
+    @NonNull
+    public Boolean getMostraRuas() {
+        return mostraRuas;
+    }
+
+    public void setMostraRuas(@NonNull Boolean mostraRuas) {
+        this.mostraRuas = mostraRuas;
+    }
+
     public boolean valida(Itinerario itinerario) {
 
-        if(super.valida(itinerario) && itinerario.getAcessivel() != null && itinerario.getTarifa() != null && itinerario.getTarifa() > 0
+        if(super.valida(itinerario) && itinerario.getAcessivel() != null && itinerario.getMostraRuas() != null && itinerario.getTarifa() != null && itinerario.getTarifa() > 0
                 && itinerario.getEmpresa() != null){
             return true;
         } else{

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "d026b66e0bf90eca9f1d4ed16406eef6",
+    "identityHash": "adac60d4a665baa7aea400b74725ea13",
     "entities": [
       {
         "tableName": "Pais",
@@ -1112,7 +1112,7 @@
       },
       {
         "tableName": "Itinerario",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`sigla` TEXT, `tarifa` REAL NOT NULL, `distancia` REAL, `tempo` INTEGER, `acessivel` INTEGER NOT NULL, `empresa` TEXT NOT NULL, `observacao` TEXT, `id` TEXT NOT NULL, `ativo` INTEGER NOT NULL, `enviado` INTEGER NOT NULL, `data_cadastro` INTEGER NOT NULL, `usuario_cadastro` TEXT, `ultima_alteracao` INTEGER NOT NULL, `usuario_ultima_alteracao` TEXT, `programado_para` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`sigla` TEXT, `tarifa` REAL NOT NULL, `distancia` REAL, `tempo` INTEGER, `acessivel` INTEGER NOT NULL, `empresa` TEXT NOT NULL, `observacao` TEXT, `mostraRuas` INTEGER NOT NULL, `id` TEXT NOT NULL, `ativo` INTEGER NOT NULL, `enviado` INTEGER NOT NULL, `data_cadastro` INTEGER NOT NULL, `usuario_cadastro` TEXT, `ultima_alteracao` INTEGER NOT NULL, `usuario_ultima_alteracao` TEXT, `programado_para` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "sigla",
@@ -1155,6 +1155,12 @@
             "columnName": "observacao",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "mostraRuas",
+            "columnName": "mostraRuas",
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "id",
@@ -2596,7 +2602,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"d026b66e0bf90eca9f1d4ed16406eef6\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"adac60d4a665baa7aea400b74725ea13\")"
     ]
   }
 }

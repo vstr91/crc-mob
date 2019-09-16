@@ -115,6 +115,12 @@ public interface ParadaItinerarioDAO {
             "ORDER BY pi.ordem")
     List<ParadaItinerario> listarTrechosIntervalo(String itinerario, String partida, String destino);
 
+    @Query("SELECT DISTINCT p.rua" +
+            "    FROM parada_itinerario pi" +
+            "    INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado" +
+            "    WHERE pi.ativo = 1 AND pi.itinerario = :itinerario AND pi.ativo = 1 ORDER BY pi.ordem")
+    LiveData<List<ParadaBairro>> listarRuasPorItinerario(String itinerario);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<ParadaItinerario> paradasItinerarios);
 

@@ -60,10 +60,13 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
     Location l;
 
+    public LiveData<List<ParadaBairro>> ruas;
+
     public void setItinerario(String itinerario, String paradaPartida, String paradaDestino,
                               String bairroPartida, String bairroDestino) {
         this.itinerario = appDatabase.itinerarioDAO().carregar(itinerario);
         this.paradas = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro(itinerario);
+        this.ruas = appDatabase.paradaItinerarioDAO().listarRuasPorItinerario(itinerario);
 
         if(paradaPartida == null || paradaDestino == null){
             new carregaHorariosAsyncTask(appDatabase, itinerario, null).execute();
@@ -124,6 +127,8 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
         retorno = new MutableLiveData<>();
         retorno.setValue(-1);
+
+        this.ruas = appDatabase.paradaItinerarioDAO().listarRuasPorItinerario("");
     }
 
     public void carregarHorariosFiltrados(String itinerario, String itinerarioARemover, String paradaPartida, String paradaDestino){

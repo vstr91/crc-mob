@@ -84,7 +84,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0">
 
         </LinearLayout>
 
@@ -275,15 +276,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
             android:text="Quadro de Horários"
             android:textAppearance="@style/texto_branco"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnInverter" />
+            app:layout_constraintTop_toBottomOf="@+id/btnVerRuas" />
 
         <TextView
             android:id="@+id/textView29"
@@ -304,30 +303,28 @@
             android:id="@+id/imageButton5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="32dp"
             android:layout_marginStart="32dp"
             android:background="@color/transparente"
-            android:onClick="@{view::btnSecoesClick}"
-            app:srcCompat="@drawable/ic_list_white_24dp"
-            android:tooltipText="Ver seções do itinerário"
             android:contentDescription="Botão ver seções do itinerário"
+            android:onClick="@{view::btnSecoesClick}"
+            android:tooltipText="Ver seções do itinerário"
             app:layout_constraintBottom_toBottomOf="@+id/textView29"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/textView28" />
+            app:layout_constraintTop_toTopOf="@+id/btnVerRuas"
+            app:srcCompat="@drawable/ic_list_white_24dp" />
 
         <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/imageButton6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="32dp"
-            android:layout_marginRight="32dp"
             android:background="@color/transparente"
             android:contentDescription="Botão compartilhar quadro de horários"
             android:onClick="onClickBtnShare"
             android:tooltipText="Compartilhar quadro de horários"
             app:layout_constraintBottom_toBottomOf="@+id/textView29"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/textView28"
+            app:layout_constraintTop_toTopOf="@+id/btnInverter"
             app:srcCompat="@drawable/ic_share_white_24dp" />
 
         <TextView
@@ -433,6 +430,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/cardViewItinerario" />
+
+        <Button
+            android:id="@+id/btnVerRuas"
+            style="@style/botao_transparente"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="Ver trajeto"
+            android:textStyle="bold"
+            android:onClick="@{view::btnRuasClick}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cardViewItinerario" />
 
     </android.support.constraint.ConstraintLayout>

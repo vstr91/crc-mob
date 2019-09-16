@@ -9,39 +9,52 @@
     </data>
 
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/parada"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:id="@+id/parada">
+        android:layout_height="wrap_content">
 
         <!--<br.com.vostre.circleview.CircleView-->
-            <!--android:id="@+id/circleView2"-->
-            <!--android:layout_width="100dp"-->
-            <!--android:layout_height="100dp"-->
-            <!--android:layout_marginEnd="8dp"-->
-            <!--android:layout_marginLeft="8dp"-->
-            <!--android:layout_marginRight="8dp"-->
-            <!--android:layout_marginStart="8dp"-->
-            <!--android:layout_marginTop="8dp"-->
-            <!--app:corArcoMaior="@color/azul"-->
-            <!--app:corArcoMenor="@color/azul"-->
-            <!--app:imagem="@{cidade.cidade.brasao}"-->
-            <!--app:espessuraArcoMaior="8"-->
-            <!--app:espessuraArcoMenor="8"-->
-            <!--app:layout_constraintEnd_toEndOf="parent"-->
-            <!--app:layout_constraintStart_toStartOf="parent"-->
-            <!--app:layout_constraintTop_toTopOf="parent" />-->
+        <!--android:id="@+id/circleView2"-->
+        <!--android:layout_width="100dp"-->
+        <!--android:layout_height="100dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginLeft="8dp"-->
+        <!--android:layout_marginRight="8dp"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--app:corArcoMaior="@color/azul"-->
+        <!--app:corArcoMenor="@color/azul"-->
+        <!--app:imagem="@{cidade.cidade.brasao}"-->
+        <!--app:espessuraArcoMaior="8"-->
+        <!--app:espessuraArcoMenor="8"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toTopOf="parent" />-->
 
         <TextView
             android:id="@+id/textViewNome"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:gravity="center"
             android:text="@{parada.parada.rua}"
+            android:textAlignment="viewStart"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="104dp"
+            app:layout_constraintStart_toEndOf="@+id/imageView11"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="cidade" />
+
+        <ImageView
+            android:id="@+id/imageView11"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:rotation="180"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/parada_rua_fim" />
 
     </android.support.constraint.ConstraintLayout>
 

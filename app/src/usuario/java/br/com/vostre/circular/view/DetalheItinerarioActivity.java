@@ -53,6 +53,7 @@ import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SnackbarHelper;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.LegendaAdapter;
+import br.com.vostre.circular.view.adapter.ParadaRuaAdapter;
 import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
 import br.com.vostre.circular.view.listener.LegendaListener;
 import br.com.vostre.circular.view.utils.InfoWindow;
@@ -67,9 +68,11 @@ public class DetalheItinerarioActivity extends BaseActivity {
     DetalhesItinerarioViewModel viewModel;
     HorarioItinerarioAdapter adapterHorarios;
     SecaoItinerarioAdapter adapterSecoes;
+    ParadaRuaAdapter adapterRuas;
 
     RecyclerView listHorarios;
     RecyclerView listSecoes;
+    RecyclerView listRuas;
     AppCompatActivity ctx;
 
     MapView map;
@@ -77,6 +80,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
     MyLocationNewOverlay mLocationOverlay;
 
     BottomSheetDialog bsd;
+    BottomSheetDialog bsdRuas;
     boolean flagFavorito = false;
     RecyclerView listLegenda;
 
@@ -95,12 +99,17 @@ public class DetalheItinerarioActivity extends BaseActivity {
     boolean inversao = false;
     String itinerario;
 
+    int contaProcessamento = 0;
+    boolean mostraRuas = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_itinerario);
         binding.getRoot().setDrawingCacheEnabled(true);
         binding.setView(this);
         binding.setLifecycleOwner(this);
+
+        contaProcessamento = 0;
 
         if(!inversao){
             super.onCreate(savedInstanceState);
@@ -157,6 +166,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
             viewModel.partida.observe(this, partidaObserver);
             viewModel.destino.observe(this, destinoObserver);
+            viewModel.ruas.observe(this, ruasObserver);
 
             listHorarios = binding.listHorarios;
             adapterHorarios = new HorarioItinerarioAdapter(viewModel.horarios.getValue(), this);
@@ -182,6 +192,28 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
         viewModel.horarios.observe(this, horariosObserver);
         viewModel.localAtual.observe(this, localObserver);
+
+        bsdRuas = new BottomSheetDialog(ctx);
+        bsdRuas.setCanceledOnTouchOutside(true);
+
+        bsdRuas.setContentView(R.layout.bottom_sheet_ruas);
+
+        listRuas = bsdRuas.findViewById(R.id.listRuas);
+        ImageButton btnFecharRuas = bsdRuas.findViewById(R.id.btnFechar);
+        btnFecharRuas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bsdRuas.dismiss();
+            }
+        });
+
+        adapterRuas = new ParadaRuaAdapter(viewModel.ruas.getValue(), this);
+        listRuas.setAdapter(adapterRuas);
+
+        binding.btnVerRuas.setVisibility(View.GONE);
+
+        binding.linearLayout4.setVisibility(View.GONE);
+        binding.textView37.setVisibility(View.GONE);
 
         geraModalLoading();
 
@@ -394,6 +426,14 @@ public class DetalheItinerarioActivity extends BaseActivity {
         mFirebaseAnalytics.logEvent("secoes_consulta", bundle);
     }
 
+    public void btnRuasClick(View v){
+        bsdRuas.show();
+
+        //log
+//        bundle = new Bundle();
+//        mFirebaseAnalytics.logEvent("secoes_consulta", bundle);
+    }
+
     Observer<List<HorarioItinerarioNome>> horariosObserver = new Observer<List<HorarioItinerarioNome>>() {
         @Override
         public void onChanged(List<HorarioItinerarioNome> horarios) {
@@ -499,7 +539,11 @@ public class DetalheItinerarioActivity extends BaseActivity {
             adapterHorarios.legenda = dados;
             adapterHorarios.notifyDataSetChanged();
 
-            ocultaModalLoading();
+            contaProcessamento++;
+
+            if(contaProcessamento == 2){
+                ocultaModalLoading();
+            }
 
             binding.listHorarios.scheduleLayoutAnimation();
 
@@ -562,6 +606,14 @@ public class DetalheItinerarioActivity extends BaseActivity {
             if(itinerario != null){
                 binding.setItinerario(itinerario);
 
+                binding.linearLayout4.setVisibility(View.VISIBLE);
+
+                if(itinerario.getItinerario().getMostraRuas()){
+                    binding.btnVerRuas.setVisibility(View.VISIBLE);
+                } else{
+                    binding.btnVerRuas.setVisibility(View.GONE);
+                }
+
                 if(itinerario.getItinerario().getSigla() == null || itinerario.getItinerario().getSigla().isEmpty() || itinerario.getItinerario().getSigla().equals("null")){
                     binding.textView37.setVisibility(View.GONE);
                 } else{
@@ -572,6 +624,12 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 viewModel.secoes.observe(ctx, secoesObserver);
                 //viewModel.carregarItinerarios(parada.getParada().getId());
                 //viewModel.itinerarios.observe(ctx, itinerariosObserver);
+
+                contaProcessamento++;
+
+                if(contaProcessamento == 2){
+                    ocultaModalLoading();
+                }
 
             }
 
@@ -624,6 +682,21 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 binding.setDestino(parada);
             }
 
+        }
+    };
+
+    Observer<List<ParadaBairro>> ruasObserver = new Observer<List<ParadaBairro>>() {
+        @Override
+        public void onChanged(List<ParadaBairro> ruas) {
+
+            if(ruas.size() > 0 && mostraRuas){
+                binding.btnVerRuas.setVisibility(View.VISIBLE);
+            } else{
+                binding.btnVerRuas.setVisibility(View.GONE);
+            }
+
+            adapterRuas.paradas = ruas;
+            adapterRuas.notifyDataSetChanged();
         }
     };
 
@@ -697,6 +770,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
         binding.textViewCarregando.setVisibility(View.GONE);
         binding.progressBar.setIndeterminate(true);
         binding.progressBar.setVisibility(View.GONE);
+        contaProcessamento = 0;
     }
 
     @Override

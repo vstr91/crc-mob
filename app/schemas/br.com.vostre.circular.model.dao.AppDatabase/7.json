@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "adac60d4a665baa7aea400b74725ea13",
+    "identityHash": "af9252a0d42df3fd87c34cf0794249e3",
     "entities": [
       {
         "tableName": "Pais",
@@ -846,7 +846,7 @@
       },
       {
         "tableName": "Parada",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `taxaDeEmbarque` REAL, `imagem` TEXT, `bairro` TEXT NOT NULL, `imagemEnviada` INTEGER NOT NULL, `sentido` INTEGER NOT NULL, `rua` TEXT, `cep` TEXT, `nome` TEXT NOT NULL, `slug` TEXT NOT NULL, `id` TEXT NOT NULL, `ativo` INTEGER NOT NULL, `enviado` INTEGER NOT NULL, `data_cadastro` INTEGER NOT NULL, `usuario_cadastro` TEXT, `ultima_alteracao` INTEGER NOT NULL, `usuario_ultima_alteracao` TEXT, `programado_para` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `taxaDeEmbarque` REAL, `imagem` TEXT, `bairro` TEXT NOT NULL, `imagemEnviada` INTEGER NOT NULL, `sentido` INTEGER NOT NULL, `rua` TEXT, `cep` TEXT, `servicos` TEXT, `nome` TEXT NOT NULL, `slug` TEXT NOT NULL, `id` TEXT NOT NULL, `ativo` INTEGER NOT NULL, `enviado` INTEGER NOT NULL, `data_cadastro` INTEGER NOT NULL, `usuario_cadastro` TEXT, `ultima_alteracao` INTEGER NOT NULL, `usuario_ultima_alteracao` TEXT, `programado_para` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "latitude",
@@ -899,6 +899,12 @@
           {
             "fieldPath": "cep",
             "columnName": "cep",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "servicos",
+            "columnName": "servicos",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -1827,7 +1833,7 @@
       },
       {
         "tableName": "parada_sugestao",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`observacao` TEXT, `parada` TEXT, `status` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `taxaDeEmbarque` REAL, `imagem` TEXT, `bairro` TEXT NOT NULL, `imagemEnviada` INTEGER NOT NULL, `sentido` INTEGER NOT NULL, `rua` TEXT, `cep` TEXT, `nome` TEXT NOT NULL, `slug` TEXT NOT NULL, `id` TEXT NOT NULL, `ativo` INTEGER NOT NULL, `enviado` INTEGER NOT NULL, `data_cadastro` INTEGER NOT NULL, `usuario_cadastro` TEXT, `ultima_alteracao` INTEGER NOT NULL, `usuario_ultima_alteracao` TEXT, `programado_para` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`observacao` TEXT, `parada` TEXT, `status` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `taxaDeEmbarque` REAL, `imagem` TEXT, `bairro` TEXT NOT NULL, `imagemEnviada` INTEGER NOT NULL, `sentido` INTEGER NOT NULL, `rua` TEXT, `cep` TEXT, `servicos` TEXT, `nome` TEXT NOT NULL, `slug` TEXT NOT NULL, `id` TEXT NOT NULL, `ativo` INTEGER NOT NULL, `enviado` INTEGER NOT NULL, `data_cadastro` INTEGER NOT NULL, `usuario_cadastro` TEXT, `ultima_alteracao` INTEGER NOT NULL, `usuario_ultima_alteracao` TEXT, `programado_para` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "observacao",
@@ -1898,6 +1904,12 @@
           {
             "fieldPath": "cep",
             "columnName": "cep",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "servicos",
+            "columnName": "servicos",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -2598,11 +2610,106 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "Servico",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`icone` TEXT NOT NULL, `imagemEnviada` INTEGER NOT NULL, `nome` TEXT NOT NULL, `slug` TEXT NOT NULL, `id` TEXT NOT NULL, `ativo` INTEGER NOT NULL, `enviado` INTEGER NOT NULL, `data_cadastro` INTEGER NOT NULL, `usuario_cadastro` TEXT, `ultima_alteracao` INTEGER NOT NULL, `usuario_ultima_alteracao` TEXT, `programado_para` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "icone",
+            "columnName": "icone",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "imagemEnviada",
+            "columnName": "imagemEnviada",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nome",
+            "columnName": "nome",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "slug",
+            "columnName": "slug",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ativo",
+            "columnName": "ativo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "enviado",
+            "columnName": "enviado",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dataCadastro",
+            "columnName": "data_cadastro",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "usuarioCadastro",
+            "columnName": "usuario_cadastro",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ultimaAlteracao",
+            "columnName": "ultima_alteracao",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "usuarioUltimaAlteracao",
+            "columnName": "usuario_ultima_alteracao",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "programadoPara",
+            "columnName": "programado_para",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Servico_nome",
+            "unique": true,
+            "columnNames": [
+              "nome"
+            ],
+            "createSql": "CREATE UNIQUE INDEX `index_Servico_nome` ON `${TABLE_NAME}` (`nome`)"
+          }
+        ],
+        "foreignKeys": []
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"adac60d4a665baa7aea400b74725ea13\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"af9252a0d42df3fd87c34cf0794249e3\")"
     ]
   }
 }

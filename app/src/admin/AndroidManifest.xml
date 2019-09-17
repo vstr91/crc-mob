@@ -69,6 +69,7 @@
         </activity>
         <activity android:name=".view.BaseActivity" />
         <activity android:name=".view.PaisesActivity" />
+        <activity android:name=".view.ServicosActivity" />
         <activity android:name=".view.EstadosActivity" />
         <activity android:name=".view.CidadesActivity" />
         <activity android:name=".view.BairrosActivity" />

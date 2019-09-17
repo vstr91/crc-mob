@@ -38,6 +38,7 @@ import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.Parada;
+import br.com.vostre.circular.model.Servico;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.BairroCidade;
@@ -59,6 +60,8 @@ public class ParadasViewModel extends AndroidViewModel {
 
     public LiveData<List<BairroCidade>> bairros;
     public BairroCidade bairro;
+
+    public LiveData<List<Servico>> servicos;
 
     public boolean centralizaMapa = true;
 
@@ -138,6 +141,8 @@ public class ParadasViewModel extends AndroidViewModel {
 
         retorno = new MutableLiveData<>();
         retorno.setValue(-1);
+
+        servicos = appDatabase.servicoDAO().listarTodosAtivos();
     }
 
     public void salvarParada(){

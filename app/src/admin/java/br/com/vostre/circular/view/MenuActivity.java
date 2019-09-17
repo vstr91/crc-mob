@@ -279,6 +279,11 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         startActivity(i);
     }
 
+    public void onClickBtnServicos(View v){
+        Intent i = new Intent(getApplicationContext(), ServicosActivity.class);
+        startActivity(i);
+    }
+
     public void onClickBtnUsuarios(View v){
         Intent i = new Intent(getApplicationContext(), UsuariosActivity.class);
         startActivity(i);

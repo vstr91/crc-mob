@@ -31,6 +31,7 @@ import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.PontoInteresseSugestao;
 import br.com.vostre.circular.model.Problema;
 import br.com.vostre.circular.model.SecaoItinerario;
+import br.com.vostre.circular.model.Servico;
 import br.com.vostre.circular.model.TipoProblema;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.model.UsuarioPreferencia;
@@ -41,7 +42,7 @@ import br.com.vostre.circular.utils.Converters;
         Parada.class, PontoInteresse.class, Itinerario.class, ParadaItinerario.class,
         Horario.class, HorarioItinerario.class, SecaoItinerario.class, Onibus.class,
         ParametroInterno.class, ParadaSugestao.class, HistoricoParada.class, UsuarioPreferencia.class,
-        HistoricoItinerario.class, Acesso.class, PontoInteresseSugestao.class, TipoProblema.class, Problema.class},
+        HistoricoItinerario.class, Acesso.class, PontoInteresseSugestao.class, TipoProblema.class, Problema.class, Servico.class},
         version = 7)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
@@ -82,6 +83,7 @@ public abstract class AppDatabase extends RoomDatabase {
     // 2.2.0 - v7 bd
     public abstract TipoProblemaDAO tipoProblemaDAO();
     public abstract ProblemaDAO problemaDAO();
+    public abstract ServicoDAO servicoDAO();
 
     public static AppDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {
@@ -125,6 +127,8 @@ public abstract class AppDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'rua' TEXT");
             database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'cep' TEXT");
             database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'mostraRuas' INTEGER NOT NULL");
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'servico' ('icone' TEXT NOT NULL, 'imagemEnviada' INTEGER NOT NULL, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'servicos' TEXT");
         }
     };
 

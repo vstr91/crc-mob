@@ -12,6 +12,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,9 +37,11 @@ import java.util.TimeZone;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormParadaBinding;
+import br.com.vostre.circular.model.Servico;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.view.adapter.BairroAdapterSpinner;
+import br.com.vostre.circular.view.adapter.ServicoAdapterForm;
 import br.com.vostre.circular.viewModel.ParadasViewModel;
 
 public class FormParada extends FormBase {
@@ -127,6 +131,7 @@ public class FormParada extends FormBase {
         btnTrocarFoto.setVisibility(View.GONE);
 
         viewModel.bairros.observe(this, bairrosObserver);
+        viewModel.servicos.observe(this, servicosObserver);
 
         if(parada != null){
             viewModel.parada = parada;
@@ -187,6 +192,12 @@ public class FormParada extends FormBase {
 
         viewModel.parada.getParada().setLatitude(latitude);
         viewModel.parada.getParada().setLongitude(longitude);
+
+        List<Servico> s = viewModel.servicos.getValue();
+
+        for(Servico se : s){
+            System.out.println(se.isSelecionado());
+        }
 
         if(parada != null){
             viewModel.editarParada();
@@ -368,6 +379,16 @@ public class FormParada extends FormBase {
 
     }
 
+    public void setListEntries(RecyclerView list, List<Servico> servicos){
+
+        if(servicos != null){
+            ServicoAdapterForm adapter = new ServicoAdapterForm(servicos, (AppCompatActivity) getActivity());
+            list.setAdapter(adapter);
+
+        }
+
+    }
+
     public void onItemSelectedSpinnerBairro (AdapterView<?> adapterView, View view, int i, long l){
         viewModel.bairro = viewModel.bairros.getValue().get(i);
     }
@@ -395,6 +416,13 @@ public class FormParada extends FormBase {
         @Override
         public void onChanged(List<BairroCidade> bairros) {
             setSpinnerEntries(binding.spinnerBairro, bairros);
+        }
+    };
+
+    Observer<List<Servico>> servicosObserver = new Observer<List<Servico>>() {
+        @Override
+        public void onChanged(List<Servico> servicos) {
+            setListEntries(binding.listServicos, servicos);
         }
     };
 

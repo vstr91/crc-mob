@@ -72,6 +72,7 @@ import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.PontoInteresseSugestao;
 import br.com.vostre.circular.model.Problema;
 import br.com.vostre.circular.model.SecaoItinerario;
+import br.com.vostre.circular.model.Servico;
 import br.com.vostre.circular.model.TipoProblema;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.model.UsuarioPreferencia;
@@ -92,6 +93,7 @@ import br.com.vostre.circular.viewModel.ParadasSugeridasViewModel;
 import br.com.vostre.circular.viewModel.ParadasViewModel;
 import br.com.vostre.circular.viewModel.PontosInteresseViewModel;
 //import br.com.vostre.circular.viewModel.ProblemasViewModel;
+import br.com.vostre.circular.viewModel.ServicosViewModel;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -146,6 +148,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     List<? extends Acesso> acessos;
 
     List<? extends EntidadeBase> pontosInteresseSugestoes;
+
+    List<? extends EntidadeBase> servicos;
 
 //    List<? extends EntidadeBase> tiposProblema;
 //    List<? extends EntidadeBase> problemas;
@@ -621,6 +625,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 JSONArray tiposProblema = null;
                 JSONArray problemas = null;
 
+                JSONArray servicos = null;
+
                 //System.out.println("PAR_SUG: "+arrayObject.optJSONArray("paradas_sugestoes"));
 
                 if(arrayObject.optJSONArray("paradas_sugestoes") != null){
@@ -649,6 +655,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 if(arrayObject.optJSONArray("problemas") != null){
                     problemas = arrayObject.getJSONArray("problemas");
+                }
+
+                if(arrayObject.optJSONArray("servicos") != null){
+                    servicos = arrayObject.getJSONArray("servicos");
                 }
 
                 // ACESSOS
@@ -692,6 +702,28 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     }
 
                     add(lstPaises, "pais");
+
+                }
+
+                // SERVICOS
+
+                if(servicos.length() > 0){
+
+                    int total = servicos.length();
+                    List<Servico> lstServicos = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        Servico servico;
+                        JSONObject obj = servicos.getJSONObject(i);
+
+                        servico = (Servico) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Servico.class, 1);
+                        servico.setEnviado(true);
+
+                        lstServicos.add(servico);
+
+                    }
+
+                    add(lstServicos, "servico");
 
                 }
 
@@ -1400,6 +1432,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 //            tiposProblema = appDatabase.tipoProblemaDAO().listarTodosAEnviar();
 //            problemas = appDatabase.problemaDAO().listarTodosAEnviar();
 
+            servicos = appDatabase.servicoDAO().listarTodosAEnviar();
+
             return null;
         }
 
@@ -1433,11 +1467,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 //            String strTiposProblema = "\"tipos_problema\": "+JsonUtils.toJson((List<EntidadeBase>) tiposProblema);
 //            String strProblemas = "\"problemas\": "+JsonUtils.toJson((List<EntidadeBase>) problemas);
 
+            String strServicos = "\"servicos\": "+JsonUtils.toJson((List<EntidadeBase>) servicos);
+
             String json = "{"+strPaises+","+strEmpresas+","+strOnibus+","+strEstados+","+strCidades+","
                     +strBairros+","+strParadas+","+strItinerarios+","+strHorarios+","+strParadasItinerarios+","
                     +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
                     +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+","+strPreferencias+","+strHistoricos+","
-                    +strPontosInteresseSugestoes+"}";
+                    +strPontosInteresseSugestoes+","+strServicos+"}";
 
              //System.out.println("JSON: "+json);
 
@@ -1463,7 +1499,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             int registros = paises.size()+empresas.size()+onibus.size()+estados.size()+cidades.size()
                     +bairros.size()+paradas.size()+itinerarios.size()+horarios.size()+paradasItinerario.size()
                     +secoesItinerarios.size()+horariosItinerarios.size()+mensagens.size()+parametros.size()+pontosInteresse.size()
-                    +usuarios.size()+paradaSugestoes.size()+preferencias.size()+historicos.size()+pontosInteresseSugestoes.size();
+                    +usuarios.size()+paradaSugestoes.size()+preferencias.size()+historicos.size()+pontosInteresseSugestoes.size()
+                    +servicos.size();
 
             if(registros > 0){
                 chamaAPI(registros, json, 0, baseUrl, token);
@@ -1491,6 +1528,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
         List<Problema> problemas;
 
+        List<Servico> servicos;
+
         @Override
         protected Void doInBackground(final Void... params) {
 
@@ -1503,6 +1542,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             pontosInteresseSugestoes = appDatabase.pontoInteresseSugestaoDAO().listarTodosImagemAEnviar();
 
             problemas = appDatabase.problemaDAO().listarTodosImagemAEnviar();
+
+            servicos = appDatabase.servicoDAO().listarTodosImagemAEnviar();
 
             return null;
         }
@@ -2013,6 +2054,48 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             }
 
+            for(final Servico servico : servicos){
+
+                File imagem = new File(getContext().getApplicationContext().getFilesDir(),  servico.getIcone());
+
+                imageUpload(imagem.getAbsolutePath(), new UploadCallback() {
+                    @Override
+                    public void onStart(String requestId) {
+                        //System.out.println("INICIANDO ENVIO IMG: "+requestId);
+                    }
+
+                    @Override
+                    public void onProgress(String requestId, long bytes, long totalBytes) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(String requestId, Map resultData) {
+                        servico.setImagemEnviada(true);
+                        ServicosViewModel.edit(servico, getContext().getApplicationContext());
+                    }
+
+                    @Override
+                    public void onError(String requestId, ErrorInfo error) {
+
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+error.getDescription()+" ("+error.getCode()+") ao enviar imagem de "+servico.getNome()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        PreferenceUtils.gravaMostraToast(ctx, false);
+                        //System.out.println("ERRO ENVIO IMG: "+error.getDescription());
+                    }
+
+                    @Override
+                    public void onReschedule(String requestId, ErrorInfo error) {
+
+                    }
+                });
+
+            }
+
 //            for(final Problema problema : problemas){
 //
 //                File imagem = new File(getContext().getApplicationContext().getFilesDir(),  problema.getImagem());
@@ -2223,6 +2306,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     break;
                 case "problema":
                     db.problemaDAO().inserirTodos((List<Problema>) params[0]);
+                    break;
+                case "servico":
+                    db.servicoDAO().inserirTodos((List<Servico>) params[0]);
                     break;
             }
 

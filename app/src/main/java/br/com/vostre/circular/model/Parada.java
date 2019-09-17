@@ -4,6 +4,8 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Index;
 import android.support.annotation.NonNull;
 
+import java.util.List;
+
 @Entity(indices = {@Index(value = {"nome", "bairro"},
         unique = true)})
 public class Parada extends EntidadeSlug {
@@ -29,6 +31,16 @@ public class Parada extends EntidadeSlug {
     private String rua;
 
     private String cep;
+
+    private List<String> servicos;
+
+    public List<String> getServicos() {
+        return servicos;
+    }
+
+    public void setServicos(List<String> servicos) {
+        this.servicos = servicos;
+    }
 
     public int getSentido() {
         return sentido;

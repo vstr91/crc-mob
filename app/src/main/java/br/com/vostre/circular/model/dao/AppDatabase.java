@@ -43,7 +43,7 @@ import br.com.vostre.circular.utils.Converters;
         Horario.class, HorarioItinerario.class, SecaoItinerario.class, Onibus.class,
         ParametroInterno.class, ParadaSugestao.class, HistoricoParada.class, UsuarioPreferencia.class,
         HistoricoItinerario.class, Acesso.class, PontoInteresseSugestao.class, TipoProblema.class, Problema.class, Servico.class},
-        version = 9)
+        version = 10)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -89,6 +89,8 @@ public abstract class AppDatabase extends RoomDatabase {
 
     // 2.2.2 - v9 bd = ajustando tabela parada_sugestao - erro na migracao anterior
 
+    // 2.2.3 - v10 bd = ajustando tabela tipo_problema - erro na migracao anterior
+
     public static AppDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {
             INSTANCE =
@@ -96,7 +98,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             // allow queries on the main thread.
                             // Don't do this on a real app! See PersistenceBasicSample for an example.
                             //.allowMainThreadQueries()
-                            .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9)
+                            .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
                             .fallbackToDestructiveMigration()
                             .build();
         }
@@ -107,14 +109,14 @@ public abstract class AppDatabase extends RoomDatabase {
         INSTANCE = null;
     }
 
-    static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+    public static final Migration MIGRATION_4_5 = new Migration(4, 5) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
             database.execSQL("CREATE TABLE IF NOT EXISTS 'acesso' ('id' TEXT NOT NULL, 'identificadorUnico' TEXT NOT NULL, 'dataCriacao' INTEGER NOT NULL, 'dataValidacao' INTEGER NOT NULL, PRIMARY KEY('id'))");
         }
     };
 
-    static final Migration MIGRATION_5_6 = new Migration(5, 6) {
+    public static final Migration MIGRATION_5_6 = new Migration(5, 6) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
             database.execSQL("CREATE TABLE IF NOT EXISTS 'ponto_interesse_sugestao' ('observacao' TEXT, 'pontoInteresse' TEXT, 'status' INTEGER NOT NULL, 'descricao' TEXT, 'latitude' REAL NOT NULL, 'longitude' REAL NOT NULL, 'imagem' TEXT, 'dataInicial' INTEGER, 'dataFinal' INTEGER, 'imagemEnviada' INTEGER NOT NULL, 'permanente' INTEGER NOT NULL, 'bairro' TEXT NOT NULL, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
@@ -123,21 +125,28 @@ public abstract class AppDatabase extends RoomDatabase {
     };
 
     // v2.2.0 - v7 bd
-    static final Migration MIGRATION_6_7 = new Migration(6, 7) {
+    public static final Migration MIGRATION_6_7 = new Migration(6, 7) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
             database.execSQL("CREATE TABLE IF NOT EXISTS 'tipo_problema' ('descricao' TEXT, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
-            database.execSQL("CREATE TABLE IF NOT EXISTS 'problema' ('descricao' TEXT NOT NULL, 'tipoProblema' TEXT NOT NULL, 'lida' INTEGER NOT NULL, 'imagem' TEXT, 'imagemEnviada' INTEGER NOT NULL, 'situacao' INTEGER NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'Problema' ('descricao' TEXT NOT NULL, 'tipoProblema' TEXT NOT NULL, 'lida' INTEGER NOT NULL, 'imagem' TEXT, 'imagemEnviada' INTEGER NOT NULL, 'situacao' INTEGER NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
             database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'rua' TEXT");
             database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'cep' TEXT");
             database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'mostraRuas' INTEGER DEFAULT 0");
-            database.execSQL("CREATE TABLE IF NOT EXISTS 'servico' ('icone' TEXT NOT NULL, 'imagemEnviada' INTEGER NOT NULL, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'Servico' ('icone' TEXT NOT NULL, 'imagemEnviada' INTEGER NOT NULL, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
             database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'servicos' TEXT");
+
+            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'rua' TEXT");
+            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'cep' TEXT");
+            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'servicos' TEXT");
+
+            database.execSQL("CREATE UNIQUE INDEX 'index_tipo_problema_nome' ON 'tipo_problema' ('nome')");
+            database.execSQL("CREATE UNIQUE INDEX 'index_Servico_nome' ON 'servico' ('nome')");
         }
     };
 
     // v2.2.1 - v8 bd
-    static final Migration MIGRATION_7_8 = new Migration(7, 8) {
+    public static final Migration MIGRATION_7_8 = new Migration(7, 8) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
 
@@ -145,12 +154,99 @@ public abstract class AppDatabase extends RoomDatabase {
     };
 
     // v2.2.2 - v9 bd
-    static final Migration MIGRATION_8_9 = new Migration(8, 9) {
+    public static final Migration MIGRATION_8_9 = new Migration(8, 9) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
+//            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'rua' TEXT");
+//            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'cep' TEXT");
+//            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'servicos' TEXT");
+        }
+    };
+
+    // migracao direta
+    public static final Migration MIGRATION_6_10 = new Migration(6, 10) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'tipo_problema' ('descricao' TEXT, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'Problema' ('descricao' TEXT NOT NULL, 'tipoProblema' TEXT NOT NULL, 'lida' INTEGER NOT NULL, 'imagem' TEXT, 'imagemEnviada' INTEGER NOT NULL, 'situacao' INTEGER NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'rua' TEXT");
+            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'cep' TEXT");
+            database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'mostraRuas' INTEGER DEFAULT 0");
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'Servico' ('icone' TEXT NOT NULL, 'imagemEnviada' INTEGER NOT NULL, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'servicos' TEXT");
+
             database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'rua' TEXT");
             database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'cep' TEXT");
             database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'servicos' TEXT");
+
+            database.execSQL("CREATE UNIQUE INDEX 'index_tipo_problema_nome' ON 'tipo_problema' ('nome')");
+            database.execSQL("CREATE UNIQUE INDEX 'index_Servico_nome' ON 'servico' ('nome')");
+        }
+    };
+
+    public static final Migration MIGRATION_7_10 = new Migration(7, 10) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'tipo_problema' ('descricao' TEXT, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'Problema' ('descricao' TEXT NOT NULL, 'tipoProblema' TEXT NOT NULL, 'lida' INTEGER NOT NULL, 'imagem' TEXT, 'imagemEnviada' INTEGER NOT NULL, 'situacao' INTEGER NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+//            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'rua' TEXT");
+//            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'cep' TEXT");
+
+            database.execSQL("CREATE TABLE 'iti' ('sigla' TEXT, 'tarifa' REAL NOT NULL, 'distancia' REAL, 'tempo' INTEGER, 'acessivel' INTEGER NOT NULL, 'empresa' TEXT NOT NULL, 'observacao' TEXT, 'mostraRuas' INTEGER, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("INSERT INTO 'iti' ('sigla', 'tarifa', 'distancia', 'tempo', 'acessivel', 'empresa', 'observacao', 'mostraRuas', 'id', 'ativo', 'enviado', 'data_cadastro', 'usuario_cadastro', 'ultima_alteracao', 'usuario_ultima_alteracao', 'programado_para') SELECT  'sigla', 'tarifa', 'distancia', 'tempo', 'acessivel', 'empresa', 'observacao', 'mostraRuas', 'id', 'ativo', 'enviado', 'data_cadastro', 'usuario_cadastro', 'ultima_alteracao', 'usuario_ultima_alteracao', 'programado_para' FROM 'Itinerario'");
+            database.execSQL("DROP TABLE 'Itinerario'");
+            database.execSQL("ALTER TABLE 'iti' RENAME TO 'Itinerario'");
+
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'Servico' ('icone' TEXT NOT NULL, 'imagemEnviada' INTEGER NOT NULL, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+//            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'servicos' TEXT");
+
+//            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'rua' TEXT");
+//            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'cep' TEXT");
+//            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'servicos' TEXT");
+
+//            database.execSQL("CREATE UNIQUE INDEX 'index_tipo_problema_nome' ON 'tipo_problema' ('nome')");
+//            database.execSQL("CREATE UNIQUE INDEX 'index_Servico_nome' ON 'servico' ('nome')");
+        }
+    };
+
+    public static final Migration MIGRATION_8_10 = new Migration(8, 10) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'tipo_problema' ('descricao' TEXT, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'Problema' ('descricao' TEXT NOT NULL, 'tipoProblema' TEXT NOT NULL, 'lida' INTEGER NOT NULL, 'imagem' TEXT, 'imagemEnviada' INTEGER NOT NULL, 'situacao' INTEGER NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+//            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'rua' TEXT");
+//            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'cep' TEXT");
+//            database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'mostraRuas' INTEGER DEFAULT 0");
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'Servico' ('icone' TEXT NOT NULL, 'imagemEnviada' INTEGER NOT NULL, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'servicos' TEXT");
+
+//            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'rua' TEXT");
+//            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'cep' TEXT");
+//            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'servicos' TEXT");
+
+            database.execSQL("CREATE UNIQUE INDEX 'index_tipo_problema_nome' ON 'tipo_problema' ('nome')");
+            database.execSQL("CREATE UNIQUE INDEX 'index_Servico_nome' ON 'servico' ('nome')");
+        }
+    };
+
+    // v2.2.3 - v10 bd
+    public static final Migration MIGRATION_9_10 = new Migration(9, 10) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'tipo_problema' ('descricao' TEXT, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'Problema' ('descricao' TEXT NOT NULL, 'tipoProblema' TEXT NOT NULL, 'lida' INTEGER NOT NULL, 'imagem' TEXT, 'imagemEnviada' INTEGER NOT NULL, 'situacao' INTEGER NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'rua' TEXT");
+            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'cep' TEXT");
+            database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'mostraRuas' INTEGER DEFAULT 0");
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'Servico' ('icone' TEXT NOT NULL, 'imagemEnviada' INTEGER NOT NULL, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'servicos' TEXT");
+
+            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'rua' TEXT");
+            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'cep' TEXT");
+            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'servicos' TEXT");
+
+            database.execSQL("CREATE UNIQUE INDEX 'index_tipo_problema_nome' ON 'tipo_problema' ('nome')");
+            database.execSQL("CREATE UNIQUE INDEX 'index_Servico_nome' ON 'servico' ('nome')");
         }
     };
 

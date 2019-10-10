@@ -42,8 +42,7 @@
         android:layout_marginTop="8dp"
         android:background="@color/transparente"
         android:contentDescription="Botão fechar"
-        app:layout_constraintBottom_toBottomOf="@+id/textViewStatus"
-        app:layout_constraintStart_toEndOf="@+id/textViewStatus"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_close_blue_24dp" />
 </android.support.constraint.ConstraintLayout>

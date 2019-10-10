@@ -9,7 +9,8 @@ public enum PagerModel {
 //    SEGUNDA("Segunda", R.layout.novidade_210_sugestao),
 //    TERCEIRA("Terceira", R.layout.novidade_210_horario);
 
-    PRIMEIRA("Primeira", R.layout.novidade_220_itinerarios);
+    PRIMEIRA("Primeira", R.layout.novidade_220_pois),
+    SEGUNDA("Segunda", R.layout.novidade_220_ajuda);
 
     private String mTitleResId;
     private int mLayoutResId;

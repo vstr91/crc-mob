@@ -43,7 +43,7 @@ import br.com.vostre.circular.utils.Converters;
         Horario.class, HorarioItinerario.class, SecaoItinerario.class, Onibus.class,
         ParametroInterno.class, ParadaSugestao.class, HistoricoParada.class, UsuarioPreferencia.class,
         HistoricoItinerario.class, Acesso.class, PontoInteresseSugestao.class, TipoProblema.class, Problema.class, Servico.class},
-        version = 7)
+        version = 9)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -85,6 +85,10 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract ProblemaDAO problemaDAO();
     public abstract ServicoDAO servicoDAO();
 
+    // 2.2.1 - v8 bd = ajustando tabela itinerario - erro na migracao anterior
+
+    // 2.2.2 - v9 bd = ajustando tabela parada_sugestao - erro na migracao anterior
+
     public static AppDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {
             INSTANCE =
@@ -92,7 +96,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             // allow queries on the main thread.
                             // Don't do this on a real app! See PersistenceBasicSample for an example.
                             //.allowMainThreadQueries()
-                            .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+                            .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9)
                             .fallbackToDestructiveMigration()
                             .build();
         }
@@ -126,9 +130,27 @@ public abstract class AppDatabase extends RoomDatabase {
             database.execSQL("CREATE TABLE IF NOT EXISTS 'problema' ('descricao' TEXT NOT NULL, 'tipoProblema' TEXT NOT NULL, 'lida' INTEGER NOT NULL, 'imagem' TEXT, 'imagemEnviada' INTEGER NOT NULL, 'situacao' INTEGER NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
             database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'rua' TEXT");
             database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'cep' TEXT");
-            database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'mostraRuas' INTEGER NOT NULL");
+            database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'mostraRuas' INTEGER DEFAULT 0");
             database.execSQL("CREATE TABLE IF NOT EXISTS 'servico' ('icone' TEXT NOT NULL, 'imagemEnviada' INTEGER NOT NULL, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
             database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'servicos' TEXT");
+        }
+    };
+
+    // v2.2.1 - v8 bd
+    static final Migration MIGRATION_7_8 = new Migration(7, 8) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+
+        }
+    };
+
+    // v2.2.2 - v9 bd
+    static final Migration MIGRATION_8_9 = new Migration(8, 9) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'rua' TEXT");
+            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'cep' TEXT");
+            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'servicos' TEXT");
         }
     };
 

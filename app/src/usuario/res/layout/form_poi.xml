@@ -119,10 +119,8 @@
             android:id="@+id/imageView"
             android:layout_width="45dp"
             android:layout_height="45dp"
-            android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
             android:scaleType="centerInside"
-            app:layout_constraintBottom_toTopOf="@+id/textViewCidadeDestino"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btnFoto"
             app:srcCompat="@mipmap/ic_onibus_azul" />

@@ -16,6 +16,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.cloudinary.Cloudinary;
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.UploadRequest;
 import com.cloudinary.android.callback.ErrorInfo;

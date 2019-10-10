@@ -25,7 +25,9 @@
         android:roundIcon="@drawable/icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
+        <meta-data
+            android:name="CLOUDINARY_URL"
+            android:value="cloudinary://@vostre"/>
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="br.com.vostre.circular.fileprovider"

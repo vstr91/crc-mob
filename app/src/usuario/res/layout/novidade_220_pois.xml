@@ -14,7 +14,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/novo_sugestoes" />
+        app:srcCompat="@drawable/novo_pois" />
 
     <TextView
         android:id="@+id/textView63"
@@ -45,7 +45,7 @@
         android:paddingLeft="5dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:text="@string/novidade_220_itinerarios"
+        android:text="@string/novidade_220_pois"
         android:textColor="@color/branco"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -8,8 +8,8 @@ android {
         minSdkVersion 19
         targetSdkVersion 28
         multiDexEnabled true
-        versionCode 24
-        versionName "2.2.0"
+        versionCode 28
+        versionName "2.2.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
 
@@ -148,6 +148,8 @@ dependencies {
     implementation 'com.daimajia.androidanimations:library:2.3@aar'
 
     implementation group: 'com.cloudinary', name: 'cloudinary-android', version: '1.25.0'
+
+    androidTestImplementation 'android.arch.persistence.room:testing:1.1.1'
 
     implementation 'me.relex:circleindicator:1.2.2'
 //    implementation 'androidx.cardview:cardview:1.0.0'

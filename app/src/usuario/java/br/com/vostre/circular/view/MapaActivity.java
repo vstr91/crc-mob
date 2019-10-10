@@ -942,6 +942,7 @@ public class MapaActivity extends BaseActivity {
                             }
 
                             Button btnDetalhes = bsdPoi.findViewById(R.id.btnDetalhes);
+                            btnDetalhes.setVisibility(View.GONE);
 //                            btnDetalhes.setVisibility(View.GONE);
 
 //                            Button btnEdicao = bsdPoi.findViewById(R.id.btnEdicao);
@@ -1211,6 +1212,7 @@ public class MapaActivity extends BaseActivity {
             binding.fabParada.setVisibility(View.GONE);
             binding.fabMeuLocal.setEnabled(false);
             binding.map.setEnabled(false);
+            binding.fabSugestao.setVisibility(View.GONE);
         } else{
 //            binding.textViewGps.setVisibility(View.GONE);
             binding.textViewGps.setText(R.string.text_procurando_gps);
@@ -1218,9 +1220,12 @@ public class MapaActivity extends BaseActivity {
             if(SessionUtils.estaLogado(getApplicationContext())){
                 binding.fabParada.setEnabled(true);
                 binding.fabParada.setVisibility(View.VISIBLE);
+                binding.fabSugestao.setVisibility(View.VISIBLE);
+                binding.fabSugestao.setEnabled(true);
             } else{
                 binding.fabParada.setEnabled(false);
                 binding.fabParada.setVisibility(View.GONE);
+                binding.fabSugestao.setVisibility(View.GONE);
             }
 
             binding.fabMeuLocal.setEnabled(true);
@@ -1238,10 +1243,13 @@ public class MapaActivity extends BaseActivity {
             if(gpsAtivo){
                 binding.fabParada.setEnabled(true);
                 binding.fabMeuLocal.setEnabled(true);
+                binding.fabSugestao.setVisibility(View.VISIBLE);
+                binding.fabSugestao.setEnabled(true);
                 configuraActivity();
             } else{
                 binding.fabParada.setEnabled(false);
                 binding.fabMeuLocal.setEnabled(false);
+                binding.fabSugestao.setVisibility(View.GONE);
             }
 
             Toast.makeText(getApplicationContext(), "Login realizado com sucesso! " +

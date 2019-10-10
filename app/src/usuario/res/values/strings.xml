@@ -36,5 +36,6 @@
     <string name="novidade_210_sugestao">Sugira paradas e pontos de interesse público, como praças, pontos turísticos, hospitais e locais de prática religiosa direto na tela de Mapa!\n\nFaça login e contribua com o projeto!</string>
     <string name="novidade_210_horario">Veja o tempo estimado* em que o ônibus passará pela parada escolhida!\n\n\n*Estimativa calculada automaticamente. Os dados não são calculados em tempo real!</string>
 
-    <string name="novidade_220_itinerarios">Agora você tem mais informações sobre os pontos de interesse cadastrados! Veja os itinerários que passam por perto e planeje melhor sua viagem ou passeio!</string>
+    <string name="novidade_220_pois">Agora você tem mais informações sobre os pontos de interesse cadastrados! Veja os itinerários que passam por perto e planeje melhor sua viagem ou passeio!</string>
+    <string name="novidade_220_ajuda">Bateu dúvida ao buscar aquela informação? Use a ajuda e veja tudo que o Circular tem a oferecer!</string>
 </resources>

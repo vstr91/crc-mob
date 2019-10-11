@@ -218,14 +218,7 @@ public abstract class AppDatabase extends RoomDatabase {
 //            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'cep' TEXT");
 //            database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'mostraRuas' INTEGER DEFAULT 0");
             database.execSQL("CREATE TABLE IF NOT EXISTS 'Servico' ('icone' TEXT NOT NULL, 'imagemEnviada' INTEGER NOT NULL, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
-            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'servicos' TEXT");
 
-//            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'rua' TEXT");
-//            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'cep' TEXT");
-//            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'servicos' TEXT");
-
-            database.execSQL("CREATE UNIQUE INDEX 'index_tipo_problema_nome' ON 'tipo_problema' ('nome')");
-            database.execSQL("CREATE UNIQUE INDEX 'index_Servico_nome' ON 'servico' ('nome')");
         }
     };
 
@@ -233,20 +226,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public static final Migration MIGRATION_9_10 = new Migration(9, 10) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS 'tipo_problema' ('descricao' TEXT, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
-            database.execSQL("CREATE TABLE IF NOT EXISTS 'Problema' ('descricao' TEXT NOT NULL, 'tipoProblema' TEXT NOT NULL, 'lida' INTEGER NOT NULL, 'imagem' TEXT, 'imagemEnviada' INTEGER NOT NULL, 'situacao' INTEGER NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
-            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'rua' TEXT");
-            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'cep' TEXT");
-            database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'mostraRuas' INTEGER DEFAULT 0");
-            database.execSQL("CREATE TABLE IF NOT EXISTS 'Servico' ('icone' TEXT NOT NULL, 'imagemEnviada' INTEGER NOT NULL, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
-            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'servicos' TEXT");
 
-            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'rua' TEXT");
-            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'cep' TEXT");
-            database.execSQL("ALTER TABLE 'parada_sugestao' ADD COLUMN 'servicos' TEXT");
-
-            database.execSQL("CREATE UNIQUE INDEX 'index_tipo_problema_nome' ON 'tipo_problema' ('nome')");
-            database.execSQL("CREATE UNIQUE INDEX 'index_Servico_nome' ON 'servico' ('nome')");
         }
     };
 

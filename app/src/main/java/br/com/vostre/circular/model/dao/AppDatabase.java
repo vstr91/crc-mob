@@ -43,7 +43,7 @@ import br.com.vostre.circular.utils.Converters;
         Horario.class, HorarioItinerario.class, SecaoItinerario.class, Onibus.class,
         ParametroInterno.class, ParadaSugestao.class, HistoricoParada.class, UsuarioPreferencia.class,
         HistoricoItinerario.class, Acesso.class, PontoInteresseSugestao.class, TipoProblema.class, Problema.class, Servico.class},
-        version = 10)
+        version = 11)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -91,6 +91,8 @@ public abstract class AppDatabase extends RoomDatabase {
 
     // 2.2.3 - v10 bd = ajustando tabela tipo_problema - erro na migracao anterior
 
+    // 2.2.4 - v11 bd = forçando recriação do BD para eliminar problemas
+
     public static AppDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {
             INSTANCE =
@@ -98,7 +100,8 @@ public abstract class AppDatabase extends RoomDatabase {
                             // allow queries on the main thread.
                             // Don't do this on a real app! See PersistenceBasicSample for an example.
                             //.allowMainThreadQueries()
-                            .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
+                            .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
+                                    MIGRATION_6_10, MIGRATION_7_10, MIGRATION_8_10, MIGRATION_9_10)
                             .fallbackToDestructiveMigration()
                             .build();
         }
@@ -192,7 +195,7 @@ public abstract class AppDatabase extends RoomDatabase {
 //            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'rua' TEXT");
 //            database.execSQL("ALTER TABLE 'parada' ADD COLUMN 'cep' TEXT");
 
-            database.execSQL("CREATE TABLE 'iti' ('sigla' TEXT, 'tarifa' REAL NOT NULL, 'distancia' REAL, 'tempo' INTEGER, 'acessivel' INTEGER NOT NULL, 'empresa' TEXT NOT NULL, 'observacao' TEXT, 'mostraRuas' INTEGER, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("CREATE TABLE 'iti' ('sigla' TEXT, 'tarifa' REAL NOT NULL, 'distancia' REAL, 'tempo' INTEGER, 'acessivel' INTEGER NOT NULL, 'empresa' TEXT NOT NULL, 'observacao' TEXT, 'mostraRuas' INTEGER DEFAULT 0, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
             database.execSQL("INSERT INTO 'iti' ('sigla', 'tarifa', 'distancia', 'tempo', 'acessivel', 'empresa', 'observacao', 'mostraRuas', 'id', 'ativo', 'enviado', 'data_cadastro', 'usuario_cadastro', 'ultima_alteracao', 'usuario_ultima_alteracao', 'programado_para') SELECT  'sigla', 'tarifa', 'distancia', 'tempo', 'acessivel', 'empresa', 'observacao', 'mostraRuas', 'id', 'ativo', 'enviado', 'data_cadastro', 'usuario_cadastro', 'ultima_alteracao', 'usuario_ultima_alteracao', 'programado_para' FROM 'Itinerario'");
             database.execSQL("DROP TABLE 'Itinerario'");
             database.execSQL("ALTER TABLE 'iti' RENAME TO 'Itinerario'");

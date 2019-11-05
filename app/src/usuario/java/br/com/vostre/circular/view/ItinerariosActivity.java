@@ -284,18 +284,22 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
                 adapterResultado.itinerarios = itinerarios;
 
-                bundle.putString("partida", bairroPartida.getBairro().getNome() + ", " + bairroPartida.getNomeCidadeComEstado());
-                bundle.putString("destino", bairroDestino.getBairro().getNome() + ", " + bairroDestino.getNomeCidadeComEstado());
+                if(bairroPartida != null && bairroDestino != null){
+                    bundle.putString("partida", bairroPartida.getBairro().getNome() + ", " + bairroPartida.getNomeCidadeComEstado());
+                    bundle.putString("destino", bairroDestino.getBairro().getNome() + ", " + bairroDestino.getNomeCidadeComEstado());
 
-                bundle.putString("partida_destino", bairroPartida.getBairro().getNome() + ", "
-                        + bairroPartida.getNomeCidadeComEstado() + " x "
-                        + bairroDestino.getBairro().getNome() + ", " + bairroDestino.getNomeCidadeComEstado());
+                    bundle.putString("partida_destino", bairroPartida.getBairro().getNome() + ", "
+                            + bairroPartida.getNomeCidadeComEstado() + " x "
+                            + bairroDestino.getBairro().getNome() + ", " + bairroDestino.getNomeCidadeComEstado());
 
-                bundle.putInt("itinerarios", itinerarios.size());
-                bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
-                bundle.putBoolean("sucesso", true);
+                    bundle.putInt("itinerarios", itinerarios.size());
+                    bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
+                    bundle.putBoolean("sucesso", true);
 
-                mFirebaseAnalytics.logEvent("consulta_itinerario", bundle);
+                    mFirebaseAnalytics.logEvent("consulta_itinerario", bundle);
+                }
+
+
 
             } else {
                 binding.listResultados.setVisibility(View.GONE);
@@ -772,27 +776,35 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     @Override
     public List<TapTarget> criaTour() {
 
-        DestaqueUtils.geraDestaqueUnico(this, binding.listCidadesPartida.getChildAt(1).findViewById(R.id.circleView2), "Escolha a cidade de partida",
-                "Escolha primeiro a cidade da qual você vai iniciar a sua viagem!", new TapTargetView.Listener(){
-            @Override
-            public void onTargetClick(TapTargetView view) {
-                super.onTargetClick(view);
+        View v =  binding.listCidadesPartida.getChildAt(1);
 
-                binding.listCidadesPartida.findViewHolderForAdapterPosition(1).itemView.findViewById(R.id.circleView2).performClick();
+        if(v != null){
+            DestaqueUtils.geraDestaqueUnico(this, binding.listCidadesPartida.getChildAt(1).findViewById(R.id.circleView2), "Escolha a cidade de partida",
+                    "Escolha primeiro a cidade da qual você vai iniciar a sua viagem!", new TapTargetView.Listener(){
+                        @Override
+                        public void onTargetClick(TapTargetView view) {
+                            super.onTargetClick(view);
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
+                            binding.listCidadesPartida.findViewHolderForAdapterPosition(1).itemView.findViewById(R.id.circleView2).performClick();
 
-                        DestaqueUtils.geraDestaqueUnico(formBairro.getDialog(), ((RecyclerView) formBairro.getView().findViewById(R.id.listBairros)).findViewHolderForAdapterPosition(1)
-                                        .itemView.findViewById(R.id.textViewNome),
-                                "Escolha o bairro de partida", "Escolha então o bairro de partida. Se houver apenas uma opção, o sistema escolherá automaticamente!", l2,
-                                false, false);
-                    }
-                }, 300);
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
 
-            }
-        }, false, true);
+                                    DestaqueUtils.geraDestaqueUnico(formBairro.getDialog(), ((RecyclerView) formBairro.getView().findViewById(R.id.listBairros)).findViewHolderForAdapterPosition(1)
+                                                    .itemView.findViewById(R.id.textViewNome),
+                                            "Escolha o bairro de partida", "Escolha então o bairro de partida. Se houver apenas uma opção, o sistema escolherá automaticamente!", l2,
+                                            false, false);
+                                }
+                            }, 300);
+
+                        }
+                    }, false, true);
+        } else{
+            Toast.makeText(getApplicationContext(), "Houve um problema ao criar o tour. Locais de partida não encontrados. Por favor tente novamente mais tarde.", Toast.LENGTH_LONG).show();
+        }
+
+
 
         List<TapTarget> targets = new ArrayList<>();
 

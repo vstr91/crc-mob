@@ -570,6 +570,11 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         startActivity(intent);
     }
 
+    public void onClickBtnMensagem(View v){
+        Intent intent = new Intent(getApplicationContext(), MensagensActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -717,6 +722,10 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w("login", "Google sign in failed", e);
+
+                if(progressBar != null){
+                    progressBar.setVisibility(View.GONE);
+                }
             }
 //            handleSignInResult(task);
             binding.btnLogin.setEnabled(true);
@@ -984,6 +993,10 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                             Toast.makeText(getApplicationContext(), "Não foi possível fazer o login. " +
                                     "Por favor tente novamente.", Toast.LENGTH_SHORT).show();
                             binding.btnLogin.setEnabled(true);
+
+                            if(progressBar != null){
+                                progressBar.setVisibility(View.GONE);
+                            }
 
                             //salva usuario preference
                             PreferenceUtils.salvarUsuarioLogado(getApplicationContext(), "");

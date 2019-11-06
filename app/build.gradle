@@ -109,7 +109,7 @@ dependencies {
 
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.github.kenglxn.QRGen:android:2.3.0'
-    implementation 'org.osmdroid:osmdroid-android:6.0.1'
+    implementation 'org.osmdroid:osmdroid-android:6.1.2'
     implementation 'com.github.MKergall:osmbonuspack:6.5.1'
     implementation 'com.karumi:dexter:4.2.0'
     implementation 'com.github.imangazalievm:slugify:1.0.0'

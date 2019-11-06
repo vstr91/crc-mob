@@ -121,28 +121,41 @@
                 </org.osmdroid.views.MapView>
 
                 <TextView
-                    android:id="@+id/textView37"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/textViewObservacao"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/horario_rounded_corner_azul"
-                    android:padding="5dp"
-                    android:text="@{`Linha `+itinerario.itinerario.sigla}"
+                    android:background="@drawable/dia_rounded_corner_azul"
+                    android:paddingBottom="10dp"
+                    android:text="@{itinerario.itinerario.observacao}"
+                    android:textAlignment="center"
                     android:textColor="@color/branco"
-                    android:textStyle="bold"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
+                    android:textSize="11sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/linearLayout4"
                     app:layout_constraintStart_toStartOf="parent"
-                    tools:text="Linha 001" />
+                    tools:text="observação" />
 
                 <LinearLayout
                     android:id="@+id/linearLayout4"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
-                    android:background="@drawable/dia_rounded_corner_azul"
+                    android:background="@color/azul"
                     android:orientation="horizontal"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/textViewObservacao"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent">
+
+                    <TextView
+                        android:id="@+id/textView37"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:text="@{`Linha `+itinerario.itinerario.sigla}"
+                        android:textColor="@color/branco"
+                        android:textSize="10sp"
+                        android:visibility="gone"
+                        tools:text="Linha 001"
+                        tools:visibility="visible" />
 
                     <LinearLayout
                         android:id="@+id/linearLayout2"
@@ -227,10 +240,10 @@
                         android:layout_height="match_parent"
                         android:layout_marginRight="10dp"
                         android:layout_weight=".5"
-                        android:tooltipText="Adicionar aos favoritos"
-                        android:contentDescription="Botão adicionar aos favoritos"
                         android:background="@color/transparente"
+                        android:contentDescription="Botão adicionar aos favoritos"
                         android:onClick="onClickBtnFavorito"
+                        android:tooltipText="Adicionar aos favoritos"
                         app:srcCompat="@drawable/ic_star_white_24dp" />
 
                 </LinearLayout>

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,9 +27,12 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
@@ -214,6 +218,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
         binding.linearLayout4.setVisibility(View.GONE);
         binding.textView37.setVisibility(View.GONE);
+        binding.textViewObservacao.setVisibility(View.GONE);
 
         geraModalLoading();
 
@@ -248,6 +253,29 @@ public class DetalheItinerarioActivity extends BaseActivity {
             binding.cardViewItinerario.getLayoutParams().height = WRAP_CONTENT;
             mapaOculto = true;
         }
+
+        map.setBuiltInZoomControls(false);
+
+        //zoom ao tocar no mapa - inicia modo acompanhamento
+        MapEventsReceiver receiver = new MapEventsReceiver() {
+            @Override
+            public boolean singleTapConfirmedHelper(GeoPoint p) {
+                GeoPoint g = new GeoPoint(viewModel.paradas.getValue().get(0).getParada().getLatitude(), viewModel.paradas.getValue().get(0).getParada().getLongitude());
+
+                mapController.setCenter(g);
+                map.getController().animateTo(g, 18d, 1000L);
+
+                return false;
+            }
+
+            @Override
+            public boolean longPressHelper(GeoPoint p) {
+                return false;
+            }
+        };
+
+        MapEventsOverlay overlayEvents = new MapEventsOverlay(getBaseContext(), receiver);
+        map.getOverlays().add(overlayEvents);
 
     }
 
@@ -618,6 +646,12 @@ public class DetalheItinerarioActivity extends BaseActivity {
                     binding.textView37.setVisibility(View.GONE);
                 } else{
                     binding.textView37.setVisibility(View.VISIBLE);
+                }
+
+                if(itinerario.getItinerario().getObservacao() == null || itinerario.getItinerario().getObservacao().isEmpty() || itinerario.getItinerario().getObservacao().equals("null")){
+                    binding.textViewObservacao.setVisibility(View.GONE);
+                } else{
+                    binding.textViewObservacao.setVisibility(View.VISIBLE);
                 }
 
                 viewModel.paradas.observe(ctx, paradasObserver);

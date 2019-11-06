@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
 import android.location.LocationManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
@@ -146,8 +148,11 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
                     if(menu != null){
                         invalidateOptionsMenu();
+                        findViewById(R.id.btnMensagem).setBackgroundColor(Color.GREEN);
                     }
 
+                } else{
+                    findViewById(R.id.btnMensagem).setBackgroundColor(Color.TRANSPARENT);
                 }
 
             }
@@ -646,8 +651,22 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
             if(menu != null){
 
                 if(mensagens.size() > 0){
+                    TextView tv = findViewById(R.id.textViewBadge);
+
+//                    if(tv != null){
+//                        tv.setText(mensagens.size());
+//                        tv.setVisibility(View.VISIBLE);
+//                    }
+
                     menu.getItem(3).getActionView().findViewById(R.id.textViewBadgeMsg).setVisibility(View.VISIBLE);
                 } else{
+
+                    TextView tv = findViewById(R.id.textViewBadge);
+
+                    if(tv != null){
+                        tv.setVisibility(View.GONE);
+                    }
+
                     menu.getItem(3).getActionView().findViewById(R.id.textViewBadgeMsg).setVisibility(View.GONE);
                 }
 

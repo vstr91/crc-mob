@@ -8,10 +8,10 @@
         android:title="@string/action_sobre"
         app:showAsAction="always" />-->
 
-    <item android:id="@+id/icon_msg"
-        android:title="Mensagens"
-        android:icon="@drawable/ic_mail_outline_24dp"
-        android:contentDescription="Ícone de Mensagens"
-        app:showAsAction="always" />
+<!--    <item android:id="@+id/icon_msg"-->
+<!--        android:title="Mensagens"-->
+<!--        android:icon="@drawable/ic_mail_outline_24dp"-->
+<!--        android:contentDescription="Ícone de Mensagens"-->
+<!--        app:showAsAction="always" />-->
 
 </menu>

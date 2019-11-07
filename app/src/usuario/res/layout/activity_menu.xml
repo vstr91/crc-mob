@@ -297,8 +297,27 @@
                         app:layout_constraintTop_toBottomOf="@+id/btnSair" />
 
                     <Button
+                        android:id="@+id/btnAtualizar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:drawablePadding="10dp"
+                        android:textAlignment="viewStart"
+                        android:drawableStart="@drawable/ic_sync_blue_24dp"
+                        android:onClick="@{view::onClickBtnAtualizar}"
+                        android:background="@color/transparente"
+                        android:text="Atualizar Dados"
+                        android:textAppearance="@style/botao_principal"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
+
+                    <Button
                         android:id="@+id/btnMensagem"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:layout_marginLeft="8dp"
@@ -308,14 +327,12 @@
                         android:drawablePadding="10dp"
                         android:textAlignment="viewStart"
                         android:drawableStart="@drawable/ic_mail_outline_blue_24dp"
-                        android:drawableEnd="@drawable/ic_info_outline_blue_24dp"
                         android:onClick="@{view::onClickBtnMensagem}"
                         android:background="@color/transparente"
                         android:text="Caixa de Mensagens"
                         android:textAppearance="@style/botao_principal"
-                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
+                        app:layout_constraintTop_toBottomOf="@+id/btnAtualizar" />
 
                     <Button
                         android:id="@+id/btnSobre"

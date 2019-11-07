@@ -12,16 +12,22 @@
         app:showAsAction="always" />-->
 
     <item android:id="@+id/icon_ajuda"
-        android:title="Alerta"
+        android:title="Ajuda"
         app:actionLayout="@layout/toolbar_ajuda_icon"
         android:contentDescription="Ícone de Ajuda"
         app:showAsAction="always" />
 
-    <item android:id="@+id/icon_sync"
-        android:title="Sincronização"
-        app:actionLayout="@layout/toolbar_sync_icon"
-        android:contentDescription="Ícone de sincronização"
+    <item android:id="@+id/icon_incidente"
+        android:title="Incidente"
+        app:actionLayout="@layout/toolbar_incidente_icon"
+        android:contentDescription="Ícone de Incidente"
         app:showAsAction="always" />
+
+<!--    <item android:id="@+id/icon_sync"-->
+<!--        android:title="Sincronização"-->
+<!--        app:actionLayout="@layout/toolbar_sync_icon"-->
+<!--        android:contentDescription="Ícone de sincronização"-->
+<!--        app:showAsAction="always" />-->
 
     <item android:id="@+id/icon_favoritos"
         android:title="Favoritos"
@@ -29,10 +35,10 @@
         android:contentDescription="Ícone de Favoritos"
         app:showAsAction="always" />
 
-    <item android:id="@+id/icon_msg"
-        android:title="Mensagens"
-        app:actionLayout="@layout/toolbar_msg_icon"
-        android:contentDescription="Ícone de Mensagens"
-        app:showAsAction="always" />
+<!--    <item android:id="@+id/icon_msg"-->
+<!--        android:title="Mensagens"-->
+<!--        app:actionLayout="@layout/toolbar_msg_icon"-->
+<!--        android:contentDescription="Ícone de Mensagens"-->
+<!--        app:showAsAction="always" />-->
 
 </menu>

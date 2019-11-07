@@ -32,10 +32,11 @@ import br.com.vostre.circular.viewModel.ToolbarViewModel;
 public class ToolbarUtils {
 
     static TextView textViewBadgeMsg;
-    static ImageButton imageButtonMsg;
+//    static ImageButton imageButtonMsg;
     static ImageButton imageButtonAjuda;
+    static ImageButton imageButtonIncidente;
     static ImageButton imageButtonFavoritos;
-    static ImageButton imageButtonSync;
+//    static ImageButton imageButtonSync;
     static View.OnClickListener mListener;
 
     public static final Integer PICK_FILE = 310;
@@ -53,31 +54,37 @@ public class ToolbarUtils {
 
         activity.getMenuInflater().inflate(R.menu.main, menu);
 
-        itemMsg = menu.findItem(R.id.icon_msg);
-        MenuItemCompat.getActionView(itemMsg).setOnClickListener(listener);
+//        itemMsg = menu.findItem(R.id.icon_msg);
+//        MenuItemCompat.getActionView(itemMsg).setOnClickListener(listener);
 
         MenuItem itemAjuda = menu.findItem(R.id.icon_ajuda);
         MenuItemCompat.getActionView(itemAjuda).setOnClickListener(listener);
 
+        MenuItem itemIncidente = menu.findItem(R.id.icon_incidente);
+        MenuItemCompat.getActionView(itemIncidente).setOnClickListener(listener);
+
         MenuItem itemFavoritos = menu.findItem(R.id.icon_favoritos);
         MenuItemCompat.getActionView(itemFavoritos).setOnClickListener(listener);
 
-        MenuItem itemSync = menu.findItem(R.id.icon_sync);
-        MenuItemCompat.getActionView(itemSync).setOnClickListener(listener);
+//        MenuItem itemSync = menu.findItem(R.id.icon_sync);
+//        MenuItemCompat.getActionView(itemSync).setOnClickListener(listener);
 
         mListener = listener;
 
-        imageButtonMsg = MenuItemCompat.getActionView(itemMsg).findViewById(R.id.imageButtonMsg);
-        imageButtonMsg.setOnClickListener(mListener);
+//        imageButtonMsg = MenuItemCompat.getActionView(itemMsg).findViewById(R.id.imageButtonMsg);
+//        imageButtonMsg.setOnClickListener(mListener);
 
         imageButtonAjuda = MenuItemCompat.getActionView(itemAjuda).findViewById(R.id.imageButtonAjuda);
         imageButtonAjuda.setOnClickListener(mListener);
 
+        imageButtonIncidente = MenuItemCompat.getActionView(itemIncidente).findViewById(R.id.imageButtonIncidente);
+        imageButtonIncidente.setOnClickListener(mListener);
+
         imageButtonFavoritos = MenuItemCompat.getActionView(itemFavoritos).findViewById(R.id.imageButtonFavoritos);
         imageButtonFavoritos.setOnClickListener(mListener);
 
-        imageButtonSync = MenuItemCompat.getActionView(itemSync).findViewById(R.id.imageButtonSync);
-        imageButtonSync.setOnClickListener(mListener);
+//        imageButtonSync = MenuItemCompat.getActionView(itemSync).findViewById(R.id.imageButtonSync);
+//        imageButtonSync.setOnClickListener(mListener);
 
 //        if(mensagensNaoLidas < 1){
 //            textViewBadgeMsg = MenuItemCompat.getActionView(itemMsg).findViewById(R.id.textViewBadgeMsg);
@@ -91,16 +98,21 @@ public class ToolbarUtils {
             case android.R.id.home:
                 activity.onBackPressed();
                 break;
-            case R.id.imageButtonMsg:
-            case R.id.msg:
-            case R.id.icon_msg:
-                Intent intent = new Intent(activity, MensagensActivity.class);
-                activity.startActivity(intent);
-                break;
+//            case R.id.imageButtonMsg:
+//            case R.id.msg:
+//            case R.id.icon_msg:
+//                Intent intent = new Intent(activity, MensagensActivity.class);
+//                activity.startActivity(intent);
+//                break;
             case R.id.imageButtonAjuda:
             case R.id.ajuda:
             case R.id.icon_ajuda:
                 activity.onToolbarItemSelected(v);
+                break;
+            case R.id.imageButtonIncidente:
+            case R.id.incidente:
+            case R.id.icon_incidente:
+                Toast.makeText(activity, "Incidente", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.imageButtonFavoritos:
             case R.id.favoritos:
@@ -108,27 +120,27 @@ public class ToolbarUtils {
                 Intent i = new Intent(activity, FavoritosActivity.class);
                 activity.startActivity(i);
                 break;
-            case R.id.imageButtonSync:
-            case R.id.icon_sync:
-            case R.id.sync:
-
-                // Pass the settings flags by inserting them in a bundle
-                Bundle settingsBundle = new Bundle();
-                settingsBundle.putBoolean(
-                        ContentResolver.SYNC_EXTRAS_MANUAL, true);
-                settingsBundle.putBoolean(
-                        ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-                /*
-                 * Request the sync for the default account, authority, and
-                 * manual sync settings
-                 */
-                ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
-
-                PreferenceUtils.gravaMostraToast(activity.getApplicationContext(),true);
-
-                Toast.makeText(activity.getApplicationContext(), "Iniciando sincronização", Toast.LENGTH_SHORT).show();
-
-                break;
+//            case R.id.imageButtonSync:
+//            case R.id.icon_sync:
+//            case R.id.sync:
+//
+//                // Pass the settings flags by inserting them in a bundle
+//                Bundle settingsBundle = new Bundle();
+//                settingsBundle.putBoolean(
+//                        ContentResolver.SYNC_EXTRAS_MANUAL, true);
+//                settingsBundle.putBoolean(
+//                        ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+//                /*
+//                 * Request the sync for the default account, authority, and
+//                 * manual sync settings
+//                 */
+//                ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
+//
+//                PreferenceUtils.gravaMostraToast(activity.getApplicationContext(),true);
+//
+//                Toast.makeText(activity.getApplicationContext(), "Iniciando sincronização", Toast.LENGTH_SHORT).show();
+//
+//                break;
         }
     }
 

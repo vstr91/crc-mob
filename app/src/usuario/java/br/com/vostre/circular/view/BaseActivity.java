@@ -65,6 +65,7 @@ import br.com.vostre.circular.utils.NotificacaoUtils;
 import br.com.vostre.circular.utils.ToolbarUtils;
 import br.com.vostre.circular.view.listener.GpsListener;
 import br.com.vostre.circular.view.listener.HoraListener;
+import br.com.vostre.circular.view.listener.MensagemListener;
 import br.com.vostre.circular.view.listener.ToolbarListener;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
@@ -73,7 +74,7 @@ import io.fabric.sdk.android.Fabric;
 
 import static br.com.vostre.circular.utils.ToolbarUtils.PICK_FILE;
 
-public class BaseActivity extends AppCompatActivity implements View.OnClickListener, HoraListener, GpsListener, ToolbarListener {
+public class BaseActivity extends AppCompatActivity implements View.OnClickListener, HoraListener, GpsListener, ToolbarListener, MensagemListener {
 
     public Toolbar toolbar;
     Menu menu;
@@ -138,7 +139,9 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
             public void onReceive(Context context, Intent intent) {
                 Bundle extras = intent.getExtras();
 
-                Integer mensagens = extras.getInt("mensagens");
+                Integer mensagens = extras.getInt("mensagens", 0);
+
+                onMensagemReceived(mensagens);
 
                 if(mensagens != null && mensagens > 0){
 
@@ -148,11 +151,11 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
                     if(menu != null){
                         invalidateOptionsMenu();
-                        findViewById(R.id.btnMensagem).setBackgroundColor(Color.GREEN);
+                        //findViewById(R.id.btnMensagem).setBackgroundColor(Color.GREEN);
                     }
 
                 } else{
-                    findViewById(R.id.btnMensagem).setBackgroundColor(Color.TRANSPARENT);
+                    //findViewById(R.id.btnMensagem).setBackgroundColor(Color.TRANSPARENT);
                 }
 
             }
@@ -207,10 +210,10 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
                 intent = new Intent(this, Parametros.class);
                 startActivity(intent);
                 break;*/
-            case R.id.textViewBadgeMsg:
-            case R.id.msg:
-            case R.id.icon_msg:
-                break;
+//            case R.id.textViewBadgeMsg:
+//            case R.id.msg:
+//            case R.id.icon_msg:
+//                break;
             case R.id.imageButtonAjuda:
             case R.id.ajuda:
             case R.id.icon_ajuda:
@@ -650,15 +653,21 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
             if(menu != null){
 
+                if(mensagens != null){
+                    onMensagemReceived(mensagens.size());
+                } else{
+                    onMensagemReceived(0);
+                }
+
                 if(mensagens.size() > 0){
                     TextView tv = findViewById(R.id.textViewBadge);
 
-//                    if(tv != null){
-//                        tv.setText(mensagens.size());
-//                        tv.setVisibility(View.VISIBLE);
-//                    }
+                    if(tv != null){
+                        tv.setText(String.valueOf(mensagens.size()));
+                        tv.setVisibility(View.VISIBLE);
+                    }
 
-                    menu.getItem(3).getActionView().findViewById(R.id.textViewBadgeMsg).setVisibility(View.VISIBLE);
+                    //menu.getItem(3).getActionView().findViewById(R.id.textViewBadgeMsg).setVisibility(View.VISIBLE);
                 } else{
 
                     TextView tv = findViewById(R.id.textViewBadge);
@@ -667,7 +676,7 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
                         tv.setVisibility(View.GONE);
                     }
 
-                    menu.getItem(3).getActionView().findViewById(R.id.textViewBadgeMsg).setVisibility(View.GONE);
+                    //menu.getItem(3).getActionView().findViewById(R.id.textViewBadgeMsg).setVisibility(View.GONE);
                 }
 
             }
@@ -699,4 +708,8 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
         DestaqueUtils.geraSequenciaDestaques(this, targets, listener);
     }
 
+    @Override
+    public void onMensagemReceived(int mensagens) {
+
+    }
 }

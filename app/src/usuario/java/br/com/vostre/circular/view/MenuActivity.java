@@ -36,6 +36,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -102,6 +103,7 @@ import br.com.vostre.circular.model.Parametro;
 import br.com.vostre.circular.model.ParametroInterno;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.BadgeDrawerToggle;
 import br.com.vostre.circular.utils.DBUtils;
 import br.com.vostre.circular.utils.DestaqueUtils;
 import br.com.vostre.circular.utils.JsonUtils;
@@ -125,7 +127,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     DrawerLayout drawer;
     NavigationView navView;
     ActivityMenuBinding binding;
-    ActionBarDrawerToggle drawerToggle;
+    BadgeDrawerToggle drawerToggle;
 
     // Constants
     // The authority for the sync adapter's content provider
@@ -234,7 +236,28 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                                     Bundle bundle = new Bundle();
                                     bundle.putString("permissoes", "0");
 
-                                    geraAvisoAjuda();
+//                                    geraAvisoAjuda();
+//                                    geraAvisoMensagens();
+//                                    geraAvisoIncidente();
+
+                                    List<TapTarget> targets = geraAvisos();
+                                    exibeTour(targets, new TapTargetSequence.Listener(){
+
+                                        @Override
+                                        public void onSequenceFinish() {
+                                            //Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        @Override
+                                        public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+
+                                        }
+
+                                        @Override
+                                        public void onSequenceCanceled(TapTarget lastTarget) {
+//                                            Toast.makeText(getApplicationContext(), "Tour cancelado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
 
                                     Toast.makeText(getApplicationContext(), "Acesso ao GPS e Armazenamento são necessários para aproveitar ao máximo as funções do Circular!", Toast.LENGTH_LONG).show();
                                 }
@@ -253,6 +276,28 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         if(!checarPermissoes() && !PreferenceUtils.carregarPreferenciaBoolean(this, "mostrou_dialog_inicial")){
             dialog.show();
+        } else{
+//            geraAvisoAjuda();
+//            geraAvisoMensagens();
+//            geraAvisoIncidente();
+            List<TapTarget> targets = geraAvisos();
+            exibeTour(targets, new TapTargetSequence.Listener(){
+
+                @Override
+                public void onSequenceFinish() {
+                    //Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+
+                }
+
+                @Override
+                public void onSequenceCanceled(TapTarget lastTarget) {
+//                                            Toast.makeText(getApplicationContext(), "Tour cancelado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
         // Create the dummy account
@@ -282,7 +327,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         navView.setNavigationItemSelectedListener(this);
 
-        drawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, 0, 0){
+        drawerToggle = new BadgeDrawerToggle(this, drawer, toolbar, 0, 0){
 
             public void onDrawerClosed(View view){
                 super.onDrawerClosed(view);
@@ -295,6 +340,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             }
 
         };
+
+        drawerToggle.setBadgeEnabled(false);
 
         drawer.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
@@ -352,13 +399,23 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         FirebaseUser account = FirebaseAuth.getInstance().getCurrentUser();
         updateUI(account);
 
-        //TODO: voltar trava para exibir so uma vez
-        if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), "novidades_220")){
-            FormNovidades formNovidades = new FormNovidades();
-            formNovidades.setVersao(BuildConfig.VERSION_NAME);
-            formNovidades.show(this.getSupportFragmentManager(), "formNovidades");
+//        if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), "novidades_230")){
+//            FormNovidades formNovidades = new FormNovidades();
+//            formNovidades.setVersao(BuildConfig.VERSION_NAME);
+//            formNovidades.show(this.getSupportFragmentManager(), "formNovidades");
+//
+//            PreferenceUtils.salvarPreferencia(getApplicationContext(), "novidades_230", true);
+//        }
 
-            PreferenceUtils.salvarPreferencia(getApplicationContext(), "novidades_220", true);
+    }
+
+    @Override
+    public void onMensagemReceived(int mensagens) {
+
+        if(mensagens > 0){
+            drawerToggle.setBadgeEnabled(true);
+        } else{
+            drawerToggle.setBadgeEnabled(false);
         }
 
     }
@@ -372,7 +429,28 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED){
             startLocationUpdates();
-            geraAvisoAjuda();
+//            geraAvisoAjuda();
+//            geraAvisoMensagens();
+//            geraAvisoIncidente();
+
+            List<TapTarget> targets = geraAvisos();
+            exibeTour(targets, new TapTargetSequence.Listener(){
+
+                @Override
+                public void onSequenceFinish() {
+                    //Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+
+                }
+
+                @Override
+                public void onSequenceCanceled(TapTarget lastTarget) {
+//                                            Toast.makeText(getApplicationContext(), "Tour cancelado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
     }
@@ -571,8 +649,28 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnMensagem(View v){
+        drawer.closeDrawers();
         Intent intent = new Intent(getApplicationContext(), MensagensActivity.class);
         startActivity(intent);
+    }
+
+    public void onClickBtnAtualizar(View v){
+        drawer.closeDrawers();
+        // Pass the settings flags by inserting them in a bundle
+        Bundle settingsBundle = new Bundle();
+        settingsBundle.putBoolean(
+                ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        settingsBundle.putBoolean(
+                ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        /*
+         * Request the sync for the default account, authority, and
+         * manual sync settings
+         */
+        ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
+
+        PreferenceUtils.gravaMostraToast(getApplicationContext(),true);
+
+        Toast.makeText(getApplicationContext(), "Iniciando sincronização", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -1034,6 +1132,33 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     public void onToolbarInflated() {
         //geraAvisoAjuda();
+        List<TapTarget> targets = geraAvisos();
+        exibeTour(targets, new TapTargetSequence.Listener(){
+
+            @Override
+            public void onSequenceFinish() {
+                //Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+
+            }
+
+            @Override
+            public void onSequenceCanceled(TapTarget lastTarget) {
+//                                            Toast.makeText(getApplicationContext(), "Tour cancelado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private ImageButton getNavButtonView(Toolbar toolbar)
+    {
+        for (int i = 0; i < toolbar.getChildCount(); i++)
+            if(toolbar.getChildAt(i) instanceof ImageButton)
+                return (ImageButton) toolbar.getChildAt(i);
+
+        return null;
     }
 
     private void geraAvisoAjuda() {
@@ -1055,6 +1180,46 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         }
     }
 
+    private void geraAvisoMensagens() {
+        if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_mensagens")){
+
+            View v = getNavButtonView(toolbar);
+
+            if(v != null){
+                DestaqueUtils.geraDestaqueUnico(ctx, v, "Mudança de Layout",
+                        "Os ícones de mensagem e atualização manual agora ficam dentro do menu principal! Fique atento à sinalização (ponto azul) aqui. " +
+                                "Ela avisa quando há mensagens não lidas!", new TapTargetView.Listener(){
+                            @Override
+                            public void onTargetClick(TapTargetView view) {
+                                super.onTargetClick(view);
+                            }
+                        }, true, false);
+
+                PreferenceUtils.salvarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_mensagens", true);
+            }
+
+        }
+    }
+
+    private void geraAvisoIncidente() {
+        if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_incidente")){
+
+            if(menu != null){
+                DestaqueUtils.geraDestaqueUnico(ctx, menu.getItem(1).getActionView().findViewById(R.id.imageButtonIncidente), "Alerta de Incidentes!",
+                        "O ônibus quebrou, atrasou ou não fez o horário previsto? Ajude os outros usuários a ficarem informados! " +
+                                "Basta pressionar aqui e cadastrar o incidente!", new TapTargetView.Listener(){
+                            @Override
+                            public void onTargetClick(TapTargetView view) {
+                                super.onTargetClick(view);
+                            }
+                        }, true, false);
+
+                PreferenceUtils.salvarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_incidente", true);
+            }
+
+        }
+    }
+
     @Override
     public List<TapTarget> criaTour() {
         List<TapTarget> targets = new ArrayList<>();
@@ -1068,14 +1233,63 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         targets.add(DestaqueUtils.geraTapTarget(binding.button3, "Mapa", "Aqui você pode consultar os dados através de um mapa. " +
                 "Veja os pontos de parada e de interesse próximos à sua localização atual!", false, true, 4));
 
-        targets.add(DestaqueUtils.geraTapTarget(binding.toolbar.findViewById(R.id.imageButtonSync), "Atualizar Dados", "Realiza a conexão com o servidor para baixar dados atualizados. " +
-                        "A atualização também ocorre automaticamente de forma periódica!",
-                false, true, 5, 30));
+//        targets.add(DestaqueUtils.geraTapTarget(binding.toolbar.findViewById(R.id.imageButtonSync), "Atualizar Dados", "Realiza a conexão com o servidor para baixar dados atualizados. " +
+//                        "A atualização também ocorre automaticamente de forma periódica!",
+//                false, true, 5, 30));
         targets.add(DestaqueUtils.geraTapTarget(binding.toolbar.findViewById(R.id.imageButtonFavoritos), "Favoritos", "Permite consultar os registros (itinerários e paradas) marcados como favoritos.",
-                false, true, 6, 30));
-        targets.add(DestaqueUtils.geraTapTarget(binding.toolbar.findViewById(R.id.imageButtonMsg), "Mensagens",
-                "Aqui você pode consultar as mensagens enviadas pelo sistema e enviar suas sugestões!",
-                false, true, 7, 30));
+                false, true, 5, 30));
+//        targets.add(DestaqueUtils.geraTapTarget(binding.toolbar.findViewById(R.id.imageButtonMsg), "Mensagens",
+//                "Aqui você pode consultar as mensagens enviadas pelo sistema e enviar suas sugestões!",
+//                false, true, 7, 30));
+
+        return targets;
+    }
+
+    public List<TapTarget> geraAvisos() {
+        List<TapTarget> targets = new ArrayList<>();
+
+        if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_ajuda")){
+
+            if(menu != null){
+                targets.add(DestaqueUtils.geraTapTarget(menu.getItem(0).getActionView().findViewById(R.id.imageButtonAjuda), "Opção de Ajuda!",
+                        "Bateu aquela dúvida na hora de utilizar o aplicativo? Não se preocupe! Pressione aqui e o " +
+                                "sistema mostrará as principais ações da tela que estiver aberta!",
+                        false, false, 1));
+
+                PreferenceUtils.salvarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_ajuda", true);
+            }
+
+
+        }
+
+        if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_mensagens")){
+
+            View v = getNavButtonView(toolbar);
+
+            if(v != null){
+                targets.add(DestaqueUtils.geraTapTarget(v, "Mudança de Layout",
+                        "Os ícones de mensagem e atualização manual agora ficam dentro do menu principal! Fique atento à sinalização (ponto azul) aqui. " +
+                                "Ela avisa quando há mensagens não lidas!",
+                        false, false, 2));
+            }
+
+            PreferenceUtils.salvarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_mensagens", true);
+
+        }
+
+        if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_incidente")){
+
+            if(menu != null){
+                targets.add(DestaqueUtils.geraTapTarget(menu.getItem(1).getActionView().findViewById(R.id.imageButtonIncidente), "Alerta de Incidentes!",
+                        "O ônibus quebrou, atrasou ou não fez o horário previsto? Ajude os outros usuários a ficarem informados! " +
+                                "Basta pressionar aqui e cadastrar o incidente!",
+                        false, false, 3));
+
+                PreferenceUtils.salvarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_incidente", true);
+            }
+
+
+        }
 
         return targets;
     }

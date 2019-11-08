@@ -20,6 +20,21 @@
         android:background="@drawable/gradiente"
         tools:context="br.com.vostre.circular.view.DetalhesItinerarioActivity">
 
+        <Button
+            android:id="@+id/btnRegistrarViagem"
+            style="@style/botao_transparente"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:onClick="@{view::onClickBtnRegistrarViagem}"
+            android:padding="0dp"
+            android:text="Registrar Viagem"
+            android:textColor="@color/branco"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textView5"
+            app:layout_constraintTop_toTopOf="@+id/textView4" />
+
         <include
             android:id="@+id/toolbar"
             layout="@layout/toolbar"
@@ -322,7 +337,7 @@
             tools:listitem="@layout/linha_paradas_itinerarios" />
 
         <Button
-            android:id="@+id/btnCadastrar"
+            android:id="@+id/btnIniciar"
             style="@style/botao_branco"
             android:layout_width="60dp"
             android:layout_height="35dp"

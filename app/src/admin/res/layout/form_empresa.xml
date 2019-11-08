@@ -136,7 +136,7 @@
             tools:checked="true" />
 
         <Button
-            android:id="@+id/btnCadastrar"
+            android:id="@+id/btnIniciar"
             style="@style/botao_principal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -3,6 +3,10 @@ package br.com.vostre.circular.model.pojo;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Ignore;
+import android.location.Location;
+import android.location.LocationManager;
+
+import java.security.Provider;
 
 import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Parada;
@@ -117,6 +121,13 @@ public class ParadaBairro {
 
     public String getNomeBairroComCidade() {
         return nomeBairro+" - "+nomeCidade+" / "+siglaEstado;
+    }
+
+    public Location getLocation(){
+        Location l = new Location(LocationManager.GPS_PROVIDER);
+        l.setLatitude(this.getParada().getLatitude());
+        l.setLongitude(this.getParada().getLongitude());
+        return l;
     }
 
     @Override

@@ -8,14 +8,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
-import android.databinding.InverseBindingAdapter;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.os.Looper;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
@@ -29,9 +27,6 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -42,42 +37,35 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import java.text.NumberFormat;
 import java.util.List;
-import java.util.TimerTask;
 
 import br.com.vostre.circular.R;
+import br.com.vostre.circular.databinding.ActivityDetalhesItinerarioBinding;
+import br.com.vostre.circular.databinding.ActivityRegistraViagemBinding;
 import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
-import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
-import br.com.vostre.circular.utils.DataHoraUtils;
+import br.com.vostre.circular.view.adapter.ParadaAdapter;
 import br.com.vostre.circular.view.adapter.ParadaItinerarioAdapter;
 import br.com.vostre.circular.view.form.FormHistorico;
 import br.com.vostre.circular.view.form.FormItinerario;
 import br.com.vostre.circular.view.utils.SortListItemHelper;
 import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
-import br.com.vostre.circular.databinding.ActivityDetalhesItinerarioBinding;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
+import br.com.vostre.circular.viewModel.RegistraViagemViewModel;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
-public class DetalhesItinerarioActivity extends BaseActivity {
+public class RegistraViagemActivity extends BaseActivity {
 
-    ActivityDetalhesItinerarioBinding binding;
+    ActivityRegistraViagemBinding binding;
     MapView map;
     IMapController mapController;
 
     RecyclerView listParadas;
-    ParadaItinerarioAdapter adapter;
+    ParadaAdapter adapter;
 
     int permissionGPS;
     int permissionStorage;
@@ -87,14 +75,11 @@ public class DetalhesItinerarioActivity extends BaseActivity {
     MyLocationNewOverlay mLocationOverlay;
     MapEventsOverlay overlayEvents;
 
-    DetalhesItinerarioViewModel viewModel;
-
-    boolean mapaOculto = false;
-    int tamanhoOriginalMapa = 0;
+    RegistraViagemViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhes_itinerario);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_registra_viagem);
         super.onCreate(savedInstanceState);
 
         MultiplePermissionsListener listener = DialogOnAnyDeniedMultiplePermissionsListener.Builder
@@ -112,7 +97,7 @@ public class DetalhesItinerarioActivity extends BaseActivity {
                 .check();
 
         permissionGPS = ContextCompat.checkSelfPermission(getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION);
+                Manifest.permission.ACCESS_FINE_LOCATION);
         permissionStorage = ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
         permissionInternet = ContextCompat.checkSelfPermission(getApplicationContext(),
@@ -127,19 +112,15 @@ public class DetalhesItinerarioActivity extends BaseActivity {
 
         } else{
             binding.setView(this);
-            setTitle("Detalhes Itinerário");
+            setTitle("Registrar Viagem");
             getSupportActionBar().setDisplayShowTitleEnabled(true);
 
-            viewModel = ViewModelProviders.of(this).get(DetalhesItinerarioViewModel.class);
+            viewModel = ViewModelProviders.of(this).get(RegistraViagemViewModel.class);
 
             viewModel.setItinerario(getIntent().getStringExtra("itinerario"));
 
             viewModel.itinerario.observe(this, itinerarioObserver);
             viewModel.paradas.observe(this, paradasObserver);
-            viewModel.pits.observe(this, pitsObserver);
-            viewModel.paradasItinerario.observe(this, paradasItinerarioObserver);
-            viewModel.historicoItinerario.observe(this, historicoItinerarioObserver);
-
             viewModel.localAtual.observe(this, localObserver);
 
             binding.setViewModel(viewModel);
@@ -181,15 +162,9 @@ public class DetalhesItinerarioActivity extends BaseActivity {
             overlayEvents = new MapEventsOverlay(getBaseContext(), receiver);
 
             listParadas = binding.listParadas;
-            adapter = new ParadaItinerarioAdapter(viewModel.paradasItinerario.getValue(), this,
-                    true);
+            adapter = new ParadaAdapter(viewModel.paradas.getValue(), this);
 
             listParadas.setAdapter(adapter);
-
-            ItemTouchHelper.Callback callback =
-                    new SortListItemHelper(adapter);
-            ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
-            touchHelper.attachToRecyclerView(listParadas);
         }
 
     }
@@ -214,85 +189,8 @@ public class DetalhesItinerarioActivity extends BaseActivity {
         map.setMinZoomLevel(9d);
     }
 
-    public void ocultarMapa(View v){
-
-        if(mapaOculto){
-            binding.map.setVisibility(View.VISIBLE);
-            binding.cardView.getLayoutParams().height = tamanhoOriginalMapa;
-            mapaOculto = false;
-        } else{
-            tamanhoOriginalMapa = binding.cardView.getLayoutParams().height;
-            binding.map.setVisibility(View.GONE);
-            binding.cardView.getLayoutParams().height = WRAP_CONTENT;
-            mapaOculto = true;
-        }
-
-    }
-
     public void onClickBtnSalvar(View v){
-        if(viewModel.paradasItinerario.getValue().size() > 1){
-            viewModel.salvarParadas();
-        } else{
-            Toast.makeText(getApplicationContext(), "Ao menos duas paradas devem ser selecionadas!", Toast.LENGTH_SHORT).show();
-        }
-    }
 
-    public void onClickBtnEditar(View v){
-
-//        Toast.makeText(getApplicationContext(), viewModel.itinerario.getValue().getItinerario().getId(), Toast.LENGTH_SHORT).show();
-
-        FormItinerario formItinerario = new FormItinerario();
-        formItinerario.setItinerario(viewModel.itinerario.getValue().getItinerario());
-        formItinerario.setCtx(ctx.getApplication());
-        formItinerario.show(getSupportFragmentManager(), "formItinerario");
-
-    }
-
-    public void onClickBtnDistancia(View v){
-
-        Toast.makeText(getApplicationContext(), "Atualizando dados de distância...", Toast.LENGTH_SHORT).show();
-
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-
-                viewModel.atualizaParadasItinerario(viewModel.itinerario.getValue().getItinerario().getId());
-
-                List<ParadaItinerarioBairro> paradas = viewModel.pits.getValue();
-
-                viewModel.calculaDistancia(paradas, false);
-            }
-        });
-    }
-
-    public void onClickBtnHistorico(View v){
-
-//        Toast.makeText(getApplicationContext(), viewModel.itinerario.getValue().getItinerario().getId(), Toast.LENGTH_SHORT).show();
-
-        FormHistorico formHistorico = new FormHistorico();
-        formHistorico.setItinerario(viewModel.itinerario.getValue().getItinerario());
-        formHistorico.setHistorico(viewModel.historicoItinerario.getValue());
-        formHistorico.setCtx(ctx.getApplication());
-        formHistorico.show(getSupportFragmentManager(), "formHistorico");
-
-    }
-
-    public void onClickBtnSecoes(View v){
-        Intent i = new Intent(ctx, SecoesItinerarioActivity.class);
-        i.putExtra("itinerario", viewModel.getItinerario().getValue().getItinerario().getId());
-        ctx.startActivity(i);
-    }
-
-    public void onClickBtnHorarios(View v){
-        Intent i = new Intent(ctx, HorariosItinerarioActivity.class);
-        i.putExtra("itinerario", viewModel.getItinerario().getValue().getItinerario().getId());
-        ctx.startActivity(i);
-    }
-
-    public void onClickBtnRegistrarViagem(View v){
-        Intent i = new Intent(ctx, RegistraViagemActivity.class);
-        i.putExtra("itinerario", viewModel.getItinerario().getValue().getItinerario().getId());
-        ctx.startActivity(i);
     }
 
     @Override
@@ -350,7 +248,7 @@ public class DetalhesItinerarioActivity extends BaseActivity {
     private boolean checarPermissoes(){
 
         permissionGPS = ContextCompat.checkSelfPermission(getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION);
+                Manifest.permission.ACCESS_FINE_LOCATION);
         permissionStorage = ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
         permissionInternet = ContextCompat.checkSelfPermission(getApplicationContext(),
@@ -372,46 +270,8 @@ public class DetalhesItinerarioActivity extends BaseActivity {
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                 m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
                 m.setTitle(p.getParada().getNome());
-                m.setDraggable(true);
+                m.setDraggable(false);
                 m.setId(p.getParada().getId());
-                m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
-                    @Override
-                    public boolean onMarkerClick(Marker marker, MapView mapView) {
-
-//                        ParadaBairro pb = getParadaFromMarker(marker, paradas);
-//
-//                        InfoWindow infoWindow = new InfoWindow();
-//                        infoWindow.setParada(pb);
-//                        infoWindow.setCtx(ctx);
-//                        infoWindow.show(getSupportFragmentManager(), "infoWindow");
-//                        mapController.animateTo(marker.getPosition());
-
-                        ParadaItinerario paradaItinerario = new ParadaItinerario();
-                        paradaItinerario.setParada(p.getParada().getId());
-                        paradaItinerario.setDestaque(false);
-                        paradaItinerario.setValorAnterior(null);
-                        paradaItinerario.setValorSeguinte(null);
-                        paradaItinerario.setAtivo(true);
-
-                        ParadaItinerarioBairro pib = new ParadaItinerarioBairro();
-                        pib.setParadaItinerario(paradaItinerario);
-                        pib.setNomeParada(p.getParada().getNome());
-                        pib.setNomeBairro(p.getNomeBairro());
-                        pib.setNomeCidade(p.getNomeCidade());
-
-                        if(viewModel.paradasItinerario.getValue().indexOf(pib) == -1){
-                            List<ParadaItinerarioBairro> paradasItinerario = viewModel.paradasItinerario.getValue();
-                            paradasItinerario.add(pib);
-                            viewModel.paradasItinerario.postValue(paradasItinerario);
-//                            viewModel.paradasItinerario.getValue().add(pib);
-                            Toast.makeText(ctx, "Parada adicionada ao itinerário", Toast.LENGTH_SHORT).show();
-                        } else{
-                            Toast.makeText(ctx, "Parada já existe no itinerário", Toast.LENGTH_SHORT).show();
-                        }
-
-                        return true;
-                    }
-                });
                 map.getOverlays().add(m);
             }
 
@@ -473,32 +333,14 @@ public class DetalhesItinerarioActivity extends BaseActivity {
             map.getOverlays().add(overlayEvents);
             atualizarParadasMapa(paradas);
 
+            if(viewModel.localAtual.getValue().distanceTo(viewModel.paradas.getValue().get(0).getLocation()) > 20){
+                Toast.makeText(getApplicationContext(), "Você está longe demais! "+, Toast.LENGTH_SHORT).show();
+            }
+
             //viewModel.carregaDirections(map, paradas);
 
 //            List<Overlay> ov = map.getOverlays().;
 //            System.out.println(ov.size());
-        }
-    };
-
-    Observer<List<ParadaItinerarioBairro>> paradasItinerarioObserver = new Observer<List<ParadaItinerarioBairro>>() {
-        @Override
-        public void onChanged(final List<ParadaItinerarioBairro> paradas) {
-            adapter.paradas = paradas;
-            adapter.notifyDataSetChanged();
-        }
-    };
-
-    Observer<List<HistoricoItinerario>> historicoItinerarioObserver = new Observer<List<HistoricoItinerario>>() {
-        @Override
-        public void onChanged(List<HistoricoItinerario> historico) {
-            //System.out.println(historico);
-        }
-    };
-
-    Observer<List<ParadaItinerarioBairro>> pitsObserver = new Observer<List<ParadaItinerarioBairro>>() {
-        @Override
-        public void onChanged(final List<ParadaItinerarioBairro> paradas) {
-            viewModel.paradasItinerario.postValue(paradas);
         }
     };
 
@@ -508,7 +350,6 @@ public class DetalhesItinerarioActivity extends BaseActivity {
 //            Toast.makeText(getApplicationContext(), viewModel.itinerario.getValue().getNomeBairroPartida()+" | AAAAAAAAAAAAA >> "
 //                    +binding.textViewBairroPartida.getText(), Toast.LENGTH_SHORT).show();
             binding.textViewBairroPartida.setText(viewModel.itinerario.getValue().getNomeBairroPartida());
-            viewModel.iti.set(itinerario);
         }
     };
 

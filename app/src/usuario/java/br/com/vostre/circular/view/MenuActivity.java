@@ -691,12 +691,22 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             binding.textViewEmail.setVisibility(View.VISIBLE);
             binding.textView34.setVisibility(View.VISIBLE);
             binding.btnSair.setVisibility(View.VISIBLE);
+
+            if(menu != null){
+                menu.getItem(1).setVisible(true);
+            }
+
         } else{
             binding.btnLogin.setVisibility(View.VISIBLE);
             binding.textViewEmail.setText("");
             binding.textViewEmail.setVisibility(View.GONE);
             binding.textView34.setVisibility(View.GONE);
             binding.btnSair.setVisibility(View.GONE);
+
+            if(menu != null){
+                menu.getItem(1).setVisible(false);
+            }
+
         }
 
     }
@@ -1132,24 +1142,11 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     public void onToolbarInflated() {
         //geraAvisoAjuda();
-        List<TapTarget> targets = geraAvisos();
-        exibeTour(targets, new TapTargetSequence.Listener(){
 
-            @Override
-            public void onSequenceFinish() {
-                //Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
-            }
+        if(menu != null){
+            menu.getItem(1).setVisible(false);
+        }
 
-            @Override
-            public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
-
-            }
-
-            @Override
-            public void onSequenceCanceled(TapTarget lastTarget) {
-//                                            Toast.makeText(getApplicationContext(), "Tour cancelado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     private ImageButton getNavButtonView(Toolbar toolbar)

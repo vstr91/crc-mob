@@ -62,6 +62,7 @@ import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.utils.Constants;
 import br.com.vostre.circular.utils.DestaqueUtils;
 import br.com.vostre.circular.utils.NotificacaoUtils;
+import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.ToolbarUtils;
 import br.com.vostre.circular.view.listener.GpsListener;
 import br.com.vostre.circular.view.listener.HoraListener;
@@ -696,6 +697,24 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onToolbarInflated() {
+
+        String id = PreferenceUtils.carregarUsuarioLogado(getApplicationContext());
+
+        if(id == null || id.isEmpty() || id.equals("") || id.equals("null")){
+
+            if(menu != null){
+                menu.getItem(1).setVisible(false);
+            }
+
+        } else{
+
+            if(menu != null){
+                menu.getItem(1).setVisible(true);
+            }
+
+        }
+
+
 
     }
 

@@ -105,7 +105,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         itinerario = new Itinerario();
-        itinerarios = appDatabase.itinerarioDAO().listarTodosComTotalHorarios();
+        itinerarios = appDatabase.itinerarioDAO().listarTodosComTotalHorariosSimplificado();
         paradas = appDatabase.paradaDAO().listarTodosAtivosComBairro();
         empresas = appDatabase.empresaDAO().listarTodosAtivos();
 

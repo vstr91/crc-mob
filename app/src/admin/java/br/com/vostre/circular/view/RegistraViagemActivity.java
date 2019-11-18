@@ -334,7 +334,8 @@ public class RegistraViagemActivity extends BaseActivity {
             atualizarParadasMapa(paradas);
 
             if(viewModel.localAtual.getValue().distanceTo(viewModel.paradas.getValue().get(0).getLocation()) > 20){
-                Toast.makeText(getApplicationContext(), "Você está longe demais! "+, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Você está longe demais! "+viewModel.paradas.getValue().get(0).getLocation().getLatitude()+" | "
+                        +viewModel.paradas.getValue().get(0).getLocation().getLongitude(), Toast.LENGTH_SHORT).show();
             }
 
             //viewModel.carregaDirections(map, paradas);

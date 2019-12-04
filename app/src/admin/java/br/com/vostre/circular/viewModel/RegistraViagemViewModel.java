@@ -129,4 +129,51 @@ public class RegistraViagemViewModel extends AndroidViewModel {
         };
     }
 
+    public void carregaDirections(MapView map, List<GeoPoint> paradas) {
+
+        new directionsAsyncTask(map, paradas, getApplication().getApplicationContext()).execute();
+    }
+
+    private static class directionsAsyncTask extends AsyncTask<String, Void, Void> {
+
+        MapView map;
+        List<GeoPoint> pontos;
+        Polyline rota;
+        Context ctx;
+
+        directionsAsyncTask(MapView map, List<GeoPoint> pontos, Context ctx) {
+            this.map = map;
+            this.pontos = pontos;
+            this.ctx = ctx;
+        }
+
+        @Override
+        protected Void doInBackground(final String... params) {
+            RoadManager roadManager = new OSRMRoadManager(ctx);
+
+            ArrayList<GeoPoint> points = new ArrayList<>();
+
+            for(GeoPoint g : pontos){
+                points.add(g);
+            }
+
+            Road road = roadManager.getRoad(points);
+            rota = RoadManager.buildRoadOverlay(road);
+
+            KmlDocument kml = new KmlDocument();
+            kml.mKmlRoot.addOverlay(rota, kml);
+            File localFile = kml.getDefaultPathForAndroid("kml_teste.kml");
+            kml.saveAsKML(localFile);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            map.getOverlays().add(rota);
+            map.invalidate();
+        }
+    }
+
 }

@@ -12,6 +12,10 @@
         <variable
             name="viewModel"
             type="br.com.vostre.circular.viewModel.RegistraViagemViewModel" />
+
+        <variable
+            name="itinerario"
+            type="br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -57,7 +61,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:paddingLeft="10dp"
-                        android:text='@{viewModel.itinerario.itinerario.sigla != null ? `Linha: `+viewModel.itinerario.itinerario.sigla : "Código da linha não cadastrado."}'
+                        android:text='@{itinerario.itinerario.sigla != null ? `Linha: `+itinerario.itinerario.sigla : "Código da linha não cadastrado."}'
                         android:textAppearance="@style/texto_azul"
                         tools:text="Linha: P115" />
 
@@ -89,7 +93,7 @@
                                 android:layout_weight="5"
                                 android:gravity="center_vertical"
                                 android:paddingLeft="10dp"
-                                android:text="@{viewModel.itinerario.nomeBairroPartida}" />
+                                android:text="@{itinerario.nomeBairroPartida}" />
 
                             <TextView
                                 android:id="@+id/textViewCidadePartida"
@@ -100,7 +104,7 @@
                                 android:gravity="center_vertical"
                                 android:paddingLeft="10dp"
                                 android:paddingBottom="5dp"
-                                android:text="@{viewModel.itinerario.nomeCidadePartida}" />
+                                android:text="@{itinerario.nomeCidadePartida}" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -125,7 +129,7 @@
                                 android:layout_weight="5"
                                 android:gravity="center_vertical"
                                 android:paddingLeft="10dp"
-                                android:text="@{viewModel.itinerario.nomeBairroDestino}" />
+                                android:text="@{itinerario.nomeBairroDestino}" />
 
                             <TextView
                                 android:id="@+id/textViewCidadeDestino"
@@ -136,7 +140,7 @@
                                 android:gravity="center_vertical"
                                 android:paddingLeft="10dp"
                                 android:paddingBottom="5dp"
-                                android:text="@{viewModel.itinerario.nomeCidadeDestino}" />
+                                android:text="@{itinerario.nomeCidadeDestino}" />
                         </LinearLayout>
 
                     </LinearLayout>
@@ -191,42 +195,28 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="Tempo Decorrido"
+                    android:text="Velocidade"
                     android:textAlignment="center"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/textViewTempoDecorrido"
+                    android:id="@+id/textViewVelocidade"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
-                    android:text="TextView"
+                    android:text="0 Km/h"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView"
-                    tools:text="23:20" />
+                    tools:text="0 Km/h" />
             </android.support.constraint.ConstraintLayout>
 
         </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/listParadas"
-            android:layout_width="0dp"
-            android:layout_height="200dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@+id/btnIniciar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView5"
-            tools:listitem="@layout/linha_paradas_itinerarios" />
 
         <Button
             android:id="@+id/btnIniciar"
@@ -236,12 +226,25 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:onClick="@{view::onClickBtnSalvar}"
-            android:text="Salvar"
+            android:onClick="@{view::onClickBtnIniciar}"
+            android:text="Iniciar"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/listParadas"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_marginBottom="8dp"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@+id/btnIniciar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:itemCount="5"
+            tools:listitem="@layout/linha_paradas_itinerarios" />
 
         <org.osmdroid.views.MapView
             android:id="@+id/map"
@@ -251,19 +254,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <LinearLayout
-            android:id="@+id/linearLayout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardView2"/>
 
     </android.support.constraint.ConstraintLayout>
 

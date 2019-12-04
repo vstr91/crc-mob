@@ -96,7 +96,7 @@
         <activity android:name=".view.ProblemasActivity" />
         <activity android:name=".view.DetalhesCidadeActivity" />
         <activity android:name=".view.DetalhesBairroActivity" />
-        <activity android:name=".view.RegistraViagemActivity" />
+        <activity android:name=".view.RegistraViagemActivity" android:screenOrientation="portrait" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />

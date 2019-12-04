@@ -8,12 +8,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
@@ -31,12 +33,16 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.R;
@@ -48,6 +54,7 @@ import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
+import br.com.vostre.circular.utils.FileUtils;
 import br.com.vostre.circular.view.adapter.ParadaAdapter;
 import br.com.vostre.circular.view.adapter.ParadaItinerarioAdapter;
 import br.com.vostre.circular.view.form.FormHistorico;
@@ -76,6 +83,13 @@ public class RegistraViagemActivity extends BaseActivity {
     MapEventsOverlay overlayEvents;
 
     RegistraViagemViewModel viewModel;
+
+    long ultimaAtualizacao = -1;
+    List<Location> locais;
+    boolean gravando = false;
+
+    Polyline line;
+    NumberFormat nf = NumberFormat.getNumberInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,9 +176,13 @@ public class RegistraViagemActivity extends BaseActivity {
             overlayEvents = new MapEventsOverlay(getBaseContext(), receiver);
 
             listParadas = binding.listParadas;
+            listParadas.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
             adapter = new ParadaAdapter(viewModel.paradas.getValue(), this);
 
             listParadas.setAdapter(adapter);
+
+            nf.setMaximumFractionDigits(0);
+            nf.setMinimumFractionDigits(0);
         }
 
     }
@@ -187,9 +205,42 @@ public class RegistraViagemActivity extends BaseActivity {
 
         map.setMaxZoomLevel(19d);
         map.setMinZoomLevel(9d);
+
+        map.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
     }
 
-    public void onClickBtnSalvar(View v){
+    public void onClickBtnIniciar(View v){
+
+        if(gravando){
+            gravando = false;
+
+            binding.btnIniciar.setText("Iniciar");
+
+//            for(GeoPoint l : line.getPoints()){
+//                Toast.makeText(getApplicationContext(), l.getLatitude()+" | "+l.getLongitude(), Toast.LENGTH_SHORT).show();
+//                System.out.println("LATLNG:: "+l.getLatitude()+" | "+l.getLongitude());
+//            }
+
+            salvarPolyline(line);
+
+            map.getOverlays().clear();
+            map.invalidate();
+
+            Toast.makeText(getApplicationContext(), "Registro Salvo!", Toast.LENGTH_SHORT).show();
+
+            binding.textViewVelocidade.setText("0 Km/h");
+
+            viewModel.carregaDirections(map, line.getPoints());
+
+            atualizarParadasMapa(viewModel.paradas.getValue());
+
+        } else{
+            gravando = true;
+            locais = new ArrayList<>();
+            binding.btnIniciar.setText("Parar");
+            line = new Polyline();
+            line.getOutlinePaint().setColor(Color.BLUE);
+        }
 
     }
 
@@ -279,6 +330,21 @@ public class RegistraViagemActivity extends BaseActivity {
 
     }
 
+    private void adicionaLocalMapa(Location local){
+
+        if(local != null){
+
+            Marker m = new Marker(map);
+            m.setPosition(new GeoPoint(local));
+            m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
+            m.setDraggable(false);
+            map.getOverlays().add(m);
+
+        }
+
+    }
+
     @NonNull
     private ParadaBairro getParadaFromMarker(Marker marker, List<ParadaBairro> paradas) {
         Parada p = new Parada();
@@ -333,10 +399,13 @@ public class RegistraViagemActivity extends BaseActivity {
             map.getOverlays().add(overlayEvents);
             atualizarParadasMapa(paradas);
 
-            if(viewModel.localAtual.getValue().distanceTo(viewModel.paradas.getValue().get(0).getLocation()) > 20){
+            if(viewModel.localAtual.getValue().distanceTo(viewModel.paradas.getValue().get(0).getLocation()) > 200){
                 Toast.makeText(getApplicationContext(), "Você está longe demais! "+viewModel.paradas.getValue().get(0).getLocation().getLatitude()+" | "
                         +viewModel.paradas.getValue().get(0).getLocation().getLongitude(), Toast.LENGTH_SHORT).show();
             }
+
+            adapter.paradas = paradas;
+            adapter.notifyDataSetChanged();
 
             //viewModel.carregaDirections(map, paradas);
 
@@ -348,9 +417,7 @@ public class RegistraViagemActivity extends BaseActivity {
     Observer<ItinerarioPartidaDestino> itinerarioObserver = new Observer<ItinerarioPartidaDestino>() {
         @Override
         public void onChanged(ItinerarioPartidaDestino itinerario) {
-//            Toast.makeText(getApplicationContext(), viewModel.itinerario.getValue().getNomeBairroPartida()+" | AAAAAAAAAAAAA >> "
-//                    +binding.textViewBairroPartida.getText(), Toast.LENGTH_SHORT).show();
-            binding.textViewBairroPartida.setText(viewModel.itinerario.getValue().getNomeBairroPartida());
+            binding.setItinerario(itinerario);
         }
     };
 
@@ -358,13 +425,74 @@ public class RegistraViagemActivity extends BaseActivity {
         @Override
         public void onChanged(Location local) {
 
-            if(viewModel.centralizaMapa && local.getLatitude() != 0.0 && local.getLongitude() != 0.0){
+            if(local.getLatitude() != 0.0 && local.getLongitude() != 0.0){
                 setMapCenter(map, new GeoPoint(local.getLatitude(), local.getLongitude()));
-                viewModel.centralizaMapa = false;
             }
+
+            if(gravando && locais != null){
+
+                locais.add(local);
+
+                //adicionaLocalMapa(local);
+
+                atualizaPolyline(local);
+
+            }
+
+
 
         }
     };
+
+    public void atualizaPolyline(Location local){
+
+        if(local.hasAccuracy() && local.getAccuracy() < 20){
+
+            //Toast.makeText(getApplicationContext(), "Vel.: "+local.getSpeed() * 3.6+" Km/h", Toast.LENGTH_SHORT).show();
+
+            String velocidadeFormatada = nf.format(local.getSpeed() * 3.6);
+
+            binding.textViewVelocidade.setText(velocidadeFormatada+" Km/h");
+
+            line.addPoint(new GeoPoint(local.getLatitude(), local.getLongitude()));
+            map.getOverlays().add(line);
+            map.invalidate();
+        }
+
+    }
+
+    private void salvarPolyline(Polyline line){
+
+        String geoJson = "{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\", \"properties\": {},\"geometry\": {\"type\": \"LineString\", \"coordinates\": [";
+
+        for(GeoPoint geo : line.getPoints()){
+            geoJson = geoJson.concat("["+geo.getLongitude()+","+geo.getLatitude()+"],");
+        }
+
+        geoJson = geoJson.substring(0, geoJson.length()-1);
+
+        geoJson = geoJson.concat("]}}]}");
+
+        String nomeArquivo = viewModel.itinerario.getValue().getItinerario().getId()
+                +"-"+DateTimeFormat.forPattern("yyyy-MM-dd-HH:mm:ss").print(DateTime.now())+".json";
+
+        FileUtils.writeToFile(nomeArquivo, geoJson, getApplicationContext());
+
+        salvarRegistroPontos(nomeArquivo.replace("json", "log"));
+
+    }
+
+    private void salvarRegistroPontos(String nome){
+
+        String pontos = "";
+
+        for(Location geo : locais){
+            pontos = pontos.concat(geo.getLongitude()+","+geo.getLatitude()+","+geo.getSpeed()*3.6+" Km/h"+"\n");
+        }
+
+        FileUtils.writeToFile(nome, pontos, getApplicationContext());
+
+    }
 
     @BindingAdapter("center")
     public static void setMapCenter(MapView map, GeoPoint geoPoint){

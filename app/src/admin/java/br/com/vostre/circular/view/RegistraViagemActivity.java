@@ -277,6 +277,7 @@ public class RegistraViagemActivity extends BaseActivity {
             locationRequest.setInterval(3000);
             locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             locationRequest.setMaxWaitTime(5000);
+//            locationRequest.setSmallestDisplacement(10);
 
             if(viewModel != null){
                 viewModel.mFusedLocationClient.requestLocationUpdates(locationRequest,

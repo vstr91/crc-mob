@@ -2,9 +2,11 @@ package br.com.vostre.circular.view;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.PendingIntent;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
@@ -12,17 +14,26 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
@@ -55,6 +66,11 @@ import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 import br.com.vostre.circular.utils.FileUtils;
+import br.com.vostre.circular.utils.LocationRequestHelper;
+import br.com.vostre.circular.utils.LocationResultHelper;
+import br.com.vostre.circular.utils.LocationUpdateUtils;
+import br.com.vostre.circular.utils.LocationUpdatesBroadcastReceiver;
+import br.com.vostre.circular.utils.LocationUtils;
 import br.com.vostre.circular.view.adapter.ParadaAdapter;
 import br.com.vostre.circular.view.adapter.ParadaItinerarioAdapter;
 import br.com.vostre.circular.view.form.FormHistorico;
@@ -65,7 +81,9 @@ import br.com.vostre.circular.viewModel.RegistraViagemViewModel;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
-public class RegistraViagemActivity extends BaseActivity {
+public class RegistraViagemActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     ActivityRegistraViagemBinding binding;
     MapView map;
@@ -90,6 +108,11 @@ public class RegistraViagemActivity extends BaseActivity {
 
     Polyline line;
     NumberFormat nf = NumberFormat.getNumberInstance();
+
+    private GoogleApiClient mGoogleApiClient;
+    LocationRequest mLocationRequest;
+
+    FusedLocationProviderClient mFusedLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,7 +162,11 @@ public class RegistraViagemActivity extends BaseActivity {
 
             binding.setViewModel(viewModel);
 
+            buildGoogleApiClient();
+
             configuraMapa();
+
+            requestLocationUpdates(null);
 
             atualizarParadasMapa(viewModel.paradas.getValue());
 
@@ -240,21 +267,99 @@ public class RegistraViagemActivity extends BaseActivity {
             binding.btnIniciar.setText("Parar");
             line = new Polyline();
             line.getOutlinePaint().setColor(Color.BLUE);
+
+            PreferenceManager.getDefaultSharedPreferences(this)
+                    .registerOnSharedPreferenceChangeListener(this);
+
         }
 
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .registerOnSharedPreferenceChangeListener(this);
+    }
+
+
+    @Override
     protected void onResume() {
         super.onResume();
-
-        if(map != null){
-            map.onResume();
-        }
-
-        startLocationUpdates();
-
+//        updateButtonsState(LocationRequestHelper.getRequesting(this));
+        Toast.makeText(getApplicationContext(), LocationResultHelper.getSavedLocationResult(this), Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    protected void onStop() {
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
+        super.onStop();
+    }
+
+    /**
+     * Builds {@link GoogleApiClient}, enabling automatic lifecycle management using
+     * {@link GoogleApiClient.Builder#enableAutoManage(android.support.v4.app.FragmentActivity,
+     * int, GoogleApiClient.OnConnectionFailedListener)}. I.e., GoogleApiClient connects in
+     * {@link AppCompatActivity#onStart}, or if onStart() has already happened, it connects
+     * immediately, and disconnects automatically in {@link AppCompatActivity#onStop}.
+     */
+    private void buildGoogleApiClient() {
+        if (mGoogleApiClient != null) {
+            return;
+        }
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .enableAutoManage(this, this)
+                .addApi(LocationServices.API)
+                .build();
+        createLocationRequest();
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Log.i("API", "GoogleApiClient connected");
+    }
+
+    /**
+     * Sets up the location request. Android has two location request settings:
+     * {@code ACCESS_COARSE_LOCATION} and {@code ACCESS_FINE_LOCATION}. These settings control
+     * the accuracy of the current location. This sample uses ACCESS_FINE_LOCATION, as defined in
+     * the AndroidManifest.xml.
+     * <p/>
+     * When the ACCESS_FINE_LOCATION setting is specified, combined with a fast update
+     * interval (5 seconds), the Fused Location Provider API returns location updates that are
+     * accurate to within a few feet.
+     * <p/>
+     * These settings are appropriate for mapping applications that show real-time location
+     * updates.
+     */
+    private void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+
+        mLocationRequest.setInterval(5000);
+
+        // Sets the fastest rate for active location updates. This interval is exact, and your
+        // application will never receive updates faster than this value.
+        mLocationRequest.setFastestInterval(3000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        // Sets the maximum time when batched location updates are delivered. Updates may be
+        // delivered sooner than this interval.
+        mLocationRequest.setMaxWaitTime(10000);
+    }
+
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//
+//        if(map != null){
+//            map.onResume();
+//        }
+//
+//        startLocationUpdates();
+//
+//    }
 
     @Override
     protected void onPause() {
@@ -268,6 +373,91 @@ public class RegistraViagemActivity extends BaseActivity {
 
     }
 
+//    @Override
+//    protected void onStop() {
+//        PreferenceManager.getDefaultSharedPreferences(this)
+//                .unregisterOnSharedPreferenceChangeListener(this);
+//        super.onStop();
+//    }
+
+    private PendingIntent getPendingIntent() {
+        // Note: for apps targeting API level 25 ("Nougat") or lower, either
+        // PendingIntent.getService() or PendingIntent.getBroadcast() may be used when requesting
+        // location updates. For apps targeting API level O, only
+        // PendingIntent.getBroadcast() should be used. This is due to the limits placed on services
+        // started in the background in "O".
+
+        // TODO(developer): uncomment to use PendingIntent.getService().
+//        Intent intent = new Intent(this, LocationUpdatesIntentService.class);
+//        intent.setAction(LocationUpdatesIntentService.ACTION_PROCESS_UPDATES);
+//        return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent intent = new Intent(this, LocationUpdatesBroadcastReceiver.class);
+        intent.setAction(LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES);
+        return PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        final String text = "Connection suspended";
+        Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        final String text = "Exception while connecting to Google Play services";
+        Log.w("CONN_ERR", text + ": " + connectionResult.getErrorMessage());
+        Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+
+        if (s.equals(LocationResultHelper.KEY_LOCATION_UPDATES_RESULT)) {
+            Toast.makeText(getApplicationContext(), "LOCAL: "+LocationResultHelper.getSavedLocationResult(this), Toast.LENGTH_SHORT).show();
+        } else if (s.equals(LocationRequestHelper.KEY_LOCATION_UPDATES_REQUESTED)) {
+
+//            updateButtonsState(LocationRequestHelper.getRequesting(this));
+        }
+    }
+
+    /**
+     * Handles the Request Updates button and requests start of location updates.
+     */
+    public void requestLocationUpdates(View view) {
+        try {
+            Log.i("UPD", "Starting location updates");
+            LocationUpdateUtils.setRequestingLocationUpdates(this, true);
+            viewModel.mFusedLocationClient.requestLocationUpdates(mLocationRequest, getPendingIntent());
+        } catch (SecurityException e) {
+            LocationUpdateUtils.setRequestingLocationUpdates(this, false);
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Handles the Request Updates button and requests start of location updates.
+     */
+    public void requestLocationUpdates(FusedLocationProviderClient mFusedLocationClient, LocationRequest mLocationRequest, LocationCallback mLocationCallback) {
+        try {
+            Log.i("LOC", "Starting location updates");
+            LocationUpdateUtils.setRequestingLocationUpdates(this, true);
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest, getPendingIntent());
+        } catch (SecurityException e) {
+            LocationUpdateUtils.setRequestingLocationUpdates(this, false);
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Handles the Remove Updates button, and requests removal of location updates.
+     */
+    public void removeLocationUpdates(FusedLocationProviderClient mFusedLocationClient) {
+        Log.i("LOC", "Removing location updates");
+        LocationRequestHelper.setRequesting(this, false);
+        mFusedLocationClient.removeLocationUpdates(getPendingIntent());
+    }
+
     @SuppressLint("MissingPermission")
     private void startLocationUpdates() {
 
@@ -278,6 +468,10 @@ public class RegistraViagemActivity extends BaseActivity {
             locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             locationRequest.setMaxWaitTime(5000);
 //            locationRequest.setSmallestDisplacement(10);
+
+            if(viewModel != null){
+                requestLocationUpdates(viewModel.mFusedLocationClient, locationRequest, viewModel.mLocationCallback);
+            }
 
             if(viewModel != null){
                 viewModel.mFusedLocationClient.requestLocationUpdates(locationRequest,
@@ -293,6 +487,7 @@ public class RegistraViagemActivity extends BaseActivity {
 
         if(viewModel != null && viewModel.mFusedLocationClient != null){
             viewModel.mFusedLocationClient.removeLocationUpdates(viewModel.mLocationCallback);
+            viewModel.mFusedLocationClient.removeLocationUpdates(getPendingIntent());
         }
 
     }

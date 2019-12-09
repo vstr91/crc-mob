@@ -20,20 +20,20 @@ import br.com.vostre.circular.R;
 /**
  * Utility methods used in this sample.
  */
-class LocationUpdateUtils {
+public class LocationUpdateUtils {
 
-    final static String KEY_LOCATION_UPDATES_REQUESTED = "location-updates-requested";
-    final static String KEY_LOCATION_UPDATES_RESULT = "location-update-result";
-    final static String CHANNEL_ID = "channel_01";
+    public final static String KEY_LOCATION_UPDATES_REQUESTED = "location-updates-requested";
+    public final static String KEY_LOCATION_UPDATES_RESULT = "location-update-result";
+    public final static String CHANNEL_ID = "channel_01";
 
-    static void setRequestingLocationUpdates(Context context, boolean value) {
+    public static void setRequestingLocationUpdates(Context context, boolean value) {
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
                 .putBoolean(KEY_LOCATION_UPDATES_REQUESTED, value)
                 .apply();
     }
 
-    static boolean getRequestingLocationUpdates(Context context) {
+    public static boolean getRequestingLocationUpdates(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context)
                 .getBoolean(KEY_LOCATION_UPDATES_REQUESTED, false);
     }
@@ -106,7 +106,7 @@ class LocationUpdateUtils {
      *
      * @param context The {@link Context}.
      */
-    static String getLocationResultTitle(Context context, List<Location> locations) {
+    public static String getLocationResultTitle(Context context, List<Location> locations) {
         String numLocationsReported = context.getResources().getQuantityString(-1, locations.size(), locations.size());
         return numLocationsReported + ": " + DateFormat.getDateTimeInstance().format(new Date());
     }
@@ -132,15 +132,20 @@ class LocationUpdateUtils {
         return sb.toString();
     }
 
-    static void setLocationUpdatesResult(Context context, List<Location> locations) {
+    public static void setLocationUpdatesResult(Context context, List<Location> locations) {
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
                 .putString(KEY_LOCATION_UPDATES_RESULT, getLocationResultTitle(context, locations)
                         + "\n" + getLocationResultText(context, locations))
                 .apply();
+
+        for(Location l : locations){
+            System.out.println("LOCATIONS: "+l.getLatitude()+" | "+l.getLongitude());
+        }
+
     }
 
-    static String getLocationUpdatesResult(Context context) {
+    public static String getLocationUpdatesResult(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(KEY_LOCATION_UPDATES_RESULT, "");
     }

@@ -33,6 +33,8 @@ public class LocationResultHelper {
     private List<Location> mLocations;
     private NotificationManager mNotificationManager;
 
+    public final static String KEY_LISTA = "location-route";
+
     LocationResultHelper(Context context, List<Location> locations) {
         mContext = context;
         mLocations = locations;
@@ -44,28 +46,41 @@ public class LocationResultHelper {
 //        getNotificationManager().createNotificationChannel(channel);
     }
 
-    /**
-     * Returns the title for reporting about a list of {@link Location} objects.
-     */
-    private String getLocationResultTitle() {
-        String numLocationsReported = mContext.getResources().getQuantityString(
-                -1, mLocations.size(), mLocations.size());
-        return numLocationsReported + ": " + DateFormat.getDateTimeInstance().format(new Date());
-    }
-
     private String getLocationResultText() {
         if (mLocations.isEmpty()) {
-            return "Local desconhecido";
+            return "0;0;0;0;0";
         }
         StringBuilder sb = new StringBuilder();
-        for (Location location : mLocations) {
-            sb.append("(");
-            sb.append(location.getLatitude());
-            sb.append(", ");
-            sb.append(location.getLongitude());
-            sb.append(")");
-            sb.append("\n");
+
+        sb.append(mLocations.get(mLocations.size()-1).getLatitude());
+        sb.append(";");
+        sb.append(mLocations.get(mLocations.size()-1).getLongitude());
+        sb.append(";");
+        sb.append(mLocations.get(mLocations.size()-1).getAccuracy());
+        sb.append(";");
+        sb.append(mLocations.get(mLocations.size()-1).getSpeed());
+        sb.append(";");
+        sb.append(mLocations.get(mLocations.size()-1).getTime());
+
+        return sb.toString();
+    }
+
+    private String getLocationResultText(Location location) {
+        if (location == null) {
+            return "0;0;0;0;0";
         }
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(location.getLatitude());
+        sb.append(";");
+        sb.append(location.getLongitude());
+        sb.append(";");
+        sb.append(location.getAccuracy());
+        sb.append(";");
+        sb.append(location.getSpeed());
+        sb.append(";");
+        sb.append(location.getTime());
+
         return sb.toString();
     }
 
@@ -75,8 +90,7 @@ public class LocationResultHelper {
     void saveResults() {
         PreferenceManager.getDefaultSharedPreferences(mContext)
                 .edit()
-                .putString(KEY_LOCATION_UPDATES_RESULT, getLocationResultTitle() + "\n" +
-                        getLocationResultText())
+                .putString(KEY_LOCATION_UPDATES_RESULT, getLocationResultText())
                 .apply();
     }
 
@@ -132,4 +146,34 @@ public class LocationResultHelper {
 
 //        getNotificationManager().notify(0, notificationBuilder.build());
     }
+
+    void updateRoute(Context context, Location location) {
+
+        String route = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(KEY_LISTA, "");
+
+        route = route.concat(getLocationResultText(location)+"|");
+
+        PreferenceManager.getDefaultSharedPreferences(mContext)
+                .edit()
+                .putString(KEY_LISTA, route)
+                .apply();
+    }
+
+    public static void clearRoute(Context context) {
+
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putString(KEY_LISTA, "")
+                .apply();
+    }
+
+    public static void marcaGravando(Context context, boolean gravando) {
+
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putBoolean(LocationUpdatesBroadcastReceiver.KEY_GRAVANDO, gravando)
+                .apply();
+    }
+
 }

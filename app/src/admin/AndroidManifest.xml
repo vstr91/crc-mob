@@ -100,6 +100,18 @@
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
+
+        <service
+            android:name=".utils.LocationUpdatesIntentService"
+            android:exported="false" />
+
+        <receiver android:name=".utils.LocationUpdatesBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="br.com.vostre.circular.admin.action.PROCESS_UPDATES" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

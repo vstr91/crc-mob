@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.gms.location.LocationResult;
@@ -27,8 +28,9 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
     private static final String TAG = "LUBroadcastReceiver";
 
     public static final String ACTION_PROCESS_UPDATES =
-            "br.com.vostre.circular.admin.action" +
-                    ".PROCESS_UPDATES";
+            "br.com.vostre.circular.admin.action.PROCESS_UPDATES";
+
+    public static final String KEY_GRAVANDO = "br.com.vostre.circular.admin.gravando_viagem";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -37,6 +39,9 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
 
             if (ACTION_PROCESS_UPDATES.equals(action)) {
                 LocationResult result = LocationResult.extractResult(intent);
+
+                Boolean ativo = PreferenceManager.getDefaultSharedPreferences(context)
+                        .getBoolean(KEY_GRAVANDO, false);
 
                 if (result != null) {
                     List<Location> locations = result.getLocations();
@@ -47,6 +52,16 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
                     // Show notification with the location data.
                     locationResultHelper.showNotification();
                     Log.i(TAG, LocationResultHelper.getSavedLocationResult(context));
+
+                    //salvando lista de locais - gravação de rota
+
+                    if(ativo){
+                        Log.i(TAG+" RT", locations.get(locations.size()-1).getLatitude()
+                                +" | "+locations.get(locations.size()-1).getLongitude());
+
+                        locationResultHelper.updateRoute(context, locations.get(locations.size()-1));
+                    }
+
                 }
 
             }

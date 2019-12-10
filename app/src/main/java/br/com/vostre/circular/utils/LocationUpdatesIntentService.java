@@ -25,8 +25,8 @@ import java.util.List;
  */
 public class LocationUpdatesIntentService extends IntentService {
 
-    static final String ACTION_PROCESS_UPDATES =
-            "com.google.android.gms.location.sample.backgroundlocationupdates.action" +
+    public static final String ACTION_PROCESS_UPDATES =
+            "br.com.vostre.circular.admin.action" +
                     ".PROCESS_UPDATES";
     private static final String TAG = LocationUpdatesIntentService.class.getSimpleName();
 

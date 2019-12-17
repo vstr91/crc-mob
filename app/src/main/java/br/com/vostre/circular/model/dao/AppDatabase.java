@@ -35,6 +35,7 @@ import br.com.vostre.circular.model.Servico;
 import br.com.vostre.circular.model.TipoProblema;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.model.UsuarioPreferencia;
+import br.com.vostre.circular.model.ViagemItinerario;
 import br.com.vostre.circular.utils.Converters;
 
 @Database(entities = {Pais.class, Estado.class, Cidade.class, Bairro.class,
@@ -42,8 +43,8 @@ import br.com.vostre.circular.utils.Converters;
         Parada.class, PontoInteresse.class, Itinerario.class, ParadaItinerario.class,
         Horario.class, HorarioItinerario.class, SecaoItinerario.class, Onibus.class,
         ParametroInterno.class, ParadaSugestao.class, HistoricoParada.class, UsuarioPreferencia.class,
-        HistoricoItinerario.class, Acesso.class, PontoInteresseSugestao.class, TipoProblema.class, Problema.class, Servico.class},
-        version = 11)
+        HistoricoItinerario.class, Acesso.class, PontoInteresseSugestao.class, TipoProblema.class, Problema.class, Servico.class, ViagemItinerario.class},
+        version = 12)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -93,6 +94,9 @@ public abstract class AppDatabase extends RoomDatabase {
 
     // 2.2.4 - v11 bd = forçando recriação do BD para eliminar problemas
 
+    // 2.3.0 - v12 bd = inserindo tabela para registrar viagem
+    public abstract ViagemItinerarioDAO viagemItinerarioDAO();
+
     public static AppDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {
             INSTANCE =
@@ -101,7 +105,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             // Don't do this on a real app! See PersistenceBasicSample for an example.
                             //.allowMainThreadQueries()
                             .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
-                                    MIGRATION_6_10, MIGRATION_7_10, MIGRATION_8_10, MIGRATION_9_10)
+                                    MIGRATION_6_10, MIGRATION_7_10, MIGRATION_8_10, MIGRATION_9_10, MIGRATION_11_12)
                             .fallbackToDestructiveMigration()
                             .build();
         }
@@ -230,6 +234,17 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
 
+        }
+    };
+
+    // v2.2.4 - v11 bd - NENHUM PROCESSO DE ATUALIZAÇÃO, PARA FORCAR A RECRIACAO DO BANCO DE DADOS E ELIMINAR TODOS OS PROBLEMAS DE MIGRACAO DA VERSAO 2.2
+
+    // v2.3.0 - v12 bd
+    public static final Migration MIGRATION_11_12 = new Migration(11, 12) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'viagem_itinerario' ('itinerario' TEXT NOT NULL, 'trajeto' TEXT NOT NULL, 'horaInicial' INTEGER, 'horaFinal' INTEGER, 'trajetoEnviado' INTEGER NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("CREATE UNIQUE INDEX 'index_viagem_itinerario_itinerario_trajeto' ON 'viagem_itinerario' ('itinerario', 'trajeto')");
         }
     };
 

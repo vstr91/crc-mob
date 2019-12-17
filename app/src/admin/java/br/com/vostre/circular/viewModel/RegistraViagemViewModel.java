@@ -30,6 +30,7 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Polyline;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +38,7 @@ import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.ParadaItinerario;
+import br.com.vostre.circular.model.ViagemItinerario;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
@@ -64,6 +66,10 @@ public class RegistraViagemViewModel extends AndroidViewModel {
     public FusedLocationProviderClient mFusedLocationClient;
     public LocationCallback mLocationCallback;
 
+    public static MutableLiveData<Integer> retorno;
+
+    public LiveData<List<ViagemItinerario>> registros;
+
     public LiveData<ItinerarioPartidaDestino> getItinerario() {
         return itinerario;
     }
@@ -71,6 +77,7 @@ public class RegistraViagemViewModel extends AndroidViewModel {
     public void setItinerario(String itinerario) {
         this.itinerario = appDatabase.itinerarioDAO().carregar(itinerario);
         paradas = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro(itinerario);
+        registros = appDatabase.viagemItinerarioDAO().carregarPorItinerario(itinerario);
 //        paradasItinerario.setValue(appDatabase.paradaItinerarioDAO()
 //                .listarTodosAtivosPorItinerarioComBairro(itinerario).getValue());
     }
@@ -101,6 +108,8 @@ public class RegistraViagemViewModel extends AndroidViewModel {
 
         localAtual = new MutableLiveData<>();
         localAtual.setValue(new Location(LocationManager.GPS_PROVIDER));
+
+        retorno = new MutableLiveData<>();
     }
 
     // fim editar
@@ -175,5 +184,52 @@ public class RegistraViagemViewModel extends AndroidViewModel {
             map.invalidate();
         }
     }
+
+    public void salvarViagem(ViagemItinerario viagemItinerario){
+
+        if(viagemItinerario.valida(viagemItinerario)){
+            add(viagemItinerario);
+        } else{
+            retorno.setValue(0);
+        }
+
+    }
+
+    // adicionar
+
+    public void add(final ViagemItinerario viagemItinerario) {
+
+        viagemItinerario.setDataCadastro(new DateTime());
+        viagemItinerario.setUltimaAlteracao(new DateTime());
+        viagemItinerario.setEnviado(false);
+
+        new addAsyncTask(appDatabase).execute(viagemItinerario);
+    }
+
+    private static class addAsyncTask extends AsyncTask<ViagemItinerario, Void, Void> {
+
+        private AppDatabase db;
+        private boolean valido = false;
+
+        addAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final ViagemItinerario... params) {
+
+            db.viagemItinerarioDAO().inserir(params[0]);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            retorno.setValue(1);
+        }
+
+    }
+
+    // fim adicionar
 
 }

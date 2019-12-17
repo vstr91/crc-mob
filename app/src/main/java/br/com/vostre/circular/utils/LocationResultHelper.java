@@ -12,6 +12,8 @@ import android.support.v4.app.TaskStackBuilder;
 import android.app.NotificationChannel;
 
 
+import org.joda.time.DateTime;
+
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
@@ -35,7 +37,7 @@ public class LocationResultHelper {
 
     public final static String KEY_LISTA = "location-route";
 
-    LocationResultHelper(Context context, List<Location> locations) {
+    public LocationResultHelper(Context context, List<Location> locations) {
         mContext = context;
         mLocations = locations;
 
@@ -87,7 +89,7 @@ public class LocationResultHelper {
     /**
      * Saves location result as a string to {@link android.content.SharedPreferences}.
      */
-    void saveResults() {
+    public void saveResults() {
         PreferenceManager.getDefaultSharedPreferences(mContext)
                 .edit()
                 .putString(KEY_LOCATION_UPDATES_RESULT, getLocationResultText())
@@ -147,7 +149,7 @@ public class LocationResultHelper {
 //        getNotificationManager().notify(0, notificationBuilder.build());
     }
 
-    void updateRoute(Context context, Location location) {
+    public void updateRoute(Context context, Location location) {
 
         String route = PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(KEY_LISTA, "");
@@ -174,6 +176,20 @@ public class LocationResultHelper {
                 .edit()
                 .putBoolean(LocationUpdatesBroadcastReceiver.KEY_GRAVANDO, gravando)
                 .apply();
+    }
+
+    public static void marcaHoraInicial(Context context, DateTime horaInicial) {
+
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putLong(LocationUpdatesBroadcastReceiver.KEY_HORA_INICIAL, horaInicial.getMillis())
+                .apply();
+    }
+
+    public static Long recuperaHoraInicial(Context context) {
+
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getLong(LocationUpdatesBroadcastReceiver.KEY_HORA_INICIAL, 0L);
     }
 
 }

@@ -32,6 +32,8 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
 
     public static final String KEY_GRAVANDO = "br.com.vostre.circular.admin.gravando_viagem";
 
+    public static final String KEY_HORA_INICIAL = "br.com.vostre.circular.admin.hora_inicial_viagem";
+
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent != null) {

@@ -5,7 +5,11 @@ import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.databinding.BindingAdapter;
@@ -18,11 +22,13 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -70,9 +76,11 @@ import br.com.vostre.circular.databinding.ActivityRegistraViagemBinding;
 import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
+import br.com.vostre.circular.model.ViagemItinerario;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
+import br.com.vostre.circular.model.service.LocationUpdatesService;
 import br.com.vostre.circular.utils.FileUtils;
 import br.com.vostre.circular.utils.LocationRequestHelper;
 import br.com.vostre.circular.utils.LocationResultHelper;
@@ -113,15 +121,23 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
 
     RegistraViagemViewModel viewModel;
 
-    long ultimaAtualizacao = -1;
     List<Location> locais;
     boolean gravando = false;
 
     Polyline line;
     NumberFormat nf = NumberFormat.getNumberInstance();
 
-    private GoogleApiClient mGoogleApiClient;
-    LocationRequest mLocationRequest;
+    // A reference to the service used to get location updates.
+    private LocationUpdatesService mService = null;
+
+    // Tracks the bound state of the service.
+    private boolean mBound = false;
+
+    // The BroadcastReceiver used to listen from broadcasts from the service.
+    private LocationUpdatesBroadcastReceiver myReceiver;
+
+    DateTime horaInicial;
+    DateTime horaFinal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,9 +185,17 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
             viewModel.paradas.observe(this, paradasObserver);
             viewModel.localAtual.observe(this, localObserver);
 
+            viewModel.registros.observe(this, registrosObserver);
+
             binding.setViewModel(viewModel);
 
-            buildGoogleApiClient();
+            listParadas = binding.listParadas;
+
+            adapter = new ParadaAdapter(viewModel.paradas.getValue(), this);
+            listParadas.setAdapter(adapter);
+            listParadas.invalidate();
+
+            //buildGoogleApiClient();
 
             configuraMapa();
 
@@ -197,30 +221,64 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
 
             listParadas = binding.listParadas;
             listParadas.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-            adapter = new ParadaAdapter(viewModel.paradas.getValue(), this);
-
-            listParadas.setAdapter(adapter);
 
             nf.setMaximumFractionDigits(0);
             nf.setMinimumFractionDigits(0);
 
-            carregaGeoJson(getIntent().getStringExtra("itinerario"));
+            //carregaGeoJson(getIntent().getStringExtra("itinerario"));
+
+            myReceiver = new LocationUpdatesBroadcastReceiver();
+
+            mService = new LocationUpdatesService();
+
+            Boolean ativo = PreferenceManager.getDefaultSharedPreferences(this)
+                    .getBoolean(KEY_GRAVANDO, false);
+
+            if(ativo){
+                binding.btnIniciar.setText("Parar");
+                gravando = true;
+            } else{
+                binding.btnIniciar.setText("Iniciar");
+                gravando = false;
+            }
 
         }
     }
 
-    private void carregaGeoJson(String itinerario){
+    // Monitors the state of the connection to the service.
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            LocationUpdatesService.LocalBinder binder = (LocationUpdatesService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+
+            mService.requestLocationUpdates();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mService = null;
+            mBound = false;
+        }
+    };
+
+    private void carregaGeoJson(final String itinerario){
         File[] s = getApplicationContext().getFilesDir().listFiles(new FilenameFilter(){
 
             @Override
             public boolean accept(File file, String s) {
-                return file.getName().endsWith(".json");
+                return s.startsWith(itinerario) && s.endsWith("json");
             }
         });
 
+        File ultima = null;
+
         for(File b : s){
-            System.out.println(b.getName());
+            ultima = b;
         }
+
     }
 
     private void configuraMapa() {
@@ -246,16 +304,17 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
     public void onClickBtnIniciar(View v){
 
         if(gravando){
+            horaFinal = DateTime.now();
             gravando = false;
 
             binding.btnIniciar.setText("Iniciar");
+
+            viewModel.retorno.observe(this, retornoObserver);
 
             salvarPolyline(line);
 
             map.getOverlays().clear();
             map.invalidate();
-
-            Toast.makeText(getApplicationContext(), "Registro Salvo!", Toast.LENGTH_SHORT).show();
 
             binding.textViewVelocidade.setText("0 Km/h");
 
@@ -266,6 +325,7 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
             LocationResultHelper.marcaGravando(getApplicationContext(), gravando);
 
         } else{
+            horaInicial = DateTime.now();
             gravando = true;
             locais = new ArrayList<>();
             binding.btnIniciar.setText("Parar");
@@ -274,8 +334,15 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
 
             LocationResultHelper.clearRoute(getApplicationContext());
             LocationResultHelper.marcaGravando(getApplicationContext(), gravando);
+            LocationResultHelper.marcaHoraInicial(getApplicationContext(), horaInicial);
         }
 
+    }
+
+    public void onClickBtnViagens(View v){
+        Intent i = new Intent(ctx, ViagensActivity.class);
+        i.putExtra("itinerario", viewModel.itinerario.getValue().getItinerario().getId());
+        ctx.startActivity(i);
     }
 
     @Override
@@ -283,24 +350,58 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
         super.onStart();
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(this);
-    }
 
+        // Bind to the service. If the service is in foreground mode, this signals to the service
+        // that since this activity is in the foreground, the service can exit foreground mode.
+        bindService(new Intent(this, LocationUpdatesService.class), mServiceConnection,
+                Context.BIND_AUTO_CREATE);
+
+
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver,
+                new IntentFilter(LocationUpdatesService.ACTION_BROADCAST));
 
-        Boolean ativo = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+        recarregaPolyline();
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(myReceiver);
+
+        checaGravacaoAtiva();
+
+        super.onPause();
+    }
+
+    private void checaGravacaoAtiva() {
+        Boolean ativo = PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean(KEY_GRAVANDO, false);
 
-        if(map != null && ativo){
-            // limpando e reiniciando mapa
-            recarregaPolyline();
-
+        if(!ativo && mService != null){
+            mService.removeLocationUpdates();
+            mService.stopSelf();
         }
+    }
 
-//        updateButtonsState(LocationRequestHelper.getRequesting(this));
-        //Toast.makeText(getApplicationContext(), LocationResultHelper.getSavedLocationResult(this), Toast.LENGTH_SHORT).show();
+    @Override
+    protected void onStop() {
+        if (mBound) {
+            // Unbind from the service. This signals to the service that this activity is no longer
+            // in the foreground, and the service can respond by promoting itself to a foreground
+            // service.
+            unbindService(mServiceConnection);
+            mBound = false;
+        }
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
+
+        checaGravacaoAtiva();
+
+        super.onStop();
     }
 
     private void recarregaPolyline() {
@@ -316,6 +417,7 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
         if(!rota.isEmpty()){
             rota = rota.substring(0, rota.length()-1);
             line = new Polyline();
+            line.getOutlinePaint().setColor(Color.BLUE);
 
             String[] pontos = rota.split("\\|");
 
@@ -335,103 +437,13 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-
-        if(map != null){
-            map.onPause();
-        }
-
-//        PreferenceManager.getDefaultSharedPreferences(this)
-//                .unregisterOnSharedPreferenceChangeListener(this);
-
-        //stopLocationUpdates();
-
-    }
-
-    @Override
-    protected void onStop() {
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .unregisterOnSharedPreferenceChangeListener(this);
-
-        super.onStop();
-    }
-
-    /**
-     * Builds {@link GoogleApiClient}, enabling automatic lifecycle management using
-     * {@link GoogleApiClient.Builder#enableAutoManage(android.support.v4.app.FragmentActivity,
-     * int, GoogleApiClient.OnConnectionFailedListener)}. I.e., GoogleApiClient connects in
-     * {@link AppCompatActivity#onStart}, or if onStart() has already happened, it connects
-     * immediately, and disconnects automatically in {@link AppCompatActivity#onStop}.
-     */
-    private void buildGoogleApiClient() {
-        if (mGoogleApiClient != null) {
-            return;
-        }
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .enableAutoManage(this, this)
-                .addApi(LocationServices.API)
-                .build();
-        createLocationRequest();
-    }
-
-    @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.i("API", "GoogleApiClient connected");
-        requestLocationUpdates(null);
 
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(this);
 
     }
-
-    /**
-     * Sets up the location request. Android has two location request settings:
-     * {@code ACCESS_COARSE_LOCATION} and {@code ACCESS_FINE_LOCATION}. These settings control
-     * the accuracy of the current location. This sample uses ACCESS_FINE_LOCATION, as defined in
-     * the AndroidManifest.xml.
-     * <p/>
-     * When the ACCESS_FINE_LOCATION setting is specified, combined with a fast update
-     * interval (5 seconds), the Fused Location Provider API returns location updates that are
-     * accurate to within a few feet.
-     * <p/>
-     * These settings are appropriate for mapping applications that show real-time location
-     * updates.
-     */
-    private void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
-
-        mLocationRequest.setInterval(5000);
-
-        // Sets the fastest rate for active location updates. This interval is exact, and your
-        // application will never receive updates faster than this value.
-        mLocationRequest.setFastestInterval(5000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        // Sets the maximum time when batched location updates are delivered. Updates may be
-        // delivered sooner than this interval.
-        //mLocationRequest.setMaxWaitTime(5000);
-    }
-
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//
-//        if(map != null){
-//            map.onResume();
-//        }
-//
-//        startLocationUpdates();
-//
-//    }
-
-//    @Override
-//    protected void onStop() {
-//        PreferenceManager.getDefaultSharedPreferences(this)
-//                .unregisterOnSharedPreferenceChangeListener(this);
-//        super.onStop();
-//    }
 
     private PendingIntent getPendingIntent() {
         // Note: for apps targeting API level 25 ("Nougat") or lower, either
@@ -487,78 +499,6 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
 //            Toast.makeText(getApplicationContext(), "REQ: "+LocationResultHelper.getSavedLocationResult(this), Toast.LENGTH_SHORT).show();
 //            updateButtonsState(LocationRequestHelper.getRequesting(this));
         }
-    }
-
-    /**
-     * Handles the Request Updates button and requests start of location updates.
-     */
-    public void requestLocationUpdates(View view) {
-        try {
-            Log.i("UPD", "Starting location updates");
-            LocationUpdateUtils.setRequestingLocationUpdates(this, true);
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, getPendingIntent());
-        } catch (SecurityException e) {
-            LocationUpdateUtils.setRequestingLocationUpdates(this, false);
-            e.printStackTrace();
-        }
-    }
-
-//    /**
-//     * Handles the Request Updates button and requests start of location updates.
-//     */
-//    public void requestLocationUpdates(FusedLocationProviderClient mFusedLocationClient, LocationRequest mLocationRequest, LocationCallback mLocationCallback) {
-//        try {
-//            Log.i("LOC", "Starting location updates");
-//            LocationUpdateUtils.setRequestingLocationUpdates(this, true);
-//            mFusedLocationClient.requestLocationUpdates(mLocationRequest, getPendingIntent());
-//        } catch (SecurityException e) {
-//            LocationUpdateUtils.setRequestingLocationUpdates(this, false);
-//            e.printStackTrace();
-//        }
-//    }
-
-    /**
-     * Handles the Remove Updates button, and requests removal of location updates.
-     */
-    public void removeLocationUpdates() {
-        Log.i("LOC", "Removing location updates");
-        LocationRequestHelper.setRequesting(this, false);
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,
-                getPendingIntent());
-    }
-
-    @SuppressLint("MissingPermission")
-    private void startLocationUpdates() {
-
-        if(checarPermissoes()){
-
-            LocationRequest locationRequest = new LocationRequest();
-            locationRequest.setInterval(3000);
-            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            locationRequest.setMaxWaitTime(5000);
-            locationRequest.setSmallestDisplacement(50);
-
-            if(viewModel != null){
-                //requestLocationUpdates(viewModel.mFusedLocationClient, locationRequest, viewModel.mLocationCallback);
-            }
-
-            if(viewModel != null){
-                viewModel.mFusedLocationClient.requestLocationUpdates(locationRequest,
-                        viewModel.mLocationCallback,
-                        null);
-            }
-
-        }
-
-    }
-
-    private void stopLocationUpdates() {
-
-        if(viewModel != null && viewModel.mFusedLocationClient != null){
-            viewModel.mFusedLocationClient.removeLocationUpdates(viewModel.mLocationCallback);
-            viewModel.mFusedLocationClient.removeLocationUpdates(getPendingIntent());
-        }
-
     }
 
     private boolean checarPermissoes(){
@@ -656,6 +596,14 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
 
     }
 
+    Observer<List<ViagemItinerario>> registrosObserver = new Observer<List<ViagemItinerario>>() {
+        @Override
+        public void onChanged(final List<ViagemItinerario> viagens) {
+            System.out.println("Viagens: " + viagens.size());
+        }
+
+    };
+
     Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {
         @Override
         public void onChanged(final List<ParadaBairro> paradas) {
@@ -664,13 +612,13 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
             map.getOverlays().add(overlayEvents);
             atualizarParadasMapa(paradas);
 
-            if(viewModel.localAtual.getValue().distanceTo(viewModel.paradas.getValue().get(0).getLocation()) > 200){
-                Toast.makeText(getApplicationContext(), "Você está longe demais! "+viewModel.paradas.getValue().get(0).getLocation().getLatitude()+" | "
-                        +viewModel.paradas.getValue().get(0).getLocation().getLongitude(), Toast.LENGTH_SHORT).show();
-            }
-
             adapter.paradas = paradas;
             adapter.notifyDataSetChanged();
+
+//            if(viewModel.localAtual.getValue().distanceTo(viewModel.paradas.getValue().get(0).getLocation()) > 200){
+//                Toast.makeText(getApplicationContext(), "Você está longe demais! "+viewModel.paradas.getValue().get(0).getLocation().getLatitude()+" | "
+//                        +viewModel.paradas.getValue().get(0).getLocation().getLongitude(), Toast.LENGTH_SHORT).show();
+//            }
 
             //viewModel.carregaDirections(map, paradas);
 
@@ -728,35 +676,68 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
 
     private void salvarPolyline(Polyline line){
 
-        String geoJson = "{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\", \"properties\": {},\"geometry\": {\"type\": \"LineString\", \"coordinates\": [";
-
-        for(GeoPoint geo : line.getPoints()){
-            geoJson = geoJson.concat("["+geo.getLongitude()+","+geo.getLatitude()+"],");
+        if(line == null){
+            recarregaPolyline();
         }
 
-        geoJson = geoJson.substring(0, geoJson.length()-1);
+        if(line != null){
+            String geoJson = "{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\", \"properties\": {},\"geometry\": {\"type\": \"LineString\", \"coordinates\": [";
 
-        geoJson = geoJson.concat("]}}]}");
+            for(GeoPoint geo : line.getPoints()){
+                geoJson = geoJson.concat("["+geo.getLongitude()+","+geo.getLatitude()+"],");
+            }
 
-        String nomeArquivo = viewModel.itinerario.getValue().getItinerario().getId()
-                +"-"+DateTimeFormat.forPattern("yyyy-MM-dd-HH:mm:ss").print(DateTime.now())+".json";
+            geoJson = geoJson.substring(0, geoJson.length()-1);
 
-        FileUtils.writeToFile(nomeArquivo, geoJson, getApplicationContext());
+            geoJson = geoJson.concat("]}}]}");
 
-        salvarRegistroPontos(nomeArquivo.replace("json", "log"));
+            String idItinerario = viewModel.itinerario.getValue().getItinerario().getId();
+
+            String nomeArquivo = idItinerario
+                    +"-"+DateTimeFormat.forPattern("yyyy-MM-dd-HH:mm:ss").print(DateTime.now())+".json";
+
+            FileUtils.writeToFile(nomeArquivo, geoJson, getApplicationContext());
+
+            salvarRegistroPontos(nomeArquivo.replace("json", "log"));
+
+            // salvando registro de viagem no BD
+            ViagemItinerario viagemItinerario = new ViagemItinerario();
+
+            viagemItinerario.setItinerario(idItinerario);
+            viagemItinerario.setTrajeto(nomeArquivo);
+            viagemItinerario.setHoraInicial(new DateTime(LocationResultHelper.recuperaHoraInicial(getApplicationContext())));
+            viagemItinerario.setHoraFinal(horaFinal);
+            viagemItinerario.setAtivo(true);
+            viagemItinerario.setEnviado(false);
+
+            viewModel.salvarViagem(viagemItinerario);
+
+        } else{
+            Toast.makeText(getApplicationContext(), "Erro ao salvar viagem. Não foi possível recuperar os pontos.", Toast.LENGTH_SHORT).show();
+        }
+
+
 
     }
 
     private void salvarRegistroPontos(String nome){
 
-        String pontos = "";
+        if(locais != null){
+            String pontos = "";
 
-        for(Location geo : locais){
-            pontos = pontos.concat(DateTimeFormat.forPattern("yyyy-MM-dd-HH:mm:ss").print(geo.getTime())
-                    +","+geo.getLongitude()+","+geo.getLatitude()+","+geo.getSpeed()*3.6+" Km/h"+"\n");
+            for(Location geo : locais){
+                pontos = pontos.concat(DateTimeFormat.forPattern("yyyy-MM-dd-HH:mm:ss").print(geo.getTime())
+                        +","+geo.getLongitude()+","+geo.getLatitude()+","+geo.getSpeed()*3.6+" Km/h"+"\n");
+            }
+
+            FileUtils.writeToFile(nome, pontos, getApplicationContext());
+
+            //Toast.makeText(getApplicationContext(), "Registro Salvo!", Toast.LENGTH_SHORT).show();
+        } else{
+            Toast.makeText(getApplicationContext(), "Nenhum ponto a ser salvo!", Toast.LENGTH_SHORT).show();
         }
 
-        FileUtils.writeToFile(nome, pontos, getApplicationContext());
+
 
     }
 
@@ -764,9 +745,24 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
     public static void setMapCenter(MapView map, GeoPoint geoPoint){
 
         if(geoPoint != null){
-            map.getController().setCenter(geoPoint);
+            map.getController().animateTo(geoPoint);
         }
 
     }
+
+    Observer<Integer> retornoObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer retorno) {
+
+            if(retorno == 1){
+                Toast.makeText(getApplicationContext(), "Viagem cadastrada!", Toast.LENGTH_SHORT).show();
+            } else if(retorno == 0){
+                Toast.makeText(getApplicationContext(),
+                        "Erro ao salvar viagem.",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    };
 
 }

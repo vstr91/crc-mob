@@ -344,18 +344,18 @@ public class LocationUpdatesService extends Service {
     private void createLocationRequest() {
         mLocationRequest = new LocationRequest();
 
-        mLocationRequest.setInterval(3000);
+        mLocationRequest.setInterval(2000);
 
         // Sets the fastest rate for active location updates. This interval is exact, and your
         // application will never receive updates faster than this value.
-        mLocationRequest.setFastestInterval(3000);
+        mLocationRequest.setFastestInterval(2000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         // Sets the maximum time when batched location updates are delivered. Updates may be
         // delivered sooner than this interval.
-        mLocationRequest.setMaxWaitTime(6000);
+        mLocationRequest.setMaxWaitTime(2000);
 
-        mLocationRequest.setSmallestDisplacement(10);
+        mLocationRequest.setSmallestDisplacement(5);
 
     }
 

@@ -24,11 +24,15 @@ public class ViagensItinerarioViewModel extends AndroidViewModel {
 
     public static MutableLiveData<Integer> retorno;
 
+    public void setItinerario(String itinerario){
+        viagens = appDatabase.viagemItinerarioDAO().listarTodosPorItinerario(itinerario);
+    }
+
     public ViagensItinerarioViewModel(Application app){
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         viagem = new ViagemItinerario();
-        viagens = appDatabase.viagemItinerarioDAO().listarTodos();
+        viagens = appDatabase.viagemItinerarioDAO().listarTodosPorItinerario("-1");
 
         retorno = new MutableLiveData<>();
         retorno.setValue(-1);

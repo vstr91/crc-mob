@@ -36,88 +36,86 @@
 
                 <TextView
                     android:id="@+id/textView44"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:text="@{viagem.horaFinal}"
                     android:textSize="12sp"
-                    app:layout_constraintBottom_toBottomOf="@+id/textView43"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/textView43"
-                    app:layout_constraintTop_toTopOf="@+id/textView43"
-                    app:layout_constraintVertical_bias="1.0"
+                    app:layout_constraintStart_toStartOf="@+id/guideline9"
+                    app:layout_constraintTop_toBottomOf="@+id/textView43"
                     tools:text="01/01/2019 00:12" />
 
                 <TextView
                     android:id="@+id/textView43"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="Final:"
+                    android:layout_marginEnd="8dp"
+                    android:text="Final"
                     android:textSize="12sp"
                     android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="@+id/textView42"
-                    app:layout_constraintEnd_toStartOf="@+id/textView44"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/textView42"
-                    app:layout_constraintTop_toTopOf="@+id/textView42" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/guideline9"
+                    app:layout_constraintTop_toTopOf="@+id/textView41" />
 
                 <TextView
                     android:id="@+id/textView41"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:text="Início:"
+                    android:layout_marginTop="8dp"
+                    android:text="Início"
                     android:textSize="12sp"
                     android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/textView42"
-                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline9"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/map" />
 
                 <TextView
                     android:id="@+id/textView42"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:textSize="12sp"
                     android:text="@{viagem.horaInicial}"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/textView43"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/textView41"
-                    app:layout_constraintTop_toBottomOf="@+id/map"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline9"
+                    app:layout_constraintStart_toStartOf="@+id/textView41"
+                    app:layout_constraintTop_toBottomOf="@+id/textView41"
                     tools:text="01/01/2019 00:00" />
 
                 <TextView
                     android:id="@+id/textView47"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
                     android:text="@{`Tempo total: `+viagem.getHorarioTotal}"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/textView48"
-                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline9"
                     app:layout_constraintStart_toStartOf="@+id/textView41"
-                    app:layout_constraintTop_toBottomOf="@+id/textView41"
+                    app:layout_constraintTop_toBottomOf="@+id/textView42"
                     tools:text="Tempo Total: 00:12" />
 
                 <TextView
                     android:id="@+id/textView48"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
                     android:text="@{`Pontos registrados: `+viagem.getTotalPontos(context)}"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="@+id/textView47"
                     app:layout_constraintEnd_toEndOf="@+id/textView44"
-                    app:layout_constraintStart_toEndOf="@+id/textView47"
-                    app:layout_constraintTop_toTopOf="@+id/textView47"
+                    app:layout_constraintStart_toStartOf="@+id/guideline9"
+                    app:layout_constraintTop_toBottomOf="@+id/textView44"
                     tools:text="Pontos registrados: 25" />
+
+                <android.support.constraint.Guideline
+                    android:id="@+id/guideline9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_begin="157dp" />
 
                 <org.osmdroid.views.MapView
                     android:id="@+id/map"

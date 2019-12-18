@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.R;
@@ -35,11 +36,12 @@ public class ViagensActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         viewModel = ViewModelProviders.of(this).get(ViagensItinerarioViewModel.class);
+        viewModel.setItinerario(getIntent().getStringExtra("itinerario"));
         viewModel.viagens.observe(this, viagensObserver);
 
         binding.setView(this);
         //binding.setViewModel(viewModel);
-        setTitle("Viagens por Itinerário");
+        setTitle("Viagens");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
         listViagens = binding.listViagens;
@@ -53,7 +55,18 @@ public class ViagensActivity extends BaseActivity {
     Observer<List<ViagemItinerario>> viagensObserver = new Observer<List<ViagemItinerario>>() {
         @Override
         public void onChanged(List<ViagemItinerario> viagens) {
-            adapter.viagens = viagens;
+
+            List<ViagemItinerario> vi = new ArrayList<>();
+
+            for(ViagemItinerario v : viagens){
+
+                if(v.getTotalPontos(getApplicationContext()) > 0 && v.getHoraInicial() != null && v.getHoraFinal() != null){
+                    vi.add(v);
+                }
+
+            }
+
+            adapter.viagens = vi;
             adapter.notifyDataSetChanged();
         }
     };

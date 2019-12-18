@@ -40,7 +40,11 @@ public class ViagemItinerarioAdapter extends RecyclerView.Adapter<ViagemItinerar
     @Override
     public void onBindViewHolder(ViagemItinerarioViewHolder holder, int position) {
         ViagemItinerario viagem = viagens.get(position);
-        holder.bind(viagem);
+
+        if(viagem.getTotalPontos(ctx) > 0){
+            holder.bind(viagem);
+        }
+
     }
 
     @Override

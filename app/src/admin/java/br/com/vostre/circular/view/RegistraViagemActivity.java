@@ -185,8 +185,6 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
             viewModel.paradas.observe(this, paradasObserver);
             viewModel.localAtual.observe(this, localObserver);
 
-            viewModel.registros.observe(this, registrosObserver);
-
             binding.setViewModel(viewModel);
 
             listParadas = binding.listParadas;
@@ -596,14 +594,6 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
 
     }
 
-    Observer<List<ViagemItinerario>> registrosObserver = new Observer<List<ViagemItinerario>>() {
-        @Override
-        public void onChanged(final List<ViagemItinerario> viagens) {
-            System.out.println("Viagens: " + viagens.size());
-        }
-
-    };
-
     Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {
         @Override
         public void onChanged(final List<ParadaBairro> paradas) {
@@ -680,7 +670,7 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
             recarregaPolyline();
         }
 
-        if(line != null){
+        if(line != null && line.getPoints().size() > 0){
             String geoJson = "{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\", \"properties\": {},\"geometry\": {\"type\": \"LineString\", \"coordinates\": [";
 
             for(GeoPoint geo : line.getPoints()){
@@ -713,7 +703,7 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
             viewModel.salvarViagem(viagemItinerario);
 
         } else{
-            Toast.makeText(getApplicationContext(), "Erro ao salvar viagem. Não foi possível recuperar os pontos.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Erro ao salvar viagem. Não foi possível recuperar os pontos ou não há pontos registrados.", Toast.LENGTH_SHORT).show();
         }
 
 

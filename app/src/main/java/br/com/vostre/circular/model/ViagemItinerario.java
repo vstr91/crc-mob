@@ -12,6 +12,7 @@ import org.joda.time.Hours;
 import org.joda.time.Minutes;
 import org.joda.time.format.DateTimeFormat;
 import org.osmdroid.bonuspack.kml.KmlDocument;
+import org.osmdroid.bonuspack.kml.KmlPlacemark;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -81,14 +82,20 @@ public class ViagemItinerario extends EntidadeBase {
         KmlDocument kmlDocument = new KmlDocument();
         kmlDocument.parseGeoJSON(jsonString);
 
-        return kmlDocument.mKmlRoot.mItems.size();
+        if(kmlDocument.mKmlRoot.mItems.size() > 0){
+            KmlPlacemark placemark = (KmlPlacemark) kmlDocument.mKmlRoot.mItems.get(0);
+
+            return placemark.mGeometry.mCoordinates.size();
+        } else{
+            return 0;
+        }
 
     }
 
     public String getHorarioTotal(){
 
         if(horaInicial != null && horaFinal != null){
-            return String.valueOf(Minutes.minutesBetween(horaInicial, horaFinal).getMinutes());
+            return Minutes.minutesBetween(horaInicial, horaFinal).getMinutes()+" minuto(s)";
         } else{
             return "-";
         }

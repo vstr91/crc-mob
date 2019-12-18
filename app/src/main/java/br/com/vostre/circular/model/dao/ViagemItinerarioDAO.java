@@ -18,6 +18,9 @@ public interface ViagemItinerarioDAO {
     @Query("SELECT * FROM viagem_itinerario")
     LiveData<List<ViagemItinerario>> listarTodos();
 
+    @Query("SELECT * FROM viagem_itinerario WHERE itinerario = :itinerario")
+    LiveData<List<ViagemItinerario>> listarTodosPorItinerario(String itinerario);
+
     @Query("SELECT * FROM viagem_itinerario WHERE enviado = 0")
     List<ViagemItinerario> listarTodosAEnviar();
 

@@ -6,6 +6,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityPaisesBinding;
 import br.com.vostre.circular.databinding.ActivityViagensBinding;
+import br.com.vostre.circular.listener.ViagemListener;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.ViagemItinerario;
 import br.com.vostre.circular.view.adapter.PaisAdapter;
@@ -21,7 +23,7 @@ import br.com.vostre.circular.view.form.FormPais;
 import br.com.vostre.circular.viewModel.PaisesViewModel;
 import br.com.vostre.circular.viewModel.ViagensItinerarioViewModel;
 
-public class ViagensActivity extends BaseActivity {
+public class ViagensActivity extends BaseActivity implements ViagemListener {
 
     ActivityViagensBinding binding;
     ViagensItinerarioViewModel viewModel;
@@ -46,7 +48,7 @@ public class ViagensActivity extends BaseActivity {
 
         listViagens = binding.listViagens;
 
-        adapter = new ViagemItinerarioAdapter(viagens, this);
+        adapter = new ViagemItinerarioAdapter(viagens, this, this);
 
         listViagens.setAdapter(adapter);
 
@@ -71,4 +73,24 @@ public class ViagensActivity extends BaseActivity {
         }
     };
 
+    Observer<Integer> retornoObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer retorno) {
+
+            if(retorno == 1){
+                Toast.makeText(getApplicationContext(), "Viagem excluída!", Toast.LENGTH_SHORT).show();
+            } else if(retorno == 0){
+                Toast.makeText(getApplicationContext(),
+                        "Erro ao excluir viagem.",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    };
+
+    @Override
+    public void onSelected(String id) {
+        viewModel.editarViagem(id, getApplicationContext());
+        viewModel.retorno.observe(this, retornoObserver);
+    }
 }

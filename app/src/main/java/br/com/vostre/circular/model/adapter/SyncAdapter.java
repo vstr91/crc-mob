@@ -34,10 +34,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLOutput;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -77,6 +80,7 @@ import br.com.vostre.circular.model.Servico;
 import br.com.vostre.circular.model.TipoProblema;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.model.UsuarioPreferencia;
+import br.com.vostre.circular.model.ViagemItinerario;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.utils.Constants;
@@ -95,6 +99,7 @@ import br.com.vostre.circular.viewModel.ParadasViewModel;
 import br.com.vostre.circular.viewModel.PontosInteresseViewModel;
 //import br.com.vostre.circular.viewModel.ProblemasViewModel;
 import br.com.vostre.circular.viewModel.ServicosViewModel;
+import br.com.vostre.circular.viewModel.ViagensItinerarioViewModel;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -151,6 +156,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     List<? extends EntidadeBase> pontosInteresseSugestoes;
 
     List<? extends EntidadeBase> servicos;
+
+    List<? extends EntidadeBase> viagens;
 
 //    List<? extends EntidadeBase> tiposProblema;
 //    List<? extends EntidadeBase> problemas;
@@ -223,6 +230,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         if(baseUrl == null){
             baseUrl = Constants.BASE_URL;
         }
+
+        //TODO: para testes
+        appDatabase.viagemItinerarioDAO().marcaTodosParaEnvio();
 
         parametroInterno = appDatabase.parametroInternoDAO().carregar();
 
@@ -628,6 +638,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 JSONArray servicos = null;
 
+                JSONArray viagens = null;
+
                 //System.out.println("PAR_SUG: "+arrayObject.optJSONArray("paradas_sugestoes"));
 
                 if(arrayObject.optJSONArray("paradas_sugestoes") != null){
@@ -660,6 +672,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 if(arrayObject.optJSONArray("servicos") != null){
                     servicos = arrayObject.getJSONArray("servicos");
+                }
+
+                if(arrayObject.optJSONArray("viagens_itinerarios") != null){
+                    viagens = arrayObject.getJSONArray("viagens_itinerarios");
                 }
 
                 // ACESSOS
@@ -1282,6 +1298,43 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 }
 
+                // VIAGENS
+
+                if(viagens.length() > 0){
+
+                    int total = viagens.length();
+                    List<ViagemItinerario> lstViagens = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        ViagemItinerario viagem;
+                        JSONObject obj = viagens.getJSONObject(i);
+
+                        viagem = (ViagemItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), ViagemItinerario.class, 1);
+                        viagem.setEnviado(true);
+
+                        lstViagens.add(viagem);
+
+                        if(viagem.getTrajeto() != null && !viagem.getTrajeto().isEmpty()){
+                            File trajeto = new File(getContext().getApplicationContext().getFilesDir(), viagem.getTrajeto());
+
+                            if(!trajeto.exists() || !trajeto.canWrite()){
+                                arquivoDownload(baseUrl, viagem.getTrajeto());
+                            }
+
+                            // log
+                            File trajetoLog = new File(getContext().getApplicationContext().getFilesDir(), viagem.getTrajeto().replace("json", "log"));
+
+                            if(!trajetoLog.exists() || !trajetoLog.canWrite()){
+                                arquivoDownload(baseUrl, trajetoLog.getName());
+                            }
+                        }
+
+                    }
+
+                    add(lstViagens, "viagem_itinerario");
+
+                }
+
                 if(!admin){
 
                     AsyncTask.execute(new Runnable() {
@@ -1435,6 +1488,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             servicos = appDatabase.servicoDAO().listarTodosAEnviar();
 
+            viagens = appDatabase.viagemItinerarioDAO().listarTodosAEnviar();
+
             return null;
         }
 
@@ -1470,13 +1525,15 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             String strServicos = "\"servicos\": "+JsonUtils.toJson((List<EntidadeBase>) servicos);
 
+            String strViagens = "\"viagens_itinerarios\": "+JsonUtils.toJson((List<EntidadeBase>) viagens);
+
             String json = "{"+strPaises+","+strEmpresas+","+strOnibus+","+strEstados+","+strCidades+","
                     +strBairros+","+strParadas+","+strItinerarios+","+strHorarios+","+strParadasItinerarios+","
                     +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
                     +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+","+strPreferencias+","+strHistoricos+","
-                    +strPontosInteresseSugestoes+","+strServicos+"}";
+                    +strPontosInteresseSugestoes+","+strServicos+","+strViagens+"}";
 
-             //System.out.println("JSON: "+json);
+             System.out.println("JSON: "+strViagens);
 
             //System.out.println("POI ENV: "+strPontosInteresse);
             //System.out.println("POIS ENV: "+strPontosInteresseSugestoes);
@@ -1501,7 +1558,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     +bairros.size()+paradas.size()+itinerarios.size()+horarios.size()+paradasItinerario.size()
                     +secoesItinerarios.size()+horariosItinerarios.size()+mensagens.size()+parametros.size()+pontosInteresse.size()
                     +usuarios.size()+paradaSugestoes.size()+preferencias.size()+historicos.size()+pontosInteresseSugestoes.size()
-                    +servicos.size();
+                    +servicos.size()+viagens.size();
 
             if(registros > 0){
                 chamaAPI(registros, json, 0, baseUrl, token);
@@ -1531,6 +1588,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
         List<Servico> servicos;
 
+        List<ViagemItinerario> viagens;
+
         @Override
         protected Void doInBackground(final Void... params) {
 
@@ -1545,6 +1604,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             problemas = appDatabase.problemaDAO().listarTodosImagemAEnviar();
 
             servicos = appDatabase.servicoDAO().listarTodosImagemAEnviar();
+
+            viagens = appDatabase.viagemItinerarioDAO().listarTodosArquivoAEnviar();
 
             return null;
         }
@@ -2140,6 +2201,86 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 //
 //            }
 
+            for(final ViagemItinerario viagem : viagens){
+
+                File trajeto = new File(getContext().getApplicationContext().getFilesDir(),  viagem.getTrajeto());
+                File trajetoLog = new File(getContext().getApplicationContext().getFilesDir(),  viagem.getTrajeto().replace("json", "log"));
+
+                // JSON
+                arquivoUpload(trajeto.getAbsolutePath(), new UploadCallback() {
+                    @Override
+                    public void onStart(String requestId) {
+                        //System.out.println("INICIANDO ENVIO IMG: "+requestId);
+                    }
+
+                    @Override
+                    public void onProgress(String requestId, long bytes, long totalBytes) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(String requestId, Map resultData) {
+                        viagem.setTrajetoEnviado(true);
+                        ViagensItinerarioViewModel.edit(viagem, getContext().getApplicationContext());
+                    }
+
+                    @Override
+                    public void onError(String requestId, ErrorInfo error) {
+
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+error.getDescription()+" ("+error.getCode()+") ao enviar arquivo de "+viagem.getItinerario()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        PreferenceUtils.gravaMostraToast(ctx, false);
+                        //System.out.println("ERRO ENVIO IMG: "+error.getDescription());
+                    }
+
+                    @Override
+                    public void onReschedule(String requestId, ErrorInfo error) {
+
+                    }
+                });
+
+                // LOG
+                arquivoUpload(trajetoLog.getAbsolutePath(), new UploadCallback() {
+                    @Override
+                    public void onStart(String requestId) {
+                        //System.out.println("INICIANDO ENVIO IMG: "+requestId);
+                    }
+
+                    @Override
+                    public void onProgress(String requestId, long bytes, long totalBytes) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(String requestId, Map resultData) {
+
+                    }
+
+                    @Override
+                    public void onError(String requestId, ErrorInfo error) {
+
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+error.getDescription()+" ("+error.getCode()+") ao enviar arquivo de log de "+viagem.getItinerario()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        PreferenceUtils.gravaMostraToast(ctx, false);
+                        //System.out.println("ERRO ENVIO IMG: "+error.getDescription());
+                    }
+
+                    @Override
+                    public void onReschedule(String requestId, ErrorInfo error) {
+
+                    }
+                });
+
+            }
+
         }
     }
 
@@ -2311,6 +2452,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 case "servico":
                     db.servicoDAO().inserirTodos((List<Servico>) params[0]);
                     break;
+                case "viagem_itinerario":
+                    db.viagemItinerarioDAO().inserirTodos((List<ViagemItinerario>) params[0]);
+                    break;
             }
 
             if(!PreferenceUtils.carregarPreferenciaBoolean(ctx, "init")){
@@ -2331,6 +2475,80 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     public static void imageUpload(final String imagem, UploadCallback callback){
         //System.out.println("CHAMOU UPLOAD");
         MediaManager.get().upload(imagem).callback(callback).unsigned("ml_default").startNow(ctx);
+    }
+
+    public static void arquivoUpload(final String arquivo, UploadCallback callback){
+        //System.out.println("CHAMOU UPLOAD");
+        MediaManager.get().upload(arquivo).option("resource_type", "auto").callback(callback).unsigned("arquivo_default").startNow(ctx);
+    }
+
+    public static void arquivoDownload(String baseUrl, final String arquivo){
+
+        baseUrl = IMAGE_BASE_URL;
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .baseUrl(baseUrl)
+                .build();
+
+        CircularAPI api = retrofit.create(CircularAPI.class);
+        Call<ResponseBody> call = api.recebeArquivo(arquivo);
+
+        //System.out.println("CALL: "+call.request().url().toString());
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                if(response.code() == 200){
+                    FileOutputStream fos = null;
+                    InputStream is = response.body().byteStream();
+                    BufferedInputStream bis = new BufferedInputStream(is);
+                    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+//                    File file = new File(ctx.getApplicationContext().getFilesDir(), arquivo);
+
+                    try {
+                        //We create an array of bytes
+                        byte[] data = new byte[50];
+                        int current = 0;
+
+                        while((current = bis.read(data,0,data.length)) != -1){
+                            buffer.write(data,0,current);
+                        }
+
+                        fos = new FileOutputStream(new File(ctx.getApplicationContext().getFilesDir(), arquivo));
+
+                        fos.write(buffer.toByteArray());
+                        fos.close();
+                    } catch (FileNotFoundException e) {
+                        Log.e("ERR_FILE", e.getLocalizedMessage());
+                        e.printStackTrace();
+//                        Toast.makeText(ctx, "Erro ("+e.getMessage()+") ao receber arquivo.", Toast.LENGTH_SHORT).show();
+                    } catch(IOException e){
+                        Log.e("ERR_FILE", e.getLocalizedMessage());
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            if (fos != null) {
+                                fos.close();
+                                //Toast.makeText(ctx, "Imagem "+imagem+" recebida.", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (IOException e) {
+                            Log.e("ERR_FILE", e.getLocalizedMessage());
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                //Toast.makeText(ctx, "Erro ("+t.getMessage()+") ao receber imagem.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public static void imageDownload(String baseUrl, final String imagem){

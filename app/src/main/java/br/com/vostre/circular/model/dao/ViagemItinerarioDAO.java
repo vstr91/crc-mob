@@ -18,7 +18,7 @@ public interface ViagemItinerarioDAO {
     @Query("SELECT * FROM viagem_itinerario")
     LiveData<List<ViagemItinerario>> listarTodos();
 
-    @Query("SELECT * FROM viagem_itinerario WHERE itinerario = :itinerario")
+    @Query("SELECT * FROM viagem_itinerario WHERE itinerario = :itinerario AND ativo = 1")
     LiveData<List<ViagemItinerario>> listarTodosPorItinerario(String itinerario);
 
     @Query("SELECT * FROM viagem_itinerario WHERE enviado = 0")
@@ -27,8 +27,14 @@ public interface ViagemItinerarioDAO {
     @Query("SELECT * FROM viagem_itinerario WHERE ativo = 1")
     LiveData<List<ViagemItinerario>> listarTodosAtivos();
 
+    @Query("SELECT * FROM viagem_itinerario WHERE trajetoEnviado = 0 AND trajeto IS NOT NULL")
+    List<ViagemItinerario> listarTodosArquivoAEnviar();
+
     @Query("SELECT * FROM viagem_itinerario WHERE itinerario = :itinerario")
     LiveData<List<ViagemItinerario>> carregarPorItinerario(String itinerario);
+
+    @Query("SELECT * FROM viagem_itinerario WHERE id = :id")
+    ViagemItinerario carregar(String id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<ViagemItinerario> itinerarios);
@@ -47,5 +53,8 @@ public interface ViagemItinerarioDAO {
 
     @Query("DELETE FROM viagem_itinerario WHERE ativo = 0")
     void deletarInativos();
+
+    @Query("UPDATE viagem_itinerario SET ultima_alteracao = datetime('now'), enviado = 0")
+    void marcaTodosParaEnvio();
 
 }

@@ -684,7 +684,7 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
             String idItinerario = viewModel.itinerario.getValue().getItinerario().getId();
 
             String nomeArquivo = idItinerario
-                    +"-"+DateTimeFormat.forPattern("yyyy-MM-dd-HH:mm:ss").print(DateTime.now())+".json";
+                    +"-"+DateTimeFormat.forPattern("yyyy-MM-dd-HH-mm-ss").print(DateTime.now())+".json";
 
             FileUtils.writeToFile(nomeArquivo, geoJson, getApplicationContext());
 

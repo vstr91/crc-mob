@@ -1,9 +1,11 @@
 package br.com.vostre.circular.view.viewHolder;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Environment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -36,6 +38,7 @@ import java.io.InputStream;
 import br.com.vostre.circular.databinding.LinhaParadasBinding;
 import br.com.vostre.circular.databinding.LinhaViagensBinding;
 import br.com.vostre.circular.listener.ParadaListener;
+import br.com.vostre.circular.listener.ViagemListener;
 import br.com.vostre.circular.model.ViagemItinerario;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.view.ViagensActivity;
@@ -45,11 +48,13 @@ public class ViagemItinerarioViewHolder extends RecyclerView.ViewHolder {
 
     private final LinhaViagensBinding binding;
     AppCompatActivity ctx;
+    ViagemListener listener;
 
-    public ViagemItinerarioViewHolder(LinhaViagensBinding binding, AppCompatActivity context) {
+    public ViagemItinerarioViewHolder(LinhaViagensBinding binding, AppCompatActivity context, ViagemListener listener) {
         super(binding.getRoot());
         this.binding = binding;
         this.ctx = context;
+        this.listener = listener;
     }
 
     public void bind(final ViagemItinerario viagem) {
@@ -61,7 +66,7 @@ public class ViagemItinerarioViewHolder extends RecyclerView.ViewHolder {
         binding.executePendingBindings();
     }
 
-    private void addAdditionalLayer (Context ctx, ViagemItinerario viagem) {
+    private void addAdditionalLayer (final Context ctx, final ViagemItinerario viagem) {
         String jsonString = null;
         try {
             InputStream jsonStream = new FileInputStream(new File(ctx.getFilesDir(), viagem.getTrajeto()));
@@ -75,14 +80,12 @@ public class ViagemItinerarioViewHolder extends RecyclerView.ViewHolder {
             return;
         }
 
+        // carregando trajeto e transformando em kml para inserir no mapa
+
         KmlDocument kmlDocument = new KmlDocument();
         kmlDocument.parseGeoJSON(jsonString);
 
-        //kmlDocument.mKmlRoot.mItems.get(0).getBoundingBox().getCenterLatitude();
-
         if(kmlDocument.mKmlRoot.mItems.size() > 0){
-
-//            mLineStyle.getOutlinePaint().setStrokeJoin(Paint.Join.ROUND);
 
             FolderOverlay myOverLay = (FolderOverlay)kmlDocument.mKmlRoot.buildOverlay(binding.map, null, new KmlFeature.Styler() {
                 @Override
@@ -119,6 +122,30 @@ public class ViagemItinerarioViewHolder extends RecyclerView.ViewHolder {
 
             binding.map.getController().animateTo(new GeoPoint(kmlDocument.mKmlRoot.mItems.get(0).getBoundingBox().getCenterLatitude(),
                     kmlDocument.mKmlRoot.mItems.get(0).getBoundingBox().getCenterLongitude()), 10d, 10L);
+
+            // fim do carregamento do mapa
+
+            // botao para exclusao do registro
+            binding.btnExcluir.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    new AlertDialog.Builder(ctx)
+                            .setTitle("Excluir registro de viagem?")
+                            .setMessage("Deseja realmente excluir o registro?")
+                            .setPositiveButton("Sim", new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    //excluir registro
+                                    listener.onSelected(viagem.getId());
+                                }
+
+                            })
+                            .setNegativeButton("Não", null)
+                            .show();
+                }
+            });
+
 
             binding.map.invalidate();
         } else{

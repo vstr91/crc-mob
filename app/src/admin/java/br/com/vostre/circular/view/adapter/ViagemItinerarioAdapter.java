@@ -10,6 +10,7 @@ import java.util.List;
 import br.com.vostre.circular.databinding.LinhaParadasBinding;
 import br.com.vostre.circular.databinding.LinhaViagensBinding;
 import br.com.vostre.circular.listener.ParadaListener;
+import br.com.vostre.circular.listener.ViagemListener;
 import br.com.vostre.circular.model.ViagemItinerario;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.view.viewHolder.ParadaViewHolder;
@@ -19,10 +20,12 @@ public class ViagemItinerarioAdapter extends RecyclerView.Adapter<ViagemItinerar
 
     public List<ViagemItinerario> viagens;
     AppCompatActivity ctx;
+    ViagemListener listener;
 
-    public ViagemItinerarioAdapter(List<ViagemItinerario> viagens, AppCompatActivity context){
+    public ViagemItinerarioAdapter(List<ViagemItinerario> viagens, AppCompatActivity context, ViagemListener listener){
         this.viagens = viagens;
         ctx = context;
+        this.listener = listener;
     }
 
     @Override
@@ -32,7 +35,7 @@ public class ViagemItinerarioAdapter extends RecyclerView.Adapter<ViagemItinerar
         LinhaViagensBinding itemBinding =
                 LinhaViagensBinding.inflate(layoutInflater, parent, false);
 
-        return new ViagemItinerarioViewHolder(itemBinding, ctx);
+        return new ViagemItinerarioViewHolder(itemBinding, ctx, listener);
 
 
     }

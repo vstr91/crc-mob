@@ -36,7 +36,7 @@ public interface CircularAPI {
     Call<ResponseBody> recebeImagem(@Path("imagem") String imagem);
 
     // API Cloudinary - CDN
-    @GET("vostre/image/upload/v1568376445/circular_viagem/{arquivo}")
+    @GET("vostre/raw/upload/v1568376445/circular_viagem/{arquivo}")
     Call<ResponseBody> recebeArquivo(@Path("arquivo") String arquivo);
 
     @Headers("Content-Type: application/json")

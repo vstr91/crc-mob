@@ -417,6 +417,8 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
             line = new Polyline();
             line.getOutlinePaint().setColor(Color.BLUE);
 
+            locais = new ArrayList<>();
+
             String[] pontos = rota.split("\\|");
 
             for(String p : pontos){
@@ -425,7 +427,15 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
 
                 GeoPoint g = new GeoPoint(Float.parseFloat(ponto[0]), Float.parseFloat(ponto[1]));
 
+                Location l = new Location(LocationManager.GPS_PROVIDER);
+                l.setLatitude(Float.parseFloat(ponto[0]));
+                l.setLongitude(Float.parseFloat(ponto[1]));
+                l.setAccuracy(Float.parseFloat(ponto[2]));
+                l.setSpeed(Float.parseFloat(ponto[3]));
+                l.setTime(Long.parseLong(ponto[4]));
+
                 line.addPoint(g);
+                locais.add(l);
             }
 
             map.getOverlays().add(line);
@@ -634,11 +644,15 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
 
             if(gravando && locais != null){
 
-                locais.add(local);
+                if(local.hasAccuracy() && local.getAccuracy() < 20){
+                    locais.add(local);
 
-                //adicionaLocalMapa(local);
+                    //adicionaLocalMapa(local);
 
-                atualizaPolyline(local);
+                    atualizaPolyline(local);
+                }
+
+
 
             }
 
@@ -649,7 +663,7 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
 
     public void atualizaPolyline(Location local){
 
-        if(local.hasAccuracy() && local.getAccuracy() < 20){
+        //if(local.hasAccuracy() && local.getAccuracy() < 20){
 
             //Toast.makeText(getApplicationContext(), "Vel.: "+local.getSpeed() * 3.6+" Km/h", Toast.LENGTH_SHORT).show();
 
@@ -660,7 +674,7 @@ public class RegistraViagemActivity extends BaseActivity implements GoogleApiCli
             line.addPoint(new GeoPoint(local.getLatitude(), local.getLongitude()));
             map.getOverlays().add(line);
             map.invalidate();
-        }
+        //}
 
     }
 

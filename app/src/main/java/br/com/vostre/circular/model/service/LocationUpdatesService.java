@@ -31,6 +31,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -247,9 +249,17 @@ public class LocationUpdatesService extends Service {
      * Returns the {@link NotificationCompat} used as part of the foreground service.
      */
     private Notification getNotification() {
+        NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setMaximumFractionDigits(0);
+        nf.setMinimumFractionDigits(0);
+        
         Intent intent = new Intent(this, LocationUpdatesService.class);
 
-        CharSequence text = LocationResultHelper.getSavedLocationResult(this);
+        String[] location = LocationResultHelper.getSavedLocationResult(this).split(";");
+
+        String velocidadeFormatada = nf.format(Float.parseFloat(location[3]) * 3.6);
+
+        CharSequence text = location[0]+","+location[1]+" | "+velocidadeFormatada+" Km/h";
 
         // Extra to help us figure out if we arrived in onStartCommand via the notification or not.
         intent.putExtra(EXTRA_STARTED_FROM_NOTIFICATION, true);
@@ -265,10 +275,10 @@ public class LocationUpdatesService extends Service {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND)
                 .setVibrate(new long[]{0})
-                .addAction(R.drawable.icon, "Abrir",
-                        activityPendingIntent)
-                .addAction(R.drawable.ic_close_blue_24dp, "Encerrar",
-                        servicePendingIntent)
+//                .addAction(R.drawable.icon, "Abrir",
+//                        activityPendingIntent)
+//                .addAction(R.drawable.ic_close_blue_24dp, "Encerrar",
+//                        servicePendingIntent)
                 .setContentText(text)
                 .setContentTitle("Localização em Segundo Plano")
                 .setOngoing(true)
@@ -348,14 +358,14 @@ public class LocationUpdatesService extends Service {
 
         // Sets the fastest rate for active location updates. This interval is exact, and your
         // application will never receive updates faster than this value.
-        mLocationRequest.setFastestInterval(2000);
+        mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         // Sets the maximum time when batched location updates are delivered. Updates may be
         // delivered sooner than this interval.
-        mLocationRequest.setMaxWaitTime(2000);
+        mLocationRequest.setMaxWaitTime(1000);
 
-        mLocationRequest.setSmallestDisplacement(5);
+        mLocationRequest.setSmallestDisplacement(2);
 
     }
 

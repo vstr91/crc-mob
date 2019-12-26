@@ -232,7 +232,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         }
 
         //TODO: para testes
-        appDatabase.viagemItinerarioDAO().marcaTodosParaEnvio();
+        //appDatabase.viagemItinerarioDAO().marcaTodosParaEnvio();
 
         parametroInterno = appDatabase.parametroInternoDAO().carregar();
 
@@ -2494,7 +2494,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         CircularAPI api = retrofit.create(CircularAPI.class);
         Call<ResponseBody> call = api.recebeArquivo(arquivo);
 
-        //System.out.println("CALL: "+call.request().url().toString());
+        System.out.println("CALL: "+call.request().url().toString());
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -2506,7 +2506,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     BufferedInputStream bis = new BufferedInputStream(is);
                     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
-//                    File file = new File(ctx.getApplicationContext().getFilesDir(), arquivo);
+                    File file = ctx.getApplicationContext().getFilesDir();
+                    file.mkdir();
 
                     try {
                         //We create an array of bytes
@@ -2517,7 +2518,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                             buffer.write(data,0,current);
                         }
 
-                        fos = new FileOutputStream(new File(ctx.getApplicationContext().getFilesDir(), arquivo));
+                        fos = new FileOutputStream(file.getAbsolutePath()+"/"+arquivo);
 
                         fos.write(buffer.toByteArray());
                         fos.close();
@@ -2525,6 +2526,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         Log.e("ERR_FILE", e.getLocalizedMessage());
                         e.printStackTrace();
 //                        Toast.makeText(ctx, "Erro ("+e.getMessage()+") ao receber arquivo.", Toast.LENGTH_SHORT).show();
+                    } catch(IllegalArgumentException e){
+                        Log.e("ERR_FILE", e.getLocalizedMessage());
+                        e.printStackTrace();
                     } catch(IOException e){
                         Log.e("ERR_FILE", e.getLocalizedMessage());
                         e.printStackTrace();
@@ -2540,6 +2544,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         }
                     }
 
+                } else{
+                    Log.e("ERR_FILE", response.message());
                 }
 
             }

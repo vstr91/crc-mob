@@ -54,7 +54,7 @@ public interface ViagemItinerarioDAO {
     @Query("DELETE FROM viagem_itinerario WHERE ativo = 0")
     void deletarInativos();
 
-    @Query("UPDATE viagem_itinerario SET ultima_alteracao = datetime('now'), enviado = 0")
+    @Query("UPDATE viagem_itinerario SET ultima_alteracao = datetime('now'), enviado = 0, trajetoEnviado = 0")
     void marcaTodosParaEnvio();
 
 }

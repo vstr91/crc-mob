@@ -68,11 +68,8 @@ public class ViagensItinerarioViewModel extends AndroidViewModel {
         @Override
         protected Void doInBackground(final ViagemItinerario... params) {
 
-            if(params[0].getItinerario().length() == 0){
-                params[0] = db.viagemItinerarioDAO().carregar(params[0].getId());
-                params[0].setAtivo(false);
-            }
-
+            params[0] = db.viagemItinerarioDAO().carregar(params[0].getId());
+            params[0].setAtivo(false);
             params[0].setUltimaAlteracao(new DateTime());
             params[0].setEnviado(false);
 

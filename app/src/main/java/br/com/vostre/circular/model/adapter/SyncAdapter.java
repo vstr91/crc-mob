@@ -2221,7 +2221,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     @Override
                     public void onSuccess(String requestId, Map resultData) {
                         viagem.setTrajetoEnviado(true);
-                        ViagensItinerarioViewModel.edit(viagem, getContext().getApplicationContext());
+                        ViagensItinerarioViewModel.edit(viagem, getContext().getApplicationContext(), false);
                     }
 
                     @Override

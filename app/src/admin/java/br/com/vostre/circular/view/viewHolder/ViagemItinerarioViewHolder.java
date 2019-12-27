@@ -1,5 +1,6 @@
 package br.com.vostre.circular.view.viewHolder;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -8,6 +9,7 @@ import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -61,11 +63,19 @@ public class ViagemItinerarioViewHolder extends RecyclerView.ViewHolder {
         binding.setViagem(viagem);
         binding.setContext(ctx);
 
+        binding.btnComparar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(ctx, "Clicou! "+viagem.getId(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
         addAdditionalLayer(ctx, viagem);
 
         binding.executePendingBindings();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void addAdditionalLayer (final Context ctx, final ViagemItinerario viagem) {
         String jsonString = null;
         try {
@@ -120,8 +130,24 @@ public class ViagemItinerarioViewHolder extends RecyclerView.ViewHolder {
             binding.map.getOverlays().add(myOverLay);
             binding.map.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
 
+            binding.map.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                    switch(motionEvent.getAction()){
+                        case MotionEvent.ACTION_DOWN:
+//                            Toast.makeText(ctx, "Clicou! "+viagem.getId(), Toast.LENGTH_SHORT).show();
+                            return false;
+                        default:
+                            return true;
+                    }
+
+                }
+
+            });
+
             binding.map.getController().animateTo(new GeoPoint(kmlDocument.mKmlRoot.mItems.get(0).getBoundingBox().getCenterLatitude(),
-                    kmlDocument.mKmlRoot.mItems.get(0).getBoundingBox().getCenterLongitude()), 10d, 10L);
+                    kmlDocument.mKmlRoot.mItems.get(0).getBoundingBox().getCenterLongitude()), 9.2d, 10L);
 
             // fim do carregamento do mapa
 

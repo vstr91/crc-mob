@@ -202,6 +202,7 @@ public class RegistraViagemViewModel extends AndroidViewModel {
         viagemItinerario.setDataCadastro(new DateTime());
         viagemItinerario.setUltimaAlteracao(new DateTime());
         viagemItinerario.setEnviado(false);
+        viagemItinerario.setAtivo(true);
 
         new addAsyncTask(appDatabase).execute(viagemItinerario);
     }

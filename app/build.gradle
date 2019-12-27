@@ -133,7 +133,7 @@ dependencies {
     //implementation "android.arch.persistence.room:rxjava2:1.0.0"
     // ReactiveStreams support for LiveData
     implementation 'android.arch.lifecycle:reactivestreams:1.1.1'
-    implementation 'net.danlew:android.joda:2.9.9.3'
+    implementation 'net.danlew:android.joda:2.10.3'
     testImplementation 'junit:junit:4.12'
 //    androidTestImplementation 'com.android.support.test:runner:1.0.2'
 //    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

@@ -43,33 +43,39 @@ public class ViagensItinerarioViewModel extends AndroidViewModel {
 
         ViagemItinerario viagem = new ViagemItinerario();
         viagem.setId(id);
-        edit(viagem, context);
+        edit(viagem, context, true);
     }
 
     // editar
 
-    public static void edit(final ViagemItinerario viagem, Context context) {
+    public static void edit(final ViagemItinerario viagem, Context context, boolean edicaoManual) {
 
         if(appDatabase == null){
             appDatabase = AppDatabase.getAppDatabase(context.getApplicationContext());
         }
 
-        new editAsyncTask(appDatabase).execute(viagem);
+        new editAsyncTask(appDatabase, edicaoManual).execute(viagem);
     }
 
     private static class editAsyncTask extends AsyncTask<ViagemItinerario, Void, Void> {
 
         private AppDatabase db;
+        private boolean edicaoManual;
 
-        editAsyncTask(AppDatabase appDatabase) {
+        editAsyncTask(AppDatabase appDatabase, boolean edicaoManual) {
             db = appDatabase;
+            this.edicaoManual = edicaoManual;
         }
 
         @Override
         protected Void doInBackground(final ViagemItinerario... params) {
 
             params[0] = db.viagemItinerarioDAO().carregar(params[0].getId());
-            params[0].setAtivo(false);
+
+            if(edicaoManual){
+                params[0].setAtivo(false);
+            }
+
             params[0].setUltimaAlteracao(new DateTime());
             params[0].setEnviado(false);
 

@@ -28,6 +28,7 @@
             Em hipótese alguma a imagem será revendida / cedida a terceiros.
             A propriedade intelectual sobre a foto permanece com seu criador.</li>\n
     </string>
+    <string name="texto_feriado">Atenção: Exibindo Quadro de Horários de Domingo/Feriado!\nMotivo: Feriado Nacional/Estadual</string>
     <string-array name="sugestao">
         <item>Parada</item>
         <item>Ponto de Interesse</item>

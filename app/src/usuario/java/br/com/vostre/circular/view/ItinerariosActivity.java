@@ -48,6 +48,7 @@ import br.com.vostre.circular.utils.DestaqueUtils;
 import br.com.vostre.circular.view.adapter.CidadeAdapter;
 import br.com.vostre.circular.view.adapter.ItinerarioResultadoAdapter;
 import br.com.vostre.circular.view.form.FormBairro;
+import br.com.vostre.circular.view.listener.FeriadoListener;
 import br.com.vostre.circular.view.listener.HoraListener;
 import br.com.vostre.circular.view.listener.ItemListener;
 import br.com.vostre.circular.view.listener.SelectListener;
@@ -86,6 +87,11 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     boolean exibindoTour = false;
 
+    // Para consulta com data modificada
+    Calendar dataEscolhida;
+    String diaEscolhido;
+    String horaEscolhida;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -103,8 +109,11 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         viewModel.cidades.observe(this, cidadesObserver);
         //viewModel.escolhaAtual = 0;
         viewModel.resultadosItinerarios.observe(this, resultadoItinerarioObserver);
+        viewModel.isFeriado.observe(this, feriadoObserver);
 
         binding.setViewModel(viewModel);
+
+        viewModel.checaFeriado(Calendar.getInstance());
 
         ocultaModalLoading();
 
@@ -528,6 +537,43 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         }
     };
 
+    Observer<Boolean> feriadoObserver = new Observer<Boolean>() {
+        @Override
+        public void onChanged(Boolean isFeriado) {
+
+            if(bairroPartida != null && bairroDestino != null){
+                if(isFeriado){
+                    viewModel.carregaResultado(horaEscolhida, "domingo", DataHoraUtils.getDiaSeguinteSelecionado(dataEscolhida),
+                            DataHoraUtils.getDiaAnteriorSelecionado(dataEscolhida), inversao);
+                    binding.textViewFeriado.setVisibility(View.VISIBLE);
+                } else{
+                    viewModel.carregaResultado(horaEscolhida, DataHoraUtils.getDiaSelecionado(dataEscolhida), DataHoraUtils.getDiaSeguinteSelecionado(dataEscolhida),
+                            DataHoraUtils.getDiaAnteriorSelecionado(dataEscolhida), inversao);
+                    binding.textViewFeriado.setVisibility(View.GONE);
+                }
+
+                adapterResultado.setDia(DataHoraUtils.getDiaSelecionadoFormatado(dataEscolhida));
+                adapterResultado.setHora(DateTimeFormat.forPattern("HH:mm:ss").print(dataEscolhida.getTimeInMillis()));
+
+                //log
+                bundle = new Bundle();
+                bundle.putString("partida", bairroPartida.getBairro().getNome()+", "+bairroPartida.getNomeCidadeComEstado());
+                bundle.putString("destino", bairroDestino.getBairro().getNome()+", "+bairroDestino.getNomeCidadeComEstado());
+
+                bundle.putString("partida_destino", bairroPartida.getBairro().getNome()+", "
+                        +bairroPartida.getNomeCidadeComEstado()+" x "
+                        +bairroDestino.getBairro().getNome()+", "+bairroDestino.getNomeCidadeComEstado());
+
+                bundle.putString("data_hora", DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(new DateTime(dataEscolhida)));
+                bundle.putBoolean("sucesso", true);
+
+                mFirebaseAnalytics.logEvent("consulta_itinerario_data_mod", bundle);
+            }
+
+        }
+
+    };
+
     @Override
     public String onSelected(String id) {
 
@@ -586,7 +632,11 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 //
 //        viewModel.setTodos(R.id.radioButtonTodos == idRadio);
 
-        viewModel.carregaResultado(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte, diaAnterior, false);
+        if(viewModel.isFeriado.getValue()){
+            viewModel.carregaResultado(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), "domingo", diaSeguinte, diaAnterior, false);
+        } else{
+            viewModel.carregaResultado(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte, diaAnterior, false);
+        }
 
         viewModel.itinerario.observe(this, itinerarioObserver);
 
@@ -685,24 +735,11 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
         geraModalLoading();
 
-        viewModel.carregaResultado(hora, DataHoraUtils.getDiaSelecionado(data), DataHoraUtils.getDiaSeguinteSelecionado(data),
-                DataHoraUtils.getDiaAnteriorSelecionado(data), inversao);
-        adapterResultado.setDia(DataHoraUtils.getDiaSelecionadoFormatado(data));
-        adapterResultado.setHora(DateTimeFormat.forPattern("HH:mm:ss").print(data.getTimeInMillis()));
+        viewModel.checaFeriado(data);
 
-        //log
-        bundle = new Bundle();
-        bundle.putString("partida", bairroPartida.getBairro().getNome()+", "+bairroPartida.getNomeCidadeComEstado());
-        bundle.putString("destino", bairroDestino.getBairro().getNome()+", "+bairroDestino.getNomeCidadeComEstado());
-
-        bundle.putString("partida_destino", bairroPartida.getBairro().getNome()+", "
-                +bairroPartida.getNomeCidadeComEstado()+" x "
-                +bairroDestino.getBairro().getNome()+", "+bairroDestino.getNomeCidadeComEstado());
-
-        bundle.putString("data_hora", DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(new DateTime(data)));
-        bundle.putBoolean("sucesso", true);
-
-        mFirebaseAnalytics.logEvent("consulta_itinerario_data_mod", bundle);
+        this.dataEscolhida = data;
+        this.diaEscolhido = dia;
+        this.horaEscolhida = hora;
 
     }
 
@@ -810,5 +847,4 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
         return targets;
     }
-
 }

@@ -113,7 +113,7 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:contentDescription="Mapa mostrando itinerário"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
@@ -135,6 +135,22 @@
                     app:layout_constraintStart_toStartOf="parent"
                     tools:text="observação" />
 
+                <TextView
+                    android:id="@+id/textView37"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/dia_rounded_corner_azul"
+                    android:padding="5dp"
+                    android:text="@{`Linha `+itinerario.itinerario.sigla}"
+                    android:textColor="@color/branco"
+                    android:textSize="10sp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Linha 001"
+                    tools:visibility="visible" />
+
                 <LinearLayout
                     android:id="@+id/linearLayout4"
                     android:layout_width="0dp"
@@ -144,18 +160,6 @@
                     app:layout_constraintBottom_toTopOf="@+id/textViewObservacao"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent">
-
-                    <TextView
-                        android:id="@+id/textView37"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="5dp"
-                        android:text="@{`Linha `+itinerario.itinerario.sigla}"
-                        android:textColor="@color/branco"
-                        android:textSize="10sp"
-                        android:visibility="gone"
-                        tools:text="Linha 001"
-                        tools:visibility="visible" />
 
                     <LinearLayout
                         android:id="@+id/linearLayout2"
@@ -263,7 +267,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
             android:layoutAnimation="@anim/layout_animation_fall_down"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            app:layoutManager=".utils.SpeedyLinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/textViewUltimaAtualizacao"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 12,
-    "identityHash": "2f29654c6539541f8f9477801a1145c5",
+    "identityHash": "c74701007c89759ebf0649bd873927e0",
     "entities": [
       {
         "tableName": "Pais",
@@ -2807,11 +2807,109 @@
           }
         ],
         "foreignKeys": []
+      },
+      {
+        "tableName": "Feriado",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`data` INTEGER NOT NULL, `cidade` TEXT, `tipo` INTEGER NOT NULL, `descricao` TEXT, `nome` TEXT NOT NULL, `slug` TEXT NOT NULL, `id` TEXT NOT NULL, `ativo` INTEGER NOT NULL, `enviado` INTEGER NOT NULL, `data_cadastro` INTEGER NOT NULL, `usuario_cadastro` TEXT, `ultima_alteracao` INTEGER NOT NULL, `usuario_ultima_alteracao` TEXT, `programado_para` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "data",
+            "columnName": "data",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cidade",
+            "columnName": "cidade",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "tipo",
+            "columnName": "tipo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "descricao",
+            "columnName": "descricao",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "nome",
+            "columnName": "nome",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "slug",
+            "columnName": "slug",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ativo",
+            "columnName": "ativo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "enviado",
+            "columnName": "enviado",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dataCadastro",
+            "columnName": "data_cadastro",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "usuarioCadastro",
+            "columnName": "usuario_cadastro",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ultimaAlteracao",
+            "columnName": "ultima_alteracao",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "usuarioUltimaAlteracao",
+            "columnName": "usuario_ultima_alteracao",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "programadoPara",
+            "columnName": "programado_para",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"2f29654c6539541f8f9477801a1145c5\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"c74701007c89759ebf0649bd873927e0\")"
     ]
   }
 }

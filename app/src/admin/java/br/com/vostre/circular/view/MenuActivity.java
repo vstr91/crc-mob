@@ -289,6 +289,11 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         startActivity(i);
     }
 
+    public void onClickBtnFeriados(View v){
+        Intent i = new Intent(getApplicationContext(), FeriadosActivity.class);
+        startActivity(i);
+    }
+
     public void onClickBtnSobre(View v){
         drawer.closeDrawers();
         Intent i = new Intent(getApplicationContext(), SobreActivity.class);

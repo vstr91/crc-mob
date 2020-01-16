@@ -61,6 +61,21 @@ public class JsonUtils {
         }
     };
 
+    public static JsonDeserializer<DateTime> deserDateTimeAPINoTZ = new JsonDeserializer<DateTime>() {
+        @Override
+        public DateTime deserialize(JsonElement json, Type typeOfT,
+                                    JsonDeserializationContext context) throws JsonParseException {
+
+            try{
+                Long.parseLong(json.getAsString());
+            } catch (NumberFormatException e){
+                return DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss").parseDateTime(json.getAsString().substring(0, json.getAsString().length()-6));
+            }
+
+            return json == null ? null : new DateTime(json.getAsLong());
+        }
+    };
+
     public static String toJson(EntidadeBase dado){
 
         Gson gson = new GsonBuilder()
@@ -87,6 +102,11 @@ public class JsonUtils {
             gson = new GsonBuilder()
                     .registerTypeAdapter(DateTime.class, JsonUtils.serDateTime)
                     .registerTypeAdapter(DateTime.class, JsonUtils.deserDateTime)
+                    .create();
+        } else if(tipo == 2){
+            gson = new GsonBuilder()
+                    .registerTypeAdapter(DateTime.class, JsonUtils.serDateTime)
+                    .registerTypeAdapter(DateTime.class, JsonUtils.deserDateTimeAPINoTZ)
                     .create();
         } else{
             gson = new GsonBuilder()

@@ -59,4 +59,7 @@ public interface CircularAPI {
     @GET("reverse")
     Call<String> carregaRua(@Query("format") String format, @Query("lat") Double latitude, @Query("lon") Double longitude, @Query("zoom") Integer zoom, @Query("addressdetails") Integer details);
 
+    @GET(".")
+    Call<String> consultaFeriados(@Query("ano") String ano, @Query("estado") String estado, @Query("cidade") String cidade, @Query("token") String token, @Query("json") String json);
+
 }

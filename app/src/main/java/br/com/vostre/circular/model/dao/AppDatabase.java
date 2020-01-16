@@ -13,6 +13,7 @@ import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.Feriado;
 import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.HistoricoParada;
 import br.com.vostre.circular.model.Horario;
@@ -43,7 +44,7 @@ import br.com.vostre.circular.utils.Converters;
         Parada.class, PontoInteresse.class, Itinerario.class, ParadaItinerario.class,
         Horario.class, HorarioItinerario.class, SecaoItinerario.class, Onibus.class,
         ParametroInterno.class, ParadaSugestao.class, HistoricoParada.class, UsuarioPreferencia.class,
-        HistoricoItinerario.class, Acesso.class, PontoInteresseSugestao.class, TipoProblema.class, Problema.class, Servico.class, ViagemItinerario.class},
+        HistoricoItinerario.class, Acesso.class, PontoInteresseSugestao.class, TipoProblema.class, Problema.class, Servico.class, ViagemItinerario.class, Feriado.class},
         version = 12)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
@@ -96,6 +97,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
     // 2.3.0 - v12 bd = inserindo tabela para registrar viagem
     public abstract ViagemItinerarioDAO viagemItinerarioDAO();
+    public abstract FeriadoDAO feriadoDAO();
 
     public static AppDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {
@@ -237,7 +239,7 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
-    // v2.2.4 - v11 bd - NENHUM PROCESSO DE ATUALIZAÇÃO, PARA FORCAR A RECRIACAO DO BANCO DE DADOS E ELIMINAR TODOS OS PROBLEMAS DE MIGRACAO DA VERSAO 2.2
+    // v2.2.4 - v11 bd - NENHUM PROCESSO DE ATUALIZAÇÃO, PARA FORÇAR A RECRIACAO DO BANCO DE DADOS E ELIMINAR TODOS OS PROBLEMAS DE MIGRACAO DA VERSAO 2.2
 
     // v2.3.0 - v12 bd
     public static final Migration MIGRATION_11_12 = new Migration(11, 12) {
@@ -245,6 +247,8 @@ public abstract class AppDatabase extends RoomDatabase {
         public void migrate(SupportSQLiteDatabase database) {
             database.execSQL("CREATE TABLE IF NOT EXISTS 'viagem_itinerario' ('itinerario' TEXT NOT NULL, 'trajeto' TEXT NOT NULL, 'horaInicial' INTEGER, 'horaFinal' INTEGER, 'trajetoEnviado' INTEGER NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
             database.execSQL("CREATE UNIQUE INDEX 'index_viagem_itinerario_itinerario_trajeto' ON 'viagem_itinerario' ('itinerario', 'trajeto')");
+
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'feriado' ('data' INTEGER NOT NULL, 'cidade' TEXT, 'tipo' INTEGER NOT NULL, 'descricao' TEXT, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
         }
     };
 

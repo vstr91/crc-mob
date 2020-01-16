@@ -60,6 +60,7 @@ import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.EntidadeBase;
 import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.Feriado;
 import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
@@ -158,6 +159,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     List<? extends EntidadeBase> servicos;
 
     List<? extends EntidadeBase> viagens;
+
+    List<? extends EntidadeBase> feriados;
 
 //    List<? extends EntidadeBase> tiposProblema;
 //    List<? extends EntidadeBase> problemas;
@@ -639,6 +642,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 JSONArray servicos = null;
 
                 JSONArray viagens = null;
+                JSONArray feriados = null;
 
                 //System.out.println("PAR_SUG: "+arrayObject.optJSONArray("paradas_sugestoes"));
 
@@ -676,6 +680,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 if(arrayObject.optJSONArray("viagens_itinerarios") != null){
                     viagens = arrayObject.getJSONArray("viagens_itinerarios");
+                }
+
+                if(arrayObject.optJSONArray("feriados") != null){
+                    feriados = arrayObject.getJSONArray("feriados");
                 }
 
                 // ACESSOS
@@ -1335,6 +1343,28 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 }
 
+                // FERIADOS
+
+                if(feriados.length() > 0){
+
+                    int total = feriados.length();
+                    List<Feriado> lstFeriados = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        Feriado feriado;
+                        JSONObject obj = feriados.getJSONObject(i);
+
+                        feriado = (Feriado) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Feriado.class, 2);
+                        feriado.setEnviado(true);
+
+                        lstFeriados.add(feriado);
+
+                    }
+
+                    add(lstFeriados, "feriado");
+
+                }
+
                 if(!admin){
 
                     AsyncTask.execute(new Runnable() {
@@ -1425,6 +1455,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         appDatabase.paradaItinerarioDAO().deletarInativos();
         appDatabase.horarioItinerarioDAO().deletarInativos();
         appDatabase.pontoInteresseDAO().deletarInativos();
+
+        appDatabase.feriadoDAO().deletarInativos();
     }
 
     private void atualizaDataAcesso(Response response){
@@ -1490,6 +1522,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             viagens = appDatabase.viagemItinerarioDAO().listarTodosAEnviar();
 
+            feriados = appDatabase.feriadoDAO().listarTodosAEnviar();
+
             return null;
         }
 
@@ -1527,13 +1561,15 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             String strViagens = "\"viagens_itinerarios\": "+JsonUtils.toJson((List<EntidadeBase>) viagens);
 
+            String strFeriados = "\"feriados\": "+JsonUtils.toJson((List<EntidadeBase>) feriados);
+
             String json = "{"+strPaises+","+strEmpresas+","+strOnibus+","+strEstados+","+strCidades+","
                     +strBairros+","+strParadas+","+strItinerarios+","+strHorarios+","+strParadasItinerarios+","
                     +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
                     +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+","+strPreferencias+","+strHistoricos+","
-                    +strPontosInteresseSugestoes+","+strServicos+","+strViagens+"}";
+                    +strPontosInteresseSugestoes+","+strServicos+","+strViagens+","+strFeriados+"}";
 
-             System.out.println("JSON: "+strViagens);
+             System.out.println("JSON: "+strFeriados);
 
             //System.out.println("POI ENV: "+strPontosInteresse);
             //System.out.println("POIS ENV: "+strPontosInteresseSugestoes);
@@ -1558,7 +1594,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     +bairros.size()+paradas.size()+itinerarios.size()+horarios.size()+paradasItinerario.size()
                     +secoesItinerarios.size()+horariosItinerarios.size()+mensagens.size()+parametros.size()+pontosInteresse.size()
                     +usuarios.size()+paradaSugestoes.size()+preferencias.size()+historicos.size()+pontosInteresseSugestoes.size()
-                    +servicos.size()+viagens.size();
+                    +servicos.size()+viagens.size()+feriados.size();
 
             if(registros > 0){
                 chamaAPI(registros, json, 0, baseUrl, token);
@@ -2455,6 +2491,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 case "viagem_itinerario":
                     db.viagemItinerarioDAO().inserirTodos((List<ViagemItinerario>) params[0]);
                     break;
+                case "feriado":
+                    db.feriadoDAO().inserirTodos((List<Feriado>) params[0]);
+                    break;
             }
 
             if(!PreferenceUtils.carregarPreferenciaBoolean(ctx, "init")){
@@ -2494,7 +2533,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         CircularAPI api = retrofit.create(CircularAPI.class);
         Call<ResponseBody> call = api.recebeArquivo(arquivo);
 
-        System.out.println("CALL: "+call.request().url().toString());
+        //System.out.println("CALL: "+call.request().url().toString());
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override

@@ -26,10 +26,13 @@ import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
 
 import br.com.vostre.circular.model.Empresa;
+import br.com.vostre.circular.model.Feriado;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.Itinerario;
@@ -43,6 +46,7 @@ import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 import br.com.vostre.circular.utils.DataHoraUtils;
+import br.com.vostre.circular.view.listener.FeriadoListener;
 import es.usc.citius.hipster.algorithm.Algorithm;
 import es.usc.citius.hipster.algorithm.Hipster;
 import es.usc.citius.hipster.graph.GraphBuilder;
@@ -83,6 +87,8 @@ public class ItinerariosViewModel extends AndroidViewModel {
     public MutableLiveData<List<ItinerarioPartidaDestino>> resultadosItinerarios;
 
     boolean todos = true;
+
+    public static MutableLiveData<Boolean> isFeriado;
 
     public boolean isTodos() {
         return todos;
@@ -167,6 +173,46 @@ public class ItinerariosViewModel extends AndroidViewModel {
         bairrosDestino = appDatabase.bairroDAO().listarTodosAtivosComCidadePorCidade(null);
         itinerarioResultado = appDatabase.itinerarioDAO().carregar("");
         resultadosItinerarios = new MutableLiveData<>();
+
+        isFeriado = new MutableLiveData<>();
+        isFeriado.setValue(false);
+    }
+
+    public void checaFeriado(final Calendar data){
+
+        new FeriadoAsyncTask(appDatabase).execute(data);
+    }
+
+    private static class FeriadoAsyncTask extends AsyncTask<Calendar, Void, Void> {
+
+        private AppDatabase db;
+        Feriado feriado;
+        FeriadoListener listener;
+
+        FeriadoAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+            this.listener = listener;
+        }
+
+        @Override
+        protected Void doInBackground(final Calendar... params) {
+            DateTime dt = new DateTime(params[0], DateTimeZone.forTimeZone(TimeZone.getTimeZone("America/Sao_Paulo")));
+            feriado = db.feriadoDAO().encontrarPorData(DateTimeFormat.forPattern("yyyy-MM-dd").print(dt));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            if(feriado != null){
+                isFeriado.postValue(true);
+            } else{
+                isFeriado.postValue(false);
+            }
+
+        }
+
     }
 
     public void carregaResultado(final String horaEscolhida, final String dia, final String diaSeguinte,

@@ -473,6 +473,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 binding.textViewLegenda.setVisibility(View.VISIBLE);
                 binding.textView51.setVisibility(View.VISIBLE);
                 binding.listLegenda.setVisibility(View.VISIBLE);
+                binding.textViewObservacao.setVisibility(View.GONE);
 
                 List<ItinerarioPartidaDestino> itinerarios = viewModel.qtdItinerarios;
                 dados = new ArrayList<>();
@@ -535,6 +536,12 @@ public class DetalheItinerarioActivity extends BaseActivity {
                     binding.textView37.setVisibility(View.VISIBLE);
                 }
 
+                if(viewModel.itinerario.getValue() != null && (viewModel.itinerario.getValue().getItinerario().getObservacao() != null &&
+                        !viewModel.itinerario.getValue().getItinerario().getObservacao().isEmpty() &&
+                        !viewModel.itinerario.getValue().getItinerario().getObservacao().equals("null"))){
+                    binding.textViewObservacao.setVisibility(View.VISIBLE);
+                }
+
                 binding.textViewLegenda.setVisibility(View.GONE);
                 binding.listLegenda.setVisibility(View.GONE);
                 binding.textView51.setVisibility(View.GONE);
@@ -562,7 +569,18 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
             mFirebaseAnalytics.logEvent("quadro_de_horarios", bundle);
 
+            int posicao = -1;
+
+            for(HorarioItinerarioNome h : horarios){
+
+                if(h.getHorarioItinerario().getHorario().equals(horario)){
+                    posicao = horarios.indexOf(h);
+                }
+
+            }
+
             adapterHorarios.setHorario(horario);
+            adapterHorarios.setPosicaoAtual(posicao);
             adapterHorarios.horarios = horarios;
             adapterHorarios.legenda = dados;
             adapterHorarios.notifyDataSetChanged();
@@ -574,6 +592,17 @@ public class DetalheItinerarioActivity extends BaseActivity {
             }
 
             binding.listHorarios.scheduleLayoutAnimation();
+
+            // scroll lista
+            binding.listHorarios.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    final int posicao = adapterHorarios.buscaPosicaoHorarioInt(horario);
+
+                    binding.listHorarios.smoothScrollToPosition(posicao+1);
+                }
+            }, 500);
 
 //            CustomLayoutManager customLayoutManager = new CustomLayoutManager(getApplicationContext());
 //            binding.listHorarios.setLayoutManager(customLayoutManager);

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<inset xmlns:android="http://schemas.android.com/apk/res/android" android:insetLeft="-4dp" android:insetRight="-4dp">
+<shape
+    android:shape="rectangle" android:padding="10dp">
+    <!-- you can use any color you want I used here gray color-->
+    <gradient
+        android:angle="90"
+        android:startColor="@color/azul"
+        android:endColor="@color/azul"
+        android:centerColor="@color/azul"
+        android:centerY="0.75"
+        android:type="linear" />
+    <stroke android:width="4dp" android:color="@color/branco" />
+</shape>
+</inset>

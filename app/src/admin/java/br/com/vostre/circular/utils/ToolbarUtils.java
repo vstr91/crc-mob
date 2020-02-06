@@ -4,6 +4,7 @@ import android.accounts.Account;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.vostre.circular.BuildConfig;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.EntidadeBase;
 import br.com.vostre.circular.model.dao.AppDatabase;
@@ -102,6 +104,12 @@ public class ToolbarUtils {
 
 //
 //        atualizaBadge(qtdMensagensNaoLidas);
+
+        if(BuildConfig.DEBUG_APP == 1){
+            activity.findViewById(R.id.toolbar).setBackgroundColor(Color.RED);
+        } else{
+            activity.findViewById(R.id.toolbar).setBackgroundColor(Color.TRANSPARENT);
+        }
 
     }
 

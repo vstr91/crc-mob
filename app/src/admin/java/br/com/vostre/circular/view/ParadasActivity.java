@@ -392,13 +392,10 @@ public class ParadasActivity extends BaseActivity implements ParadaListener {
 
                     switch(p.getParada().getSentido()){
                         case 0:
-                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_backspace_black_24dp));
+                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.circle_button_dia));
                             break;
                         case 1:
-                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
-                            break;
-                        case 2:
-                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
+                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.circle_button_dia_off));
                             break;
                         default:
                             m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
@@ -410,15 +407,11 @@ public class ParadasActivity extends BaseActivity implements ParadaListener {
                     switch(p.getParada().getSentido()){
                         case 0:
                             m.setIcon(DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
-                                    mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_backspace_black_24dp).mutate()));
+                                    mergeDrawable(this, R.drawable.marker, R.drawable.circle_button_dia).mutate()));
                             break;
                         case 1:
                             m.setIcon(DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
-                                    mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp).mutate()));
-                            break;
-                        case 2:
-                            m.setIcon(DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
-                                    mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp).mutate()));
+                                    mergeDrawable(this, R.drawable.marker, R.drawable.circle_button_dia_off).mutate()));
                             break;
                         default:
                             m.setIcon(DrawableUtils.convertToGrayscale(getApplicationContext().getResources().getDrawable(R.drawable.marker).mutate()));

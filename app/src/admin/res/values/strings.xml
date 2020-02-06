@@ -5,9 +5,8 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string-array name="sentido">
         <item>Não Mostrar</item>
-        <item>Ambos</item>
-        <item>Direita</item>
-        <item>Esquerda</item>
+        <item>Centro</item>
+        <item>Bairro</item>
     </string-array>
     <string name="server_client_id">301375921468-s9146rmd1ih7vto7ujtqotp1v92rgacr.apps.googleusercontent.com</string>
     <string name="text_gps">Ative o GPS para que o mapa funcione corretamente</string>

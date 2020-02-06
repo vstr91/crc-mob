@@ -26,7 +26,7 @@ public class Parada extends EntidadeSlug {
     @NonNull
     private boolean imagemEnviada = true;
 
-    private int sentido = -1; // 0 = esquerda | 1 = direita | 2 = ambas | -1 = nao mostra
+    private int sentido = -1; // 0 = esquerda | 1 = direita | 2 = ambas | -1 = nao mostra ||| NOVO => 0 = centro | 1 = bairro | -1 = nao mostra
 
     private String rua;
 

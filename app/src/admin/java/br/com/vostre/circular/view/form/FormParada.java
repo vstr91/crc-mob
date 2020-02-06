@@ -140,16 +140,10 @@ public class FormParada extends FormBase {
 
             switch(sentido){
                 case 0:
-                    binding.spinnerSentido.setSelection(3);
-                    break;
-                case 1:
                     binding.spinnerSentido.setSelection(2);
                     break;
-                case -1:
-                    binding.spinnerSentido.setSelection(0);
-                    break;
-                case 2:
-                    binding.spinnerSentido.setSelection(1);
+                case 1:
+                    binding.spinnerSentido.setSelection(3);
                     break;
                 default:
                     binding.spinnerSentido.setSelection(0);
@@ -399,14 +393,11 @@ public class FormParada extends FormBase {
             case 0: // nao mostrar
                 viewModel.getParada().getParada().setSentido(-1);
                 break;
-            case 1: // ambos
-                viewModel.getParada().getParada().setSentido(2);
-                break;
-            case 2: // direita
-                viewModel.getParada().getParada().setSentido(1);
-                break;
-            case 3: // esquerda
+            case 1: // centro
                 viewModel.getParada().getParada().setSentido(0);
+                break;
+            case 2: // bairro
+                viewModel.getParada().getParada().setSentido(1);
                 break;
         }
 

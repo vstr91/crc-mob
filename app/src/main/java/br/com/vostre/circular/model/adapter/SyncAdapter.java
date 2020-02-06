@@ -234,6 +234,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             baseUrl = Constants.BASE_URL;
         }
 
+        if(BuildConfig.DEBUG_APP == 1){
+            baseUrl = Constants.BASE_URL_DEBUG;
+        }
+
         //TODO: para testes
         //appDatabase.viagemItinerarioDAO().marcaTodosParaEnvio();
 
@@ -336,6 +340,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                         token = response.body();
 
+                        System.out.println("URL: "+call.request().url());
+
                         try {
                             token = crypt.bytesToHex(crypt.encrypt(token));
                         } catch (Exception e) {
@@ -366,6 +372,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 @Override
                 public void onFailure(Call<String> call, Throwable t) {
+
+                    System.out.println("URL ERRO: "+call.request().url());
 
                     if(mostraToast){
                         Toast.makeText(getContext().getApplicationContext(),

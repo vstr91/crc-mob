@@ -40,8 +40,29 @@ public class HorarioItinerarioViewHolder extends RecyclerView.ViewHolder {
 
         if(passado){
             binding.cardview.setCardBackgroundColor(ctx.getResources().getColor(R.color.cinzaInativo));
+            binding.textViewNome.setTextColor(ctx.getResources().getColor(R.color.cinzaMedio));
+
+            binding.textView18.setTextColor(ctx.getResources().getColor(R.color.cinzaMedio));
+            binding.textView19.setTextColor(ctx.getResources().getColor(R.color.cinzaMedio));
+            binding.textView20.setTextColor(ctx.getResources().getColor(R.color.cinzaMedio));
+            binding.textView21.setTextColor(ctx.getResources().getColor(R.color.cinzaMedio));
+            binding.textView22.setTextColor(ctx.getResources().getColor(R.color.cinzaMedio));
+            binding.textView23.setTextColor(ctx.getResources().getColor(R.color.cinzaMedio));
+            binding.textView24.setTextColor(ctx.getResources().getColor(R.color.cinzaMedio));
+            binding.textViewObservacao.setTextColor(ctx.getResources().getColor(R.color.cinzaMedio));
+
         } else{
             binding.cardview.setCardBackgroundColor(Color.WHITE);
+            binding.textViewNome.setTextColor(ctx.getResources().getColor(R.color.cinzaEscuro));
+
+            binding.textView18.setTextColor(ctx.getResources().getColor(R.color.azul));
+            binding.textView19.setTextColor(ctx.getResources().getColor(R.color.azul));
+            binding.textView20.setTextColor(ctx.getResources().getColor(R.color.azul));
+            binding.textView21.setTextColor(ctx.getResources().getColor(R.color.azul));
+            binding.textView22.setTextColor(ctx.getResources().getColor(R.color.azul));
+            binding.textView23.setTextColor(ctx.getResources().getColor(R.color.azul));
+            binding.textView24.setTextColor(ctx.getResources().getColor(R.color.azul));
+            binding.textViewObservacao.setTextColor(ctx.getResources().getColor(R.color.azul));
         }
 
         if(horarioItinerario.getIdHorario().equals(proximoHorario) || horarioItinerario.getHorarioItinerario().getId().equals(proximoHorario)){

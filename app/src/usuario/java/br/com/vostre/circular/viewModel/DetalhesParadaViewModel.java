@@ -17,6 +17,7 @@ import android.os.AsyncTask;
 import android.widget.ImageView;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
 import org.joda.time.format.DateTimeFormat;
@@ -34,10 +35,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import br.com.vostre.circular.R;
+import br.com.vostre.circular.model.Feriado;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.PontoInteresse;
@@ -50,6 +54,7 @@ import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 import br.com.vostre.circular.utils.DataHoraUtils;
 import br.com.vostre.circular.utils.StringUtils;
+import br.com.vostre.circular.view.listener.FeriadoListener;
 
 public class DetalhesParadaViewModel extends AndroidViewModel {
 
@@ -66,6 +71,8 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
     public LiveData<List<PontoInteresse>> pois;
 
     public Bitmap foto;
+
+    public static MutableLiveData<Boolean> isFeriado;
 
     public ParadaBairro getParadaBairro() {
         return paradaBairro;
@@ -91,13 +98,17 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
         this.foto = foto;
     }
 
-    public void setParada(final String parada) {
+    public void setParada(final String parada, boolean isFeriado) {
         //foto = BitmapFactory.decodeFile(parada.getParada().getImagem());
         this.parada = appDatabase.paradaDAO().carregarComBairro(parada);
 
         String dia = DataHoraUtils.getDiaAtual();
         String diaSeguinte = DataHoraUtils.getDiaSeguinte();
         String hora = DataHoraUtils.getHoraAtual()+":00";
+
+        if(isFeriado){
+            dia = "domingo";
+        }
 
         final SimpleSQLiteQuery query = new SimpleSQLiteQuery("SELECT i.*, e.nome AS 'nomeEmpresa', " +
                 "IFNULL(( SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario " +
@@ -278,6 +289,46 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
         parada = appDatabase.paradaDAO().carregarComBairro("");
         itinerarios = new MutableLiveData<>();
         localAtual = new MutableLiveData<>();
+
+        isFeriado = new MutableLiveData<>();
+        isFeriado.setValue(null);
+    }
+
+    public void checaFeriado(final Calendar data){
+
+        new FeriadoAsyncTask(appDatabase).execute(data);
+    }
+
+    public static class FeriadoAsyncTask extends AsyncTask<Calendar, Void, Void> {
+
+        private AppDatabase db;
+        Feriado feriado;
+        FeriadoListener listener;
+
+        FeriadoAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+            this.listener = listener;
+        }
+
+        @Override
+        protected Void doInBackground(final Calendar... params) {
+            DateTime dt = new DateTime(params[0], DateTimeZone.forTimeZone(TimeZone.getTimeZone("America/Sao_Paulo")));
+            feriado = db.feriadoDAO().encontrarPorData(DateTimeFormat.forPattern("yyyy-MM-dd").print(dt));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            if(feriado != null){
+                isFeriado.postValue(true);
+            } else{
+                isFeriado.postValue(false);
+            }
+
+        }
+
     }
 
     @BindingAdapter("srcCompat")

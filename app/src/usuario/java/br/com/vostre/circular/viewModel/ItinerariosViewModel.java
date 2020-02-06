@@ -183,7 +183,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
         new FeriadoAsyncTask(appDatabase).execute(data);
     }
 
-    private static class FeriadoAsyncTask extends AsyncTask<Calendar, Void, Void> {
+    public static class FeriadoAsyncTask extends AsyncTask<Calendar, Void, Void> {
 
         private AppDatabase db;
         Feriado feriado;
@@ -1302,7 +1302,13 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "'"+bairroDestino+"' AS 'bairroConsultaDestino'," +
                 " e.nome AS 'nomeEmpresa', " +
                 "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) as 'proximoHorario', " +
-                "hi.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
+
+                "IFNULL( ( SELECT h.id FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario " +
+                "                WHERE itinerario = i.id AND "+dia+" = 1 AND hi.ativo = 1 AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= '"+hora+"'" +
+                "                ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ), ( SELECT h.id FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario" +
+                "                WHERE itinerario = i.id AND "+diaSeguinte+" = 1 AND hi.ativo = 1 ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ) ) as 'idProximoHorario', " +
+
+                "IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
                 "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                 "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                 "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
@@ -1312,6 +1318,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                 "WHERE hi2." + diaAnterior + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                 "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'horarioAnterior', " +
+
                 "IFNULL( (SELECT hi2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                 "WHERE hi2." + dia + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                 "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
@@ -1383,32 +1390,41 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "( SELECT pp.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
                 "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1 ) " +
                 "AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'idPartida', " +
+
                 "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
                 "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1 ) " +
                 "AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'nomePartida', " +
+
                 "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
                 "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
                 "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'nomeDestino', " +
+
                 "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
                 "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'idBairroPartida', " +
+
                 "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
                 "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'idBairroDestino', " +
+
                 "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
                 "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'bairroPartida', " +
+
                 "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro b ON b.id = pp.bairro WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
                 "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'bairroDestino', " +
+
                 "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
                 "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
                 "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'cidadePartida', " +
+
                 "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN " +
                 "bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
                 "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1 ) " +
                 "AND pi.itinerario = i.id AND pi.ativo = 1      ) AS 'cidadeDestino' " +
+
                 "FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario INNER JOIN " +
                 "itinerario i ON i.id = hi.itinerario INNER JOIN empresa e ON e.id = i.empresa " +
                 "WHERE hi.itinerario IN ('" + itinerariosDisponiveis + "') AND " + dia + " = 1 " +
@@ -1499,8 +1515,12 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "'"+bairroPartida+"' AS 'bairroConsultaPartida', " +
                 "'"+bairroDestino+"' AS 'bairroConsultaDestino', " +
                 "e.nome AS 'nomeEmpresa', " +
+
                 "strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) as 'proximoHorario', " +
-                "hi.id as 'idProximoHorario', IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
+
+                "h.id as 'idProximoHorario', " +
+
+                "IFNULL((SELECT strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) " +
                 "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                 "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                 "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +
@@ -1510,6 +1530,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 "FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                 "WHERE hi2." + diaAnt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                 "ORDER BY h2.nome DESC LIMIT 1 ) ) AS 'horarioAnterior', " +
+
                 "IFNULL( (SELECT h2.id FROM horario_itinerario hi2 INNER JOIN horario h2 ON h2.id = hi2.horario " +
                 "WHERE hi2." + diaAt + " = 1 AND hi2.itinerario IN ('" + itinerariosDisponiveis + "') " +
                 "AND strftime('%H:%M', TIME(h2.nome/1000, 'unixepoch', 'localtime')) < " +

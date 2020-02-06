@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Environment;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -13,7 +14,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import org.joda.time.format.DateTimeFormat;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.kml.KmlFeature;
@@ -36,6 +42,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaParadasBinding;
 import br.com.vostre.circular.databinding.LinhaViagensBinding;
@@ -67,6 +75,48 @@ public class ViagemItinerarioViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View view) {
                 Toast.makeText(ctx, "Clicou! "+viagem.getId(), Toast.LENGTH_SHORT).show();
+
+                String json = getJson(ctx, viagem);
+                List<GeoPoint> pontos = new ArrayList<>();
+
+                try {
+                    JSONObject jsonArray = new JSONObject(json);
+                    JSONArray features = jsonArray.getJSONArray("features");
+                    JSONObject geo = ((JSONObject) features.get(0)).getJSONObject("geometry");
+                    JSONArray coord = (JSONArray) geo.get("coordinates");
+
+                    int c = coord.length();
+
+                    GeoPoint geoAnterior = null;
+
+
+                    for(int i = 0; i < c; i++){
+
+                        String latitude = ((JSONArray) coord.get(i)).get(0).toString();
+                        String longitude = ((JSONArray) coord.get(i)).get(1).toString();
+
+                        GeoPoint g = new GeoPoint(Double.parseDouble(latitude), Double.parseDouble(longitude));
+
+                        if(geoAnterior != null){
+
+                            if(g.distanceToAsDouble(geoAnterior) > 50){
+                                pontos.add(g);
+                                geoAnterior = g;
+                            }
+
+                        } else{
+                            geoAnterior = g;
+                        }
+
+                    }
+
+                    coord.get(0);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(json);
+                System.out.println(pontos);
+
             }
         });
 
@@ -78,17 +128,9 @@ public class ViagemItinerarioViewHolder extends RecyclerView.ViewHolder {
     @SuppressLint("ClickableViewAccessibility")
     private void addAdditionalLayer (final Context ctx, final ViagemItinerario viagem) {
         String jsonString = null;
-        try {
-            InputStream jsonStream = new FileInputStream(new File(ctx.getFilesDir(), viagem.getTrajeto()));
-            int size = jsonStream.available();
-            byte[] buffer = new byte[size];
-            jsonStream.read(buffer);
-            jsonStream.close();
-            jsonString = new String(buffer,"UTF-8");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return;
-        }
+        jsonString = getJson(ctx, viagem);
+
+        if (jsonString == null) return;
 
         // carregando trajeto e transformando em kml para inserir no mapa
 
@@ -180,6 +222,23 @@ public class ViagemItinerarioViewHolder extends RecyclerView.ViewHolder {
 
 
 
+    }
+
+    @Nullable
+    private String getJson(Context ctx, ViagemItinerario viagem) {
+        String jsonString;
+        try {
+            InputStream jsonStream = new FileInputStream(new File(ctx.getFilesDir(), viagem.getTrajeto()));
+            int size = jsonStream.available();
+            byte[] buffer = new byte[size];
+            jsonStream.read(buffer);
+            jsonStream.close();
+            jsonString = new String(buffer,"UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return jsonString;
     }
 
 }

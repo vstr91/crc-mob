@@ -93,6 +93,7 @@ import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import br.com.vostre.circular.R;
@@ -368,6 +369,9 @@ public class MapaActivity extends BaseActivity {
 //                            .playOn(findViewById(R.id.textView66));
             }
         });
+
+        viewModel.checaFeriado(Calendar.getInstance());
+
     }
 
     private void checaLogin() {
@@ -486,6 +490,12 @@ public class MapaActivity extends BaseActivity {
                 bsd.findViewById(R.id.textViewLegenda).setVisibility(View.VISIBLE);
             }
 
+            if(viewModel.isFeriado.getValue()){
+                bsd.findViewById(R.id.textViewFeriado).setVisibility(View.VISIBLE);
+            } else{
+                bsd.findViewById(R.id.textViewFeriado).setVisibility(View.GONE);
+            }
+
             if(!bsd.isShowing()){
                 bsd.show();
             }
@@ -549,7 +559,7 @@ public class MapaActivity extends BaseActivity {
 
                             final ParadaBairro pb = getParadaFromMarker(marker, paradas);
 
-                            viewModel.setParada(pb);
+                            viewModel.setParada(pb, viewModel.isFeriado.getValue());
                             viewModel.itinerarios.observe(ctx, itinerariosObserver);
 
                             RecyclerView listItinerarios = bsd.findViewById(R.id.listItinerarios);

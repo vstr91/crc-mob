@@ -43,6 +43,7 @@ import java.net.URI;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -52,6 +53,7 @@ import br.com.vostre.circular.databinding.ActivityDetalheParadaBinding;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.DataHoraUtils;
 import br.com.vostre.circular.utils.DestaqueUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SnackbarHelper;
@@ -123,9 +125,9 @@ public class DetalheParadaActivity extends BaseActivity {
         } else{
             idParada = getIntent().getStringExtra("parada");
 
-            viewModel.setParada(idParada);
-
-            viewModel.parada.observe(this, paradaObserver);
+//            viewModel.setParada(idParada);
+//
+//            viewModel.parada.observe(this, paradaObserver);
         }
 
         listItinerarios = binding.listItinerarios;
@@ -166,6 +168,10 @@ public class DetalheParadaActivity extends BaseActivity {
         }
 
         binding.textViewLegenda.setVisibility(View.GONE);
+        binding.textViewFeriado.setVisibility(View.GONE);
+
+        viewModel.checaFeriado(Calendar.getInstance());
+        viewModel.isFeriado.observe(this, feriadoObserver);
 
     }
 
@@ -306,6 +312,30 @@ public class DetalheParadaActivity extends BaseActivity {
         //Toast.makeText(getApplicationContext(), "GPS Status: "+ativo, Toast.LENGTH_SHORT).show();
     }
 
+    Observer<Boolean> feriadoObserver = new Observer<Boolean>() {
+        @Override
+        public void onChanged(Boolean isFeriado) {
+
+            if(idParada != null && isFeriado != null){
+
+                //viewModel.itinerarios.observe(ctx, itinerariosObserver);
+
+                viewModel.setParada(idParada, isFeriado);
+
+                viewModel.parada.observe(ctx, paradaObserver);
+
+                if(isFeriado){
+                    binding.textViewFeriado.setVisibility(View.VISIBLE);
+                } else{
+                    binding.textViewFeriado.setVisibility(View.GONE);
+                }
+
+            }
+
+        }
+
+    };
+
     Observer<List<ItinerarioPartidaDestino>> itinerariosObserver = new Observer<List<ItinerarioPartidaDestino>>() {
         @Override
         public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
@@ -392,6 +422,8 @@ public class DetalheParadaActivity extends BaseActivity {
                     idParada = parada.getParada().getId();
                     checaFavorito();
                     geraModalLoading();
+                } else{
+                    //viewModel.itinerarios.observe(ctx, itinerariosObserver);
                 }
 
                 //viewModel.carregarItinerarios(parada.getParada().getId());

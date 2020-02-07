@@ -140,10 +140,10 @@ public class FormParada extends FormBase {
 
             switch(sentido){
                 case 0:
-                    binding.spinnerSentido.setSelection(2);
+                    binding.spinnerSentido.setSelection(1);
                     break;
                 case 1:
-                    binding.spinnerSentido.setSelection(3);
+                    binding.spinnerSentido.setSelection(2);
                     break;
                 default:
                     binding.spinnerSentido.setSelection(0);
@@ -194,7 +194,7 @@ public class FormParada extends FormBase {
         }
 
         if(parada != null){
-            viewModel.editarParada();
+            viewModel.editarParada(true);
         } else{
             viewModel.salvarParada();
         }

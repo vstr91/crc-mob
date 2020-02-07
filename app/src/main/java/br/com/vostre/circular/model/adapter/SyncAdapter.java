@@ -340,7 +340,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                         token = response.body();
 
-                        System.out.println("URL: "+call.request().url());
+                        //System.out.println("URL: "+call.request().url());
 
                         try {
                             token = crypt.bytesToHex(crypt.encrypt(token));
@@ -373,7 +373,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 @Override
                 public void onFailure(Call<String> call, Throwable t) {
 
-                    System.out.println("URL ERRO: "+call.request().url());
+                    //System.out.println("URL ERRO: "+call.request().url());
 
                     if(mostraToast){
                         Toast.makeText(getContext().getApplicationContext(),

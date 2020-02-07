@@ -27,6 +27,14 @@
         <meta-data
             android:name="CLOUDINARY_URL"
             android:value="cloudinary://@vostre"/>
+
+        <meta-data
+            android:name="MAPBOX_MAPID"
+            android:value="mapbox.streets-satellite"/>
+        <meta-data
+            android:name="MAPBOX_ACCESS_TOKEN"
+            android:value="pk.eyJ1IjoiYWxtaXJqdW5pb3I5MSIsImEiOiJjanNvdnV5OXEwcjNzM3luNWc5anA3OHJnIn0.Uj8yuT4uCHMdHhyjjX2B-A"/>
+
         <activity android:name=".view.HorarioPorImagemActivity"></activity>
         <activity android:name=".view.DetalheAcessoActivity" />
         <activity android:name=".view.DashboardActivity" />

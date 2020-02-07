@@ -24,7 +24,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DrawableUtils;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
@@ -61,6 +60,7 @@ import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
+import br.com.vostre.circular.utils.DrawableUtils;
 import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ParadaItinerarioAdapter;
 import br.com.vostre.circular.view.form.FormItinerario;
@@ -441,19 +441,36 @@ public class ItinerariosActivity extends BaseActivity {
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
 //                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
 
-                switch(p.getParada().getSentido()){
-                    case 0:
-                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_backspace_black_24dp));
-                        break;
-                    case 1:
-                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
-                        break;
-                    case 2:
-                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
-                        break;
-                    default:
-                        m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
-                        break;
+                if(p.getParada().getAtivo()){
+
+                    switch(p.getParada().getSentido()){
+                        case 0:
+                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.centro));
+                            break;
+                        case 1:
+                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.bairro));
+                            break;
+                        default:
+                            m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
+                            break;
+                    }
+
+                } else{
+
+                    switch(p.getParada().getSentido()){
+                        case 0:
+                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
+                                    mergeDrawable(this, R.drawable.marker, R.drawable.centro).mutate()));
+                            break;
+                        case 1:
+                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
+                                    mergeDrawable(this, R.drawable.marker, R.drawable.bairro).mutate()));
+                            break;
+                        default:
+                            m.setIcon(DrawableUtils.convertToGrayscale(getApplicationContext().getResources().getDrawable(R.drawable.marker).mutate()));
+                            break;
+                    }
+
                 }
 
                 m.setTitle(p.getParada().getNome());

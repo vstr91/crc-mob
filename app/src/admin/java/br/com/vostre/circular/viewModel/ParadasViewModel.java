@@ -161,14 +161,18 @@ public class ParadasViewModel extends AndroidViewModel {
 
     }
 
-    public void editarParada(){
+    public void editarParada(boolean porFormulario){
 
-        if(bairro != null){
-            parada.getParada().setBairro(bairro.getBairro().getId());
-        }
+        if(porFormulario){
 
-        if(foto != null){
-            salvarFoto();
+            if(bairro != null){
+                parada.getParada().setBairro(bairro.getBairro().getId());
+            }
+
+            if(foto != null){
+                salvarFoto();
+            }
+
         }
 
         if(parada.getParada().valida(parada.getParada())){

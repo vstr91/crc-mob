@@ -55,6 +55,7 @@ import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 import br.com.vostre.circular.utils.DataHoraUtils;
+import br.com.vostre.circular.utils.DrawableUtils;
 import br.com.vostre.circular.view.adapter.ParadaItinerarioAdapter;
 import br.com.vostre.circular.view.form.FormHistorico;
 import br.com.vostre.circular.view.form.FormItinerario;
@@ -370,7 +371,40 @@ public class DetalhesItinerarioActivity extends BaseActivity {
                 Marker m = new Marker(map);
                 m.setPosition(new GeoPoint(p.getParada().getLatitude(), p.getParada().getLongitude()));
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
+//                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
+
+                if(p.getParada().getAtivo()){
+
+                    switch(p.getParada().getSentido()){
+                        case 0:
+                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.centro));
+                            break;
+                        case 1:
+                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.bairro));
+                            break;
+                        default:
+                            m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
+                            break;
+                    }
+
+                } else{
+
+                    switch(p.getParada().getSentido()){
+                        case 0:
+                            m.setIcon(DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
+                                    mergeDrawable(this, R.drawable.marker, R.drawable.centro).mutate()));
+                            break;
+                        case 1:
+                            m.setIcon(DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
+                                    mergeDrawable(this, R.drawable.marker, R.drawable.bairro).mutate()));
+                            break;
+                        default:
+                            m.setIcon(DrawableUtils.convertToGrayscale(getApplicationContext().getResources().getDrawable(R.drawable.marker).mutate()));
+                            break;
+                    }
+
+                }
+
                 m.setTitle(p.getParada().getNome());
                 m.setDraggable(true);
                 m.setId(p.getParada().getId());

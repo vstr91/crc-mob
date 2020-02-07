@@ -41,6 +41,8 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants;
+import org.osmdroid.tileprovider.tilesource.MapBoxTileSource;
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -187,8 +189,16 @@ public class ParadasActivity extends BaseActivity implements ParadaListener {
     }
 
     private void configuraMapa() {
+
+        OnlineTileSourceBase MAPBOXSATELLITELABELLED = new MapBoxTileSource("MapBoxSatelliteLabelled", 1, 19, 256, ".png");
+        ((MapBoxTileSource) MAPBOXSATELLITELABELLED).retrieveAccessToken(this);
+        ((MapBoxTileSource) MAPBOXSATELLITELABELLED).retrieveMapBoxMapId(this);
+        TileSourceFactory.addTileSource(MAPBOXSATELLITELABELLED);
+
         map = binding.map;
-        map.setTileSource(TileSourceFactory.MAPNIK);
+
+//        map.setTileSource(TileSourceFactory.MAPNIK);
+        map.setTileSource(MAPBOXSATELLITELABELLED);
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
 
@@ -202,8 +212,9 @@ public class ParadasActivity extends BaseActivity implements ParadaListener {
 //        GeoPoint startPoint = new GeoPoint(-22.470804460339885, -43.82463455200195);
 //        mapController.setCenter(startPoint);
 
-        map.setMaxZoomLevel(19d);
+        map.setMaxZoomLevel(25d);
         map.setMinZoomLevel(5d);
+
     }
 
     public void onFabClick(View v){
@@ -392,10 +403,10 @@ public class ParadasActivity extends BaseActivity implements ParadaListener {
 
                     switch(p.getParada().getSentido()){
                         case 0:
-                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.circle_button_dia));
+                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.centro));
                             break;
                         case 1:
-                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.circle_button_dia_off));
+                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.bairro));
                             break;
                         default:
                             m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
@@ -407,11 +418,11 @@ public class ParadasActivity extends BaseActivity implements ParadaListener {
                     switch(p.getParada().getSentido()){
                         case 0:
                             m.setIcon(DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
-                                    mergeDrawable(this, R.drawable.marker, R.drawable.circle_button_dia).mutate()));
+                                    mergeDrawable(this, R.drawable.marker, R.drawable.centro).mutate()));
                             break;
                         case 1:
                             m.setIcon(DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
-                                    mergeDrawable(this, R.drawable.marker, R.drawable.circle_button_dia_off).mutate()));
+                                    mergeDrawable(this, R.drawable.marker, R.drawable.bairro).mutate()));
                             break;
                         default:
                             m.setIcon(DrawableUtils.convertToGrayscale(getApplicationContext().getResources().getDrawable(R.drawable.marker).mutate()));
@@ -450,7 +461,7 @@ public class ParadasActivity extends BaseActivity implements ParadaListener {
                         ParadaBairro pb = getParadaFromMarker(marker, paradas);
                         viewModel.buscarRua(pb.getParada());
                         viewModel.setParada(pb);
-                        viewModel.editarParada();
+                        viewModel.editarParada(false);
                         Toast.makeText(getApplicationContext(), "Parada alterada", Toast.LENGTH_SHORT).show();
                     }
 

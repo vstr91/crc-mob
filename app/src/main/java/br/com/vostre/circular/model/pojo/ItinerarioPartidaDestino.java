@@ -142,6 +142,9 @@ public class ItinerarioPartidaDestino {
     @Ignore
     public Float distanciaPoi;
 
+    @Ignore
+    public boolean trechoIsolado = false;
+
     public String getHorarioEstimado() {
         return horarioEstimado;
     }
@@ -481,6 +484,14 @@ public class ItinerarioPartidaDestino {
 
     public void setNomeParadaReferencia(String nomeParadaReferencia) {
         this.nomeParadaReferencia = nomeParadaReferencia;
+    }
+
+    public boolean isTrechoIsolado() {
+        return trechoIsolado;
+    }
+
+    public void setTrechoIsolado(boolean trechoIsolado) {
+        this.trechoIsolado = trechoIsolado;
     }
 
     @Override

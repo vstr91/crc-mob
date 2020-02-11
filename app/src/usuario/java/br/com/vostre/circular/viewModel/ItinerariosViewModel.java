@@ -90,6 +90,8 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
     public static MutableLiveData<Boolean> isFeriado;
 
+    boolean trechoIsolado = false;
+
     public boolean isTodos() {
         return todos;
     }
@@ -418,6 +420,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                     }
 
                 } else{
+                    // NAO ENCONTROU ITINERARIO DIRETO. BUSCANDO ITINERARIOS CONECTADOS QUE LEVEM AO DESTINO SELECIONADO
                     GraphBuilder<String, Double> builder = GraphBuilder.create();
 
                     itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosTesteSync();
@@ -444,7 +447,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                     HipsterDirectedGraph<String,Double> graph = builder.createDirectedGraph();
 
-                    Iterable<GraphEdge<String, Double>> a = graph.edgesOf(myPartida.getBairro().getId());
+                    //Iterable<GraphEdge<String, Double>> a = graph.edgesOf(myPartida.getBairro().getId());
 
                     SearchProblem p = GraphSearchProblem
                             .startingFrom(myPartida.getBairro().getId())
@@ -455,6 +458,32 @@ public class ItinerariosViewModel extends AndroidViewModel {
                     Algorithm.SearchResult result = Hipster.createDijkstra(p).search(myDestino.getBairro().getId());
 
                     //System.out.println("RES: "+result);
+
+                    // DEBUG GRAPH
+
+                    for(GraphEdge<String, Double> g : graph.edges()){
+                        System.out.println("VERTEX: "+g.getVertex1()+" | "+g.getVertex2()+": "+g.getEdgeValue()+" || "+g.getType().name());
+
+                        BairroCidade partida = appDatabase.bairroDAO().carregarSync(g.getVertex1());
+                        BairroCidade destino = appDatabase.bairroDAO().carregarSync(g.getVertex2());
+
+                        if((partida.getNomeCidade().equals("Barra do Piraí") && destino.getNomeCidade().equals("Volta Redonda")) ||
+                                (partida.getNomeCidade().equals("Barra do Piraí") && destino.getNomeCidade().equals("Barra Mansa")) ||
+                                (partida.getNomeCidade().equals("Volta Redonda") && destino.getNomeCidade().equals("Barra Mansa")) ||
+                                (partida.getNomeCidade().equals("Volta Redonda") && destino.getNomeCidade().equals("Resende")) ||
+                                (partida.getNomeCidade().equals("Barra Mansa") && destino.getNomeCidade().equals("Resende"))){
+
+                            System.out.println("VERTEX LOAD: "+partida.getBairro().getNome()+" ("+partida.getNomeCidadeComEstado()+")"+" | "
+                                    +destino.getBairro().getNome()+" ("+destino.getNomeCidadeComEstado()+")"+": "+g.getEdgeValue()+" || "+g.getType().name());
+
+                        }
+
+
+
+                    }
+
+                    // FIM DEBUG GRAPH
+
 
                     List<List> caminhos = result.getOptimalPaths();
 
@@ -511,6 +540,19 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                                 String itinerariosDisponiveis = TextUtils.join("','", itis);
 
+                                // NOVO v2.3.x - busca por trecho isolado caso não encontre nas formas anteriores
+                                if(itinerariosDisponiveis.isEmpty()){
+                                    itinerariosDisponiveis = TextUtils.join("','",
+                                            appDatabase.itinerarioDAO().carregarOpcoesPorPartidaEDestinoTrechoSync(bairroAnterior.getBairro().getId(), b.getBairro().getId()));
+
+                                    if(!itinerariosDisponiveis.isEmpty()){
+                                        trechoIsolado = true;
+                                    } else{
+                                        trechoIsolado = false;
+                                    }
+
+                                }
+
                                 SimpleSQLiteQuery query = new SimpleSQLiteQuery(
                                         geraQueryResultado(bairroAnterior.getBairro().getId(),
                                                 b.getBairro().getId(), diaAnterior, dia, diaSeguinte, hora, itinerariosDisponiveis));
@@ -521,6 +563,8 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                 if(itinerario != null){
                                     itinerario.setDia(dia);
                                     itinerario.setHora(hora);
+
+                                    itinerario.setTrechoIsolado(trechoIsolado);
 
                                     if(itinerario.isFlagTrecho()){
 
@@ -665,6 +709,9 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                                     itinerarios.add(itinerario);
                                     bairroAnterior = b;
+                                } else{
+                                    // Busca por trecho
+
                                 }
 
 

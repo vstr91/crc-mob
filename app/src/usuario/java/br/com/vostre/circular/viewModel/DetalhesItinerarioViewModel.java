@@ -9,6 +9,7 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -28,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
+import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
@@ -62,14 +64,26 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
     public LiveData<List<ParadaBairro>> ruas;
 
+    public boolean trechoIsolado = false;
+
+    public String partidaConsulta;
+    public String destinoConsulta;
+
     public void setItinerario(String itinerario, String paradaPartida, String paradaDestino,
                               String bairroPartida, String bairroDestino) {
         this.itinerario = appDatabase.itinerarioDAO().carregar(itinerario);
-        this.paradas = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro(itinerario);
+
+        if(trechoIsolado){
+            this.paradas = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairroTrecho(partidaConsulta, destinoConsulta);
+        } else{
+            this.paradas = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro(itinerario);
+        }
+
+
         this.ruas = appDatabase.paradaItinerarioDAO().listarRuasPorItinerario(itinerario);
 
         if(paradaPartida == null || paradaDestino == null){
-            new carregaHorariosAsyncTask(appDatabase, itinerario, null).execute();
+            new carregaHorariosAsyncTask(appDatabase, itinerario, null, trechoIsolado, partidaConsulta, destinoConsulta).execute();
         } else{
             this.paradaPartida = paradaPartida;
             this.paradaDestino = paradaDestino;
@@ -77,7 +91,7 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
             this.partida = appDatabase.paradaDAO().carregarComBairro(paradaPartida);
             this.destino = appDatabase.paradaDAO().carregarComBairro(paradaDestino);
 
-            new carregaHorariosAsyncTask(appDatabase, itinerario, null, bairroPartida, bairroDestino).execute();
+            new carregaHorariosAsyncTask(appDatabase, itinerario, null, bairroPartida, bairroDestino, trechoIsolado, partidaConsulta, destinoConsulta).execute();
         }
 
 
@@ -131,8 +145,9 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
         this.ruas = appDatabase.paradaItinerarioDAO().listarRuasPorItinerario("");
     }
 
-    public void carregarHorariosFiltrados(String itinerario, String itinerarioARemover, String paradaPartida, String paradaDestino){
-        new carregaHorariosAsyncTask(appDatabase, itinerario, itinerarioARemover, paradaPartida, paradaDestino).execute();
+    public void carregarHorariosFiltrados(String itinerario, String itinerarioARemover, String paradaPartida, String paradaDestino, boolean trechoIsolado,
+                                          String partidaConsulta, String destinoConsulta){
+        new carregaHorariosAsyncTask(appDatabase, itinerario, itinerarioARemover, paradaPartida, paradaDestino, trechoIsolado, partidaConsulta, destinoConsulta).execute();
     }
 
     private static class carregaHorariosAsyncTask extends AsyncTask<List<ItinerarioPartidaDestino>, Void, Void> {
@@ -144,19 +159,31 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
         private String bairroPartida;
         private String bairroDestino;
 
-        carregaHorariosAsyncTask(AppDatabase appDatabase, String itinerario, String itinerarioARemover, String partida, String destino) {
+        boolean trechoIsolado;
+
+        private String partidaConsulta;
+        private String destinoConsulta;
+
+        carregaHorariosAsyncTask(AppDatabase appDatabase, String itinerario, String itinerarioARemover, String partida, String destino, boolean trechoIsolado, String partidaConsulta, String destinoConsulta) {
             db = appDatabase;
             this.itinerario = itinerario;
             this.itinerarioARemover = itinerarioARemover;
 
             this.bairroPartida = partida;
             this.bairroDestino = destino;
+
+            this.trechoIsolado = trechoIsolado;
+            this.partidaConsulta = partidaConsulta;
+            this.destinoConsulta = destinoConsulta;
         }
 
-        carregaHorariosAsyncTask(AppDatabase appDatabase, String itinerario, String itinerarioARemover) {
+        carregaHorariosAsyncTask(AppDatabase appDatabase, String itinerario, String itinerarioARemover, boolean trechoIsolado, String partidaConsulta, String destinoConsulta) {
             db = appDatabase;
             this.itinerario = itinerario;
             this.itinerarioARemover = itinerarioARemover;
+            this.trechoIsolado = trechoIsolado;
+            this.partidaConsulta = partidaConsulta;
+            this.destinoConsulta = destinoConsulta;
         }
 
         @Override
@@ -183,8 +210,15 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
                 System.out.println("TEMPO INICIAL ITI: "+iniIti);
 
-                qtdItinerarios = db.horarioItinerarioDAO()
-                        .contaItinerariosPorPartidaEDestinoSimplificadoSync(bairroPartida, bairroDestino);
+                if(trechoIsolado){
+                    qtdItinerarios = db.itinerarioDAO()
+                            .carregarOpcoesPorPartidaEDestinoTrechoItinerarioSync(partidaConsulta, destinoConsulta);
+                } else{
+                    qtdItinerarios = db.horarioItinerarioDAO()
+                            .contaItinerariosPorPartidaEDestinoSimplificadoSync(bairroPartida, bairroDestino);
+                }
+
+
 
                 Long finIti = System.nanoTime();
                 Long totIti = finIti - iniIti;
@@ -227,7 +261,15 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
                         System.out.println("TEMPO INICIAL HOR: "+iniHor);
 
-                        horarios.postValue(db.horarioItinerarioDAO().listarApenasAtivosPorPartidaEDestinoSync(bairroPartida, bairroDestino));
+                        if(trechoIsolado){
+
+                            List<HorarioItinerarioNome> hrs = db.horarioItinerarioDAO().listarApenasAtivosPorItinerarioTrechoSync(db.itinerarioDAO().carregarOpcoesPorPartidaEDestinoTrechoSync(partidaConsulta, destinoConsulta));
+
+                            horarios.postValue(hrs);
+                        } else{
+                            horarios.postValue(db.horarioItinerarioDAO().listarApenasAtivosPorPartidaEDestinoSync(bairroPartida, bairroDestino));
+                        }
+
 
                         Long finHor = System.nanoTime();
                         Long totHor = finHor - iniHor;

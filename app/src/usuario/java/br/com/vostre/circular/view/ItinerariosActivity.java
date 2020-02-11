@@ -279,6 +279,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         public void onChanged(final List<ItinerarioPartidaDestino> itinerarios) {
 
             if (itinerarios != null && itinerarios.size() > 0) {
+
                 binding.cardViewListDestino.setVisibility(View.GONE);
                 binding.listResultados.setVisibility(View.VISIBLE);
                 binding.cardViewResultadoVazio.setVisibility(View.GONE);

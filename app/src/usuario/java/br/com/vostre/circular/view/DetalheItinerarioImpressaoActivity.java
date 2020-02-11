@@ -89,6 +89,8 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
 
     boolean imprimePorPartidaEDestino = true;
 
+    boolean trechoIsolado = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_itinerario_impressao);
@@ -98,15 +100,22 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
 
         ctx = this;
 
+        viewModel = ViewModelProviders.of(this).get(DetalhesItinerarioViewModel.class);
+
         itinerarioPartida = getIntent().getStringExtra("itinerarioPartida");
         itinerarioDestino = getIntent().getStringExtra("itinerarioDestino");
 
         paradaPartida = getIntent().getStringExtra("paradaPartida");
         paradaDestino = getIntent().getStringExtra("paradaDestino");
 
-        imprimePorPartidaEDestino = getIntent().getBooleanExtra("imprimePorPartidaEDestino", true);
+        // nova busca por trecho
+        trechoIsolado = getIntent().getBooleanExtra("trechoIsolado", false);
+        viewModel.trechoIsolado = trechoIsolado;
 
-        viewModel = ViewModelProviders.of(this).get(DetalhesItinerarioViewModel.class);
+        viewModel.partidaConsulta = getIntent().getStringExtra("partidaConsulta");
+        viewModel.destinoConsulta = getIntent().getStringExtra("destinoConsulta");
+
+        imprimePorPartidaEDestino = getIntent().getBooleanExtra("imprimePorPartidaEDestino", true);
 
         if(!imprimePorPartidaEDestino){
             paradaPartidaOriginal = paradaPartida;

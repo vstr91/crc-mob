@@ -176,7 +176,7 @@
                         <TextView
                             android:id="@+id/textViewNome"
                             android:layout_width="match_parent"
-                            android:layout_height="0dp"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="bottom|center_vertical"
                             android:text="@={partida.nomeBairro}"
@@ -187,7 +187,7 @@
                         <TextView
                             android:id="@+id/textViewBairro"
                             android:layout_width="match_parent"
-                            android:layout_height="0dp"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="top"
                             android:text="@{partida.nomeCidade}"
@@ -219,7 +219,7 @@
                         <TextView
                             android:id="@+id/textViewNomeDestino"
                             android:layout_width="match_parent"
-                            android:layout_height="0dp"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="bottom|center_vertical"
                             android:text="@={destino.nomeBairro}"
@@ -230,7 +230,7 @@
                         <TextView
                             android:id="@+id/textViewBairroDestino"
                             android:layout_width="match_parent"
-                            android:layout_height="0dp"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="top"
                             android:text="@{destino.nomeCidade}"

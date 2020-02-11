@@ -6,6 +6,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import br.com.vostre.circular.BuildConfig;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.view.BaseActivity;
@@ -90,6 +92,12 @@ public class ToolbarUtils {
 //            textViewBadgeMsg = MenuItemCompat.getActionView(itemMsg).findViewById(R.id.textViewBadgeMsg);
 //            textViewBadgeMsg.setVisibility(View.INVISIBLE);
 //        }
+
+        if(BuildConfig.DEBUG_APP == 1){
+            activity.findViewById(R.id.toolbar).setBackgroundColor(Color.RED);
+        } else{
+            activity.findViewById(R.id.toolbar).setBackgroundColor(Color.TRANSPARENT);
+        }
 
     }
 

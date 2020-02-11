@@ -106,6 +106,8 @@ public class DetalheItinerarioActivity extends BaseActivity {
     int contaProcessamento = 0;
     boolean mostraRuas = false;
 
+    boolean trechoIsolado = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_itinerario);
@@ -161,6 +163,13 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
             paradaPartida = getIntent().getStringExtra("paradaPartida");
             paradaDestino = getIntent().getStringExtra("paradaDestino");
+
+            // nova busca por trecho
+            trechoIsolado = getIntent().getBooleanExtra("trechoIsolado", false);
+            viewModel.trechoIsolado = trechoIsolado;
+
+            viewModel.partidaConsulta = getIntent().getStringExtra("partidaConsulta");
+            viewModel.destinoConsulta = getIntent().getStringExtra("destinoConsulta");
 
             viewModel.setItinerario(getIntent().getStringExtra("itinerario"), paradaPartida, paradaDestino,
                     itinerarioPartida, itinerarioDestino);
@@ -335,6 +344,11 @@ public class DetalheItinerarioActivity extends BaseActivity {
         i.putExtra("paradaPartida", paradaPartida);
         i.putExtra("paradaDestino", paradaDestino);
 
+        i.putExtra("trechoIsolado", trechoIsolado);
+
+        i.putExtra("partidaConsulta", viewModel.partidaConsulta);
+        i.putExtra("destinoConsulta", viewModel.destinoConsulta);
+
         if(viewModel.qtdItinerarios.size() <= 1){
             i.putExtra("imprimePorPartidaEDestino", false);
         }
@@ -475,6 +489,9 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 binding.listLegenda.setVisibility(View.VISIBLE);
                 binding.textViewObservacao.setVisibility(View.GONE);
 
+                binding.imageButton5.setVisibility(View.GONE);
+                binding.textView37.setVisibility(View.GONE);
+
                 List<ItinerarioPartidaDestino> itinerarios = viewModel.qtdItinerarios;
                 dados = new ArrayList<>();
 
@@ -545,9 +562,15 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 binding.textViewLegenda.setVisibility(View.GONE);
                 binding.listLegenda.setVisibility(View.GONE);
                 binding.textView51.setVisibility(View.GONE);
+
+                binding.imageButton5.setVisibility(View.VISIBLE);
             }
 
-            HorarioItinerarioNome horarioItinerarioNome = horarios.get(0);
+            HorarioItinerarioNome horarioItinerarioNome = null;
+
+            if(horarios.size() > 0){
+                horarioItinerarioNome = horarios.get(0);
+            }
 
             if(horarioItinerarioNome != null && horarioItinerarioNome.getUltimaAtualizacao() != null){
                 DateTime ultimaAtualizacao = new DateTime(horarioItinerarioNome.getUltimaAtualizacao());
@@ -743,6 +766,11 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
             if(parada != null){
                 binding.setDestino(parada);
+
+//                if(binding.getPartida() != null){
+//                    viewModel.setItinerario(itinerario, );
+//                }
+
             }
 
         }
@@ -783,7 +811,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
                 m.setTitle(p.getParada().getNome());
                 m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker_ponto));
-                m.setDraggable(true);
+                m.setDraggable(false);
                 m.setId(p.getParada().getId());
                 m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                     @Override

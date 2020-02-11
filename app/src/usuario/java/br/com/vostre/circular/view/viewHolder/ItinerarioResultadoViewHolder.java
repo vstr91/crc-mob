@@ -128,11 +128,27 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
                         if(report.areAllPermissionsGranted()){
                             Intent i = new Intent(ctx, DetalheItinerarioActivity.class);
                             i.putExtra("itinerario", itinerario.getItinerario().getId());
-                            i.putExtra("itinerarioPartida", itinerario.getBairroConsultaPartida());
-                            i.putExtra("itinerarioDestino", itinerario.getBairroConsultaDestino());
 
-                            i.putExtra("paradaPartida", itinerario.getParadaPartida());
-                            i.putExtra("paradaDestino", itinerario.getParadaDestino());
+                            if(itinerario.isTrechoIsolado()){
+                                i.putExtra("itinerarioPartida", itinerario.getIdBairroPartida());
+                                i.putExtra("itinerarioDestino", itinerario.getIdBairroDestino());
+
+                                i.putExtra("paradaPartida", itinerario.getParadaPartida());
+                                i.putExtra("paradaDestino", itinerario.getParadaDestino());
+
+                                i.putExtra("trechoIsolado", true);
+
+                                i.putExtra("partidaConsulta", itinerario.getBairroConsultaPartida());
+                                i.putExtra("destinoConsulta", itinerario.getBairroConsultaDestino());
+                            } else{
+                                i.putExtra("itinerarioPartida", itinerario.getBairroConsultaPartida());
+                                i.putExtra("itinerarioDestino", itinerario.getBairroConsultaDestino());
+
+                                i.putExtra("paradaPartida", itinerario.getParadaPartida());
+                                i.putExtra("paradaDestino", itinerario.getParadaDestino());
+                            }
+
+
                             i.putExtra("horario", itinerario.getIdProximoHorario());
                             ctx.startActivity(i);
                         } else{
@@ -140,8 +156,14 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
                                     "salvar partes do mapa e permitir o acesso offline. O mapa não funcionará corretamente sem essa permissão.", Toast.LENGTH_LONG).show();
                             Intent i = new Intent(ctx, DetalheItinerarioActivity.class);
                             i.putExtra("itinerario", itinerario.getItinerario().getId());
-                            i.putExtra("itinerarioPartida", itinerario.getBairroConsultaPartida());
-                            i.putExtra("itinerarioDestino", itinerario.getBairroConsultaDestino());
+
+                            if(itinerario.isTrechoIsolado()){
+                                i.putExtra("itinerarioPartida", itinerario.getIdBairroPartida());
+                                i.putExtra("itinerarioDestino", itinerario.getIdBairroDestino());
+                            } else{
+                                i.putExtra("itinerarioPartida", itinerario.getBairroConsultaPartida());
+                                i.putExtra("itinerarioDestino", itinerario.getBairroConsultaDestino());
+                            }
 
                             i.putExtra("paradaPartida", itinerario.getParadaPartida());
                             i.putExtra("paradaDestino", itinerario.getParadaDestino());

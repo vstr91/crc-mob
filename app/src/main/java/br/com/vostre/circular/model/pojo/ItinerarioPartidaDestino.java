@@ -13,6 +13,7 @@ import java.util.List;
 
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.ParadaItinerario;
+import br.com.vostre.circular.model.SecaoItinerario;
 
 public class ItinerarioPartidaDestino {
 
@@ -144,6 +145,17 @@ public class ItinerarioPartidaDestino {
 
     @Ignore
     public boolean trechoIsolado = false;
+
+    @Ignore
+    public List<SecaoItinerario> secoes;
+
+    public List<SecaoItinerario> getSecoes() {
+        return secoes;
+    }
+
+    public void setSecoes(List<SecaoItinerario> secoes) {
+        this.secoes = secoes;
+    }
 
     public String getHorarioEstimado() {
         return horarioEstimado;
@@ -492,6 +504,10 @@ public class ItinerarioPartidaDestino {
 
     public void setTrechoIsolado(boolean trechoIsolado) {
         this.trechoIsolado = trechoIsolado;
+    }
+
+    public String getNomeCompleto(){
+        return getNomeBairroPartida()+" ("+getNomeCidadePartida()+") x "+getNomeBairroDestino()+" ("+getNomeCidadeDestino()+")";
     }
 
     @Override

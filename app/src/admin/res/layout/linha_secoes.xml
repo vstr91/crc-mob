@@ -41,7 +41,7 @@
                     android:text="@{secao.nome}" />
 
                 <TextView
-                    android:id="@+id/textViewTarifa"
+                    android:id="@+id/textViewTarifaAtual"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"

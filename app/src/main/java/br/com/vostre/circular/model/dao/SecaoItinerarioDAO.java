@@ -25,6 +25,9 @@ public interface SecaoItinerarioDAO {
     @Query("SELECT * FROM secao_itinerario WHERE itinerario = :itinerario")
     LiveData<List<SecaoItinerario>> listarTodosPorItinerario(String itinerario);
 
+    @Query("SELECT * FROM secao_itinerario WHERE itinerario = :itinerario")
+    List<SecaoItinerario> listarTodosPorItinerarioSync(String itinerario);
+
     @Query("SELECT si.*, pa.id AS 'idPartida', pa.nome AS 'nomePartida', bp.nome AS 'nomeBairroPartida', " +
             "cp.nome AS 'nomeCidadePartida', pd.id AS 'idPartida', pd.nome AS 'nomePartida', " +
             "bd.nome AS 'nomeBairroPartida', cd.nome AS 'nomeCidadePartida' " +

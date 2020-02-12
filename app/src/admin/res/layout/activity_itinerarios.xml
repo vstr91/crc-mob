@@ -16,12 +16,204 @@
         android:background="@drawable/gradiente"
         tools:context="br.com.vostre.circular.view.ItinerariosActivity">
 
-        <include
-            android:id="@+id/toolbar"
-            layout="@layout/toolbar"
+        <Button
+            android:id="@+id/btnTarifas"
+            style="@style/botao_branco"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:onClick="@{view::onClickTarifas}"
+            android:padding="5dp"
+            android:text="Alterar Tarifas em Massa"
+            app:layout_constraintEnd_toStartOf="@+id/btnTarifasSecoes"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+        <Button
+            android:id="@+id/btnTarifasSecoes"
+            style="@style/botao_branco"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:onClick="@{view::onClickTarifasSecoes}"
+            android:padding="5dp"
+            android:text="Alterar Tarifas Por Seção"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btnTarifas"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+        <Button
+            android:id="@+id/btnOcultarMapa"
+            style="@style/botao_transparente"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:onClick="@{view::ocultarMapa}"
+            android:padding="0dp"
+            android:text="Ocultar/Exibir Mapa"
+            android:textColor="@color/azul"
+            android:textSize="12sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"></include>
+            app:layout_constraintTop_toBottomOf="@+id/btnTarifas" />
+
+        <ScrollView
+            android:id="@+id/scrollView2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cardView">
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:id="@+id/btnIniciar"
+                    style="@style/botao_branco"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
+                    android:onClick="@{view::onClickSalvar}"
+                    android:text="Salvar"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/listParadas" />
+
+                <EditText
+                    android:id="@+id/editTextFiltro"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
+                    android:ems="10"
+                    android:hint="Digite para filtrar..."
+                    android:inputType="textPersonName"
+                    android:textColor="@color/branco"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView26" />
+
+                <TextView
+                    android:id="@+id/textView5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
+                    android:text="Pressione e Arraste para reordenar"
+                    android:textColor="@color/branco"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+                <TextView
+                    android:id="@+id/textView4"
+                    style="@style/texto_branco"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
+                    android:text="Paradas Selecionadas"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/cardView" />
+
+                <TextView
+                    android:id="@+id/textView26"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="Itinerários Cadastrados"
+                    android:textAppearance="@style/texto_branco"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btnIniciar" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/listItinerarios"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/editTextFiltro"
+                    tools:listitem="@layout/linha_itinerarios">
+
+                </android.support.v7.widget.RecyclerView>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/listParadas"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="112dp"
+                    android:minHeight="200dp"
+                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                    app:layout_constraintBottom_toTopOf="@+id/btnCadastrar"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView5"
+                    tools:listitem="@layout/linha_paradas_itinerarios">
+
+                </android.support.v7.widget.RecyclerView>
+
+            </android.support.constraint.ConstraintLayout>
+
+        </ScrollView>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabZoomOut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:onClick="@{view::onClickZoomOut}"
+            android:rotation="180"
+            app:fabSize="mini"
+            app:layout_constraintEnd_toEndOf="@+id/cardView"
+            app:layout_constraintTop_toBottomOf="@+id/btnOcultarMapa"
+            app:srcCompat="@drawable/ic_arrow_downward_white_24dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabZoomIn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:onClick="@{view::onClickZoomIn}"
+            app:fabSize="mini"
+            app:layout_constraintEnd_toEndOf="@+id/cardView"
+            app:layout_constraintTop_toBottomOf="@+id/fabZoomOut"
+            app:srcCompat="@drawable/ic_arrow_downward_white_24dp" />
 
         <android.support.v7.widget.CardView
             android:id="@+id/cardView"
@@ -39,191 +231,12 @@
 
         </android.support.v7.widget.CardView>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fabZoomOut"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:rotation="180"
-            app:fabSize="mini"
-            android:onClick="@{view::onClickZoomOut}"
-            app:layout_constraintEnd_toEndOf="@+id/cardView"
-            app:layout_constraintTop_toBottomOf="@+id/btnOcultarMapa"
-            app:srcCompat="@drawable/ic_arrow_downward_white_24dp" />
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fabZoomIn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            app:fabSize="mini"
-            android:onClick="@{view::onClickZoomIn}"
-            app:layout_constraintEnd_toEndOf="@+id/cardView"
-            app:layout_constraintTop_toBottomOf="@+id/fabZoomOut"
-            app:srcCompat="@drawable/ic_arrow_downward_white_24dp" />
-
-        <ScrollView
-            android:id="@+id/scrollView2"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:fillViewport="true"
-            app:layout_constraintBottom_toBottomOf="parent"
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/toolbar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardView">
-
-            <android.support.constraint.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <EditText
-                    android:id="@+id/editTextFiltro"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginStart="16dp"
-                    android:ems="10"
-                    android:hint="Digite para filtrar..."
-                    android:inputType="textPersonName"
-                    android:textColor="@color/branco"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView26" />
-
-                <TextView
-                    android:id="@+id/textView4"
-                    style="@style/texto_branco"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:text="Paradas Selecionadas"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/cardView" />
-
-                <TextView
-                    android:id="@+id/textView5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginStart="8dp"
-                    android:text="Pressione e Arraste para reordenar"
-                    android:textColor="@color/branco"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView4" />
-
-                <Button
-                    android:id="@+id/btnIniciar"
-                    style="@style/botao_branco"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:onClick="@{view::onClickSalvar}"
-                    android:text="Salvar"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/listParadas" />
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/listItinerarios"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/editTextFiltro"
-                    tools:listitem="@layout/linha_itinerarios">
-
-                </android.support.v7.widget.RecyclerView>
-
-                <TextView
-                    android:id="@+id/textView26"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:text="Itinerários Cadastrados"
-                    android:textAppearance="@style/texto_branco"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/btnIniciar" />
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/listParadas"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="112dp"
-                    android:minHeight="200dp"
-                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-                    app:layout_constraintBottom_toTopOf="@+id/btnCadastrar"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView5"
-                    tools:listitem="@layout/linha_paradas_itinerarios" >
-
-                </android.support.v7.widget.RecyclerView>
-
-            </android.support.constraint.ConstraintLayout>
-
-        </ScrollView>
-
-        <Button
-            android:id="@+id/btnTarifas"
-            style="@style/botao_branco"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:padding="5dp"
-            android:onClick="@{view::onClickTarifas}"
-            android:text="Alterar Tarifas em Massa"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
-
-        <Button
-            android:id="@+id/btnOcultarMapa"
-            style="@style/botao_transparente"
-            android:layout_width="wrap_content"
-            android:layout_height="20dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:onClick="@{view::ocultarMapa}"
-            android:padding="0dp"
-            android:text="Ocultar/Exibir Mapa"
-            android:textColor="@color/azul"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnTarifas" />
+            app:layout_constraintTop_toTopOf="parent"></include>
 
 
     </android.support.constraint.ConstraintLayout>

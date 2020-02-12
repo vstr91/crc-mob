@@ -23,6 +23,6 @@
         <item>@color/ciano</item>
         <item>@color/cinzaEscuro</item>
         <item>@color/cianoEscuro</item>
-        <item>@color/branco</item>
+        <item>@color/verde</item>
     </array>
 </resources>

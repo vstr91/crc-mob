@@ -10,11 +10,13 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.LinhaItinerariosTarifaBinding;
+import br.com.vostre.circular.databinding.LinhaTarifasSecoesBinding;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.view.viewHolder.ItinerarioTarifaViewHolder;
@@ -25,11 +27,19 @@ public class TarifaSecaoAdapter extends BaseExpandableListAdapter {
     public List<ItinerarioPartidaDestino> itinerarios;
     AppCompatActivity ctx;
     List<String> titulos;
+    NumberFormat nf;
 
     public TarifaSecaoAdapter(List<ItinerarioPartidaDestino> itinerarios, List<String> titulos,  AppCompatActivity context){
         this.itinerarios = itinerarios;
         ctx = context;
         this.titulos = titulos;
+
+        nf = NumberFormat.getCurrencyInstance();
+
+    }
+
+    private String formataTarifa(Double tarifa){
+        return nf.format(tarifa);
     }
 
 //    @Override
@@ -77,17 +87,30 @@ public class TarifaSecaoAdapter extends BaseExpandableListAdapter {
 
         final String expandedListText = secao.getNome();
 
-        if (convertView == null) {
-            LayoutInflater layoutInflater = (LayoutInflater) this.ctx
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.linha_tarifas_secoes, null);
-        }
+        LayoutInflater layoutInflater =
+                LayoutInflater.from(parent.getContext());
+        LinhaTarifasSecoesBinding itemBinding =
+                LinhaTarifasSecoesBinding.inflate(layoutInflater, parent, false);
 
-        TextView expandedListTextView = (TextView) convertView
-                .findViewById(R.id.textViewNome);
-        expandedListTextView.setText(expandedListText);
+        itemBinding.setSecao(secao);
 
-        return convertView;
+        return new TarifaSecaoViewHolder(itemBinding, ctx).itemView;
+
+//        if (convertView == null) {
+//            LayoutInflater layoutInflater = (LayoutInflater) this.ctx
+//                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//            convertView = layoutInflater.inflate(R.layout.linha_tarifas_secoes, null);
+//        }
+//
+//        TextView expandedListTextView = (TextView) convertView
+//                .findViewById(R.id.textViewNome);
+//        expandedListTextView.setText(expandedListText);
+//
+//        TextView textViewTarifa = (TextView) convertView
+//                .findViewById(R.id.textViewTarifaAtual);
+//        textViewTarifa.setText(formataTarifa(secao.getTarifa()));
+
+//        return convertView;
     }
 
     @Override

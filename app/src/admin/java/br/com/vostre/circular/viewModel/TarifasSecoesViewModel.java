@@ -4,12 +4,15 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Context;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 
 import java.util.List;
 
+import br.com.vostre.circular.model.HistoricoSecao;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
@@ -38,40 +41,50 @@ public class TarifasSecoesViewModel extends AndroidViewModel {
         itinerarios.postValue(null);
     }
 
-    public void editarPais(){
+    // atualizar
 
-    }
+    public void atualizar(final List<SecaoItinerario> secoes, Context context) {
 
-    // editar
-
-    public void edit(final List<ItinerarioPartidaDestino> itinerarios, Double tarifa) {
-
-        for(ItinerarioPartidaDestino i : itinerarios){
-            i.getItinerario().setTarifa(tarifa);
-            i.getItinerario().setUltimaAlteracao(DateTime.now());
-            i.getItinerario().setEnviado(false);
-            i.getItinerario().setUsuarioUltimaAlteracao(PreferenceUtils.carregarUsuarioLogado(getApplication()));
+        for(SecaoItinerario s : secoes){
+            s.setUltimaAlteracao(DateTime.now());
+            s.setEnviado(false);
+            s.setUsuarioUltimaAlteracao(PreferenceUtils.carregarUsuarioLogado(getApplication()));
         }
 
-        new editAsyncTask(appDatabase, itinerarios).execute();
+        new atualizarAsyncTask(appDatabase, secoes, context).execute();
 
     }
 
-    private static class editAsyncTask extends AsyncTask<Pais, Void, Void> {
+    private static class atualizarAsyncTask extends AsyncTask<Void, Void, Void> {
 
         private AppDatabase db;
-        private List<ItinerarioPartidaDestino> itinerarios;
+        private List<SecaoItinerario> secoes;
+        Context ctx;
 
-        editAsyncTask(AppDatabase appDatabase, List<ItinerarioPartidaDestino> itinerarios) {
+        atualizarAsyncTask(AppDatabase appDatabase, List<SecaoItinerario> secoes, Context ctx) {
             db = appDatabase;
-            this.itinerarios = itinerarios;
+            this.secoes = secoes;
+            this.ctx = ctx;
         }
 
         @Override
-        protected Void doInBackground(final Pais... params) {
+        protected Void doInBackground(final Void... params) {
 
-            for(ItinerarioPartidaDestino i : itinerarios){
-                db.itinerarioDAO().editar(i.getItinerario());
+            for(SecaoItinerario s : secoes){
+
+                HistoricoSecao hs = new HistoricoSecao();
+                hs.setSecao(s.getId());
+                hs.setTarifa(s.getTarifa());
+                hs.setAtivo(true);
+                hs.setDataCadastro(new DateTime());
+                hs.setEnviado(false);
+                hs.setUltimaAlteracao(new DateTime());
+
+                db.historicoSecaoDAO().inserir(hs);
+
+                s.setTarifa(s.getNovaTarifa());
+
+                db.secaoItinerarioDAO().editar(s);
             }
 
             return null;
@@ -80,6 +93,7 @@ public class TarifasSecoesViewModel extends AndroidViewModel {
         @Override
         protected void onPostExecute(Void aVoid) {
 //            TarifasViewModel.retorno.setValue(1);
+            Toast.makeText(ctx, "Tarifas Atualizadas!", Toast.LENGTH_SHORT).show();
         }
 
     }

@@ -16,6 +16,7 @@ import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.Feriado;
 import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.HistoricoParada;
+import br.com.vostre.circular.model.HistoricoSecao;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.Itinerario;
@@ -44,7 +45,8 @@ import br.com.vostre.circular.utils.Converters;
         Parada.class, PontoInteresse.class, Itinerario.class, ParadaItinerario.class,
         Horario.class, HorarioItinerario.class, SecaoItinerario.class, Onibus.class,
         ParametroInterno.class, ParadaSugestao.class, HistoricoParada.class, UsuarioPreferencia.class,
-        HistoricoItinerario.class, Acesso.class, PontoInteresseSugestao.class, TipoProblema.class, Problema.class, Servico.class, ViagemItinerario.class, Feriado.class},
+        HistoricoItinerario.class, Acesso.class, PontoInteresseSugestao.class, TipoProblema.class, Problema.class, Servico.class,
+        ViagemItinerario.class, Feriado.class, HistoricoSecao.class},
         version = 12)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
@@ -98,6 +100,7 @@ public abstract class AppDatabase extends RoomDatabase {
     // 2.3.0 - v12 bd = inserindo tabela para registrar viagem
     public abstract ViagemItinerarioDAO viagemItinerarioDAO();
     public abstract FeriadoDAO feriadoDAO();
+    public abstract HistoricoSecaoDAO historicoSecaoDAO();
 
     public static AppDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {
@@ -249,6 +252,9 @@ public abstract class AppDatabase extends RoomDatabase {
             database.execSQL("CREATE UNIQUE INDEX 'index_viagem_itinerario_itinerario_trajeto' ON 'viagem_itinerario' ('itinerario', 'trajeto')");
 
             database.execSQL("CREATE TABLE IF NOT EXISTS 'feriado' ('data' INTEGER NOT NULL, 'cidade' TEXT, 'tipo' INTEGER NOT NULL, 'descricao' TEXT, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'historico_secao' ('secao' TEXT NOT NULL, 'tarifa' REAL NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("CREATE UNIQUE INDEX 'index_historico_secao_secao_tarifa' ON 'historico_secao' ('secao', 'tarifa')");
         }
     };
 

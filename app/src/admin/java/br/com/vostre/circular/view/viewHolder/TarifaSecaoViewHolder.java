@@ -21,8 +21,6 @@ public class TarifaSecaoViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bind(final ItinerarioPartidaDestino itinerario) {
-        binding.setItinerario(itinerario);
-
         binding.executePendingBindings();
     }
 }

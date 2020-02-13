@@ -1,6 +1,7 @@
 package br.com.vostre.circular.model;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.support.annotation.NonNull;
 
@@ -19,6 +20,17 @@ public class SecaoItinerario extends EntidadeBase {
 
     @NonNull
     private Double tarifa;
+
+    @Ignore
+    private Double novaTarifa;
+
+    public Double getNovaTarifa() {
+        return novaTarifa;
+    }
+
+    public void setNovaTarifa(Double novaTarifa) {
+        this.novaTarifa = novaTarifa;
+    }
 
     @NonNull
     public String getItinerario() {

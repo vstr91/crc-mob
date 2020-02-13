@@ -62,6 +62,7 @@ import br.com.vostre.circular.model.EntidadeBase;
 import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.Feriado;
 import br.com.vostre.circular.model.HistoricoItinerario;
+import br.com.vostre.circular.model.HistoricoSecao;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.Itinerario;
@@ -161,6 +162,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     List<? extends EntidadeBase> viagens;
 
     List<? extends EntidadeBase> feriados;
+
+    List<? extends EntidadeBase> historicosSecoes;
 
 //    List<? extends EntidadeBase> tiposProblema;
 //    List<? extends EntidadeBase> problemas;
@@ -652,6 +655,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 JSONArray viagens = null;
                 JSONArray feriados = null;
 
+                JSONArray historicosSecoes = null;
+
                 //System.out.println("PAR_SUG: "+arrayObject.optJSONArray("paradas_sugestoes"));
 
                 if(arrayObject.optJSONArray("paradas_sugestoes") != null){
@@ -692,6 +697,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 if(arrayObject.optJSONArray("feriados") != null){
                     feriados = arrayObject.getJSONArray("feriados");
+                }
+
+                if(arrayObject.optJSONArray("historicos_secoes") != null){
+                    historicosSecoes = arrayObject.getJSONArray("historicos_secoes");
                 }
 
                 // ACESSOS
@@ -1373,6 +1382,28 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 }
 
+                // HISTORICOS SECOES
+
+                if(historicosSecoes != null && historicosSecoes.length() > 0){
+
+                    int total = historicosSecoes.length();
+                    List<HistoricoSecao> lstHistoricosSecoes = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        HistoricoSecao historicoSecao;
+                        JSONObject obj = historicosSecoes.getJSONObject(i);
+
+                        historicoSecao = (HistoricoSecao) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), HistoricoSecao.class, 1);
+                        historicoSecao.setEnviado(true);
+
+                        lstHistoricosSecoes.add(historicoSecao);
+
+                    }
+
+                    add(lstHistoricosSecoes, "historico_secao");
+
+                }
+
                 if(!admin){
 
                     AsyncTask.execute(new Runnable() {
@@ -1532,6 +1563,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             feriados = appDatabase.feriadoDAO().listarTodosAEnviar();
 
+            historicosSecoes = appDatabase.historicoSecaoDAO().listarTodosAEnviar();
+
             return null;
         }
 
@@ -1571,13 +1604,15 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             String strFeriados = "\"feriados\": "+JsonUtils.toJson((List<EntidadeBase>) feriados);
 
+            String strHistoricoSecoes = "\"historicos_secoes\": "+JsonUtils.toJson((List<EntidadeBase>) historicosSecoes);
+
             String json = "{"+strPaises+","+strEmpresas+","+strOnibus+","+strEstados+","+strCidades+","
                     +strBairros+","+strParadas+","+strItinerarios+","+strHorarios+","+strParadasItinerarios+","
                     +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
                     +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+","+strPreferencias+","+strHistoricos+","
-                    +strPontosInteresseSugestoes+","+strServicos+","+strViagens+","+strFeriados+"}";
+                    +strPontosInteresseSugestoes+","+strServicos+","+strViagens+","+strFeriados+","+strHistoricoSecoes+"}";
 
-             System.out.println("JSON: "+strFeriados);
+             System.out.println("JSON: "+strHistoricoSecoes);
 
             //System.out.println("POI ENV: "+strPontosInteresse);
             //System.out.println("POIS ENV: "+strPontosInteresseSugestoes);
@@ -1602,7 +1637,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     +bairros.size()+paradas.size()+itinerarios.size()+horarios.size()+paradasItinerario.size()
                     +secoesItinerarios.size()+horariosItinerarios.size()+mensagens.size()+parametros.size()+pontosInteresse.size()
                     +usuarios.size()+paradaSugestoes.size()+preferencias.size()+historicos.size()+pontosInteresseSugestoes.size()
-                    +servicos.size()+viagens.size()+feriados.size();
+                    +servicos.size()+viagens.size()+feriados.size()+secoesItinerarios.size();
 
             if(registros > 0){
                 chamaAPI(registros, json, 0, baseUrl, token);
@@ -2501,6 +2536,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     break;
                 case "feriado":
                     db.feriadoDAO().inserirTodos((List<Feriado>) params[0]);
+                    break;
+                case "historico_secao":
+                    db.historicoSecaoDAO().inserirTodos((List<HistoricoSecao>) params[0]);
                     break;
             }
 

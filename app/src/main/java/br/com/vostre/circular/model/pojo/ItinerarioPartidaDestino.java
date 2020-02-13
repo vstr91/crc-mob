@@ -507,7 +507,14 @@ public class ItinerarioPartidaDestino {
     }
 
     public String getNomeCompleto(){
-        return getNomeBairroPartida()+" ("+getNomeCidadePartida()+") x "+getNomeBairroDestino()+" ("+getNomeCidadeDestino()+")";
+
+        if(getItinerario().getObservacao() != null && !getItinerario().getObservacao().isEmpty() && !getItinerario().getObservacao().trim().equals("")){
+            return getNomeBairroPartida()+" ("+getNomeCidadePartida()+") x "+getNomeBairroDestino()+" ("+getNomeCidadeDestino()+") - "+getItinerario().getObservacao();
+        } else{
+            return getNomeBairroPartida()+" ("+getNomeCidadePartida()+") x "+getNomeBairroDestino()+" ("+getNomeCidadeDestino()+")";
+        }
+
+
     }
 
     @Override

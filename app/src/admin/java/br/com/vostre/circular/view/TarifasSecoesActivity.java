@@ -2,19 +2,25 @@ package br.com.vostre.circular.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.databinding.InverseBindingAdapter;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityTarifasBinding;
 import br.com.vostre.circular.databinding.ActivityTarifasSecoesBinding;
+import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.view.adapter.ItinerarioTarifaAdapter;
 import br.com.vostre.circular.view.adapter.TarifaSecaoAdapter;
@@ -119,15 +125,21 @@ public class TarifasSecoesActivity extends BaseActivity {
     public void onBtnSalvarClick(View v){
 
         itinerarios = viewModel.itinerarios.getValue();
-        List<ItinerarioPartidaDestino> itis = new ArrayList<>();
+        List<SecaoItinerario> secoes = new ArrayList<>();
 
         for(ItinerarioPartidaDestino i : itinerarios){
 
-            if(i.isSelecionado()){
-                itis.add(i);
+            for(SecaoItinerario s : i.getSecoes()){
+
+                if(s.getNovaTarifa() != null && s.getNovaTarifa() != s.getTarifa()){
+                    secoes.add(s);
+                }
+
             }
 
         }
+
+        viewModel.atualizar(secoes, getApplicationContext());
 
 //        if(itis.size() > 0 || !binding.editTextTarifa.getText().toString().isEmpty()){
 //            Double tarifa = Double.parseDouble(binding.editTextTarifa.getText().toString().replace(".", "").replace(",", "."));
@@ -146,6 +158,38 @@ public class TarifasSecoesActivity extends BaseActivity {
 //        } else{
 //            Toast.makeText(getApplicationContext(), "Ao menos um itinerário deve ser selecionado e a tarifa deve ser informada.", Toast.LENGTH_SHORT).show();
 //        }
+
+
+    }
+
+    @BindingAdapter("android:text")
+    public static void setText(EditText view, Double valor) {
+        NumberFormat nf = NumberFormat.getCurrencyInstance();
+
+        if(valor != null){
+            view.setText(nf.format(valor));
+        }
+
+    }
+
+    @InverseBindingAdapter(attribute = "android:text")
+    public static Double getText(TextView view) {
+
+        if(view.getText().toString().equals("null") || view.getText().toString().equals("")){
+            return 0.0;
+        } else{
+
+            try{
+                String valor = view.getText().toString();
+                valor = valor.replace(".", "");
+                valor = valor.replace(",", ".");
+                Double d = Double.parseDouble(valor);
+                return d;
+            } catch(NumberFormatException e){
+                return 0.0;
+            }
+
+        }
 
 
     }

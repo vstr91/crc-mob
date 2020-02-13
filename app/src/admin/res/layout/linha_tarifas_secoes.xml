@@ -5,9 +5,6 @@
         <variable
             name="secao"
             type="br.com.vostre.circular.model.SecaoItinerario" />
-        <variable
-            name="itinerario"
-            type="br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -24,7 +21,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             app:cardCornerRadius="10dp"
-            android:background="@color/azul"
+            android:backgroundTint="@color/azul"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -36,35 +33,41 @@
                 <EditText
                     android:id="@+id/editTextTarifa"
                     android:layout_width="0dp"
-                    android:layout_height="0dp"
+                    android:layout_height="wrap_content"
                     android:ems="10"
-                    android:inputType="numberDecimal"
+                    android:digits="0123456789,."
+                    android:inputType="numberDecimal|number"
+                    android:textColor="@color/branco"
+                    android:text="@={secao.novaTarifa}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/textViewTarifaAtual"
+                    app:layout_constraintStart_toStartOf="@+id/guideline11"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/textViewNome"
                     style="@style/texto_lista"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:padding="10dp"
                     android:text="@{secao.nome}"
+                    android:textColor="@color/branco"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/guideline10"
                     app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/textViewTarifaAtual"
-                    android:layout_width="80dp"
-                    android:layout_height="0dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
                     android:gravity="center|center_horizontal"
                     android:text="@{secao.tarifa}"
-                    android:textColor="@color/cinzaMedio"
+                    android:textColor="@color/branco"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline11"
                     app:layout_constraintStart_toStartOf="@+id/guideline10"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -74,6 +77,13 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     app:layout_constraintGuide_begin="183dp" />
+
+                <android.support.constraint.Guideline
+                    android:id="@+id/guideline11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_begin="240dp" />
 
             </android.support.constraint.ConstraintLayout>
 

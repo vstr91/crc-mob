@@ -147,7 +147,18 @@ public class ItinerarioPartidaDestino {
     public boolean trechoIsolado = false;
 
     @Ignore
+    public Double novaTarifa;
+
+    @Ignore
     public List<SecaoItinerario> secoes;
+
+    public Double getNovaTarifa() {
+        return novaTarifa;
+    }
+
+    public void setNovaTarifa(Double novaTarifa) {
+        this.novaTarifa = novaTarifa;
+    }
 
     public List<SecaoItinerario> getSecoes() {
         return secoes;

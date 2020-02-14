@@ -13,14 +13,14 @@ import org.joda.time.DateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.HistoricoSecao;
-import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.utils.PreferenceUtils;
 
-public class TarifasSecoesViewModel extends AndroidViewModel {
+public class TarifasItinerariosViewModel extends AndroidViewModel {
 
     private AppDatabase appDatabase;
 
@@ -34,7 +34,7 @@ public class TarifasSecoesViewModel extends AndroidViewModel {
         this.itinerarios = itinerarios;
     }
 
-    public TarifasSecoesViewModel(Application app){
+    public TarifasItinerariosViewModel(Application app){
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
 
@@ -44,48 +44,48 @@ public class TarifasSecoesViewModel extends AndroidViewModel {
 
     // atualizar
 
-    public void atualizar(final List<SecaoItinerario> secoes, Context context) {
+    public void atualizar(final List<ItinerarioPartidaDestino> itinerarios, Context context) {
 
-        for(SecaoItinerario s : secoes){
-            s.setUltimaAlteracao(DateTime.now());
-            s.setEnviado(false);
-            s.setUsuarioUltimaAlteracao(PreferenceUtils.carregarUsuarioLogado(getApplication()));
+        for(ItinerarioPartidaDestino i : itinerarios){
+            i.getItinerario().setUltimaAlteracao(DateTime.now());
+            i.getItinerario().setEnviado(false);
+            i.getItinerario().setUsuarioUltimaAlteracao(PreferenceUtils.carregarUsuarioLogado(getApplication()));
         }
 
-        new atualizarAsyncTask(appDatabase, secoes, context).execute();
+        new atualizarAsyncTask(appDatabase, itinerarios, context).execute();
 
     }
 
     private static class atualizarAsyncTask extends AsyncTask<Void, Void, Void> {
 
         private AppDatabase db;
-        private List<SecaoItinerario> secoes;
+        private List<ItinerarioPartidaDestino> itinerarios;
         Context ctx;
 
-        atualizarAsyncTask(AppDatabase appDatabase, List<SecaoItinerario> secoes, Context ctx) {
+        atualizarAsyncTask(AppDatabase appDatabase, List<ItinerarioPartidaDestino> itinerarios, Context ctx) {
             db = appDatabase;
-            this.secoes = secoes;
+            this.itinerarios = itinerarios;
             this.ctx = ctx;
         }
 
         @Override
         protected Void doInBackground(final Void... params) {
 
-            for(SecaoItinerario s : secoes){
+            for(ItinerarioPartidaDestino i : itinerarios){
 
-                HistoricoSecao hs = new HistoricoSecao();
-                hs.setSecao(s.getId());
-                hs.setTarifa(s.getTarifa());
-                hs.setAtivo(true);
-                hs.setDataCadastro(new DateTime());
-                hs.setEnviado(false);
-                hs.setUltimaAlteracao(new DateTime());
+                HistoricoItinerario hi = new HistoricoItinerario();
+                hi.setItinerario(i.getItinerario().getId());
+                hi.setTarifa(i.getItinerario().getTarifa());
+                hi.setAtivo(true);
+                hi.setDataCadastro(new DateTime());
+                hi.setEnviado(false);
+                hi.setUltimaAlteracao(new DateTime());
 
-                db.historicoSecaoDAO().inserir(hs);
+                db.historicoItinerarioDAO().inserir(hi);
 
-                s.setTarifa(s.getNovaTarifa());
+                i.getItinerario().setTarifa(i.getNovaTarifa());
 
-                db.secaoItinerarioDAO().editar(s);
+                db.itinerarioDAO().editar(i.getItinerario());
             }
 
             return null;
@@ -94,7 +94,7 @@ public class TarifasSecoesViewModel extends AndroidViewModel {
         @Override
         protected void onPostExecute(Void aVoid) {
 //            TarifasViewModel.retorno.setValue(1);
-            Toast.makeText(ctx, "Tarifas Atualizadas!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx, "Itinerarios Atualizados!", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -119,19 +119,8 @@ public class TarifasSecoesViewModel extends AndroidViewModel {
         protected Void doInBackground(final Void... params) {
 
             itis = db.itinerarioDAO().listarTodosAtivosSimplificadoSync();
-            List<ItinerarioPartidaDestino> comSecoes = new ArrayList<>();
 
-            for(ItinerarioPartidaDestino i : itis){
-                List<SecaoItinerario> secoes = db.secaoItinerarioDAO().listarTodosPorItinerarioSync(i.getItinerario().getId());
-
-                if(secoes != null && secoes.size() > 0){
-                    i.setSecoes(secoes);
-                    comSecoes.add(i);
-                }
-
-            }
-
-            itinerarios.postValue(comSecoes);
+            itinerarios.postValue(itis);
 
             return null;
         }

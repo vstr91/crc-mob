@@ -1274,19 +1274,19 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         }
 
-        if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_incidente")){
-
-            if(menu != null){
-                targets.add(DestaqueUtils.geraTapTarget(menu.getItem(1).getActionView().findViewById(R.id.imageButtonIncidente), "Alerta de Incidentes!",
-                        "O ônibus quebrou, atrasou ou não fez o horário previsto? Ajude os outros usuários a ficarem informados! " +
-                                "Basta pressionar aqui e cadastrar o incidente!",
-                        false, false, 3));
-
-                PreferenceUtils.salvarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_incidente", true);
-            }
-
-
-        }
+//        if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_incidente")){
+//
+//            if(menu != null){
+//                targets.add(DestaqueUtils.geraTapTarget(menu.getItem(1).getActionView().findViewById(R.id.imageButtonIncidente), "Alerta de Incidentes!",
+//                        "O ônibus quebrou, atrasou ou não fez o horário previsto? Ajude os outros usuários a ficarem informados! " +
+//                                "Basta pressionar aqui e cadastrar o incidente!",
+//                        false, false, 3));
+//
+//                PreferenceUtils.salvarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_incidente", true);
+//            }
+//
+//
+//        }
 
         return targets;
     }

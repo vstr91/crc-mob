@@ -347,6 +347,25 @@ public interface ItinerarioDAO {
             "WHERE i.ativo = 1")
     List<ItinerarioPartidaDestino> listarTodosAtivosSync();
 
+    @Query("SELECT DISTINCT i.*, " +
+            "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'bairroPartida', " +
+            "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'bairroDestino'," +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1" +
+            ") AS 'cidadePartida', " +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1" +
+            ") AS 'cidadeDestino', 1 AS 'flagTrecho' " +
+            "FROM parada_itinerario pit INNER JOIN itinerario i ON i.id = pit.itinerario " +
+            "WHERE i.ativo = 1 ORDER BY cidadePartida, bairroPartida, cidadeDestino, bairroDestino")
+    List<ItinerarioPartidaDestino> listarTodosAtivosSimplificadoSync();
+
     @Query("SELECT i.*, b.id AS 'idBairroPartida', p.id AS 'idPartida', p.nome AS 'nomePartida', b.nome AS 'bairroPartida', c.nome AS 'cidadePartida', " +
             "b2.id AS 'idBairroDestino', p2.id AS 'idDestino', p2.nome AS 'nomeDestino', b2.nome AS 'bairroDestino', " +
             "c2.nome AS 'cidadeDestino', 1 AS 'flagTrecho' " +

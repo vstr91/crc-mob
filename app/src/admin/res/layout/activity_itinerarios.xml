@@ -21,13 +21,11 @@
             style="@style/botao_branco"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:onClick="@{view::onClickTarifas}"
             android:padding="5dp"
             android:text="Alterar Tarifas em Massa"
-            app:layout_constraintEnd_toStartOf="@+id/btnTarifasSecoes"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
@@ -37,14 +35,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="16dp"
             android:onClick="@{view::onClickTarifasSecoes}"
             android:padding="5dp"
             android:text="Alterar Tarifas Por Seção"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/btnTarifas"
             app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+        <Button
+            android:id="@+id/btnTarifasItinerarios"
+            style="@style/botao_branco"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:onClick="@{view::onClickTarifasItinerarios}"
+            android:padding="5dp"
+            android:text="Alterar Tarifas Por Itinerário"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnTarifas" />
 
         <Button
             android:id="@+id/btnOcultarMapa"
@@ -52,10 +61,8 @@
             android:layout_width="wrap_content"
             android:layout_height="20dp"
             android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
             android:onClick="@{view::ocultarMapa}"
             android:padding="0dp"
             android:text="Ocultar/Exibir Mapa"
@@ -64,7 +71,7 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnTarifas" />
+            app:layout_constraintTop_toBottomOf="@+id/btnTarifasItinerarios" />
 
         <ScrollView
             android:id="@+id/scrollView2"

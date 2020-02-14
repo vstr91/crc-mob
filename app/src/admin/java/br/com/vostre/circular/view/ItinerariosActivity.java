@@ -305,6 +305,11 @@ public class ItinerariosActivity extends BaseActivity {
         startActivity(i);
     }
 
+    public void onClickTarifasItinerarios(View v){
+        Intent i = new Intent(getApplicationContext(), TarifasItinerariosActivity.class);
+        startActivity(i);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();

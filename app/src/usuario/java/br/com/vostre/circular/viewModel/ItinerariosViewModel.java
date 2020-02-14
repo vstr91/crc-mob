@@ -430,7 +430,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                     for(ItinerarioPartidaDestino i : itinerarios){
 
                         if(i.isFlagTrecho()){
-                            builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(i.getItinerario().getDistancia());
+                            builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(i.getDistanciaTrecho());
                         } else{
 
                             if(i.getItinerario().getDistancia() <= 10){

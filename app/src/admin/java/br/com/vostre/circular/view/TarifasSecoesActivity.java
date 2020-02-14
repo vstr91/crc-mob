@@ -15,7 +15,9 @@ import android.widget.Toast;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
+import java.util.Locale;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityTarifasBinding;
@@ -181,6 +183,7 @@ public class TarifasSecoesActivity extends BaseActivity {
 
             try{
                 String valor = view.getText().toString();
+                valor = valor.replace(Currency.getInstance(Locale.getDefault()).getCurrencyCode(), "");
                 valor = valor.replace(".", "");
                 valor = valor.replace(",", ".");
                 Double d = Double.parseDouble(valor);

@@ -102,8 +102,6 @@ public class TarifasItinerariosActivity extends BaseActivity {
     public static void setText(EditText view, Double valor) {
         NumberFormat nf = NumberFormat.getCurrencyInstance();
 
-        System.out.println("CURR: "+Currency.getInstance(Locale.getDefault()).getSymbol());
-
         if(valor != null){
             view.setText(nf.format(valor));
         } else{

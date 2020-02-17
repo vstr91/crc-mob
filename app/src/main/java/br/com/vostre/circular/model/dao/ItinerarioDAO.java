@@ -342,10 +342,37 @@ public interface ItinerarioDAO {
             "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
             "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
             "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1" +
-            ") AS 'cidadeDestino', 1 AS 'flagTrecho' " +
+            ") AS 'cidadeDestino', 0 AS 'flagTrecho' " +
             "FROM parada_itinerario pit INNER JOIN itinerario i ON i.id = pit.itinerario " +
             "WHERE i.ativo = 1")
     List<ItinerarioPartidaDestino> listarTodosAtivosSync();
+
+    @Query("SELECT DISTINCT i.*, " +
+            "(SELECT pp.bairro FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'idBairroPartida', " +
+            "/*(SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'nomePartida',*/ " +
+            "(SELECT pp.bairro FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'idBairroDestino'," +
+            "/*(SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'nomeDestino'," +
+            "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'bairroPartida', " +
+            "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'bairroDestino'," +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1" +
+            ") AS 'cidadePartida', " +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1" +
+            ") AS 'cidadeDestino',*/ 0 AS 'flagTrecho' " +
+            "FROM parada_itinerario pit INNER JOIN itinerario i ON i.id = pit.itinerario " +
+            "WHERE i.ativo = 1")
+    List<ItinerarioPartidaDestino> listarTodosAtivosGraphSync();
 
     @Query("SELECT DISTINCT i.*, " +
             "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
@@ -368,7 +395,7 @@ public interface ItinerarioDAO {
 
     @Query("SELECT i.*, b.id AS 'idBairroPartida', p.id AS 'idPartida', p.nome AS 'nomePartida', b.nome AS 'bairroPartida', c.nome AS 'cidadePartida', " +
             "b2.id AS 'idBairroDestino', p2.id AS 'idDestino', p2.nome AS 'nomeDestino', b2.nome AS 'bairroDestino', " +
-            "c2.nome AS 'cidadeDestino', 1 AS 'flagTrecho' " +
+            "c2.nome AS 'cidadeDestino', 1 AS 'flagTrecho', pi.distanciaSeguinte " +
             "FROM itinerario i INNER JOIN parada_itinerario pi ON pi.itinerario = i.id INNER JOIN parada p ON p.id = pi.parada INNER JOIN " +
             "bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade " +
             "INNER JOIN parada_itinerario pi2 ON pi2.itinerario = i.id INNER JOIN parada p2 ON p2.id = pi2.parada INNER JOIN bairro b2 ON b2.id = p2.bairro INNER JOIN cidade c2 ON c2.id = b2.cidade " +
@@ -378,6 +405,34 @@ public interface ItinerarioDAO {
             "AND pi2.ativo = 1 " +
             "ORDER BY i.id, pi.ordem, pi2.ordem")
     List<ItinerarioPartidaDestino> listarTodosAtivosTesteSync();
+
+    @Query("SELECT i.*, bp.id AS 'idBairroPartida', pp.id AS 'idPartida', /*pp.nome AS 'nomePartida', bp.nome AS 'bairroPartida', c.nome AS 'cidadePartida', pi.ordem,*/" +
+            "(" +
+            "SELECT b2.id FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada INNER JOIN bairro b2 ON b2.id = p2.bairro WHERE pi2.itinerario = i.id AND pi2.ordem = pi.ordem + 1" +
+            ") AS 'idBairroDestino'," +
+            "(" +
+            "SELECT p2.id FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada WHERE pi2.itinerario = i.id AND pi2.ordem = pi.ordem + 1" +
+            ") AS 'idDestino'," +
+            "/*(" +
+            "SELECT p2.nome FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada WHERE pi2.itinerario = i.id AND pi2.ordem = pi.ordem + 1" +
+            ") AS 'nomeDestino'," +
+            "(" +
+            "SELECT b2.nome FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada INNER JOIN bairro b2 ON b2.id = p2.bairro WHERE pi2.itinerario = i.id AND pi2.ordem = pi.ordem + 1" +
+            ") AS 'bairroDestino'," +
+            "(" +
+            "SELECT c2.nome FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada INNER JOIN " +
+            "bairro b2 ON b2.id = p2.bairro INNER JOIN cidade c2 ON c2.id = b2.cidade WHERE pi2.itinerario = i.id AND pi2.ordem = pi.ordem + 1" +
+            ") AS 'cidadeDestino',*/ " +
+            "1 AS 'flagTrecho', pi.distanciaSeguinte AS 'distanciaTrecho' " +
+            "FROM parada_itinerario pi INNER JOIN " +
+            "     itinerario i ON i.id = pi.itinerario INNER JOIN" +
+            "     parada pp ON pp.id = pi.parada INNER JOIN" +
+            "     bairro bp ON bp.id = pp.bairro INNER JOIN" +
+            "     cidade c ON c.id = bp.cidade " +
+            "WHERE pi.ativo = 1 " +
+            "AND idDestino IS NOT NULL " +
+            "ORDER BY i.id, pi.ordem")
+    List<ItinerarioPartidaDestino> listarTodosAtivosTesteNovoSync();
 
     // QUERY ANTIGA
 //    @Query("SELECT i.*, " +

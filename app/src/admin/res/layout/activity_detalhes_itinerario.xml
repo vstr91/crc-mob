@@ -224,7 +224,7 @@
                                 android:layout_height="20dp"
                                 android:layout_weight="1"
                                 android:gravity="center"
-                                app:text="@{viewModel.iti.itinerario.distancia}" />
+                                app:distancia="@{viewModel.iti.itinerario.distancia}" />
                         </LinearLayout>
 
                     </LinearLayout>

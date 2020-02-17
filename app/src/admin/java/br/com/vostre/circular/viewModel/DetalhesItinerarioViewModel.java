@@ -185,14 +185,14 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
                                 String distancia = objDados.getString("distance");
                                 int tempo = objDados.getInt("duration");
 
-                                Double distanciaKm = Double.parseDouble(distancia) / 1000;
+                                Double distanciaMetros = Double.parseDouble(distancia);
                                 String tempoFormatado = DataHoraUtils.segundosParaHoraFormatado(tempo);
 
-                                long distKm = (long) distanciaKm.doubleValue();
+                                long distMetros = (long) distanciaMetros.doubleValue();
 
-                                if(distKm > 0){
+                                if(distMetros > 0){
                                     finalParadaAnterior.getParadaItinerario()
-                                            .setDistanciaSeguinte(Double.parseDouble(String.valueOf(distKm)));
+                                            .setDistanciaSeguinte(Double.parseDouble(String.valueOf(distMetros)));
                                 }
 
                                 if(tempoFormatado != null){
@@ -485,14 +485,14 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
                             tempo += umMinuto * (tempo % 5);
                         }
 
-                        Double distanciaKm = Double.parseDouble(distancia) / 1000;
+                        Double distanciaMetros = Double.parseDouble(distancia);
                         String tempoFormatado = DataHoraUtils.segundosParaHoraFormatado(tempo);
 
-                        long distKm = (long) distanciaKm.doubleValue();
+                        long distMetros = (long) distanciaMetros.doubleValue();
 
-                        if(distKm > 0){
+                        if(distMetros > 0){
                             itinerario.getValue().getItinerario()
-                                    .setDistancia(Double.parseDouble(String.valueOf(distKm)));
+                                    .setDistancia(Double.parseDouble(String.valueOf(distMetros)));
                         }
 
                         if(tempoFormatado != null){

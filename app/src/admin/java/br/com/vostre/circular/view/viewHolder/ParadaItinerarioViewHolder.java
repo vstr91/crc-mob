@@ -28,6 +28,7 @@ public class ParadaItinerarioViewHolder extends RecyclerView.ViewHolder {
     AndroidViewModel viewModel;
     public Boolean edicaoItinerario = false;
     DateTimeFormatter nfTempo;
+    NumberFormat nf;
 
     public ParadaItinerarioViewHolder(LinhaParadasItinerariosBinding binding, AppCompatActivity context,
                                       @Nullable Boolean edicaoItinerario) {
@@ -43,6 +44,8 @@ public class ParadaItinerarioViewHolder extends RecyclerView.ViewHolder {
         }
 
         nfTempo = DateTimeFormat.forPattern("HH:mm:ss");
+        nf = NumberFormat.getNumberInstance();
+        nf.setMaximumFractionDigits(2);
 
     }
 
@@ -74,8 +77,7 @@ public class ParadaItinerarioViewHolder extends RecyclerView.ViewHolder {
             binding.textViewDistancia.setText("-");
         } else{
             try{
-                String valor = String.valueOf(parada.getParadaItinerario().getDistanciaSeguinte()).replace(".", ",");
-                binding.textViewDistancia.setText(valor+" Km");
+                binding.textViewDistancia.setText(nf.format(parada.getParadaItinerario().getDistanciaSeguinte()/1000)+" Km");
             } catch(NumberFormatException e){
                 binding.textViewDistancia.setText("0 Km");
             }

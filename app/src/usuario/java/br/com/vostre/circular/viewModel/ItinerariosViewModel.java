@@ -423,21 +423,28 @@ public class ItinerariosViewModel extends AndroidViewModel {
                     // NAO ENCONTROU ITINERARIO DIRETO. BUSCANDO ITINERARIOS CONECTADOS QUE LEVEM AO DESTINO SELECIONADO
                     GraphBuilder<String, Double> builder = GraphBuilder.create();
 
-                    itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosTesteSync();
+                    itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosTesteNovoSync();
 //                itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosSync();
-                    //itinerarios.addAll(appDatabase.itinerarioDAO().listarTodosAtivosSync());
+//                    itinerarios.addAll(appDatabase.itinerarioDAO().listarTodosAtivosGraphSync());
 
                     for(ItinerarioPartidaDestino i : itinerarios){
 
                         if(i.isFlagTrecho()){
-                            builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(i.getDistanciaTrecho());
+
+                            if(i.getDistanciaTrecho() != null){
+                                builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(i.getDistanciaTrecho()+i.getDistanciaTrecho()*.5);
+                            } else{
+                                builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(i.getDistanciaTrecho());
+                            }
+
+
                         } else{
 
                             if(i.getItinerario().getDistancia() <= 10){
                                 builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(1d);
                             } else{
                                 builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino())
-                                        .withEdge((i.getItinerario().getDistancia()-10));
+                                        .withEdge((i.getItinerario().getDistancia()-i.getItinerario().getDistancia()/2));
                             }
 
                         }
@@ -467,7 +474,8 @@ public class ItinerariosViewModel extends AndroidViewModel {
                         BairroCidade partida = appDatabase.bairroDAO().carregarSync(g.getVertex1());
                         BairroCidade destino = appDatabase.bairroDAO().carregarSync(g.getVertex2());
 
-                        if((partida.getNomeCidade().equals("Barra do Piraí") && destino.getNomeCidade().equals("Volta Redonda")) ||
+                        if((partida.getNomeCidade().equals("Barra do Piraí") && destino.getNomeCidade().equals("Barra do Pirai")) ||
+                                (partida.getNomeCidade().equals("Barra do Piraí") && destino.getNomeCidade().equals("Volta Redonda")) ||
                                 (partida.getNomeCidade().equals("Barra do Piraí") && destino.getNomeCidade().equals("Barra Mansa")) ||
                                 (partida.getNomeCidade().equals("Volta Redonda") && destino.getNomeCidade().equals("Barra Mansa")) ||
                                 (partida.getNomeCidade().equals("Volta Redonda") && destino.getNomeCidade().equals("Resende")) ||

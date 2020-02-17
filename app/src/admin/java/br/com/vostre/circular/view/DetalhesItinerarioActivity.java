@@ -480,16 +480,19 @@ public class DetalhesItinerarioActivity extends BaseActivity {
 
     }
 
-    @BindingAdapter("text")
+    @BindingAdapter("app:distancia")
     public static void setText(TextView view, Double value) {
+
+        NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setMaximumFractionDigits(1);
 
         if(value == null){
             view.setText("0 Km");
         } else{
 
             try{
-                String valor = String.valueOf(value).replace(".", ",");
-                view.setText(valor+" Km");
+                String distancia = nf.format(value/1000)+" Km";
+                view.setText(distancia);
             } catch(NumberFormatException e){
                 view.setText("0 Km");
             }

@@ -10,6 +10,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -26,11 +27,15 @@ import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
+import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.Feriado;
 import br.com.vostre.circular.model.Horario;
@@ -46,6 +51,7 @@ import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 import br.com.vostre.circular.utils.DataHoraUtils;
+import br.com.vostre.circular.utils.StringUtils;
 import br.com.vostre.circular.view.listener.FeriadoListener;
 import es.usc.citius.hipster.algorithm.Algorithm;
 import es.usc.citius.hipster.algorithm.Hipster;
@@ -427,27 +433,94 @@ public class ItinerariosViewModel extends AndroidViewModel {
 //                itinerarios = appDatabase.itinerarioDAO().listarTodosAtivosSync();
 //                    itinerarios.addAll(appDatabase.itinerarioDAO().listarTodosAtivosGraphSync());
 
+                    Collections.sort(itinerarios, new Comparator<ItinerarioPartidaDestino>() {
+                        @Override
+                        public int compare(ItinerarioPartidaDestino itinerarioPartidaDestino, ItinerarioPartidaDestino t1) {
+
+                            if(itinerarioPartidaDestino.isFlagTrecho() && (itinerarioPartidaDestino.getDistanciaTrecho() != null && t1.getDistanciaTrecho() != null)){
+                                return itinerarioPartidaDestino.getDistanciaTrecho().compareTo(t1.getDistanciaTrecho());
+                            } else{
+                                return itinerarioPartidaDestino.getItinerario().getDistancia().compareTo(t1.getItinerario().getDistancia());
+                            }
+
+                        }
+                    });
+
+                    List<Bairro> bairros = appDatabase.bairroDAO().listarTodosSync();
+
+                    String nodesDebug = "";
+                    String graphDebug = "";
+                    int in = 100;
+                    int ib = 100;
+
+                    for(Bairro b : bairros){
+                        nodesDebug = nodesDebug.concat("<node positionX=\""+ib+"\" positionY=\""+(ib+50)+"\" id=\""
+                                +b.getId()+"\" mainText=\""+ StringUtils.toSlug(b.getNome())+"\" upText=\"\"></node>");
+                        ib = ib+50;
+                    }
+
+                    String lines = "";
+
                     for(ItinerarioPartidaDestino i : itinerarios){
+
+                        BairroCidade partida = appDatabase.bairroDAO().carregarSync(i.getIdBairroPartida());
+                        BairroCidade destino = appDatabase.bairroDAO().carregarSync(i.getIdBairroDestino());
 
                         if(i.isFlagTrecho()){
 
                             if(i.getDistanciaTrecho() != null){
-                                builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(i.getDistanciaTrecho()+i.getDistanciaTrecho()*.5);
+                                builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(i.getDistanciaTrecho()+50000);
+
+                                graphDebug = graphDebug.concat("<edge vertex1=\""+i.getIdBairroPartida()+"\" vertex2=\""+i.getIdBairroDestino()+"\" isDirect=\"true\" weight=\""
+                                        +(i.getDistanciaTrecho()+50000)+"\" useWeight=\"true\" id=\""+i.getIdBairroPartida()+i.getIdBairroDestino()
+                                        +"\" text=\"\" arrayStyleStart=\"\" arrayStyleFinish=\"\" model_width=\"4\" model_type=\"0\" model_curvedValue=\"0.1\"></edge>");
+
+
+
+                                lines = lines.concat(partida.getBairro().getId()+";"+partida.getBairro().getNome()+";"+partida.getNomeCidade()+";"
+                                        +destino.getBairro().getId()+";"+destino.getBairro().getNome()+";"+destino.getNomeCidade()+";"+(i.getDistanciaTrecho()+5000)+System.lineSeparator());
+
                             } else{
-                                builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(i.getDistanciaTrecho());
+                                builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(100000d);
+
+                                graphDebug = graphDebug.concat("<edge vertex1=\""+i.getIdBairroPartida()+"\" vertex2=\""+i.getIdBairroDestino()+"\" isDirect=\"true\" weight=\""
+                                        +100000+"\" useWeight=\"true\" id=\""+i.getIdBairroPartida()+i.getIdBairroDestino()
+                                        +"\" text=\"\" arrayStyleStart=\"\" arrayStyleFinish=\"\" model_width=\"4\" model_type=\"0\" model_curvedValue=\"0.1\"></edge>");
+
+                                lines = lines.concat(partida.getBairro().getId()+";"+partida.getBairro().getNome()+";"+partida.getNomeCidade()+";"
+                                        +destino.getBairro().getId()+";"+destino.getBairro().getNome()+";"+destino.getNomeCidade()+";"+100000+System.lineSeparator());
+
                             }
 
 
                         } else{
 
-                            if(i.getItinerario().getDistancia() <= 10){
+                            if(i.getItinerario().getDistancia() <= 50000){
                                 builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(1d);
+
+                                graphDebug = graphDebug.concat("<edge vertex1=\""+i.getIdBairroPartida()+"\" vertex2=\""+i.getIdBairroDestino()+"\" isDirect=\"true\" weight=\""
+                                        +1+"\" useWeight=\"true\" id=\""+i.getIdBairroPartida()+i.getIdBairroDestino()
+                                        +"\" text=\"\" arrayStyleStart=\"\" arrayStyleFinish=\"\" model_width=\"4\" model_type=\"0\" model_curvedValue=\"0.1\"></edge>");
+
+                                lines = lines.concat(partida.getBairro().getId()+";"+partida.getBairro().getNome()+";"+partida.getNomeCidade()+";"
+                                        +destino.getBairro().getId()+";"+destino.getBairro().getNome()+";"+destino.getNomeCidade()+";"+1+System.lineSeparator());
+
                             } else{
                                 builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino())
-                                        .withEdge((i.getItinerario().getDistancia()-i.getItinerario().getDistancia()/2));
+                                        .withEdge((i.getItinerario().getDistancia()-50000));
+
+                                graphDebug = graphDebug.concat("<edge vertex1=\""+i.getIdBairroPartida()+"\" vertex2=\""+i.getIdBairroDestino()+"\" isDirect=\"true\" weight=\""
+                                        +(i.getItinerario().getDistancia()-50000)+"\" useWeight=\"true\" id=\""+i.getIdBairroPartida()+i.getIdBairroDestino()
+                                        +"\" text=\"\" arrayStyleStart=\"\" arrayStyleFinish=\"\" model_width=\"4\" model_type=\"0\" model_curvedValue=\"0.1\"></edge>");
+
+                                lines = lines.concat(partida.getBairro().getId()+";"+partida.getBairro().getNome()+";"+partida.getNomeCidade()+";"
+                                        +destino.getBairro().getId()+";"+destino.getBairro().getNome()+";"+destino.getNomeCidade()+";"+(i.getItinerario().getDistancia()-50000)+System.lineSeparator());
+
                             }
 
                         }
+
+                        in = in + 50;
 
 
                     }
@@ -462,14 +535,24 @@ public class ItinerariosViewModel extends AndroidViewModel {
                             .takeCostsFromEdges()
                             .build();
 
-                    Algorithm.SearchResult result = Hipster.createDijkstra(p).search(myDestino.getBairro().getId());
+                    Algorithm.SearchResult result = Hipster.createAStar(p).search(myDestino.getBairro().getId());
 
                     //System.out.println("RES: "+result);
 
                     // DEBUG GRAPH
 
+                    List<List> paths = result.getOptimalPaths();
+
+                    for(List a : paths){
+
+                        for(Object b : a){
+
+                        }
+
+                    }
+
                     for(GraphEdge<String, Double> g : graph.edges()){
-                        System.out.println("VERTEX: "+g.getVertex1()+" | "+g.getVertex2()+": "+g.getEdgeValue()+" || "+g.getType().name());
+                        Log.d("AA", g.getVertex1() + ";" + g.getVertex2() + ";" + g.getEdgeValue() + ";" + g.getType().name());
 
                         BairroCidade partida = appDatabase.bairroDAO().carregarSync(g.getVertex1());
                         BairroCidade destino = appDatabase.bairroDAO().carregarSync(g.getVertex2());

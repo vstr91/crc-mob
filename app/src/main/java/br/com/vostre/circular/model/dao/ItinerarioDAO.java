@@ -406,32 +406,46 @@ public interface ItinerarioDAO {
             "ORDER BY i.id, pi.ordem, pi2.ordem")
     List<ItinerarioPartidaDestino> listarTodosAtivosTesteSync();
 
-    @Query("SELECT i.*, bp.id AS 'idBairroPartida', pp.id AS 'idPartida', /*pp.nome AS 'nomePartida', bp.nome AS 'bairroPartida', c.nome AS 'cidadePartida', pi.ordem,*/" +
+    @Query("SELECT i.*, " +
+            "bp.id AS 'idBairroPartida', pp.id AS 'idPartida', pp.nome AS 'nomePartida', bp.nome AS 'bairroPartida', c.nome AS 'cidadePartida'," +
+            "bd.id AS 'idBairroDestino', pd.id AS 'idDestino', pd.nome AS 'nomeDestino', bd.nome AS 'bairroDestino', cd.nome AS 'cidadeDestino'," +
             "(" +
-            "SELECT b2.id FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada INNER JOIN bairro b2 ON b2.id = p2.bairro WHERE pi2.itinerario = i.id AND pi2.ordem = pi.ordem + 1" +
-            ") AS 'idBairroDestino'," +
+            "SELECT SUM(pi3.distanciaSeguinte) " +
+            "FROM parada_itinerario pi3 " +
+            "WHERE pi3.itinerario = i.id " +
+            "AND pi3.ordem >= pi.ordem " +
+            "AND pi3.ordem < pi2.ordem" +
+            ") AS 'distanciaTrecho', " +
             "(" +
-            "SELECT p2.id FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada WHERE pi2.itinerario = i.id AND pi2.ordem = pi.ordem + 1" +
-            ") AS 'idDestino'," +
-            "/*(" +
-            "SELECT p2.nome FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada WHERE pi2.itinerario = i.id AND pi2.ordem = pi.ordem + 1" +
-            ") AS 'nomeDestino'," +
+            "SELECT sUM(pi3.tempoSeguinte) " +
+            "FROM parada_itinerario pi3 " +
+            "WHERE pi3.itinerario = i.id " +
+            "AND pi3.ordem >= pi.ordem " +
+            "AND pi3.ordem < pi2.ordem" +
+            ") AS 'tempoTrecho', " +
             "(" +
-            "SELECT b2.nome FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada INNER JOIN bairro b2 ON b2.id = p2.bairro WHERE pi2.itinerario = i.id AND pi2.ordem = pi.ordem + 1" +
-            ") AS 'bairroDestino'," +
-            "(" +
-            "SELECT c2.nome FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada INNER JOIN " +
-            "bairro b2 ON b2.id = p2.bairro INNER JOIN cidade c2 ON c2.id = b2.cidade WHERE pi2.itinerario = i.id AND pi2.ordem = pi.ordem + 1" +
-            ") AS 'cidadeDestino',*/ " +
-            "1 AS 'flagTrecho', pi.distanciaSeguinte AS 'distanciaTrecho' " +
-            "FROM parada_itinerario pi INNER JOIN " +
-            "     itinerario i ON i.id = pi.itinerario INNER JOIN" +
-            "     parada pp ON pp.id = pi.parada INNER JOIN" +
-            "     bairro bp ON bp.id = pp.bairro INNER JOIN" +
-            "     cidade c ON c.id = bp.cidade " +
-            "WHERE pi.ativo = 1 " +
-            "AND idDestino IS NOT NULL " +
-            "ORDER BY i.id, pi.ordem")
+            "SELECT SUM(pi3.valorSeguinte) " +
+            "FROM parada_itinerario pi3 " +
+            "WHERE pi3.itinerario = i.id " +
+            "AND pi3.ordem >= pi.ordem " +
+            "AND pi3.ordem < pi2.ordem " +
+            ") AS 'tarifaTrecho'," +
+
+            "CASE WHEN pi.ordem = 1 AND pi2.ordem = (SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) THEN 0 ELSE 1 END AS 'flagTrecho'" +
+            "            FROM parada_itinerario pi INNER JOIN " +
+            "                 itinerario i ON i.id = pi.itinerario INNER JOIN" +
+            "                 parada pp ON pp.id = pi.parada INNER JOIN" +
+            "                 bairro bp ON bp.id = pp.bairro INNER JOIN" +
+            "                 cidade c ON c.id = bp.cidade INNER JOIN" +
+            "                 parada_itinerario pi2 ON pi2.itinerario = i.id AND pi2.ordem > pi.ordem INNER JOIN" +
+            "                 parada pd ON pd.id = pi2.parada INNER JOIN" +
+            "                 bairro bd ON bd.id = pd.bairro INNER JOIN" +
+            "                 cidade cd ON cd.id = bd.cidade" +
+            "            WHERE pi.ativo = 1 " +
+            "            AND   pi2.ativo = 1" +
+            "            AND   i.ativo = 1" +
+            "            AND idDestino IS NOT NULL " +
+            "            ORDER BY i.id, pi.ordem, pi2.ordem")
     List<ItinerarioPartidaDestino> listarTodosAtivosTesteNovoSync();
 
     // QUERY ANTIGA

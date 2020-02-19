@@ -18,6 +18,8 @@ public class Itinerario extends EntidadeBase {
 
     private Double distancia;
 
+    private Double distanciaMetros;
+
     private DateTime tempo;
 
     @NonNull
@@ -33,6 +35,14 @@ public class Itinerario extends EntidadeBase {
     public Itinerario(){
         this.setAcessivel(false);
         this.setMostraRuas(false);
+    }
+
+    public Double getDistanciaMetros() {
+        return distanciaMetros;
+    }
+
+    public void setDistanciaMetros(Double distanciaMetros) {
+        this.distanciaMetros = distanciaMetros;
     }
 
     public String getSigla() {

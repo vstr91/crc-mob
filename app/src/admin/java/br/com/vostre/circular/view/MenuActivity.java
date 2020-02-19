@@ -490,7 +490,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             if (resultCode == RESULT_OK) {
                 Uri resultUri = result.getUri();
 
-                Intent i = new Intent(getApplicationContext(), CameraResultadoActivity.class);
+                Intent i = new Intent(getApplicationContext(), CameraResultadoOnibusActivity.class);
                     i.putExtra("imagem", resultUri.toString());
                     startActivity(i);
 

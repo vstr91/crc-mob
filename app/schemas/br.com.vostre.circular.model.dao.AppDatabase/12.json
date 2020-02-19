@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 12,
-    "identityHash": "8eb8d3a2a55897678d77b890b3c34a1c",
+    "identityHash": "1dc2cbb86ed33b84cba8931a455a2f4a",
     "entities": [
       {
         "tableName": "Pais",
@@ -1118,7 +1118,7 @@
       },
       {
         "tableName": "Itinerario",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`sigla` TEXT, `tarifa` REAL NOT NULL, `distancia` REAL, `tempo` INTEGER, `acessivel` INTEGER NOT NULL, `empresa` TEXT NOT NULL, `observacao` TEXT, `mostraRuas` INTEGER, `id` TEXT NOT NULL, `ativo` INTEGER NOT NULL, `enviado` INTEGER NOT NULL, `data_cadastro` INTEGER NOT NULL, `usuario_cadastro` TEXT, `ultima_alteracao` INTEGER NOT NULL, `usuario_ultima_alteracao` TEXT, `programado_para` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`sigla` TEXT, `tarifa` REAL NOT NULL, `distancia` REAL, `distanciaMetros` REAL, `tempo` INTEGER, `acessivel` INTEGER NOT NULL, `empresa` TEXT NOT NULL, `observacao` TEXT, `mostraRuas` INTEGER, `id` TEXT NOT NULL, `ativo` INTEGER NOT NULL, `enviado` INTEGER NOT NULL, `data_cadastro` INTEGER NOT NULL, `usuario_cadastro` TEXT, `ultima_alteracao` INTEGER NOT NULL, `usuario_ultima_alteracao` TEXT, `programado_para` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "sigla",
@@ -1135,6 +1135,12 @@
           {
             "fieldPath": "distancia",
             "columnName": "distancia",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "distanciaMetros",
+            "columnName": "distanciaMetros",
             "affinity": "REAL",
             "notNull": false
           },
@@ -1228,7 +1234,7 @@
       },
       {
         "tableName": "parada_itinerario",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`parada` TEXT NOT NULL, `itinerario` TEXT NOT NULL, `ordem` INTEGER NOT NULL, `destaque` INTEGER NOT NULL, `valorAnterior` REAL, `valorSeguinte` REAL, `tempoSeguinte` INTEGER, `distanciaSeguinte` REAL, `id` TEXT NOT NULL, `ativo` INTEGER NOT NULL, `enviado` INTEGER NOT NULL, `data_cadastro` INTEGER NOT NULL, `usuario_cadastro` TEXT, `ultima_alteracao` INTEGER NOT NULL, `usuario_ultima_alteracao` TEXT, `programado_para` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`parada` TEXT NOT NULL, `itinerario` TEXT NOT NULL, `ordem` INTEGER NOT NULL, `destaque` INTEGER NOT NULL, `valorAnterior` REAL, `valorSeguinte` REAL, `tempoSeguinte` INTEGER, `distanciaSeguinte` REAL, `distanciaSeguinteMetros` REAL, `id` TEXT NOT NULL, `ativo` INTEGER NOT NULL, `enviado` INTEGER NOT NULL, `data_cadastro` INTEGER NOT NULL, `usuario_cadastro` TEXT, `ultima_alteracao` INTEGER NOT NULL, `usuario_ultima_alteracao` TEXT, `programado_para` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "parada",
@@ -1275,6 +1281,12 @@
           {
             "fieldPath": "distanciaSeguinte",
             "columnName": "distanciaSeguinte",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "distanciaSeguinteMetros",
+            "columnName": "distanciaSeguinteMetros",
             "affinity": "REAL",
             "notNull": false
           },
@@ -2993,7 +3005,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"8eb8d3a2a55897678d77b890b3c34a1c\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"1dc2cbb86ed33b84cba8931a455a2f4a\")"
     ]
   }
 }

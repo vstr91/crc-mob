@@ -33,6 +33,16 @@ public class ParadaItinerario extends EntidadeBase {
 
     private Double distanciaSeguinte;
 
+    private Double distanciaSeguinteMetros;
+
+    public Double getDistanciaSeguinteMetros() {
+        return distanciaSeguinteMetros;
+    }
+
+    public void setDistanciaSeguinteMetros(Double distanciaSeguinteMetros) {
+        this.distanciaSeguinteMetros = distanciaSeguinteMetros;
+    }
+
     public DateTime getTempoSeguinte() {
         return tempoSeguinte;
     }

@@ -355,7 +355,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/cinzaEscuro"
                     android:textSize="12sp"
-                    app:distancia="@{itinerario.distanciaTrecho == null ? itinerario.itinerario.distancia : itinerario.distanciaTrecho}"
+                    app:distancia="@{itinerario.distanciaTrechoMetros == null ? itinerario.itinerario.distanciaMetros : itinerario.distanciaTrechoMetros}"
                     app:layout_constraintEnd_toEndOf="@+id/imageView7"
                     app:layout_constraintStart_toStartOf="@+id/imageView7"
                     app:layout_constraintTop_toBottomOf="@+id/imageView6"

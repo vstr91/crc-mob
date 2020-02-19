@@ -125,6 +125,9 @@ public class ItinerarioPartidaDestino {
     @ColumnInfo(name = "longitudeParadaReferencia")
     Float longitudeParadaReferencia;
 
+    @ColumnInfo(name = "distanciaTrechoMetros")
+    Double distanciaTrechoMetros;
+
     @Ignore
     public boolean selecionado;
 
@@ -151,6 +154,14 @@ public class ItinerarioPartidaDestino {
 
     @Ignore
     public List<SecaoItinerario> secoes;
+
+    public Double getDistanciaTrechoMetros() {
+        return distanciaTrechoMetros;
+    }
+
+    public void setDistanciaTrechoMetros(Double distanciaTrechoMetros) {
+        this.distanciaTrechoMetros = distanciaTrechoMetros;
+    }
 
     public Double getNovaTarifa() {
         return novaTarifa;

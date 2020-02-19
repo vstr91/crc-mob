@@ -255,6 +255,9 @@ public abstract class AppDatabase extends RoomDatabase {
 
             database.execSQL("CREATE TABLE IF NOT EXISTS 'historico_secao' ('secao' TEXT NOT NULL, 'tarifa' REAL NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
             database.execSQL("CREATE UNIQUE INDEX 'index_historico_secao_secao_tarifa' ON 'historico_secao' ('secao', 'tarifa')");
+
+            database.execSQL("ALTER TABLE 'parada_itinerario' ADD COLUMN 'distanciaSeguinteMetros' REAL");
+            database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'distanciaMetros' REAL");
         }
     };
 

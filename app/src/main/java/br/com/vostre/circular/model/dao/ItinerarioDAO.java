@@ -395,7 +395,7 @@ public interface ItinerarioDAO {
 
     @Query("SELECT i.*, b.id AS 'idBairroPartida', p.id AS 'idPartida', p.nome AS 'nomePartida', b.nome AS 'bairroPartida', c.nome AS 'cidadePartida', " +
             "b2.id AS 'idBairroDestino', p2.id AS 'idDestino', p2.nome AS 'nomeDestino', b2.nome AS 'bairroDestino', " +
-            "c2.nome AS 'cidadeDestino', 1 AS 'flagTrecho', pi.distanciaSeguinte " +
+            "c2.nome AS 'cidadeDestino', 1 AS 'flagTrecho', pi.distanciaSeguinte, pi.distanciaSeguinteMetros " +
             "FROM itinerario i INNER JOIN parada_itinerario pi ON pi.itinerario = i.id INNER JOIN parada p ON p.id = pi.parada INNER JOIN " +
             "bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade " +
             "INNER JOIN parada_itinerario pi2 ON pi2.itinerario = i.id INNER JOIN parada p2 ON p2.id = pi2.parada INNER JOIN bairro b2 ON b2.id = p2.bairro INNER JOIN cidade c2 ON c2.id = b2.cidade " +
@@ -416,6 +416,15 @@ public interface ItinerarioDAO {
             "AND pi3.ordem >= pi.ordem " +
             "AND pi3.ordem < pi2.ordem" +
             ") AS 'distanciaTrecho', " +
+
+            "(" +
+            "SELECT SUM(pi3.distanciaSeguinteMetros) " +
+            "FROM parada_itinerario pi3 " +
+            "WHERE pi3.itinerario = i.id " +
+            "AND pi3.ordem >= pi.ordem " +
+            "AND pi3.ordem < pi2.ordem" +
+            ") AS 'distanciaTrechoMetros', " +
+
             "(" +
             "SELECT sUM(pi3.tempoSeguinte) " +
             "FROM parada_itinerario pi3 " +

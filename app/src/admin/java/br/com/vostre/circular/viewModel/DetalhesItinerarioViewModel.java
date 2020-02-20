@@ -187,12 +187,19 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
                                 Double distanciaMetros = Double.parseDouble(distancia);
                                 String tempoFormatado = DataHoraUtils.segundosParaHoraFormatado(tempo);
+                                Double distanciaKm = distanciaMetros/1000;
 
                                 long distMetros = (long) distanciaMetros.doubleValue();
+                                long distKm = (long) distanciaKm.doubleValue();
 
                                 if(distMetros > 0){
                                     finalParadaAnterior.getParadaItinerario()
-                                            .setDistanciaSeguinte(Double.parseDouble(String.valueOf(distMetros)));
+                                            .setDistanciaSeguinteMetros(Double.parseDouble(String.valueOf(distMetros)));
+                                }
+
+                                if(distKm > 0){
+                                    finalParadaAnterior.getParadaItinerario()
+                                            .setDistanciaSeguinte(Double.parseDouble(String.valueOf(distKm)));
                                 }
 
                                 if(tempoFormatado != null){
@@ -354,6 +361,7 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
                 paradaItinerario.setValorSeguinte(pi.getValorSeguinte());
                 paradaItinerario.setEnviado(false);
                 paradaItinerario.setDistanciaSeguinte(pi.getDistanciaSeguinte());
+                paradaItinerario.setDistanciaSeguinteMetros(pi.getDistanciaSeguinteMetros());
                 paradaItinerario.setTempoSeguinte(pi.getTempoSeguinte());
                 paradaItinerario.setUltimaAlteracao(DateTime.now());
 
@@ -487,12 +495,21 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
                         Double distanciaMetros = Double.parseDouble(distancia);
                         String tempoFormatado = DataHoraUtils.segundosParaHoraFormatado(tempo);
+                        Double distanciaKm = distanciaMetros/1000;
 
                         long distMetros = (long) distanciaMetros.doubleValue();
+                        long distKm = (long) distanciaKm.doubleValue();
 
+                        // distancia em metros - v2.3
                         if(distMetros > 0){
                             itinerario.getValue().getItinerario()
-                                    .setDistancia(Double.parseDouble(String.valueOf(distMetros)));
+                                    .setDistanciaMetros(Double.parseDouble(String.valueOf(distMetros)));
+                        }
+
+                        // distancia em km - versoes anteriores
+                        if(distKm > 0){
+                            itinerario.getValue().getItinerario()
+                                    .setDistancia(Double.parseDouble(String.valueOf(distKm)));
                         }
 
                         if(tempoFormatado != null){

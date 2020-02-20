@@ -45,7 +45,7 @@ public class ParadaItinerarioViewHolder extends RecyclerView.ViewHolder {
 
         nfTempo = DateTimeFormat.forPattern("HH:mm:ss");
         nf = NumberFormat.getNumberInstance();
-        nf.setMaximumFractionDigits(2);
+        nf.setMaximumFractionDigits(1);
 
     }
 
@@ -73,11 +73,11 @@ public class ParadaItinerarioViewHolder extends RecyclerView.ViewHolder {
             binding.textViewProximo.setText("-");
         }
 
-        if(parada.getParadaItinerario().getDistanciaSeguinte() == null){
+        if(parada.getParadaItinerario().getDistanciaSeguinteMetros() == null){
             binding.textViewDistancia.setText("-");
         } else{
             try{
-                binding.textViewDistancia.setText(nf.format(parada.getParadaItinerario().getDistanciaSeguinte()/1000)+" Km");
+                binding.textViewDistancia.setText(nf.format(parada.getParadaItinerario().getDistanciaSeguinteMetros()/1000)+" Km");
             } catch(NumberFormatException e){
                 binding.textViewDistancia.setText("0 Km");
             }

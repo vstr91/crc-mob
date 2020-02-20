@@ -563,7 +563,13 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 binding.listLegenda.setVisibility(View.GONE);
                 binding.textView51.setVisibility(View.GONE);
 
-                binding.imageButton5.setVisibility(View.VISIBLE);
+                if(viewModel.secoes != null && viewModel.secoes.getValue().size() > 0){
+                    binding.imageButton5.setVisibility(View.VISIBLE);
+                } else{
+                    binding.imageButton5.setVisibility(View.GONE);
+                }
+
+
             }
 
             HorarioItinerarioNome horarioItinerarioNome = null;

@@ -454,7 +454,7 @@ public interface ItinerarioDAO {
             "            AND   pi2.ativo = 1" +
             "            AND   i.ativo = 1" +
             "            AND idDestino IS NOT NULL " +
-            "            ORDER BY i.id, pi.ordem, pi2.ordem")
+            "            ORDER BY i.id, CASE WHEN flagTrecho = 1 THEN distanciaTrechoMetros ELSE distanciaMetros END, pi.ordem, pi2.ordem")
     List<ItinerarioPartidaDestino> listarTodosAtivosTesteNovoSync();
 
     // QUERY ANTIGA

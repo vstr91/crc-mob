@@ -256,11 +256,17 @@ public class ItinerariosActivity extends BaseActivity {
         if(mapaOculto){
             binding.map.setVisibility(View.VISIBLE);
             binding.cardView.getLayoutParams().height = tamanhoOriginalMapa;
+
+            binding.fabZoomIn.setVisibility(View.VISIBLE);
+            binding.fabZoomOut.setVisibility(View.VISIBLE);
             mapaOculto = false;
         } else{
             tamanhoOriginalMapa = binding.cardView.getLayoutParams().height;
             binding.map.setVisibility(View.GONE);
             binding.cardView.getLayoutParams().height = WRAP_CONTENT;
+
+            binding.fabZoomIn.setVisibility(View.GONE);
+            binding.fabZoomOut.setVisibility(View.GONE);
             mapaOculto = true;
         }
 
@@ -308,6 +314,11 @@ public class ItinerariosActivity extends BaseActivity {
     public void onClickTarifasItinerarios(View v){
         Intent i = new Intent(getApplicationContext(), TarifasItinerariosActivity.class);
         startActivity(i);
+    }
+
+    public void onClickDistanciasItinerarios(View v){
+        viewModel.atualizarDistancias(getApplicationContext());
+        Toast.makeText(getApplicationContext(), "Atualizando distâncias...", Toast.LENGTH_SHORT).show();
     }
 
     @Override

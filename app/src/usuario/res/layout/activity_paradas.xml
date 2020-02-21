@@ -34,12 +34,11 @@
             android:id="@+id/cardViewListCidade"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="visible"
             app:cardCornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -56,8 +55,8 @@
                     android:id="@+id/textView14"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="0dp"
                     android:paddingTop="10dp"
+                    android:paddingBottom="0dp"
                     android:text="Escolha uma cidade abaixo"
                     android:textAppearance="@style/texto_azul" />
 
@@ -82,7 +81,7 @@
         <android.support.v7.widget.CardView
             android:id="@+id/cardViewCidade"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="80dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
@@ -97,50 +96,6 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1">
 
-                <ImageView
-                    android:id="@+id/circleViewPartida"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginBottom="16dp"
-                    android:layout_weight="1"
-                    android:contentDescription="@{`Brasão `+cidade.cidade.nome}"
-                    app:corArcoMaior="@color/azul"
-                    app:corArcoMenor="@color/azul"
-                    app:espessuraArcoMaior="4"
-                    app:espessuraArcoMenor="4"
-                    app:imagem="@{cidade.cidade.brasao}"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
-
-                <TextView
-                    android:id="@+id/textViewBairroPartida"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_weight="1"
-                    android:text="@{cidade.cidade.nome}"
-                    android:textAppearance="@style/texto_azul"
-                    android:textColor="@color/cinzaEscuro"
-                    app:layout_constraintStart_toEndOf="@+id/circleViewPartida"
-                    app:layout_constraintTop_toTopOf="@+id/circleViewPartida"
-                    tools:text="Cidade" />
-
-                <TextView
-                    android:id="@+id/textView10"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:text="@{cidade.nomeEstado}"
-                    android:textSize="12sp"
-                    app:layout_constraintBottom_toBottomOf="@+id/circleViewPartida"
-                    app:layout_constraintStart_toStartOf="@+id/textViewBairroPartida"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewBairroPartida"
-                    tools:text="estado" />
-
                 <ImageButton
                     android:id="@+id/imageButton"
                     style="@style/botao_transparente"
@@ -154,6 +109,49 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/ic_edit_blue_24dp" />
+
+                <ImageView
+                    android:id="@+id/circleViewPartida"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@{`Brasão `+cidade.cidade.nome}"
+                    app:corArcoMaior="@color/azul"
+                    app:corArcoMenor="@color/azul"
+                    app:espessuraArcoMaior="4"
+                    app:espessuraArcoMenor="4"
+                    app:imagem="@{cidade.cidade.brasao}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/textView10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="@{cidade.nomeEstado}"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/circleViewPartida"
+                    app:layout_constraintStart_toStartOf="@+id/textViewBairroPartida"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewBairroPartida"
+                    tools:text="estado" />
+
+                <TextView
+                    android:id="@+id/textViewBairroPartida"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_weight="1"
+                    android:text="@{cidade.cidade.nome}"
+                    android:textAppearance="@style/texto_azul"
+                    android:textColor="@color/cinzaEscuro"
+                    app:layout_constraintBottom_toBottomOf="@+id/circleViewPartida"
+                    app:layout_constraintStart_toEndOf="@+id/circleViewPartida"
+                    app:layout_constraintTop_toTopOf="@+id/circleViewPartida"
+                    tools:text="Cidade" />
 
             </android.support.constraint.ConstraintLayout>
 

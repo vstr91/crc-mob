@@ -112,7 +112,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_itinerario);
         binding.getRoot().setDrawingCacheEnabled(true);
-        binding.setView(this);
+        binding.setVw(this);
         binding.setLifecycleOwner(this);
 
         contaProcessamento = 0;
@@ -428,29 +428,38 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
     }
 
-    public void ocultarMapa(View v){
+    public void ocultarMapa(View v, Boolean automatica){
 
         if(mapaOculto){
             binding.map.setVisibility(View.VISIBLE);
             binding.cardViewItinerario.getLayoutParams().height = tamanhoOriginalMapa;
-            PreferenceUtils.salvarPreferencia(ctx, "mapa", 1);
+
+            if(!automatica){
+                PreferenceUtils.salvarPreferencia(ctx, "mapa", 1);
+                //log
+                bundle = new Bundle();
+                bundle.putBoolean("oculto", false);
+                mFirebaseAnalytics.logEvent("mapa_oculto", bundle);
+            }
+
             mapaOculto = false;
 
-            //log
-            bundle = new Bundle();
-            bundle.putBoolean("oculto", false);
-            mFirebaseAnalytics.logEvent("mapa_oculto", bundle);
+
         } else{
             tamanhoOriginalMapa = binding.cardViewItinerario.getLayoutParams().height;
             binding.map.setVisibility(View.GONE);
             binding.cardViewItinerario.getLayoutParams().height = WRAP_CONTENT;
-            PreferenceUtils.salvarPreferencia(ctx, "mapa", 0);
+
+            if(!automatica){
+                PreferenceUtils.salvarPreferencia(ctx, "mapa", 0);
+                //log
+                bundle = new Bundle();
+                bundle.putBoolean("oculto", true);
+                mFirebaseAnalytics.logEvent("mapa_oculto", bundle);
+            }
+
             mapaOculto = true;
 
-            //log
-            bundle = new Bundle();
-            bundle.putBoolean("oculto", true);
-            mFirebaseAnalytics.logEvent("mapa_oculto", bundle);
         }
 
     }
@@ -545,6 +554,10 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 });
                 binding.listLegenda.setAdapter(adapter);
 
+                if(!mapaOculto){
+                    ocultarMapa(null, true);
+                }
+
             } else{
 
                 if(viewModel.itinerario.getValue() != null && (viewModel.itinerario.getValue().getItinerario().getSigla() != null &&
@@ -563,7 +576,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 binding.listLegenda.setVisibility(View.GONE);
                 binding.textView51.setVisibility(View.GONE);
 
-                if(viewModel.secoes != null && viewModel.secoes.getValue().size() > 0){
+                if(viewModel.secoes != null && viewModel.secoes.getValue() != null && viewModel.secoes.getValue().size() > 0){
                     binding.imageButton5.setVisibility(View.VISIBLE);
                 } else{
                     binding.imageButton5.setVisibility(View.GONE);

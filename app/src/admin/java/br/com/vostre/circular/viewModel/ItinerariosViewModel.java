@@ -4,9 +4,11 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -16,6 +18,9 @@ import com.google.android.gms.location.LocationServices;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,10 +31,17 @@ import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.ParadaItinerario;
+import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
+import br.com.vostre.circular.utils.DataHoraUtils;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ItinerariosViewModel extends AndroidViewModel {
 
@@ -60,6 +72,8 @@ public class ItinerariosViewModel extends AndroidViewModel {
     }
 
     public static MutableLiveData<Integer> retorno;
+
+    int umMinuto = 60;
 
     public void setItinerarios(LiveData<List<ItinerarioPartidaDestino>> itinerarios) {
         this.itinerarios = itinerarios;
@@ -183,6 +197,16 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
     }
 
+    public void editarItinerario(Itinerario itinerario){
+
+        if(itinerario.valida(itinerario)){
+            edit(itinerario);
+        } else{
+            retorno.setValue(0);
+        }
+
+    }
+
     public void salvarParada(){
 
     }
@@ -193,6 +217,213 @@ public class ItinerariosViewModel extends AndroidViewModel {
 //        pib = parada;
         this.paradasItinerario.postValue(pibs);
 
+    }
+
+    public void atualizarDistancias(Context ctx){
+        new atualizaDistanciasAsyncTask(appDatabase, ctx, this).execute();
+    }
+
+    private static class atualizaDistanciasAsyncTask extends AsyncTask<List<ParadaItinerario>, Void, Void> {
+
+        private AppDatabase db;
+        private Context ctx;
+        ItinerariosViewModel thiz;
+
+        atualizaDistanciasAsyncTask(AppDatabase appDatabase, Context context, ItinerariosViewModel thiz) {
+            db = appDatabase;
+            ctx = context;
+            this.thiz = thiz;
+        }
+
+        @Override
+        protected Void doInBackground(final List<ParadaItinerario>... params) {
+
+            List<ItinerarioPartidaDestino> itinerarios = db.itinerarioDAO().listarTodosAtivosSync();
+
+            for(ItinerarioPartidaDestino itinerario : itinerarios){
+
+                List<ParadaItinerarioBairro> pis = db.paradaItinerarioDAO()
+                        .listarTodosPorItinerarioComBairroSync(itinerario.getItinerario().getId());
+
+                // atualiza distancia itinerario
+                if(itinerario.getDistanciaTrechoMetros() == null || itinerario.getItinerario().getDistanciaMetros() == null){
+                    thiz.calculaDistancia(pis, itinerario.getItinerario());
+                }
+
+                ParadaItinerarioBairro paradaAnterior = null;
+
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl("http://router.project-osrm.org/")
+                        .addConverterFactory(ScalarsConverterFactory.create())
+                        .build();
+                CircularAPI api = retrofit.create(CircularAPI.class);
+
+                // atualiza distancia paradas
+                for(ParadaItinerarioBairro pb : pis){
+
+                    if(paradaAnterior != null && paradaAnterior.getParadaItinerario().getDistanciaSeguinteMetros() == null){
+
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        Call<String> call = api.carregaDistancia(paradaAnterior.getLongitude()+","
+                                +paradaAnterior.getLatitude(),pb.getLongitude()+","+pb.getLatitude());
+
+                        final ParadaItinerarioBairro finalParadaAnterior = paradaAnterior;
+                        call.enqueue(new Callback<String>() {
+                            @Override
+                            public void onResponse(Call<String> call, Response<String> response) {
+                                System.out.println(response);
+                                try {
+
+                                    if(response.body() != null){
+                                        JSONObject obj = new JSONObject(response.body().toString());
+                                        JSONArray routes = obj.getJSONArray("routes");
+                                        JSONObject objDados = routes.getJSONObject(0);
+
+                                        String distancia = objDados.getString("distance");
+                                        int tempo = objDados.getInt("duration");
+
+                                        Double distanciaMetros = Double.parseDouble(distancia);
+                                        String tempoFormatado = DataHoraUtils.segundosParaHoraFormatado(tempo);
+                                        Double distanciaKm = distanciaMetros/1000;
+
+                                        long distMetros = (long) distanciaMetros.doubleValue();
+                                        long distKm = (long) distanciaKm.doubleValue();
+
+                                        if(distMetros > 0){
+                                            finalParadaAnterior.getParadaItinerario()
+                                                    .setDistanciaSeguinteMetros(Double.parseDouble(String.valueOf(distMetros)));
+                                        }
+
+                                        if(distKm > 0){
+                                            finalParadaAnterior.getParadaItinerario()
+                                                    .setDistanciaSeguinte(Double.parseDouble(String.valueOf(distKm)));
+                                        }
+
+                                        if(tempoFormatado != null){
+                                            finalParadaAnterior.getParadaItinerario()
+                                                    .setTempoSeguinte(DateTimeFormat.forPattern("HH:mm:ss")
+                                                            .parseDateTime(tempoFormatado));
+                                        }
+
+                                        AsyncTask.execute(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                finalParadaAnterior.getParadaItinerario().setEnviado(false);
+                                                finalParadaAnterior.getParadaItinerario().setUltimaAlteracao(DateTime.now());
+                                                db.paradaItinerarioDAO().editar(finalParadaAnterior.getParadaItinerario());
+                                            }
+                                        });
+                                    } else{
+                                        Toast.makeText(ctx, "Erro ao buscar distâncias das paradas! "+response.message(), Toast.LENGTH_SHORT).show();
+                                    }
+
+//                            viewModel.editarItinerario();
+
+                                    //System.out.println(obj);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<String> call, Throwable t) {
+                                System.out.println(call.request().body());
+                            }
+                        });
+
+//                System.out.println("PARADAS ITINERARIO::: "
+//                        +paradaAnterior.getNomeParada()+" - "+paradaAnterior.getNomeBairro()
+//                        +", "+paradaAnterior.getNomeCidade()
+//                        +", ("+paradaAnterior.getLatitude()+";"+paradaAnterior.getLongitude()+") || "+pb.getNomeParada()+" - "+pb.getNomeBairro()
+//                        +", "+pb.getNomeCidade()+", ("+pb.getLatitude()+";"+pb.getLongitude()+")");
+                    }
+
+                    paradaAnterior = pb;
+
+                }
+
+            }
+
+            return null;
+        }
+
+    }
+
+    public void calculaDistancia(List<ParadaItinerarioBairro> paradas, final Itinerario itinerario) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://router.project-osrm.org/")
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .build();
+        CircularAPI api = retrofit.create(CircularAPI.class);
+        Call<String> call = api.carregaDistancia(paradas.get(0).getLongitude()
+                +","+paradas.get(0).getLatitude(),paradas.get(paradas.size()-1).getLongitude()
+                +","+paradas.get(paradas.size()-1).getLatitude());
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+
+                try {
+
+                    if(response.body() != null){
+                        JSONObject obj = new JSONObject(response.body().toString());
+                        JSONArray routes = obj.getJSONArray("routes");
+                        JSONObject objDados = routes.getJSONObject(0);
+
+                        String distancia = objDados.getString("distance");
+                        int tempo = objDados.getInt("duration");
+
+                        if(tempo > umMinuto && tempo <= umMinuto * 10){
+                            //tempo += 60;
+                        } else if(tempo > umMinuto * 10){
+                            tempo += umMinuto * (tempo % 5);
+                        }
+
+                        Double distanciaMetros = Double.parseDouble(distancia);
+                        String tempoFormatado = DataHoraUtils.segundosParaHoraFormatado(tempo);
+                        Double distanciaKm = distanciaMetros/1000;
+
+                        long distMetros = (long) distanciaMetros.doubleValue();
+                        long distKm = (long) distanciaKm.doubleValue();
+
+                        // distancia em metros - v2.3
+                        if(distMetros > 0){
+                            itinerario.setDistanciaMetros(Double.parseDouble(String.valueOf(distMetros)));
+                        }
+
+                        // distancia em km - versoes anteriores
+                        if(distKm > 0){
+                            itinerario.setDistancia(Double.parseDouble(String.valueOf(distKm)));
+                        }
+
+                        if(tempoFormatado != null){
+                            itinerario.setTempo(DateTimeFormat.forPattern("HH:mm:ss").parseDateTime(tempoFormatado));
+                        }
+
+                        editarItinerario(itinerario);
+
+                    } else{
+                        Toast.makeText(getApplication().getApplicationContext(), "Erro ao buscar distância do itinerário! "+response.message(), Toast.LENGTH_SHORT).show();
+                    }
+
+
+
+                    //System.out.println(obj);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                System.out.println(call.request().body());
+            }
+        });
     }
 
     // adicionar paradas

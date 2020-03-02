@@ -151,6 +151,17 @@
                     tools:text="Linha 001"
                     tools:visibility="visible" />
 
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/btnVerRuas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_half_rounded_corner_azul"
+                    android:onClick="@{vw::btnRuasClick}"
+                    android:padding="10dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_directions_white_24dp" />
+
                 <LinearLayout
                     android:id="@+id/linearLayout4"
                     android:layout_width="0dp"
@@ -299,7 +310,7 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnVerRuas" />
+            app:layout_constraintTop_toBottomOf="@+id/cardViewItinerario" />
 
         <TextView
             android:id="@+id/textView29"
@@ -327,7 +338,7 @@
             android:tooltipText="Ver seções do itinerário"
             app:layout_constraintBottom_toBottomOf="@+id/textView29"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/btnVerRuas"
+            app:layout_constraintTop_toTopOf="@+id/btnInverter"
             app:srcCompat="@drawable/ic_list_white_24dp" />
 
         <android.support.v7.widget.AppCompatImageButton
@@ -447,18 +458,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@+id/cardViewItinerario" />
-
-        <Button
-            android:id="@+id/btnVerRuas"
-            style="@style/botao_transparente"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:text="Ver trajeto"
-            android:textStyle="bold"
-            android:onClick="@{vw::btnRuasClick}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cardViewItinerario" />
 
     </android.support.constraint.ConstraintLayout>

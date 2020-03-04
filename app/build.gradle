@@ -13,7 +13,7 @@ android {
 //        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
-        buildConfigField "int", "DEBUG_APP", "1"
+        buildConfigField "int", "DEBUG_APP", "0"
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -50,7 +50,7 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix ".debug"
+            //applicationIdSuffix ".debug"
             versionNameSuffix '-SNAPSHOT'
         }
         release {

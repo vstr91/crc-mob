@@ -1,3 +1,4 @@
 <resources>
     <string name="texto_buscando_rota">Buscando rotas disponíveis! Só um momento, por favor!\n\nAtenção: Em rotas sem itinerário direto, com troca de ônibus, a busca pode demorar um pouco mais!</string>
+    <string name="texto_buscando_por_linha">Buscando itinerários disponíveis! Só um momento, por favor!</string>
 </resources>

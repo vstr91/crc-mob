@@ -516,11 +516,47 @@ public interface ItinerarioDAO {
             " ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 )")
     LiveData<List<ItinerarioPartidaDestino>> listarTodosAtivosPorParadaComBairroEHorario(String parada, String hora);
 
+    @Query("SELECT DISTINCT (SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+            "FROM horario_itinerario hi INNER JOIN " +
+            "horario h ON h.id = hi.horario " +
+            "WHERE itinerario = i.id AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= :hora " +
+            "ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ) AS 'proximoHorario', i.*, " +
+            "(SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'nomePartida', " +
+            "(SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'nomeDestino'," +
+            "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'bairroPartida', " +
+            "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'bairroDestino'," +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1" +
+            ") AS 'cidadePartida', " +
+            "(SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
+            "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pi.ordem = " +
+            "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1" +
+            ") AS 'cidadeDestino' FROM parada_itinerario pit INNER JOIN itinerario i ON i.id = pit.itinerario " +
+            "WHERE i.ativo = 1 AND i.sigla LIKE :linha " +
+            "ORDER BY (SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) " +
+            "FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario " +
+            "WHERE itinerario = i.id AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= :hora" +
+            " ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 )")
+    LiveData<List<ItinerarioPartidaDestino>> listarTodosAtivosPorLinhaComBairroEHorario(String linha, String hora);
+
     @RawQuery(observedEntities = ItinerarioPartidaDestino.class)
     LiveData<List<ItinerarioPartidaDestino>> listarTodosAtivosPorParadaComBairroEHorarioCompleto(SupportSQLiteQuery query);
 
     @RawQuery(observedEntities = ItinerarioPartidaDestino.class)
     List<ItinerarioPartidaDestino> listarTodosAtivosPorParadaComBairroEHorarioCompletoSync(SupportSQLiteQuery query);
+
+    @RawQuery(observedEntities = ItinerarioPartidaDestino.class)
+    LiveData<List<ItinerarioPartidaDestino>> listarTodosAtivosPorLinhaComBairroEHorarioCompleto(SupportSQLiteQuery query);
+
+    @RawQuery(observedEntities = ItinerarioPartidaDestino.class)
+    LiveData<List<ItinerarioPartidaDestino>> listarTodosAtivosPorDestinoComBairroEHorarioCompleto(SupportSQLiteQuery query);
 //    @RawQuery
 //    LiveData<List<ItinerarioPartidaDestino>> listarTodosAtivosPorParadaComBairroEHorarioCompleto(SupportSQLiteQuery query);
 
@@ -603,6 +639,24 @@ public interface ItinerarioDAO {
             "AND pi2.ordem > pi.ordem " +
             "ORDER BY i.id;")
     List<String> carregarOpcoesPorPartidaEDestinoTrechoSync(String partida, String destino);
+
+    @Query("SELECT DISTINCT i.id " +
+            "FROM itinerario i INNER JOIN " +
+            "     parada_itinerario pi ON pi.itinerario = i.id INNER JOIN" +
+            "     parada p ON p.id = pi.parada INNER JOIN" +
+            "     parada_itinerario pi2 ON pi2.itinerario = i.id INNER JOIN" +
+            "     parada pd ON pd.id = pi2.parada " +
+            "WHERE pd.bairro = :destino " +
+            "AND pi2.ordem > pi.ordem " +
+            "AND i.id NOT IN (" +
+            "                 SELECT pi2.itinerario " +
+            "                 FROM parada_itinerario pi2 INNER JOIN" +
+            "                      parada p ON p.id = pi2.parada" +
+            "                 WHERE p.bairro = :destino" +
+            "                 AND pi2.ordem = 1" +
+            "            )" +
+            "ORDER BY i.id;")
+    List<String> carregarOpcoesPorPartidaEDestinoTrechoConsultaSync(String destino);
 
     @Query("SELECT DISTINCT i.*, " +
             "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +

@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TabHost;
+import android.widget.TabWidget;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -84,6 +86,9 @@ public class FavoritosActivity extends BaseActivity {
         spec2.setContent(R.id.tab2);
         spec2.setIndicator("Paradas");
         tabHost.addTab(spec2);
+
+        final TabWidget tw = (TabWidget) tabHost.findViewById(android.R.id.tabs);
+        tw.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
 
     }
 

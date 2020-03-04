@@ -2,8 +2,10 @@ package br.com.vostre.circular.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -11,11 +13,19 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputFilter;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TabHost;
+import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +55,9 @@ import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.utils.DataHoraUtils;
 import br.com.vostre.circular.utils.DestaqueUtils;
+import br.com.vostre.circular.utils.WidgetUtils;
 import br.com.vostre.circular.view.adapter.CidadeAdapter;
+import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ItinerarioResultadoAdapter;
 import br.com.vostre.circular.view.form.FormBairro;
 import br.com.vostre.circular.view.listener.FeriadoListener;
@@ -67,6 +79,12 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     RecyclerView listResultados;
     ItinerarioResultadoAdapter adapterResultado;
 
+    RecyclerView listItinerariosPorLinha;
+    ItinerarioAdapter adapterItinerariosPorLinha;
+
+    RecyclerView listItinerariosPorDestino;
+    ItinerarioAdapter adapterItinerariosPorDestino;
+
     static AppCompatActivity ctx;
 
     ItinerariosViewModel viewModel;
@@ -77,6 +95,9 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     BairroCidade bairroPartida;
     BairroCidade bairroDestino;
+
+    BairroCidade bairroDestinoConsulta;
+    CidadeAdapter adapterDestinoConsulta;
 
     boolean inversao = false;
 
@@ -91,6 +112,12 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     Calendar dataEscolhida;
     String diaEscolhido;
     String horaEscolhida;
+
+    TabHost tabHost;
+
+    RecyclerView listCidadesDestinoConsulta;
+
+    int currentTab = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +137,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         //viewModel.escolhaAtual = 0;
         viewModel.resultadosItinerarios.observe(this, resultadoItinerarioObserver);
         viewModel.isFeriado.observe(this, feriadoObserver);
+
+        viewModel.cidadesDestinoConsulta.observe(this, cidadesDestinoConsultaObserver);
 
         binding.setViewModel(viewModel);
 
@@ -132,6 +161,72 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         listResultados = binding.listResultados;
         adapterResultado = new ItinerarioResultadoAdapter(viewModel.resultadosItinerarios.getValue(), this, "", "");
         listResultados.setAdapter(adapterResultado);
+
+        listItinerariosPorLinha = binding.listItinerarios;
+        adapterItinerariosPorLinha = new ItinerarioAdapter(viewModel.itinerariosPorLinha.getValue(), this);
+        listItinerariosPorLinha.setAdapter(adapterItinerariosPorLinha);
+
+        listItinerariosPorDestino = binding.listItinerariosDestino;
+        adapterItinerariosPorDestino = new ItinerarioAdapter(viewModel.itinerariosPorDestino.getValue(), this);
+        listItinerariosPorDestino.setAdapter(adapterItinerariosPorDestino);
+
+        listCidadesDestinoConsulta = binding.listCidadesDestinoConsulta;
+        adapterDestinoConsulta = new CidadeAdapter(viewModel.cidadesDestinoConsulta.getValue(), this);
+        adapterDestinoConsulta.setListener(this);
+
+        listCidadesDestinoConsulta.setAdapter(adapterDestinoConsulta);
+
+        tabHost = binding.tabs;
+        tabHost.setup();
+
+        TabHost.TabSpec spec = tabHost.newTabSpec("Partida/Destino");
+        spec.setContent(R.id.tab1);
+        spec.setIndicator("Tradicional");
+        tabHost.addTab(spec);
+
+        TabHost.TabSpec spec2 = tabHost.newTabSpec("Linha");
+        spec2.setContent(R.id.tab2);
+        spec2.setIndicator("Por Linha");
+        tabHost.addTab(spec2);
+
+        TabHost.TabSpec spec3 = tabHost.newTabSpec("Destino");
+        spec3.setContent(R.id.tab3);
+        spec3.setIndicator("Por Destino");
+        tabHost.addTab(spec3);
+
+        final TabWidget tw = (TabWidget) tabHost.findViewById(android.R.id.tabs);
+        tw.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
+
+        WidgetUtils.formataTabs(tw, this, 11, 0);
+
+
+        // Forcando maiusculas
+        InputFilter[] editFilters = binding.editTextLinha.getFilters();
+        InputFilter[] newFilters = new InputFilter[editFilters.length + 1];
+        System.arraycopy(editFilters, 0, newFilters, 0, editFilters.length);
+        newFilters[editFilters.length] = new InputFilter.AllCaps();
+        binding.editTextLinha.setFilters(newFilters);
+
+        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            public void onTabChanged(String tabId)
+            {
+                View currentView = tabHost.getCurrentView();
+                if (tabHost.getCurrentTab() > currentTab)
+                {
+                    currentView.setAnimation( inFromRightAnimation() );
+                }
+                else
+                {
+                    currentView.setAnimation( outToRightAnimation() );
+                }
+
+                currentTab = tabHost.getCurrentTab();
+            }
+        });
+
+        // tab por linha
+
+        // fim tab por linha
 
     }
 
@@ -175,6 +270,31 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     }
 
+    // Tab por linha
+
+    public void onClickBtnProcurarPorLinha(View v){
+        viewModel.buscarPorLinha(binding.editTextLinha.getText().toString().trim().replaceAll(" ", ""));
+
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+
+        viewModel.itinerariosPorLinha.observe(this, itinerarioPorLinhaObserver);
+
+        geraModalLoading(1);
+    }
+
+    // Fim Tab por linha
+
+    // tab destino
+
+    public void onClickBtnEditarDestinoConsulta(View v){
+        binding.cardViewDestinoConsulta.setVisibility(View.GONE);
+        binding.cardViewListDestinoConsulta.setVisibility(View.VISIBLE);
+//        binding.listResultadosConsulta.setVisibility(View.GONE);
+    }
+
+    // fim tab destino
+
     public void onClickBtnEditarPartida(View v){
         binding.cardViewPartida.setVisibility(View.GONE);
         binding.cardViewListPartida.setVisibility(View.VISIBLE);
@@ -212,6 +332,17 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         mFirebaseAnalytics.logEvent("edicao_destino", bundle);
     }
 
+    public void onClickBtnEditarPartidaConsulta(View v){
+        binding.cardViewDestinoConsulta.setVisibility(View.GONE);
+        binding.cardViewListDestinoConsulta.setVisibility(View.VISIBLE);
+        binding.listItinerariosDestino.setVisibility(View.GONE);
+
+        //log
+//        bundle = new Bundle();
+//        mFirebaseAnalytics.logEvent("edicao_partida", bundle);
+
+    }
+
     public void onClickBtnInverter(View v){
 
         inversao = !inversao;
@@ -233,7 +364,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
         viewModel.carregaResultadoInvertido(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte, diaAnterior);
 
-        geraModalLoading();
+        geraModalLoading(0);
 
 //        BairroCidade bairro = bairroPartida;
 //        bairroPartida = bairroDestino;
@@ -260,8 +391,19 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     }
 
-    private void geraModalLoading() {
+    // 0 = versao anterior | 1 = busca por linha
+    private void geraModalLoading(int tipo) {
         binding.fundo.setVisibility(View.VISIBLE);
+
+        switch(tipo){
+            case 0:
+                binding.textViewCarregando.setText(R.string.texto_buscando_rota);
+                break;
+            case 1:
+                binding.textViewCarregando.setText(R.string.texto_buscando_por_linha);
+                break;
+        }
+
         binding.textViewCarregando.setVisibility(View.VISIBLE);
         binding.progressBar.setIndeterminate(true);
         binding.progressBar.setVisibility(View.VISIBLE);
@@ -404,6 +546,14 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         }
     };
 
+    Observer<List<CidadeEstado>> cidadesDestinoConsultaObserver = new Observer<List<CidadeEstado>>() {
+        @Override
+        public void onChanged(List<CidadeEstado> cidades) {
+            adapterDestinoConsulta.cidades = cidades;
+            adapterDestinoConsulta.notifyDataSetChanged();
+        }
+    };
+
     Observer<BairroCidade> bairroObserver = new Observer<BairroCidade>() {
         @Override
         public void onChanged(BairroCidade bairro) {
@@ -431,21 +581,91 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         }
     };
 
+    Observer<BairroCidade> bairroConsultaObserver = new Observer<BairroCidade>() {
+        @Override
+        public void onChanged(BairroCidade bairro) {
+
+            if(bairro != null){
+                mostraDadosBairro(bairro, 0);
+                bairroDestinoConsulta = bairro;
+
+                viewModel.buscarPorDestino(bairro.getBairro().getId());
+                viewModel.itinerariosPorDestino.observe(ctx, itinerarioPorDestinoObserver);
+
+                geraModalLoading(1);
+
+            }
+
+        }
+    };
+
+    Observer<List<ItinerarioPartidaDestino>> itinerarioPorLinhaObserver = new Observer<List<ItinerarioPartidaDestino>>() {
+        @Override
+        public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
+
+
+            if(itinerarios.size() > 0){
+                adapterItinerariosPorLinha.itinerarios = itinerarios;
+                adapterItinerariosPorLinha.notifyDataSetChanged();
+            } else{
+                Toast.makeText(getApplicationContext(), "Nenhum itinerário encontrado...", Toast.LENGTH_SHORT).show();
+            }
+
+            ocultaModalLoading();
+
+        }
+    };
+
+    Observer<List<ItinerarioPartidaDestino>> itinerarioPorDestinoObserver = new Observer<List<ItinerarioPartidaDestino>>() {
+        @Override
+        public void onChanged(List<ItinerarioPartidaDestino> itinerarios) {
+
+
+            if(itinerarios.size() > 0){
+
+                binding.listItinerariosDestino.setVisibility(View.VISIBLE);
+
+                adapterItinerariosPorDestino.itinerarios = itinerarios;
+                adapterItinerariosPorDestino.notifyDataSetChanged();
+            } else{
+                Toast.makeText(getApplicationContext(), "Nenhum itinerário encontrado...", Toast.LENGTH_SHORT).show();
+            }
+
+            ocultaModalLoading();
+
+        }
+    };
+
     private void mostraDadosBairro(BairroCidade bairro, int tipo) {
 
-        if(tipo == 0){
-            binding.cardViewPartida.setVisibility(View.VISIBLE);
-            viewModel.escolhaAtual = 1;
-            viewModel.cidadesDestino.observe(this, cidadesDestinoObserver);
-            binding.setPartida(bairro);
-            binding.cardViewListPartida.setVisibility(View.GONE);
-            binding.cardViewListDestino.setVisibility(View.VISIBLE);
-        } else{
-            binding.cardViewDestino.setVisibility(View.VISIBLE);
-            binding.cardViewListDestino.setVisibility(View.GONE);
-            binding.setDestino(bairro);
-            viewModel.escolhaAtual = 0;
+        switch(tabHost.getCurrentTab()){
+            case 0:
+
+                if(tipo == 0){
+                    binding.cardViewPartida.setVisibility(View.VISIBLE);
+                    viewModel.escolhaAtual = 1;
+                    viewModel.cidadesDestino.observe(this, cidadesDestinoObserver);
+                    binding.setPartida(bairro);
+                    binding.cardViewListPartida.setVisibility(View.GONE);
+                    binding.cardViewListDestino.setVisibility(View.VISIBLE);
+                } else{
+                    binding.cardViewDestino.setVisibility(View.VISIBLE);
+                    binding.cardViewListDestino.setVisibility(View.GONE);
+                    binding.setDestino(bairro);
+                    viewModel.escolhaAtual = 0;
+                }
+
+                break;
+            case 2:
+
+                binding.cardViewDestinoConsulta.setVisibility(View.VISIBLE);
+                binding.setDestinoConsulta(bairro);
+                binding.cardViewListDestinoConsulta.setVisibility(View.GONE);
+
+                break;
         }
+
+
 
     }
 
@@ -578,43 +798,85 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     @Override
     public String onSelected(String id) {
 
-        formBairro = new FormBairro();
+        switch(tabHost.getCurrentTab()) {
+            case 0:
+                // consulta tradicional
 
-        Bundle bundle = new Bundle();
-        bundle.putString("cidade", id);
+                formBairro = new FormBairro();
 
-        if(bairroPartida != null){
-            formBairro.setBairroPartida(bairroPartida);
+                Bundle bundle = new Bundle();
+                bundle.putString("cidade", id);
+
+                if (bairroPartida != null) {
+                    formBairro.setBairroPartida(bairroPartida);
+                }
+
+                formBairro.setArguments(bundle);
+                formBairro.setCtx(ctx.getApplication());
+                formBairro.setListener(this);
+                formBairro.show(ctx.getSupportFragmentManager(), "formBairro");
+
+                this.bundle = new Bundle();
+                this.bundle.putString(FirebaseAnalytics.Param.START_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
+
+                break;
+            case 2:
+                // consulta nova
+
+                formBairro = new FormBairro();
+
+                Bundle bundleConsulta = new Bundle();
+                bundleConsulta.putString("cidade", id);
+
+                formBairro.setArguments(bundleConsulta);
+                formBairro.setCtx(ctx.getApplication());
+                formBairro.setListener(this);
+                formBairro.show(ctx.getSupportFragmentManager(), "formBairro");
+
+                break;
         }
 
-        formBairro.setArguments(bundle);
-        formBairro.setCtx(ctx.getApplication());
-        formBairro.setListener(this);
-        formBairro.show(ctx.getSupportFragmentManager(), "formBairro");
 
-        this.bundle = new Bundle();
-        this.bundle.putString(FirebaseAnalytics.Param.START_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
 
         return null;
     }
 
     @Override
     public String onItemSelected(String id) {
-        BairroCidade bairroCidade = new BairroCidade();
-        bairroCidade.getBairro().setId(id);
 
-        if(viewModel.partidaEscolhida == false){
-            bairroPartida = bairroCidade;
-            viewModel.setBairroPartida(bairroCidade);
-            viewModel.bairroPartida.observe(this, bairroObserver);
-            viewModel.partidaEscolhida = true;
-        } else{
-            //viewModel.setBairroPartida(bairroPartida);
-            viewModel.setBairroDestino(bairroCidade);
-            bairroDestino = bairroCidade;
-            viewModel.bairroDestino.observe(this, bairroDestinoObserver);
-            viewModel.destinoEscolhido = true;
+        switch(tabHost.getCurrentTab()){
+            case 0:
+                // consulta tradicional
+
+                BairroCidade bairroCidade = new BairroCidade();
+                bairroCidade.getBairro().setId(id);
+
+                if(viewModel.partidaEscolhida == false){
+                    bairroPartida = bairroCidade;
+                    viewModel.setBairroPartida(bairroCidade);
+                    viewModel.bairroPartida.observe(this, bairroObserver);
+                    viewModel.partidaEscolhida = true;
+                } else{
+                    //viewModel.setBairroPartida(bairroPartida);
+                    viewModel.setBairroDestino(bairroCidade);
+                    bairroDestino = bairroCidade;
+                    viewModel.bairroDestino.observe(this, bairroDestinoObserver);
+                    viewModel.destinoEscolhido = true;
+                }
+
+                break;
+            case 2:
+                // consulta nova
+                BairroCidade bairroCidadeConsulta = new BairroCidade();
+                bairroCidadeConsulta.getBairro().setId(id);
+
+                bairroDestinoConsulta = bairroCidadeConsulta;
+                viewModel.setBairroDestinoConsulta(bairroCidadeConsulta);
+                viewModel.bairroDestinoConsulta.observe(this, bairroConsultaObserver);
+                break;
         }
+
+
 
 
         return null;
@@ -641,7 +903,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
         viewModel.itinerario.observe(this, itinerarioObserver);
 
-        geraModalLoading();
+        geraModalLoading(0);
 
 //        binding.textViewBairroPartidaResultado.setText(viewModel.);
 
@@ -734,7 +996,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 //
 //        viewModel.setTodos(R.id.radioButtonTodos == idRadio);
 
-        geraModalLoading();
+        geraModalLoading(0);
 
         viewModel.checaFeriado(data);
 
@@ -848,4 +1110,29 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
         return targets;
     }
+
+    public Animation inFromRightAnimation()
+    {
+        Animation inFromRight = new TranslateAnimation(
+                Animation.RELATIVE_TO_PARENT, +1.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f);
+        inFromRight.setDuration(240);
+        inFromRight.setInterpolator(new AccelerateInterpolator());
+        return inFromRight;
+    }
+
+    public Animation outToRightAnimation()
+    {
+        Animation outtoLeft = new TranslateAnimation(
+                Animation.RELATIVE_TO_PARENT, -1.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f);
+        outtoLeft.setDuration(240);
+        outtoLeft.setInterpolator(new AccelerateInterpolator());
+        return outtoLeft;
+    }
+
 }

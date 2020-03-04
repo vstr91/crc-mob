@@ -9,7 +9,9 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TabHost;
+import android.widget.TabWidget;
 import android.widget.Toast;
 
 import com.getkeepsafe.taptargetview.TapTarget;
@@ -91,6 +93,9 @@ public class MensagensActivity extends BaseActivity {
         spec.setContent(R.id.tab1);
         spec.setIndicator("Enviadas");
         tabHost.addTab(spec);
+
+        final TabWidget tw = (TabWidget) tabHost.findViewById(android.R.id.tabs);
+        tw.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
 
     }
 

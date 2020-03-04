@@ -137,6 +137,10 @@ public class FormBairro extends FormBase implements SelectListener {
                 viewModel.setCidadeDestino(cidade);
                 viewModel.bairrosDestino.observe(this, bairrosObserver);
                 adapter = new BairroAdapter(viewModel.bairrosDestino.getValue(), ctx.getApplicationContext());
+            } else{
+                viewModel.setCidadeDestinoConsulta(cidade);
+                viewModel.bairrosDestinoConsulta.observe(this, bairrosObserver);
+                adapter = new BairroAdapter(viewModel.bairrosDestinoConsulta.getValue(), ctx.getApplicationContext());
             }
 
         }

@@ -17,6 +17,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TabHost;
+import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,7 +58,9 @@ import br.com.vostre.circular.utils.CustomLayoutManager;
 import br.com.vostre.circular.utils.DestaqueUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SnackbarHelper;
+import br.com.vostre.circular.utils.WidgetUtils;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
+import br.com.vostre.circular.view.adapter.ItinerarioInfoAdapter;
 import br.com.vostre.circular.view.adapter.LegendaAdapter;
 import br.com.vostre.circular.view.adapter.ParadaRuaAdapter;
 import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
@@ -74,6 +79,8 @@ public class DetalheItinerarioActivity extends BaseActivity {
     SecaoItinerarioAdapter adapterSecoes;
     ParadaRuaAdapter adapterRuas;
 
+    ItinerarioInfoAdapter adapterInfos;
+
     RecyclerView listHorarios;
     RecyclerView listSecoes;
     RecyclerView listRuas;
@@ -87,6 +94,9 @@ public class DetalheItinerarioActivity extends BaseActivity {
     BottomSheetDialog bsdRuas;
     boolean flagFavorito = false;
     RecyclerView listLegenda;
+    RecyclerView listLegendaInfo;
+
+    RecyclerView listInfos;
 
     String horario;
     boolean mapaOculto = false;
@@ -108,6 +118,8 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
     boolean trechoIsolado = false;
 
+    TabHost tabHost;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_itinerario);
@@ -119,7 +131,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
         if(!inversao){
             super.onCreate(savedInstanceState);
-            setTitle("Horários");
+            setTitle("Detalhes");
             getSupportActionBar().setDisplayShowTitleEnabled(true);
 
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
@@ -135,6 +147,9 @@ public class DetalheItinerarioActivity extends BaseActivity {
         }
 
         listLegenda = binding.listLegenda;
+        listLegendaInfo = binding.listLegendaInfo;
+
+        listInfos = binding.listInfos;
 
         //inversao false == primeira entrada;
         if(inversao){
@@ -223,7 +238,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
         adapterRuas = new ParadaRuaAdapter(viewModel.ruas.getValue(), this);
         listRuas.setAdapter(adapterRuas);
 
-        binding.btnVerRuas.setVisibility(View.GONE);
+//        binding.btnVerRuas.setVisibility(View.GONE);
 
         binding.linearLayout4.setVisibility(View.GONE);
         binding.textView37.setVisibility(View.GONE);
@@ -232,6 +247,24 @@ public class DetalheItinerarioActivity extends BaseActivity {
         geraModalLoading();
 
         configuraMapa();
+
+        tabHost = binding.tabs;
+        tabHost.setup();
+
+        TabHost.TabSpec spec = tabHost.newTabSpec("Horários");
+        spec.setContent(R.id.tab1);
+        spec.setIndicator("Quadro de Horários");
+        tabHost.addTab(spec);
+
+        TabHost.TabSpec spec2 = tabHost.newTabSpec("Infos");
+        spec2.setContent(R.id.tab2);
+        spec2.setIndicator("Outras Infos");
+        tabHost.addTab(spec2);
+
+        final TabWidget tw = (TabWidget) tabHost.findViewById(android.R.id.tabs);
+        tw.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
+
+        WidgetUtils.formataTabs(tw, this, 11, 0);
 
     }
 
@@ -254,14 +287,14 @@ public class DetalheItinerarioActivity extends BaseActivity {
         map.setMaxZoomLevel(19d);
         map.setMinZoomLevel(8d);
 
-        int preferenciaMapa = PreferenceUtils.carregarPreferenciaInt(ctx, "mapa");
-
-        if(preferenciaMapa == 0){
-            tamanhoOriginalMapa = binding.cardViewItinerario.getLayoutParams().height;
-            binding.map.setVisibility(View.GONE);
-            binding.cardViewItinerario.getLayoutParams().height = WRAP_CONTENT;
-            mapaOculto = true;
-        }
+//        int preferenciaMapa = PreferenceUtils.carregarPreferenciaInt(ctx, "mapa");
+//
+//        if(preferenciaMapa == 0){
+//            tamanhoOriginalMapa = binding.cardViewItinerario.getLayoutParams().height;
+//            binding.map.setVisibility(View.GONE);
+//            binding.cardViewItinerario.getLayoutParams().height = WRAP_CONTENT;
+//            mapaOculto = true;
+//        }
 
         map.setBuiltInZoomControls(false);
 
@@ -490,12 +523,14 @@ public class DetalheItinerarioActivity extends BaseActivity {
         public void onChanged(List<HorarioItinerarioNome> horarios) {
 
             List<Legenda> dados = null;
+            int[] cores = null;
 
             if(viewModel.qtdItinerarios.size() > 1){
                 binding.textView37.setVisibility(View.GONE);
                 binding.textViewLegenda.setVisibility(View.VISIBLE);
                 binding.textView51.setVisibility(View.VISIBLE);
                 binding.listLegenda.setVisibility(View.VISIBLE);
+                binding.listLegendaInfo.setVisibility(View.VISIBLE);
                 binding.textViewObservacao.setVisibility(View.GONE);
 
                 binding.imageButton5.setVisibility(View.GONE);
@@ -504,7 +539,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 List<ItinerarioPartidaDestino> itinerarios = viewModel.qtdItinerarios;
                 dados = new ArrayList<>();
 
-                int[] cores = ctx.getResources().getIntArray(R.array.cores_legenda);
+                cores = ctx.getResources().getIntArray(R.array.cores_legenda);
 
                 int cont = 0;
 
@@ -553,10 +588,11 @@ public class DetalheItinerarioActivity extends BaseActivity {
                     }
                 });
                 binding.listLegenda.setAdapter(adapter);
+                binding.listLegendaInfo.setAdapter(adapter);
 
-                if(!mapaOculto){
-                    ocultarMapa(null, true);
-                }
+//                if(!mapaOculto){
+//                    ocultarMapa(null, true);
+//                }
 
             } else{
 
@@ -574,6 +610,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
                 binding.textViewLegenda.setVisibility(View.GONE);
                 binding.listLegenda.setVisibility(View.GONE);
+                binding.listLegendaInfo.setVisibility(View.GONE);
                 binding.textView51.setVisibility(View.GONE);
 
                 if(viewModel.secoes != null && viewModel.secoes.getValue() != null && viewModel.secoes.getValue().size() > 0){
@@ -584,6 +621,9 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
 
             }
+
+            adapterInfos = new ItinerarioInfoAdapter(viewModel.qtdItinerarios, ctx, cores);
+            listInfos.setAdapter(adapterInfos);
 
             HorarioItinerarioNome horarioItinerarioNome = null;
 
@@ -708,9 +748,9 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 binding.linearLayout4.setVisibility(View.VISIBLE);
 
                 if(itinerario.getItinerario().getMostraRuas()){
-                    binding.btnVerRuas.setVisibility(View.VISIBLE);
+//                    binding.btnVerRuas.setVisibility(View.VISIBLE);
                 } else{
-                    binding.btnVerRuas.setVisibility(View.GONE);
+//                    binding.btnVerRuas.setVisibility(View.GONE);
                 }
 
                 if(itinerario.getItinerario().getSigla() == null || itinerario.getItinerario().getSigla().isEmpty() || itinerario.getItinerario().getSigla().equals("null")){
@@ -800,9 +840,9 @@ public class DetalheItinerarioActivity extends BaseActivity {
         public void onChanged(List<ParadaBairro> ruas) {
 
             if(ruas.size() > 0 && mostraRuas){
-                binding.btnVerRuas.setVisibility(View.VISIBLE);
+//                binding.btnVerRuas.setVisibility(View.VISIBLE);
             } else{
-                binding.btnVerRuas.setVisibility(View.GONE);
+//                binding.btnVerRuas.setVisibility(View.GONE);
             }
 
             adapterRuas.paradas = ruas;

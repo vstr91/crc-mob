@@ -144,7 +144,7 @@ public interface HorarioItinerarioDAO {
             "ORDER BY h.nome")
     List<ItinerarioPartidaDestino> contaItinerariosPorPartidaEDestinoSync(String partida, String destino);
 
-    @Query("SELECT DISTINCT i.id, i.observacao, " +
+    @Query("SELECT DISTINCT i.*, " +
             "'' AS 'nomePartida', " +
             "'' AS 'nomeDestino', " +
             "(SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +

@@ -39,4 +39,7 @@
 
     <string name="novidade_220_pois">Agora você tem mais informações sobre os pontos de interesse cadastrados! Veja os itinerários que passam por perto e planeje melhor sua viagem ou passeio!</string>
     <string name="novidade_220_ajuda">Bateu dúvida ao buscar aquela informação? Use a ajuda e veja tudo que o Circular tem a oferecer!</string>
+
+    <string name="texto_legenda">Mais de um itinerário encontrado.\nAtenção à legenda!</string>
+    <string name="texto_horarios">Carregando quadro de horários!\nSó um momento, por favor!</string>
 </resources>

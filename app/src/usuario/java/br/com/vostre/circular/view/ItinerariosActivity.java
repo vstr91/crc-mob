@@ -949,7 +949,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         if(d != null){
 
             NumberFormat nf = NumberFormat.getNumberInstance();
-            nf.setMaximumFractionDigits(2);
+            nf.setMaximumFractionDigits(1);
 
             textView.setText(nf.format(d/1000)+" Km");
         }

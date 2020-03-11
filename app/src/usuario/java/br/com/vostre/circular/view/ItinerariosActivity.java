@@ -1,19 +1,25 @@
 package br.com.vostre.circular.view;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputFilter;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateInterpolator;
@@ -34,25 +40,31 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.getkeepsafe.taptargetview.TapTargetView;
+import com.google.android.gms.location.LocationRequest;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.format.DateTimeFormat;
+import org.osmdroid.util.GeoPoint;
 
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import br.com.vostre.circleview.CircleView;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityItinerariosBinding;
+import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
+import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.DataHoraUtils;
 import br.com.vostre.circular.utils.DestaqueUtils;
 import br.com.vostre.circular.utils.WidgetUtils;
@@ -118,6 +130,9 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     RecyclerView listCidadesDestinoConsulta;
 
     int currentTab = 0;
+    Location ultimoLocal;
+
+    Bairro bairroAtual;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +152,16 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         //viewModel.escolhaAtual = 0;
         viewModel.resultadosItinerarios.observe(this, resultadoItinerarioObserver);
         viewModel.isFeriado.observe(this, feriadoObserver);
+        viewModel.localAtual.observe(this, localObserver);
+
+        ultimoLocal = new Location(LocationManager.GPS_PROVIDER);
+
+        viewModel.iniciarAtualizacoesPosicao();
+
+        if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED){
+            startLocationUpdates();
+        }
 
         viewModel.cidadesDestinoConsulta.observe(this, cidadesDestinoConsultaObserver);
 
@@ -211,6 +236,21 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
             public void onTabChanged(String tabId)
             {
                 View currentView = tabHost.getCurrentView();
+
+                if(tabHost.getCurrentTab() == 0){
+
+                    if(menu != null){
+                        menu.getItem(0).setVisible(true);
+                    }
+
+                } else{
+
+                    if(menu != null){
+                        menu.getItem(0).setVisible(false);
+                    }
+
+                }
+
                 if (tabHost.getCurrentTab() > currentTab)
                 {
                     currentView.setAnimation( inFromRightAnimation() );
@@ -231,12 +271,31 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        boolean retorno = super.onCreateOptionsMenu(menu);
+
+        this.menu = menu;
+
+        return retorno;
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
+
+        if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED){
+            startLocationUpdates();
+        }
+
     }
 
     @Override
     protected void onPause() {
+
+        stopLocationUpdates();
+
         super.onPause();
     }
 
@@ -273,7 +332,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     // Tab por linha
 
     public void onClickBtnProcurarPorLinha(View v){
-        viewModel.buscarPorLinha(binding.editTextLinha.getText().toString().trim().replaceAll(" ", ""));
+        viewModel.buscarPorLinha(binding.editTextLinha.getText().toString().trim().replace(" ", "").replace("-", "").replace("_", ""));
 
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
@@ -402,6 +461,9 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
             case 1:
                 binding.textViewCarregando.setText(R.string.texto_buscando_por_linha);
                 break;
+            case 2:
+                binding.textViewCarregando.setText(R.string.texto_buscando_por_destino);
+                break;
         }
 
         binding.textViewCarregando.setVisibility(View.VISIBLE);
@@ -499,6 +561,59 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         }
     };
 
+    Observer<Location> localObserver = new Observer<Location>() {
+        @Override
+        public void onChanged(Location local) {
+
+            if(local.getLatitude() != 0.0 && local.getLongitude() != 0.0 && local.distanceTo(ultimoLocal) > 100){
+                ultimoLocal = local;
+
+                viewModel.buscarParadasProximas(getApplicationContext(), local);
+                viewModel.paradasProximas.observe(ctx, paradasProximasObserver);
+
+            }
+
+        }
+    };
+
+    Observer<List<ParadaBairro>> paradasProximasObserver = new Observer<List<ParadaBairro>>() {
+        @Override
+        public void onChanged(List<ParadaBairro> paradas) {
+
+            if(paradas.size() > 0){
+
+                Location poiLocation = new Location(LocationManager.GPS_PROVIDER);
+                poiLocation.setLatitude(ultimoLocal.getLatitude());
+                poiLocation.setLongitude(ultimoLocal.getLongitude());
+
+                for(ParadaBairro i : paradas){
+                    Location paradaLocation = new Location(LocationManager.GPS_PROVIDER);
+                    paradaLocation.setLatitude(i.getParada().getLatitude());
+                    paradaLocation.setLongitude(i.getParada().getLongitude());
+
+                    i.setDistancia(paradaLocation.distanceTo(poiLocation));
+                }
+
+                Collections.sort(paradas, new Comparator<ParadaBairro>() {
+                    @Override
+                    public int compare(ParadaBairro paradaBairro, ParadaBairro t1) {
+                        return paradaBairro.getDistancia() > t1.getDistancia() ? 1 : -1;
+                    }
+                });
+
+                ParadaBairro parada = paradas.get(0);
+
+                bairroAtual = new Bairro();
+                bairroAtual.setId(parada.getIdBairro());
+                bairroAtual.setNome(parada.getNomeBairro());
+                bairroAtual.setCidade(parada.getIdCidade());
+
+                //Toast.makeText(ctx, parada.getNomeBairroComCidade(), Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    };
+
     Observer<List<CidadeEstado>> cidadesObserver = new Observer<List<CidadeEstado>>() {
         @Override
         public void onChanged(List<CidadeEstado> cidades) {
@@ -589,10 +704,15 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
                 mostraDadosBairro(bairro, 0);
                 bairroDestinoConsulta = bairro;
 
-                viewModel.buscarPorDestino(bairro.getBairro().getId());
+                if(bairroAtual != null && gpsAtivo){
+                    viewModel.buscarPorDestino(bairro.getBairro().getId(), bairroAtual.getId());
+                } else{
+                    viewModel.buscarPorDestino(bairro.getBairro().getId(), "");
+                }
+
                 viewModel.itinerariosPorDestino.observe(ctx, itinerarioPorDestinoObserver);
 
-                geraModalLoading(1);
+                geraModalLoading(2);
 
             }
 
@@ -626,6 +746,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
                 binding.listItinerariosDestino.setVisibility(View.VISIBLE);
 
                 adapterItinerariosPorDestino.itinerarios = itinerarios;
+                adapterItinerariosPorDestino.destaca = viewModel.destacaItinerario;
                 adapterItinerariosPorDestino.notifyDataSetChanged();
             } else{
                 Toast.makeText(getApplicationContext(), "Nenhum itinerário encontrado...", Toast.LENGTH_SHORT).show();
@@ -763,6 +884,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         public void onChanged(Boolean isFeriado) {
 
             if(bairroPartida != null && bairroDestino != null){
+
                 if(isFeriado){
                     viewModel.carregaResultado(horaEscolhida, "domingo", DataHoraUtils.getDiaSeguinteSelecionado(dataEscolhida),
                             DataHoraUtils.getDiaAnteriorSelecionado(dataEscolhida), inversao);
@@ -922,53 +1044,6 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 //        binding.textViewHorarioSeguinte.setText(DateTimeFormat.forPattern("HH:mm").print(horario.getNomeHorario()));
     }
 
-    @BindingAdapter("app:horario")
-    public static void setHorario(TextView textView, String s){
-        textView.setText(s);
-    }
-
-    @BindingAdapter("app:horario")
-    public static void setHorario(TextView textView, Long l){
-
-        if(l != null){
-            textView.setText(DateTimeFormat.forPattern("HH:mm")
-                    .print(l));
-        }
-
-    }
-
-    @BindingAdapter("app:tempo")
-    public static void setTempo(TextView textView, DateTime dateTime){
-        textView.setText(DateTimeFormat.forPattern("HH:mm")
-                .print(dateTime));
-    }
-
-    @BindingAdapter("app:distancia")
-    public static void setDistancia(TextView textView, Double d){
-
-        if(d != null){
-
-            NumberFormat nf = NumberFormat.getNumberInstance();
-            nf.setMaximumFractionDigits(1);
-
-            textView.setText(nf.format(d/1000)+" Km");
-        }
-
-    }
-
-    @BindingAdapter("app:tarifa")
-    public static void setTarifa(TextView textView, Double d){
-
-        if(d != null){
-
-            NumberFormat nf = NumberFormat.getCurrencyInstance();
-            nf.setMaximumFractionDigits(2);
-
-            textView.setText(nf.format(d));
-        }
-
-    }
-
     public void exibeDadosResultado(){
 
 //        if(viewModel.itinerario.getValue().getHorarioItinerario().getObservacao() == null){
@@ -1003,6 +1078,50 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         this.dataEscolhida = data;
         this.diaEscolhido = dia;
         this.horaEscolhida = hora;
+
+    }
+
+    private boolean checarPermissoes(){
+        return ContextCompat.checkSelfPermission(getApplicationContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @Override
+    public void onGpsChanged(boolean ativo) {
+
+        if(ativo){
+            viewModel.buscarParadasProximas(getApplicationContext(), ultimoLocal);
+        } else{
+
+        }
+
+    }
+
+    @SuppressLint("MissingPermission")
+    private void startLocationUpdates() {
+
+        if(checarPermissoes()){
+
+            LocationRequest locationRequest = new LocationRequest();
+            locationRequest.setInterval(3000);
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            locationRequest.setMaxWaitTime(5000);
+
+            if(viewModel != null){
+                viewModel.mFusedLocationClient.requestLocationUpdates(locationRequest,
+                        viewModel.mLocationCallback,
+                        null);
+            }
+
+        }
+
+    }
+
+    private void stopLocationUpdates() {
+
+        if(viewModel != null && viewModel.mFusedLocationClient != null){
+            viewModel.mFusedLocationClient.removeLocationUpdates(viewModel.mLocationCallback);
+        }
 
     }
 
@@ -1078,7 +1197,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
         View v =  binding.listCidadesPartida.getChildAt(1);
 
-        if(v != null){
+        if(v != null && tabHost.getCurrentTab() == 0){
+
             DestaqueUtils.geraDestaqueUnico(this, binding.listCidadesPartida.getChildAt(1).findViewById(R.id.circleView2), "Escolha a cidade de partida",
                     "Escolha primeiro a cidade da qual você vai iniciar a sua viagem!", new TapTargetView.Listener(){
                         @Override
@@ -1100,6 +1220,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
                         }
                     }, false, true);
+        } else if(tabHost.getCurrentTab() == 1){
+
         } else{
             Toast.makeText(getApplicationContext(), "Houve um problema ao criar o tour. Locais de partida não encontrados. Por favor tente novamente mais tarde.", Toast.LENGTH_LONG).show();
         }

@@ -15,7 +15,11 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
@@ -45,6 +49,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityDetalheItinerarioBinding;
@@ -65,13 +70,14 @@ import br.com.vostre.circular.view.adapter.LegendaAdapter;
 import br.com.vostre.circular.view.adapter.ParadaRuaAdapter;
 import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
 import br.com.vostre.circular.view.listener.LegendaListener;
+import br.com.vostre.circular.view.listener.PartidaEDestinoListener;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.view.viewHolder.LegendaViewHolder;
 import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
-public class DetalheItinerarioActivity extends BaseActivity {
+public class DetalheItinerarioActivity extends BaseActivity implements PartidaEDestinoListener {
 
     ActivityDetalheItinerarioBinding binding;
     DetalhesItinerarioViewModel viewModel;
@@ -119,6 +125,12 @@ public class DetalheItinerarioActivity extends BaseActivity {
     boolean trechoIsolado = false;
 
     TabHost tabHost;
+
+    int currentTab = 0;
+
+    Long iniRuas;
+    Long iniPartida;
+    Long iniDestino;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,15 +198,20 @@ public class DetalheItinerarioActivity extends BaseActivity {
             viewModel.partidaConsulta = getIntent().getStringExtra("partidaConsulta");
             viewModel.destinoConsulta = getIntent().getStringExtra("destinoConsulta");
 
+            viewModel.carregaPartidaEDestino(paradaPartida, paradaDestino);
+            viewModel.setListener(this);
+
             viewModel.setItinerario(getIntent().getStringExtra("itinerario"), paradaPartida, paradaDestino,
                     itinerarioPartida, itinerarioDestino);
             horario = getIntent().getStringExtra("horario");
 
             viewModel.itinerario.observe(this, itinerarioObserver);
 
+            iniPartida = System.nanoTime();
             viewModel.partida.observe(this, partidaObserver);
+
+            iniDestino = System.nanoTime();
             viewModel.destino.observe(this, destinoObserver);
-            viewModel.ruas.observe(this, ruasObserver);
 
             listHorarios = binding.listHorarios;
             adapterHorarios = new HorarioItinerarioAdapter(viewModel.horarios.getValue(), this);
@@ -236,7 +253,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
         });
 
         adapterRuas = new ParadaRuaAdapter(viewModel.ruas.getValue(), this);
-        listRuas.setAdapter(adapterRuas);
+        binding.listRuas.setAdapter(adapterRuas);
 
 //        binding.btnVerRuas.setVisibility(View.GONE);
 
@@ -266,9 +283,53 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
         WidgetUtils.formataTabs(tw, this, 11, 0);
 
+        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            public void onTabChanged(String tabId)
+            {
+                View currentView = tabHost.getCurrentView();
+
+                if(tabHost.getCurrentTab() == 0){
+
+                    if(menu != null){
+                        menu.getItem(0).setVisible(true);
+                    }
+
+                } else{
+
+                    if(menu != null){
+                        menu.getItem(0).setVisible(false);
+                    }
+
+                }
+
+                if (tabHost.getCurrentTab() > currentTab)
+                {
+                    currentView.setAnimation( inFromRightAnimation() );
+                }
+                else
+                {
+                    currentView.setAnimation( outToRightAnimation() );
+                }
+
+                currentTab = tabHost.getCurrentTab();
+            }
+        });
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        boolean retorno = super.onCreateOptionsMenu(menu);
+
+        this.menu = menu;
+
+        return retorno;
     }
 
     private void configuraMapa() {
+        Long mapInit = System.nanoTime();
+
         map = binding.map;
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setBuiltInZoomControls(true);
@@ -318,6 +379,10 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
         MapEventsOverlay overlayEvents = new MapEventsOverlay(getBaseContext(), receiver);
         map.getOverlays().add(overlayEvents);
+
+        Long mapFin = System.nanoTime();
+
+        System.out.println("TEMPO TOTAL MAPA: "+TimeUnit.SECONDS.convert(mapFin - mapInit, TimeUnit.NANOSECONDS));
 
     }
 
@@ -423,42 +488,6 @@ public class DetalheItinerarioActivity extends BaseActivity {
         Bitmap b = Bitmap.createBitmap(v.getDrawingCache());
         v.setDrawingCacheEnabled(false); // clear drawing cache
         return b;
-    }
-
-    @BindingAdapter("app:textDinheiro")
-    public static void setTextDinheiro(TextView view, Double val){
-
-        if(val != null){
-            view.setText(NumberFormat.getCurrencyInstance().format(val));
-        } else{
-            view.setText("-");
-        }
-
-    }
-
-    @BindingAdapter("app:textDistancia")
-    public static void setTextDistancia(TextView view, Double val){
-
-        if(val != null){
-            DecimalFormat format = new DecimalFormat();
-            format.setMinimumFractionDigits(1);
-            format.setMaximumFractionDigits(1);
-            view.setText(format.format(val)+" Km");
-        } else{
-            view.setText("-");
-        }
-
-    }
-
-    @BindingAdapter("app:textData")
-    public static void setText(TextView view, DateTime val){
-
-        if(val != null){
-            view.setText(DateTimeFormat.forPattern("HH:mm").print(val));
-        } else{
-            view.setText("-");
-        }
-
     }
 
     public void ocultarMapa(View v, Boolean automatica){
@@ -669,9 +698,9 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
             contaProcessamento++;
 
-            if(contaProcessamento == 2){
+            //if(contaProcessamento == 2){
                 ocultaModalLoading();
-            }
+            //}
 
             binding.listHorarios.scheduleLayoutAnimation();
 
@@ -725,11 +754,16 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 viewModel.destino.observe(ctx, destinoObserver);
             }
 
-            int i = lstItinerarios.indexOf(paradas.get(0).getIdBairro()+"|"+paradas.get(paradas.size()-1).getIdBairro());
+            if(paradas.size() > 0){
+                int i = lstItinerarios.indexOf(paradas.get(0).getIdBairro()+"|"+paradas.get(paradas.size()-1).getIdBairro());
 
-            if(i >= 0){
-                binding.imageButton4.setImageResource(R.drawable.ic_star_white_24dp);
-                flagFavorito = true;
+                if(i >= 0){
+                    binding.imageButton4.setImageResource(R.drawable.ic_star_white_24dp);
+                    flagFavorito = true;
+                } else{
+                    binding.imageButton4.setImageResource(R.drawable.ic_star_border_white_24dp);
+                    flagFavorito = false;
+                }
             } else{
                 binding.imageButton4.setImageResource(R.drawable.ic_star_border_white_24dp);
                 flagFavorito = false;
@@ -747,12 +781,6 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
                 binding.linearLayout4.setVisibility(View.VISIBLE);
 
-                if(itinerario.getItinerario().getMostraRuas()){
-//                    binding.btnVerRuas.setVisibility(View.VISIBLE);
-                } else{
-//                    binding.btnVerRuas.setVisibility(View.GONE);
-                }
-
                 if(itinerario.getItinerario().getSigla() == null || itinerario.getItinerario().getSigla().isEmpty() || itinerario.getItinerario().getSigla().equals("null")){
                     binding.textView37.setVisibility(View.GONE);
                 } else{
@@ -765,6 +793,18 @@ public class DetalheItinerarioActivity extends BaseActivity {
                     binding.textViewObservacao.setVisibility(View.VISIBLE);
                 }
 
+                if(itinerario.getItinerario().getMostraRuas()){
+                    mostraRuas = true;
+                    viewModel.carregarRuas(itinerario.getItinerario().getId());
+
+                    iniRuas = System.nanoTime();
+
+                    viewModel.ruas.observe(ctx, ruasObserver);
+                } else{
+                    mostraRuas = false;
+                    binding.textViewRuas.setVisibility(View.GONE);
+                }
+
                 viewModel.paradas.observe(ctx, paradasObserver);
                 viewModel.secoes.observe(ctx, secoesObserver);
                 //viewModel.carregarItinerarios(parada.getParada().getId());
@@ -772,9 +812,9 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
                 contaProcessamento++;
 
-                if(contaProcessamento == 2){
-                    ocultaModalLoading();
-                }
+                //if(contaProcessamento == 2){
+                    //ocultaModalLoading();
+                //}
 
             }
 
@@ -816,6 +856,10 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 binding.setPartida(parada);
             }
 
+            Long partidaFin = System.nanoTime();
+
+            System.out.println("TEMPO TOTAL PARTIDA: "+TimeUnit.SECONDS.convert(partidaFin - iniPartida, TimeUnit.NANOSECONDS));
+
         }
     };
 
@@ -830,6 +874,10 @@ public class DetalheItinerarioActivity extends BaseActivity {
 //                    viewModel.setItinerario(itinerario, );
 //                }
 
+                Long destinoFin = System.nanoTime();
+
+                System.out.println("TEMPO TOTAL DESTINO: "+TimeUnit.SECONDS.convert(destinoFin - iniDestino, TimeUnit.NANOSECONDS));
+
             }
 
         }
@@ -841,9 +889,18 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
             if(ruas.size() > 0 && mostraRuas){
 //                binding.btnVerRuas.setVisibility(View.VISIBLE);
+                binding.textViewRuas.setVisibility(View.VISIBLE);
+                binding.listRuas.setVisibility(View.VISIBLE);
             } else{
 //                binding.btnVerRuas.setVisibility(View.GONE);
+                binding.textViewRuas.setVisibility(View.GONE);
+                binding.listRuas.setVisibility(View.GONE);
             }
+
+            Long finRuas = System.nanoTime();
+            Long totRuas = finRuas - iniRuas;
+
+            System.out.println("TEMPO TOTAL IRUAS: "+ TimeUnit.SECONDS.convert(totRuas, TimeUnit.NANOSECONDS));
 
             adapterRuas.paradas = ruas;
             adapterRuas.notifyDataSetChanged();
@@ -962,10 +1019,63 @@ public class DetalheItinerarioActivity extends BaseActivity {
         targets.add(DestaqueUtils.geraTapTarget(binding.imageButton6, "Compartilhar", "Aqui você pode compartilhar o quadro de horários com seus contatos!",
                 false, true, 3));
 
-        targets.add(DestaqueUtils.geraTapTarget(binding.listHorarios.findViewHolderForAdapterPosition(0).itemView.findViewById(R.id.textViewNome),
-                "Horários", "Aqui você verá o quadro de horários do itinerário escolhido!", false, true, 4));
+//        targets.add(DestaqueUtils.geraTapTarget(binding.listHorarios.findViewHolderForAdapterPosition(0).itemView.findViewById(R.id.textViewNome),
+//                "Horários", "Aqui você verá o quadro de horários do itinerário escolhido!", false, true, 4));
 
         return targets;
     }
 
+    public Animation inFromRightAnimation()
+    {
+        Animation inFromRight = new TranslateAnimation(
+                Animation.RELATIVE_TO_PARENT, +1.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f);
+        inFromRight.setDuration(240);
+        inFromRight.setInterpolator(new AccelerateInterpolator());
+        return inFromRight;
+    }
+
+    public Animation outToRightAnimation()
+    {
+        Animation outtoLeft = new TranslateAnimation(
+                Animation.RELATIVE_TO_PARENT, -1.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f);
+        outtoLeft.setDuration(240);
+        outtoLeft.setInterpolator(new AccelerateInterpolator());
+        return outtoLeft;
+    }
+
+    @Override
+    public void onLoaded(ParadaBairro partida, ParadaBairro destino) {
+
+        if(partida != null){
+            binding.setPartida(partida);
+        }
+
+        Long partidaFin = System.nanoTime();
+
+        System.out.println("TEMPO TOTAL PARTIDA: "+TimeUnit.SECONDS.convert(partidaFin - iniPartida, TimeUnit.NANOSECONDS));
+
+        // destino
+
+        if(destino != null){
+            binding.setDestino(destino);
+
+//                if(binding.getPartida() != null){
+//                    viewModel.setItinerario(itinerario, );
+//                }
+
+            Long destinoFin = System.nanoTime();
+
+            System.out.println("TEMPO TOTAL DESTINO: "+TimeUnit.SECONDS.convert(destinoFin - iniDestino, TimeUnit.NANOSECONDS));
+
+        }
+
+        ocultaModalLoading();
+
+    }
 }

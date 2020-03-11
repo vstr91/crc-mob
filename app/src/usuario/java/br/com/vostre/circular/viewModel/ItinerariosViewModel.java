@@ -6,6 +6,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.persistence.db.SimpleSQLiteQuery;
+import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
@@ -51,6 +52,7 @@ import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 import br.com.vostre.circular.utils.DataHoraUtils;
+import br.com.vostre.circular.utils.LocationUtils;
 import br.com.vostre.circular.utils.StringUtils;
 import br.com.vostre.circular.view.listener.FeriadoListener;
 import es.usc.citius.hipster.algorithm.Algorithm;
@@ -85,6 +87,9 @@ public class ItinerariosViewModel extends AndroidViewModel {
     public BairroCidade myPartida = null;
     public BairroCidade myDestino = null;
 
+    public FusedLocationProviderClient mFusedLocationClient;
+    public LocationCallback mLocationCallback;
+
     public CidadeEstado cidadeDestinoConsulta;
     public LiveData<List<CidadeEstado>> cidadesDestinoConsulta;
     public BairroCidade myDestinoConsulta = null;
@@ -107,6 +112,10 @@ public class ItinerariosViewModel extends AndroidViewModel {
     public LiveData<List<ItinerarioPartidaDestino>> itinerariosPorLinha;
 
     public MutableLiveData<List<ItinerarioPartidaDestino>> itinerariosPorDestino;
+
+    public MutableLiveData<Location> localAtual;
+    public LiveData<List<ParadaBairro>> paradasProximas;
+    public boolean destacaItinerario = false;
 
     public boolean isTodos() {
         return todos;
@@ -210,6 +219,34 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
         isFeriado = new MutableLiveData<>();
         isFeriado.setValue(false);
+
+        localAtual = new MutableLiveData<>();
+        localAtual.postValue(new Location(LocationManager.GPS_PROVIDER));
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplication());
+    }
+
+    public void iniciarAtualizacoesPosicao(){
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+
+                    if(location.getAccuracy() <= 20){
+                        localAtual.postValue(location);
+
+                        if(localAtual.getValue() != null){
+                            localAtual.getValue().setLatitude(localAtual.getValue().getLatitude());
+                            localAtual.getValue().setLongitude(localAtual.getValue().getLongitude());
+                        }
+
+                    }
+
+                }
+            }
+        };
     }
 
     public void buscarPorLinha(final String linha){
@@ -326,7 +363,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 .listarTodosAtivosPorLinhaComBairroEHorarioCompleto(query);
     }
 
-    public void buscarPorDestino(final String bairro){
+    public void buscarPorDestino(final String bairro, final String bairroAtual){
 
         String dia = DataHoraUtils.getDiaAtual();
         final String diaSeguinte = DataHoraUtils.getDiaSeguinte();
@@ -342,30 +379,84 @@ public class ItinerariosViewModel extends AndroidViewModel {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                List<String> itinerariosDisponiveis = appDatabase.itinerarioDAO().carregarOpcoesPorPartidaEDestinoTrechoConsultaSync(bairro);
-                List<ItinerarioPartidaDestino> itinerarios = new ArrayList<>();
 
-                for(String iti : itinerariosDisponiveis){
-                    SimpleSQLiteQuery query = new SimpleSQLiteQuery(
-                            geraQueryResultadoConsulta(bairro, diaAnterior, finalDia, diaSeguinte, hora, iti));
+                List<String> itinerariosDisponiveis;
+                List<ItinerarioPartidaDestino> itis;
 
-                    ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO()
-                            .carregarPorPartidaEDestinoComHorarioSync(query);
+                if(bairroAtual.isEmpty()){
+                    itinerariosDisponiveis = appDatabase.itinerarioDAO().carregarOpcoesPorDestinoTrechoConsultaSync(bairro);
 
-                    itinerarios.add(itinerario);
+                    itis = new ArrayList<>();
+
+                    for(String iti : itinerariosDisponiveis){
+                        SimpleSQLiteQuery query = new SimpleSQLiteQuery(
+                                geraQueryResultadoConsulta(bairro, diaAnterior, finalDia, diaSeguinte, hora, iti));
+
+                        ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO()
+                                .carregarPorPartidaEDestinoComHorarioSync(query);
+
+                        itis.add(itinerario);
+                    }
+
+                    Collections.sort(itis, new Comparator<ItinerarioPartidaDestino>() {
+                        @Override
+                        public int compare(ItinerarioPartidaDestino itinerarioPartidaDestino, ItinerarioPartidaDestino t1) {
+
+                            return DateTimeFormat.forPattern("HH:mm").parseLocalTime(itinerarioPartidaDestino.getProximoHorario())
+                                    .compareTo(DateTimeFormat.forPattern("HH:mm").parseLocalTime(t1.getProximoHorario()));
+
+                        }
+                    });
+
+                    destacaItinerario = false;
+
+                } else{
+                    itinerariosDisponiveis = appDatabase.itinerarioDAO().carregarOpcoesPorPartidaEDestinoTrechoConsultaSync(bairro, bairroAtual);
+
+                    itis = new ArrayList<>();
+
+                    String itinerarioDestaque = itinerariosDisponiveis.get(0);
+
+                    ItinerarioPartidaDestino destaque = new ItinerarioPartidaDestino();
+                    destaque.getItinerario().setId(itinerarioDestaque);
+
+                    for(String iti : itinerariosDisponiveis){
+                        SimpleSQLiteQuery query = new SimpleSQLiteQuery(
+                                geraQueryResultadoConsulta(bairro, diaAnterior, finalDia, diaSeguinte, hora, iti));
+
+                        ItinerarioPartidaDestino itinerario = appDatabase.itinerarioDAO()
+                                .carregarPorPartidaEDestinoComHorarioSync(query);
+
+                        itis.add(itinerario);
+                    }
+
+                    Collections.sort(itis, new Comparator<ItinerarioPartidaDestino>() {
+                        @Override
+                        public int compare(ItinerarioPartidaDestino itinerarioPartidaDestino, ItinerarioPartidaDestino t1) {
+
+                            return DateTimeFormat.forPattern("HH:mm").parseLocalTime(itinerarioPartidaDestino.getProximoHorario())
+                                    .compareTo(DateTimeFormat.forPattern("HH:mm").parseLocalTime(t1.getProximoHorario()));
+
+                        }
+                    });
+
+                    destaque = itis.get(itis.indexOf(destaque));
+
+                    if(destaque.getIdBairroPartida().equals(bairroAtual)){
+
+                        itis.remove(destaque);
+                        itis.add(0, destaque);
+
+                        destacaItinerario = true;
+                    } else{
+                        destacaItinerario = false;
+                    }
+
+
+
                 }
 
-                Collections.sort(itinerarios, new Comparator<ItinerarioPartidaDestino>() {
-                    @Override
-                    public int compare(ItinerarioPartidaDestino itinerarioPartidaDestino, ItinerarioPartidaDestino t1) {
-
-                        return DateTimeFormat.forPattern("HH:mm").parseLocalTime(itinerarioPartidaDestino.getProximoHorario())
-                                .compareTo(DateTimeFormat.forPattern("HH:mm").parseLocalTime(t1.getProximoHorario()));
-
-                    }
-                });
-
-                itinerariosPorDestino.postValue(itinerarios);
+                itinerariosPorDestino.postValue(itis);
 
             }
         });
@@ -407,6 +498,12 @@ public class ItinerariosViewModel extends AndroidViewModel {
             }
 
         }
+
+    }
+
+    public void buscarParadasProximas(Context ctx, Location location){
+
+        paradasProximas = LocationUtils.buscaParadasProximas(ctx, location, 500);
 
     }
 
@@ -985,6 +1082,18 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                         itinerario.setObservacaoProximoHorario(obsProximoHorario);
                                     }
 
+                                    if(trechoIsolado){
+                                        HorarioItinerarioNome horarioItinerarioAnterior;
+                                        HorarioItinerarioNome horarioItinerarioSeguinte;
+
+                                        horarioItinerarioAnterior = appDatabase.horarioItinerarioDAO().carregarPorIdSync(itinerario.getIdHorarioAnterior());
+                                        horarioItinerarioSeguinte = appDatabase.horarioItinerarioDAO().carregarPorIdSync(itinerario.getIdHorarioSeguinte());
+
+                                        itinerario.setItinerarioAnterior(appDatabase.itinerarioDAO().carregarSync(horarioItinerarioAnterior.getHorarioItinerario().getItinerario()));
+                                        itinerario.setItinerarioSeguinte(appDatabase.itinerarioDAO().carregarSync(horarioItinerarioSeguinte.getHorarioItinerario().getItinerario()));
+
+                                    }
+
                                     itinerarioAnterior = itinerario;
 
                                     itinerarios.add(itinerario);
@@ -1490,6 +1599,18 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                         String obsProximoHorario = appDatabase.horarioItinerarioDAO()
                                                 .carregarObservacaoPorHorario(itinerario.getIdProximoHorario());
                                         itinerario.setObservacaoProximoHorario(obsProximoHorario);
+                                    }
+
+                                    if(trechoIsolado){
+                                        HorarioItinerarioNome horarioItinerarioAnterior;
+                                        HorarioItinerarioNome horarioItinerarioSeguinte;
+
+                                        horarioItinerarioAnterior = appDatabase.horarioItinerarioDAO().carregarPorIdSync(itinerario.getHorarioAnterior());
+                                        horarioItinerarioSeguinte = appDatabase.horarioItinerarioDAO().carregarPorIdSync(itinerario.getHorarioSeguinte());
+
+                                        itinerario.setItinerarioAnterior(appDatabase.itinerarioDAO().carregarSync(horarioItinerarioAnterior.getHorarioItinerario().getItinerario()));
+                                        itinerario.setItinerarioSeguinte(appDatabase.itinerarioDAO().carregarSync(horarioItinerarioSeguinte.getHorarioItinerario().getItinerario()));
+
                                     }
 
                                     itinerarioAnterior = itinerario;

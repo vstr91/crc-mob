@@ -409,7 +409,6 @@
                         android:gravity="center"
                         android:ellipsize="none"
                         android:maxLines="2"
-                        android:text="@{itinerario.observacaoProximoHorario}"
                         android:textAppearance="@style/texto_branco"
                         android:textSize="10sp"
                         android:textStyle="bold" />
@@ -504,7 +503,6 @@
                     android:ellipsize="none"
                     android:gravity="center"
                     android:maxLines="4"
-                    android:text="@{itinerario.observacaoHorarioAnterior}"
                     android:textColor="@color/cinzaEscuro"
                     android:textSize="9sp"
                     android:textStyle="bold"
@@ -524,7 +522,6 @@
                     android:ellipsize="none"
                     android:gravity="center"
                     android:maxLines="4"
-                    android:text="@{itinerario.observacaoHorarioSeguinte}"
                     android:textColor="@color/cinzaEscuro"
                     android:textSize="9sp"
                     android:textStyle="bold"

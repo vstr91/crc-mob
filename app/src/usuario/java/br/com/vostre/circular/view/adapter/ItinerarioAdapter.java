@@ -19,10 +19,17 @@ public class ItinerarioAdapter extends RecyclerView.Adapter<ItinerarioViewHolder
 
     public List<ItinerarioPartidaDestino> itinerarios;
     AppCompatActivity ctx;
+    public boolean destaca = false;
 
     public ItinerarioAdapter(List<ItinerarioPartidaDestino> itinerarios, AppCompatActivity context){
         this.itinerarios = itinerarios;
         ctx = context;
+    }
+
+    public ItinerarioAdapter(List<ItinerarioPartidaDestino> itinerarios, AppCompatActivity context, boolean destaca){
+        this.itinerarios = itinerarios;
+        ctx = context;
+        this.destaca = destaca;
     }
 
     @Override
@@ -36,9 +43,16 @@ public class ItinerarioAdapter extends RecyclerView.Adapter<ItinerarioViewHolder
 
     @Override
     public void onBindViewHolder(ItinerarioViewHolder holder, int position) {
+
         final ItinerarioPartidaDestino itinerario = this.itinerarios.get(position);
 
-        holder.bind(itinerario);
+        if(destaca && position == 0){
+            holder.bind(itinerario, destaca);
+        } else{
+            holder.bind(itinerario);
+        }
+
+
 
 
     }

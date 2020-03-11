@@ -2,4 +2,5 @@
 <resources>
     <color name="azul">#334bff</color>
     <color name="azul80">#DD334bff</color>
+    <color name="secondary_text_material_light">#8A000000</color>
 </resources>

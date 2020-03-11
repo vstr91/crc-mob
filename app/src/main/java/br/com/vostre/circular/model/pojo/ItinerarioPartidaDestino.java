@@ -155,6 +155,28 @@ public class ItinerarioPartidaDestino {
     @Ignore
     public List<SecaoItinerario> secoes;
 
+    @Ignore
+    public ItinerarioPartidaDestino itinerarioAnterior;
+
+    @Ignore
+    public ItinerarioPartidaDestino itinerarioSeguinte;
+
+    public ItinerarioPartidaDestino getItinerarioAnterior() {
+        return itinerarioAnterior;
+    }
+
+    public void setItinerarioAnterior(ItinerarioPartidaDestino itinerarioAnterior) {
+        this.itinerarioAnterior = itinerarioAnterior;
+    }
+
+    public ItinerarioPartidaDestino getItinerarioSeguinte() {
+        return itinerarioSeguinte;
+    }
+
+    public void setItinerarioSeguinte(ItinerarioPartidaDestino itinerarioSeguinte) {
+        this.itinerarioSeguinte = itinerarioSeguinte;
+    }
+
     public Double getDistanciaTrechoMetros() {
         return distanciaTrechoMetros;
     }
@@ -534,6 +556,17 @@ public class ItinerarioPartidaDestino {
             return getNomeBairroPartida()+" ("+getNomeCidadePartida()+") x "+getNomeBairroDestino()+" ("+getNomeCidadeDestino()+") - "+getItinerario().getObservacao();
         } else{
             return getNomeBairroPartida()+" ("+getNomeCidadePartida()+") x "+getNomeBairroDestino()+" ("+getNomeCidadeDestino()+")";
+        }
+
+
+    }
+
+    public String getPartidaEDestinoResumido(){
+
+        if(getNomeCidadePartida().equals(getNomeCidadeDestino())){
+            return getNomeBairroPartida()+" x "+getNomeBairroDestino();
+        } else{
+            return getNomeCidadePartida()+" x "+getNomeCidadeDestino();
         }
 
 

@@ -456,8 +456,54 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     public void onClickBtnItinerarios(View v){
-        Intent i = new Intent(getApplicationContext(), ItinerariosActivity.class);
-        startActivity(i);
+
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED){
+            Intent i = new Intent(getApplicationContext(), ItinerariosActivity.class);
+            startActivity(i);
+        } else{
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle("Permissão de GPS")
+                    .setMessage("Para aproveitar todas as funções do Circular, por favor permita o uso do GPS no diálogo a seguir. " +
+                            "O GPS é necessário para mostrar paradas próximas a você e fazer com que os mapas no aplicativo funcionem corretamente.")
+                    .setNeutralButton("Entendi", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+
+                            Dexter.withActivity(ctx)
+                                    .withPermissions(
+                                            Manifest.permission.ACCESS_FINE_LOCATION
+                                    ).withListener(new MultiplePermissionsListener() {
+                                @Override
+                                public void onPermissionsChecked(MultiplePermissionsReport report) {
+
+                                    if(report.areAllPermissionsGranted()){
+                                        Intent i = new Intent(getApplicationContext(), ItinerariosActivity.class);
+                                        startActivity(i);
+                                    } else{
+                                        Toast.makeText(getApplicationContext(), "Acesso ao GPS é necessário para o " +
+                                                "mapa e funções de localização funcionarem corretamente!", Toast.LENGTH_LONG).show();
+
+                                        Intent i = new Intent(getApplicationContext(), ItinerariosActivity.class);
+                                        startActivity(i);
+                                    }
+
+                                }
+
+                                @Override
+                                public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                    token.continuePermissionRequest();
+                                }
+                            }).check();
+
+                        }
+                    }).create();
+
+            dialog.show();
+        }
+
     }
 
     public void onClickBtnParadas(View v){
@@ -850,7 +896,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         @Override
         public void onChanged(Location local) {
 
-            if(local.getLatitude() != 0.0 && local.getLongitude() != 0.0 && local.distanceTo(localAnterior) > 20){
+            if(local != null && local.getLatitude() != 0.0 && local.getLongitude() != 0.0 && local.distanceTo(localAnterior) > 20){
                 localAnterior = local;
 
                 if(!viewModel.isRunningNearPlaces){

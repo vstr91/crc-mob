@@ -58,27 +58,6 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
             binding.linearLayoutOrdem.setVisibility(View.VISIBLE);
         }
 
-        if(itinerario.getObservacaoProximoHorario() == null || (itinerario.getObservacaoProximoHorario().isEmpty() ||
-                itinerario.getObservacaoProximoHorario().equals("null") || itinerario.getObservacaoProximoHorario().equals(""))){
-            binding.textViewObservacao.setVisibility(View.GONE);
-        } else{
-            binding.textViewObservacao.setVisibility(View.VISIBLE);
-        }
-
-        if(itinerario.getObservacaoHorarioAnterior() == null || (itinerario.getObservacaoHorarioAnterior().isEmpty() ||
-                itinerario.getObservacaoHorarioAnterior().equals("null") || itinerario.getObservacaoHorarioAnterior().equals(""))){
-            binding.textViewObervacaoAnterior.setVisibility(View.GONE);
-        } else{
-            binding.textViewObervacaoAnterior.setVisibility(View.VISIBLE);
-        }
-
-        if(itinerario.getObservacaoHorarioSeguinte() == null || (itinerario.getObservacaoHorarioSeguinte().isEmpty() ||
-                itinerario.getObservacaoHorarioSeguinte().equals("null") || itinerario.getObservacaoHorarioSeguinte().equals(""))){
-            binding.textViewObervacaoSeguinte.setVisibility(View.GONE);
-        } else{
-            binding.textViewObervacaoSeguinte.setVisibility(View.VISIBLE);
-        }
-
         binding.textViewOrdem.setText(String.valueOf(ordem));
 
         if(dia.equals("") || hora.equals("")){
@@ -219,6 +198,62 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
         } else{
             binding.textViewParada.setVisibility(View.VISIBLE);
             binding.imageView.setVisibility(View.VISIBLE);
+        }
+
+        if(itinerario.getItinerarioAnterior() != null && itinerario.getItinerarioSeguinte() != null){
+
+            if(itinerario.getObservacaoProximoHorario() == null || (itinerario.getObservacaoProximoHorario().isEmpty() ||
+                    itinerario.getObservacaoProximoHorario().equals("null") || itinerario.getObservacaoProximoHorario().equals(""))){
+                binding.textViewObservacao.setText(itinerario.getPartidaEDestinoResumido());
+            } else{
+                binding.textViewObservacao.setText(itinerario.getPartidaEDestinoResumido()+" ("+itinerario.getObservacaoProximoHorario()+")");
+            }
+
+            if(itinerario.getObservacaoHorarioAnterior() == null || (itinerario.getObservacaoHorarioAnterior().isEmpty() ||
+                    itinerario.getObservacaoHorarioAnterior().equals("null") || itinerario.getObservacaoHorarioAnterior().equals(""))){
+                binding.textViewObervacaoAnterior.setText(itinerario.getItinerarioAnterior().getPartidaEDestinoResumido());
+            } else{
+                binding.textViewObervacaoAnterior.setText(itinerario.getItinerarioAnterior().getPartidaEDestinoResumido()+" ("+itinerario.getObservacaoHorarioAnterior()+")");
+            }
+
+            if(itinerario.getObservacaoHorarioSeguinte() == null || (itinerario.getObservacaoHorarioSeguinte().isEmpty() ||
+                    itinerario.getObservacaoHorarioSeguinte().equals("null") || itinerario.getObservacaoHorarioSeguinte().equals(""))){
+                binding.textViewObervacaoSeguinte.setText(itinerario.getItinerarioSeguinte().getPartidaEDestinoResumido());
+            } else{
+                binding.textViewObervacaoSeguinte.setText(itinerario.getItinerarioSeguinte().getPartidaEDestinoResumido()+" ("+itinerario.getObservacaoHorarioSeguinte()+")");
+            }
+
+            binding.textViewObservacao.setVisibility(View.VISIBLE);
+            binding.textViewObervacaoAnterior.setVisibility(View.VISIBLE);
+            binding.textViewObervacaoSeguinte.setVisibility(View.VISIBLE);
+
+
+        } else{
+
+            if(itinerario.getObservacaoProximoHorario() == null || (itinerario.getObservacaoProximoHorario().isEmpty() ||
+                    itinerario.getObservacaoProximoHorario().equals("null") || itinerario.getObservacaoProximoHorario().equals(""))){
+                binding.textViewObservacao.setVisibility(View.GONE);
+            } else{
+                binding.textViewObservacao.setText(itinerario.getObservacaoProximoHorario());
+                binding.textViewObservacao.setVisibility(View.VISIBLE);
+            }
+
+            if(itinerario.getObservacaoHorarioAnterior() == null || (itinerario.getObservacaoHorarioAnterior().isEmpty() ||
+                    itinerario.getObservacaoHorarioAnterior().equals("null") || itinerario.getObservacaoHorarioAnterior().equals(""))){
+                binding.textViewObervacaoAnterior.setVisibility(View.GONE);
+            } else{
+                binding.textViewObervacaoAnterior.setText(itinerario.getObservacaoHorarioAnterior());
+                binding.textViewObervacaoAnterior.setVisibility(View.VISIBLE);
+            }
+
+            if(itinerario.getObservacaoHorarioSeguinte() == null || (itinerario.getObservacaoHorarioSeguinte().isEmpty() ||
+                    itinerario.getObservacaoHorarioSeguinte().equals("null") || itinerario.getObservacaoHorarioSeguinte().equals(""))){
+                binding.textViewObervacaoSeguinte.setVisibility(View.GONE);
+            } else{
+                binding.textViewObervacaoSeguinte.setText(itinerario.getObservacaoHorarioSeguinte());
+                binding.textViewObervacaoSeguinte.setVisibility(View.VISIBLE);
+            }
+
         }
 
         binding.executePendingBindings();

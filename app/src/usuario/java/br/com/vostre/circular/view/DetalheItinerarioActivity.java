@@ -77,7 +77,7 @@ import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
-public class DetalheItinerarioActivity extends BaseActivity implements PartidaEDestinoListener {
+public class DetalheItinerarioActivity extends BaseActivity {
 
     ActivityDetalheItinerarioBinding binding;
     DetalhesItinerarioViewModel viewModel;
@@ -176,6 +176,9 @@ public class DetalheItinerarioActivity extends BaseActivity implements PartidaED
             viewModel.setItinerario(itinerario, paradaPartida, paradaDestino,
                     itinerarioPartida, itinerarioDestino);
 
+            iniPartida = System.nanoTime();
+            iniDestino = System.nanoTime();
+
             viewModel.itinerario.observe(this, itinerarioObserver);
 
             viewModel.partida.observe(this, partidaObserver);
@@ -198,8 +201,8 @@ public class DetalheItinerarioActivity extends BaseActivity implements PartidaED
             viewModel.partidaConsulta = getIntent().getStringExtra("partidaConsulta");
             viewModel.destinoConsulta = getIntent().getStringExtra("destinoConsulta");
 
-            viewModel.carregaPartidaEDestino(paradaPartida, paradaDestino);
-            viewModel.setListener(this);
+            iniPartida = System.nanoTime();
+            iniDestino = System.nanoTime();
 
             viewModel.setItinerario(getIntent().getStringExtra("itinerario"), paradaPartida, paradaDestino,
                     itinerarioPartida, itinerarioDestino);
@@ -207,10 +210,7 @@ public class DetalheItinerarioActivity extends BaseActivity implements PartidaED
 
             viewModel.itinerario.observe(this, itinerarioObserver);
 
-            iniPartida = System.nanoTime();
             viewModel.partida.observe(this, partidaObserver);
-
-            iniDestino = System.nanoTime();
             viewModel.destino.observe(this, destinoObserver);
 
             listHorarios = binding.listHorarios;
@@ -257,7 +257,6 @@ public class DetalheItinerarioActivity extends BaseActivity implements PartidaED
 
 //        binding.btnVerRuas.setVisibility(View.GONE);
 
-        binding.linearLayout4.setVisibility(View.GONE);
         binding.textView37.setVisibility(View.GONE);
         binding.textViewObservacao.setVisibility(View.GONE);
 
@@ -698,9 +697,10 @@ public class DetalheItinerarioActivity extends BaseActivity implements PartidaED
 
             contaProcessamento++;
 
-            //if(contaProcessamento == 2){
+            if(contaProcessamento == 2){
                 ocultaModalLoading();
-            //}
+                System.out.println("TEMPO SAIDA HORARIO OBSERVER");
+            }
 
             binding.listHorarios.scheduleLayoutAnimation();
 
@@ -715,19 +715,6 @@ public class DetalheItinerarioActivity extends BaseActivity implements PartidaED
                 }
             }, 500);
 
-//            CustomLayoutManager customLayoutManager = new CustomLayoutManager(getApplicationContext());
-//            binding.listHorarios.setLayoutManager(customLayoutManager);
-////            manager.scrollToPositionWithOffset(adapterHorarios.buscaPosicaoHorarioInt(horario), 0);
-//            customLayoutManager.smoothScrollToPosition(binding.listHorarios, null, adapterHorarios.buscaPosicaoHorarioInt(horario));
-
-//            HorarioItinerarioNome h = adapterHorarios.buscaPosicaoHorario(horario, viewModel.itinerario.getValue().getItinerario().getId());
-//            int posicao = -1;
-//
-//            if(h != null){
-//                posicao = adapterHorarios.horarios.indexOf(h);
-//            }
-
-            //binding.listHorarios.smoothScrollToPosition(15);
         }
     };
 
@@ -747,8 +734,6 @@ public class DetalheItinerarioActivity extends BaseActivity implements PartidaED
             if(paradaPartida == null || paradaDestino == null){
                 paradaPartida = listParadas.get(0).getParada().getId();
                 paradaDestino = listParadas.get(listParadas.size()-1).getParada().getId();
-
-                viewModel.setPartidaEDestino(paradaPartida, paradaDestino);
 
                 viewModel.partida.observe(ctx, partidaObserver);
                 viewModel.destino.observe(ctx, destinoObserver);
@@ -779,8 +764,6 @@ public class DetalheItinerarioActivity extends BaseActivity implements PartidaED
             if(itinerario != null){
                 binding.setItinerario(itinerario);
 
-                binding.linearLayout4.setVisibility(View.VISIBLE);
-
                 if(itinerario.getItinerario().getSigla() == null || itinerario.getItinerario().getSigla().isEmpty() || itinerario.getItinerario().getSigla().equals("null")){
                     binding.textView37.setVisibility(View.GONE);
                 } else{
@@ -810,11 +793,14 @@ public class DetalheItinerarioActivity extends BaseActivity implements PartidaED
                 //viewModel.carregarItinerarios(parada.getParada().getId());
                 //viewModel.itinerarios.observe(ctx, itinerariosObserver);
 
+                System.out.println("TEMPO ITINERARIO OBSERVER "+contaProcessamento);
+
                 contaProcessamento++;
 
-                //if(contaProcessamento == 2){
-                    //ocultaModalLoading();
-                //}
+                if(contaProcessamento == 2){
+                    ocultaModalLoading();
+                    System.out.println("TEMPO SAIDA ITINERARIO OBSERVER");
+                }
 
             }
 
@@ -1049,33 +1035,4 @@ public class DetalheItinerarioActivity extends BaseActivity implements PartidaED
         return outtoLeft;
     }
 
-    @Override
-    public void onLoaded(ParadaBairro partida, ParadaBairro destino) {
-
-        if(partida != null){
-            binding.setPartida(partida);
-        }
-
-        Long partidaFin = System.nanoTime();
-
-        System.out.println("TEMPO TOTAL PARTIDA: "+TimeUnit.SECONDS.convert(partidaFin - iniPartida, TimeUnit.NANOSECONDS));
-
-        // destino
-
-        if(destino != null){
-            binding.setDestino(destino);
-
-//                if(binding.getPartida() != null){
-//                    viewModel.setItinerario(itinerario, );
-//                }
-
-            Long destinoFin = System.nanoTime();
-
-            System.out.println("TEMPO TOTAL DESTINO: "+TimeUnit.SECONDS.convert(destinoFin - iniDestino, TimeUnit.NANOSECONDS));
-
-        }
-
-        ocultaModalLoading();
-
-    }
 }

@@ -127,7 +127,7 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
 
             viewModel.itinerario.observe(this, itinerarioObserver);
 
-            viewModel.setPartidaEDestino(paradaPartidaOriginal, paradaDestinoOriginal);
+//            viewModel.setPartidaEDestino(paradaPartidaOriginal, paradaDestinoOriginal);
 
         } else{
             viewModel.setItinerario(getIntent().getStringExtra("itinerario"), paradaPartida, paradaDestino, itinerarioPartida, itinerarioDestino);

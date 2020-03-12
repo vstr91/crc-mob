@@ -70,30 +70,9 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
     public String partidaConsulta;
     public String destinoConsulta;
 
-    PartidaEDestinoListener listener;
-
-    public void carregaPartidaEDestino(final String partida, final String destino){
-
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                listener.onLoaded(appDatabase.paradaDAO().carregarComBairroSync(partida), appDatabase.paradaDAO().carregarComBairroSync(destino));
-            }
-        });
-
-    }
-
-    public PartidaEDestinoListener getListener() {
-        return listener;
-    }
-
-    public void setListener(PartidaEDestinoListener listener) {
-        this.listener = listener;
-    }
-
     public void setItinerario(String itinerario, String paradaPartida, String paradaDestino,
                               String bairroPartida, String bairroDestino) {
-        this.itinerario = appDatabase.itinerarioDAO().carregar(itinerario);
+        this.itinerario = appDatabase.itinerarioDAO().carregarSimplificado(itinerario);
 
         if(trechoIsolado){
             this.paradas = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairroTrecho(partidaConsulta, destinoConsulta);
@@ -107,6 +86,9 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
             this.paradaPartida = paradaPartida;
             this.paradaDestino = paradaDestino;
 
+            this.partida = appDatabase.paradaDAO().carregarComBairro(paradaPartida);
+            this.destino = appDatabase.paradaDAO().carregarComBairro(paradaDestino);
+
             new carregaHorariosAsyncTask(appDatabase, itinerario, null, bairroPartida, bairroDestino, trechoIsolado, partidaConsulta, destinoConsulta).execute();
         }
 
@@ -117,13 +99,13 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 //        this.secoesComNome = appDatabase.secaoItinerarioDAO().listarTodosPorItinerarioComParada(itinerario);
     }
 
-    public void setPartidaEDestino(String paradaPartida, String paradaDestino) {
-        this.paradaPartida = paradaPartida;
-        this.paradaDestino = paradaDestino;
-
-        this.partida = appDatabase.paradaDAO().carregarComBairro(paradaPartida);
-        this.destino = appDatabase.paradaDAO().carregarComBairro(paradaDestino);
-    }
+//    public void setPartidaEDestino(String paradaPartida, String paradaDestino) {
+//        this.paradaPartida = paradaPartida;
+//        this.paradaDestino = paradaDestino;
+//
+//        this.partida = appDatabase.paradaDAO().carregarComBairro(paradaPartida);
+//        this.destino = appDatabase.paradaDAO().carregarComBairro(paradaDestino);
+//    }
 
     public LiveData<List<ParadaBairro>> getParadas() {
         return paradas;
@@ -271,6 +253,8 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 //
 //                qtdItinerarios = db.itinerarioDAO()
 //                        .carregarOpcoesPorPartidaEDestinoSync(queryOpcoes);
+
+                /////////////////
 
                 if(itinerarioARemover != null && !itinerarioARemover.isEmpty()){
 
@@ -462,5 +446,41 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
         }
 
     }
+
+//    public void carregaPartidaEDestino(String partida, String destino, PartidaEDestinoListener listener){
+//        new carregaPartidaEDestinoAsyncTask(appDatabase, partida, destino, listener);
+//    }
+//
+//    private static class carregaPartidaEDestinoAsyncTask extends AsyncTask<List<SecaoItinerarioParada>, Void, Void> {
+//
+//        private AppDatabase db;
+//        private String partida;
+//        private String destino;
+//        ParadaBairro paradaPartida;
+//        ParadaBairro paradadestino;
+//        PartidaEDestinoListener listener;
+//
+//        carregaPartidaEDestinoAsyncTask(AppDatabase appDatabase, String partida, String destino, PartidaEDestinoListener listener) {
+//            db = appDatabase;
+//            this.partida = partida;
+//            this.destino = destino;
+//            this.listener = listener;
+//        }
+//
+//        @Override
+//        protected Void doInBackground(final List<SecaoItinerarioParada>... params) {
+//
+//            paradaPartida = db.paradaDAO().carregarComBairroSync(partida);
+//            paradadestino = db.paradaDAO().carregarComBairroSync(destino);
+//
+//            return null;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Void aVoid) {
+//            super.onPostExecute(aVoid);
+//            listener.onLoaded(paradaPartida, paradadestino);
+//        }
+//    }
 
 }

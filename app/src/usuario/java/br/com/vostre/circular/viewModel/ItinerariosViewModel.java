@@ -779,7 +779,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                         } else{
 
-                            if(i.getItinerario().getDistancia() <= 50000){
+                            if(i.getItinerario().getDistanciaMetros() <= 50000){
                                 builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(1d);
 
 //                                graphDebug = graphDebug.concat("<edge vertex1=\""+i.getIdBairroPartida()+"\" vertex2=\""+i.getIdBairroDestino()+"\" isDirect=\"true\" weight=\""

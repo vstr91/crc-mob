@@ -735,6 +735,8 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 paradaPartida = listParadas.get(0).getParada().getId();
                 paradaDestino = listParadas.get(listParadas.size()-1).getParada().getId();
 
+                viewModel.setPartidaEDestino(paradaPartida, paradaDestino);
+
                 viewModel.partida.observe(ctx, partidaObserver);
                 viewModel.destino.observe(ctx, destinoObserver);
             }

@@ -21,11 +21,13 @@
             style="@style/botao_branco"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:onClick="@{view::onClickTarifas}"
             android:padding="5dp"
-            android:text="Alterar Tarifas em Massa"
+            android:text="Em Massa"
+            app:layout_constraintEnd_toStartOf="@+id/btnTarifasSecoes"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
@@ -34,12 +36,14 @@
             style="@style/botao_branco"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
             android:onClick="@{view::onClickTarifasSecoes}"
             android:padding="5dp"
-            android:text="Alterar Tarifas Por Seção"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:text="Por Seção"
+            app:layout_constraintEnd_toStartOf="@+id/btnTarifasItinerarios"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btnTarifas"
             app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
         <Button
@@ -47,30 +51,31 @@
             style="@style/botao_branco"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:onClick="@{view::onClickTarifasItinerarios}"
             android:padding="5dp"
-            android:text="Alterar Tarifas Por Itinerário"
+            android:text="Por Itinerário"
             app:layout_constraintEnd_toStartOf="@+id/btnDistancias"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnTarifas" />
+            app:layout_constraintStart_toEndOf="@+id/btnTarifasSecoes"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
         <Button
             android:id="@+id/btnDistancias"
             style="@style/botao_branco"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="8dp"
             android:onClick="@{view::onClickDistanciasItinerarios}"
             android:padding="5dp"
-            android:text="Atualizar Distâncias Itinerários"
+            android:text="Distâncias"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/btnTarifasItinerarios"
-            app:layout_constraintTop_toBottomOf="@+id/btnTarifas" />
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
         <Button
             android:id="@+id/btnOcultarMapa"

@@ -45,7 +45,7 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
     public LiveData<List<ParadaBairro>> paradas;
     public static MutableLiveData<List<HorarioItinerarioNome>> horarios;
     public LiveData<List<SecaoItinerario>> secoes;
-//    public LiveData<List<SecaoItinerarioParada>> secoesComNome;
+    public LiveData<List<SecaoItinerarioParada>> secoesComNome;
     public MutableLiveData<Location> localAtual;
     public boolean centralizaMapa = true;
 
@@ -96,16 +96,16 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
         //this.horarios = appDatabase.horarioItinerarioDAO().listarApenasAtivosPorItinerario(itinerario);
         this.secoes = appDatabase.secaoItinerarioDAO().listarTodosPorItinerario(itinerario);
-//        this.secoesComNome = appDatabase.secaoItinerarioDAO().listarTodosPorItinerarioComParada(itinerario);
+        this.secoesComNome = appDatabase.secaoItinerarioDAO().listarTodosPorItinerarioComParada(itinerario);
     }
 
-//    public void setPartidaEDestino(String paradaPartida, String paradaDestino) {
-//        this.paradaPartida = paradaPartida;
-//        this.paradaDestino = paradaDestino;
-//
-//        this.partida = appDatabase.paradaDAO().carregarComBairro(paradaPartida);
-//        this.destino = appDatabase.paradaDAO().carregarComBairro(paradaDestino);
-//    }
+    public void setPartidaEDestino(String paradaPartida, String paradaDestino) {
+        this.paradaPartida = paradaPartida;
+        this.paradaDestino = paradaDestino;
+
+        this.partida = appDatabase.paradaDAO().carregarComBairro(paradaPartida);
+        this.destino = appDatabase.paradaDAO().carregarComBairro(paradaDestino);
+    }
 
     public LiveData<List<ParadaBairro>> getParadas() {
         return paradas;
@@ -118,7 +118,7 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
     public DetalhesItinerarioViewModel(Application app){
         super(app);
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
-        //itinerario = appDatabase.itinerarioDAO().carregar("");
+//        itinerario = appDatabase.itinerarioDAO().carregar("");
         paradas = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro("");
         //horarios = appDatabase.horarioItinerarioDAO().listarApenasAtivosPorItinerario("");
         horarios = new MutableLiveData<>();
@@ -223,7 +223,7 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
                     System.out.println("TEMPO FINAL ITI TRECHO: "+finIti);
                     System.out.println("TEMPO TOTAL ITI TRECHO: "+TimeUnit.SECONDS.convert(totIti, TimeUnit.NANOSECONDS));
 
-                } else{
+                } else if(bairroPartida != null && bairroDestino != null){
                     qtdItinerarios = db.horarioItinerarioDAO()
                             .contaItinerariosPorPartidaEDestinoSimplificadoSync(bairroPartida, bairroDestino);
 
@@ -233,12 +233,19 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
                     System.out.println("TEMPO FINAL ITI: "+finIti);
                     System.out.println("TEMPO TOTAL ITI: "+TimeUnit.SECONDS.convert(totIti, TimeUnit.NANOSECONDS));
 
-                }
+                } else{
 
-                System.out.println("TEMPO QTD ITI: "+qtdItinerarios.size());
+                   // if(qtdItinerarios == null || qtdItinerarios.size() == 0){
+                        qtdItinerarios = db.itinerarioDAO().listarTodosAtivosPorIdSync(itinerario);
 
-                if(qtdItinerarios.size() == 0){
-                    qtdItinerarios = db.itinerarioDAO().listarTodosAtivosPorIdSync(itinerario);
+                        Long finIti = System.nanoTime();
+                        Long totIti = finIti - iniIti;
+
+                        System.out.println("TEMPO FINAL ITI SOLO: "+finIti);
+                        System.out.println("TEMPO TOTAL ITI SOLO: "+TimeUnit.SECONDS.convert(totIti, TimeUnit.NANOSECONDS));
+
+                    //}
+
                 }
 
 
@@ -252,9 +259,7 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 //                        ItinerariosViewModel.geraQueryItinerarios(bairroPartida, bairroDestino));
 //
 //                qtdItinerarios = db.itinerarioDAO()
-//                        .carregarOpcoesPorPartidaEDestinoSync(queryOpcoes);
-
-                /////////////////
+//                        .carregarOpcoesPorPartidaEDestinoSync(queryOpcoes)
 
                 if(itinerarioARemover != null && !itinerarioARemover.isEmpty()){
 
@@ -273,7 +278,16 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
                         System.out.println("TEMPO FINAL HOR: "+finHor);
                         System.out.println("TEMPO TOTAL HOR: "+TimeUnit.SECONDS.convert(totHor, TimeUnit.NANOSECONDS));
                     } else{
+                        Long iniHor = System.nanoTime();
+                        System.out.println("TEMPO INICIAL HOR: "+iniHor);
+
                         horarios.postValue(db.horarioItinerarioDAO().listarApenasAtivosPorItinerarioFiltradoSync(itinerario, itinerarioARemover));
+
+                        Long finHor = System.nanoTime();
+                        Long totHor = finHor - iniHor;
+
+                        System.out.println("TEMPO FINAL HOR: "+finHor);
+                        System.out.println("TEMPO TOTAL HOR: "+TimeUnit.SECONDS.convert(totHor, TimeUnit.NANOSECONDS));
                     }
 
 
@@ -291,7 +305,16 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
                             horarios.postValue(hrs);
                         } else{
+                            Long iniHor2 = System.nanoTime();
+                            System.out.println("TEMPO INICIAL HOR: "+iniHor2);
+
                             horarios.postValue(db.horarioItinerarioDAO().listarApenasAtivosPorPartidaEDestinoSync(bairroPartida, bairroDestino));
+
+                            Long finHor = System.nanoTime();
+                            Long totHor = finHor - iniHor2;
+
+                            System.out.println("TEMPO FINAL HOR: "+finHor);
+                            System.out.println("TEMPO TOTAL HOR: "+TimeUnit.SECONDS.convert(totHor, TimeUnit.NANOSECONDS));
                         }
 
 
@@ -301,7 +324,17 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
                         System.out.println("TEMPO FINAL HOR: "+finHor);
                         System.out.println("TEMPO TOTAL HOR: "+TimeUnit.SECONDS.convert(totHor, TimeUnit.NANOSECONDS));
                     } else{
+
+                        Long iniHor = System.nanoTime();
+                        System.out.println("TEMPO INICIAL HOR: "+iniHor);
+
                         horarios.postValue(db.horarioItinerarioDAO().listarApenasAtivosPorItinerarioSync(itinerario));
+
+                        Long finHor = System.nanoTime();
+                        Long totHor = finHor - iniHor;
+
+                        System.out.println("TEMPO FINAL HOR: "+finHor);
+                        System.out.println("TEMPO TOTAL HOR: "+TimeUnit.SECONDS.convert(totHor, TimeUnit.NANOSECONDS));
                     }
 
 

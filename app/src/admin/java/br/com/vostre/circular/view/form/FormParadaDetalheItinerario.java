@@ -1,12 +1,12 @@
 package br.com.vostre.circular.view.form;
 
 import android.app.Application;
-import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.BindingAdapter;
-import android.databinding.DataBindingUtil;
-import android.databinding.InverseBindingAdapter;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.InverseBindingAdapter;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +26,6 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormParadaDetalheItinerarioBinding;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
-import br.com.vostre.circular.viewModel.ItinerariosViewModel;
 
 public class FormParadaDetalheItinerario extends FormBase {
 

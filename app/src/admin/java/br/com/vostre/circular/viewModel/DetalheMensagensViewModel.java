@@ -1,8 +1,8 @@
 package br.com.vostre.circular.viewModel;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import android.os.AsyncTask;
 
 import org.joda.time.DateTime;
@@ -12,8 +12,6 @@ import java.util.List;
 import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.MensagemResposta;
 import br.com.vostre.circular.model.dao.AppDatabase;
-import br.com.vostre.circular.model.dao.MensagemDAO;
-import br.com.vostre.circular.model.dao.MensagemRespostaDAO;
 
 public class DetalheMensagensViewModel extends AndroidViewModel {
 

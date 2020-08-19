@@ -1,15 +1,14 @@
 package br.com.vostre.circular.view.adapter;
 
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaBairrosBinding;
-import br.com.vostre.circular.databinding.LinhaCidadesBinding;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.view.listener.SelectListener;

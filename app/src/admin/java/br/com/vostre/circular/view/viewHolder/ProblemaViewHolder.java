@@ -1,19 +1,10 @@
 package br.com.vostre.circular.view.viewHolder;
 
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
-import org.joda.time.format.DateTimeFormat;
-
-import br.com.vostre.circular.databinding.LinhaMensagensBinding;
 import br.com.vostre.circular.databinding.LinhaProblemasBinding;
-import br.com.vostre.circular.model.Mensagem;
-import br.com.vostre.circular.model.Problema;
 import br.com.vostre.circular.model.pojo.ProblemaTipo;
-import br.com.vostre.circular.view.form.FormDetalheMensagem;
-import br.com.vostre.circular.view.form.FormMensagem;
 
 public class ProblemaViewHolder extends RecyclerView.ViewHolder {
 

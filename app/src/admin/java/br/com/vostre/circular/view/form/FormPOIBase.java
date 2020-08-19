@@ -1,7 +1,5 @@
 package br.com.vostre.circular.view.form;
 
-import android.support.v4.app.DialogFragment;
-
 import java.util.Calendar;
 
 public class FormPOIBase extends FormBase {

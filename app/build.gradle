@@ -1,19 +1,24 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
+apply plugin: 'com.onesignal.androidsdk.onesignal-gradle-plugin'
+
+repositories {
+    maven { url 'https://maven.google.com' }
+}
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "br.com.vostre.circular"
         minSdkVersion 19
-        targetSdkVersion 28
+        targetSdkVersion 29
         multiDexEnabled true
-        versionCode 31
+        versionCode 36
         versionName "2.3.0"
 //        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
-        buildConfigField "int", "DEBUG_APP", "1"
+        buildConfigField "int", "DEBUG_APP", "0"
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -22,6 +27,12 @@ android {
         }
 
         vectorDrawables.useSupportLibrary = true
+
+        manifestPlaceholders = [
+                onesignal_app_id: '02ec2fb2-4df1-41c4-828e-4db1a7247276',
+                // Project number pulled from dashboard, local value is ignored.
+                onesignal_google_project_number: 'REMOTE'
+        ]
 
     }
 
@@ -78,21 +89,21 @@ android {
 
 }
 
-afterEvaluate {
-    tasks.matching {
-        it.name.startsWith('dex')
-    }.each { dx ->
-        if (dx.additionalParameters == null) {
-            dx.additionalParameters = ['--multi-dex']
-        } else {
-            dx.additionalParameters += '--multi-dex'
-        }
-    }
-}
+//afterEvaluate {
+//    tasks.matching {
+//        it.name.startsWith('dex')
+//    }.each { dx ->
+//        if (dx.additionalParameters == null) {
+//            dx.additionalParameters = ['--multi-dex']
+//        } else {
+//            dx.additionalParameters += '--multi-dex'
+//        }
+//    }
+//}
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:support-annotations:28.0.0'
+    implementation 'androidx.annotation:annotation:1.0.0'
     implementation('com.github.nisrulz:qreader:2.1.2') {
         exclude module: 'com.google.android.gms:play-services-vision:11.4.2'
     }
@@ -108,7 +119,9 @@ dependencies {
         exclude module: 'com.android.support:design:26.1.0'
     }
 
-    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'com.onesignal:OneSignal:[3.13.0, 3.99.99]'
+
+    implementation 'androidx.multidex:multidex:2.0.0'
     implementation 'com.github.kenglxn.QRGen:android:2.3.0'
     implementation 'org.osmdroid:osmdroid-android:6.1.2'
     implementation 'com.github.MKergall:osmbonuspack:6.5.1'
@@ -122,29 +135,29 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.0.2'
     implementation 'com.squareup.retrofit2:converter-scalars:2.3.0'
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:recyclerview-v7:28.0.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    implementation 'android.arch.lifecycle:extensions:1.1.1'
-    implementation 'com.android.support:support-v4:28.0.0'
-    annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta7'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.0.0'
     // Room (use 1.1.0-beta1 for latest beta)
-    implementation 'android.arch.persistence.room:runtime:1.1.1'
-    annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
+    implementation 'androidx.room:room-runtime:2.0.0'
+    annotationProcessor 'androidx.room:room-compiler:2.0.0'
     //implementation "android.arch.persistence.room:rxjava2:1.0.0"
     // ReactiveStreams support for LiveData
-    implementation 'android.arch.lifecycle:reactivestreams:1.1.1'
+    implementation 'androidx.lifecycle:lifecycle-reactivestreams:2.0.0'
     implementation 'net.danlew:android.joda:2.10.3'
     testImplementation 'junit:junit:4.12'
 //    androidTestImplementation 'com.android.support.test:runner:1.0.2'
 //    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     // Test helpers for LiveData
-    testImplementation 'android.arch.core:core-testing:1.1.1'
+    testImplementation 'androidx.arch.core:core-testing:2.0.0'
     // Test helpers for Room
-    testImplementation 'android.arch.persistence.room:testing:1.1.1'
+    testImplementation 'androidx.room:room-testing:2.0.0'
     implementation project(':circleview-debug')
-    implementation 'com.android.support:design:28.0.0'
-    implementation 'com.android.support:cardview-v7:28.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
     apply plugin: 'com.google.gms.google-services'
 
@@ -159,7 +172,7 @@ dependencies {
     androidTestImplementation 'androidx.test:rules:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    androidTestImplementation 'android.arch.persistence.room:testing:1.1.1'
+    androidTestImplementation 'androidx.room:room-testing:2.0.0'
 
     implementation 'me.relex:circleindicator:1.2.2'
 //    implementation 'androidx.cardview:cardview:1.0.0'

@@ -1,18 +1,15 @@
 package br.com.vostre.circular.model.pojo;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Embedded;
-import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.Relation;
-import android.support.annotation.Nullable;
+import androidx.room.ColumnInfo;
+import androidx.room.Embedded;
+import androidx.room.Ignore;
+import androidx.room.Relation;
 
 import org.joda.time.DateTime;
 
-import java.util.Date;
 import java.util.List;
 
 import br.com.vostre.circular.model.Itinerario;
-import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.SecaoItinerario;
 
 public class ItinerarioPartidaDestino {
@@ -563,12 +560,18 @@ public class ItinerarioPartidaDestino {
 
     public String getPartidaEDestinoResumido(){
 
-        if(getNomeCidadePartida().equals(getNomeCidadeDestino())){
+        if(getNomeCidadePartida() != null && getNomeCidadePartida().equals(getNomeCidadeDestino())){
             return getNomeBairroPartida()+" x "+getNomeBairroDestino();
         } else{
             return getNomeCidadePartida()+" x "+getNomeCidadeDestino();
         }
 
+
+    }
+
+    public boolean isMesmoItinerario(ItinerarioPartidaDestino outroItinerario){
+
+        return this.getPartidaEDestinoResumido().equalsIgnoreCase(outroItinerario.getPartidaEDestinoResumido());
 
     }
 

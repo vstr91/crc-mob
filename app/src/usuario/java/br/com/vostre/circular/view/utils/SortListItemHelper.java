@@ -1,11 +1,11 @@
 package br.com.vostre.circular.view.utils;
 
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 
 import br.com.vostre.circular.view.adapter.ItemTouchHelperAdapter;
 
-public class SortListItemHelper extends android.support.v7.widget.helper.ItemTouchHelper.Callback {
+public class SortListItemHelper extends androidx.recyclerview.widget.ItemTouchHelper.Callback {
 
     private final ItemTouchHelperAdapter mAdapter;
 

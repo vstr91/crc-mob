@@ -1,6 +1,6 @@
 package br.com.vostre.circular.model;
 
-import android.arch.persistence.room.Entity;
+import androidx.room.Entity;
 
 @Entity(tableName = "ponto_interesse_sugestao")
 public class PontoInteresseSugestao extends PontoInteresse {

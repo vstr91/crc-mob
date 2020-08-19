@@ -1,6 +1,6 @@
 package br.com.vostre.circular.view;
 
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -11,9 +11,8 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -33,7 +32,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.databinding.ActivityCameraResultadoBinding;
 import br.com.vostre.circular.databinding.ActivityCameraResultadoOnibusBinding;
 import br.com.vostre.circular.model.pojo.ocr.Bloco;
 import br.com.vostre.circular.utils.GraphicOverlay;

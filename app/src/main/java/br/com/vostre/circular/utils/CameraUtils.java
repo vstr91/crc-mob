@@ -3,14 +3,10 @@ package br.com.vostre.circular.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import android.util.SparseIntArray;
 import android.view.Surface;
-
-import static android.content.Context.CAMERA_SERVICE;
 
 public class CameraUtils {
 

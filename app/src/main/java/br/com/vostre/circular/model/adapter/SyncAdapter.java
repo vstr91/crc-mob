@@ -16,17 +16,12 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.cloudinary.Cloudinary;
 import com.cloudinary.android.MediaManager;
-import com.cloudinary.android.UploadRequest;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
-import com.cloudinary.android.callback.UploadResult;
-import com.cloudinary.android.policy.TimeWindow;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -41,7 +36,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLOutput;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -85,13 +79,13 @@ import br.com.vostre.circular.model.UsuarioPreferencia;
 import br.com.vostre.circular.model.ViagemItinerario;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
+import br.com.vostre.circular.model.log.LogItinerario;
+import br.com.vostre.circular.model.log.LogParada;
 import br.com.vostre.circular.utils.Constants;
 import br.com.vostre.circular.utils.Crypt;
 import br.com.vostre.circular.utils.JsonUtils;
 import br.com.vostre.circular.utils.NotificacaoUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
-import br.com.vostre.circular.utils.SessionUtils;
-import br.com.vostre.circular.utils.Unique;
 import br.com.vostre.circular.view.MensagensActivity;
 import br.com.vostre.circular.view.MenuActivity;
 import br.com.vostre.circular.viewModel.CidadesViewModel;
@@ -102,9 +96,6 @@ import br.com.vostre.circular.viewModel.PontosInteresseViewModel;
 //import br.com.vostre.circular.viewModel.ProblemasViewModel;
 import br.com.vostre.circular.viewModel.ServicosViewModel;
 import br.com.vostre.circular.viewModel.ViagensItinerarioViewModel;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -164,6 +155,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     List<? extends EntidadeBase> feriados;
 
     List<? extends EntidadeBase> historicosSecoes;
+
+    List<? extends EntidadeBase> logsItinerarios;
+    List<? extends EntidadeBase> logsParadas;
 
 //    List<? extends EntidadeBase> tiposProblema;
 //    List<? extends EntidadeBase> problemas;
@@ -612,7 +606,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         String dados = response.body();
         //System.out.println("RESPON: "+response.body());
 
-        //System.out.println(dados);
+        System.out.println(dados);
 
         if(dados != null){
 
@@ -656,6 +650,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 JSONArray feriados = null;
 
                 JSONArray historicosSecoes = null;
+                JSONArray logsItinerarios = null;
+                JSONArray logsParadas = null;
 
                 //System.out.println("PAR_SUG: "+arrayObject.optJSONArray("paradas_sugestoes"));
 
@@ -701,6 +697,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 if(arrayObject.optJSONArray("historicos_secoes") != null){
                     historicosSecoes = arrayObject.getJSONArray("historicos_secoes");
+                }
+
+                if(arrayObject.optJSONArray("logs_itinerarios") != null){
+                    logsItinerarios = arrayObject.getJSONArray("logs_itinerarios");
+                }
+
+                if(arrayObject.optJSONArray("logs_paradas") != null){
+                    logsParadas = arrayObject.getJSONArray("logs_paradas");
                 }
 
                 // ACESSOS
@@ -938,6 +942,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     for(int i = 0; i < total; i++){
                         Itinerario itinerario;
                         JSONObject obj = itinerarios.getJSONObject(i);
+
+//                        System.out.println("ITINERARIOS: "+obj.toString());
 
                         itinerario = (Itinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Itinerario.class, 1);
                         itinerario.setEnviado(true);
@@ -1404,6 +1410,50 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 }
 
+                // LOGS ITINERARIOS
+
+                if(logsItinerarios != null && logsItinerarios.length() > 0){
+
+                    int total = logsItinerarios.length();
+                    List<LogItinerario> lstLogsItinerarios = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        LogItinerario log;
+                        JSONObject obj = logsItinerarios.getJSONObject(i);
+
+                        log = (LogItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), LogItinerario.class, 1);
+                        log.setEnviado(true);
+
+                        lstLogsItinerarios.add(log);
+
+                    }
+
+                    add(lstLogsItinerarios, "log_itinerario");
+
+                }
+
+                // LOGS PARADAS
+
+                if(logsParadas != null && logsParadas.length() > 0){
+
+                    int total = logsParadas.length();
+                    List<LogParada> lstLogsParadas = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        LogParada log;
+                        JSONObject obj = logsParadas.getJSONObject(i);
+
+                        log = (LogParada) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), LogParada.class, 1);
+                        log.setEnviado(true);
+
+                        lstLogsParadas.add(log);
+
+                    }
+
+                    add(lstLogsParadas, "log_parada");
+
+                }
+
                 if(!admin){
 
                     AsyncTask.execute(new Runnable() {
@@ -1496,6 +1546,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         appDatabase.pontoInteresseDAO().deletarInativos();
 
         appDatabase.feriadoDAO().deletarInativos();
+
+        if(BuildConfig.APPLICATION_ID.endsWith("circular")){
+            appDatabase.logConsultaDAO().deletarItinerariosEnviados();
+            appDatabase.logConsultaDAO().deletarParadasEnviadas();
+        }
+
     }
 
     private void atualizaDataAcesso(Response response){
@@ -1565,6 +1621,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             historicosSecoes = appDatabase.historicoSecaoDAO().listarTodosAEnviar();
 
+            logsItinerarios = appDatabase.logConsultaDAO().listarTodosItinerariosAEnviar();
+            logsParadas = appDatabase.logConsultaDAO().listarTodasParadasAEnviar();
+
             return null;
         }
 
@@ -1606,13 +1665,17 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
             String strHistoricoSecoes = "\"historicos_secoes\": "+JsonUtils.toJson((List<EntidadeBase>) historicosSecoes);
 
+            String strLogsItinerarios = "\"logs_itinerarios\": "+JsonUtils.toJson((List<EntidadeBase>) logsItinerarios);
+            String strLogsParadas = "\"logs_paradas\": "+JsonUtils.toJson((List<EntidadeBase>) logsParadas);
+
             String json = "{"+strPaises+","+strEmpresas+","+strOnibus+","+strEstados+","+strCidades+","
                     +strBairros+","+strParadas+","+strItinerarios+","+strHorarios+","+strParadasItinerarios+","
                     +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
                     +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+","+strPreferencias+","+strHistoricos+","
-                    +strPontosInteresseSugestoes+","+strServicos+","+strViagens+","+strFeriados+","+strHistoricoSecoes+"}";
+                    +strPontosInteresseSugestoes+","+strServicos+","+strViagens+","+strFeriados+","+strHistoricoSecoes+","
+                    +strLogsItinerarios+","+strLogsParadas+"}";
 
-             System.out.println("JSON: "+strHistoricoSecoes);
+             System.out.println("JSON: "+strItinerarios);
 
             //System.out.println("POI ENV: "+strPontosInteresse);
             //System.out.println("POIS ENV: "+strPontosInteresseSugestoes);
@@ -1637,7 +1700,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     +bairros.size()+paradas.size()+itinerarios.size()+horarios.size()+paradasItinerario.size()
                     +secoesItinerarios.size()+horariosItinerarios.size()+mensagens.size()+parametros.size()+pontosInteresse.size()
                     +usuarios.size()+paradaSugestoes.size()+preferencias.size()+historicos.size()+pontosInteresseSugestoes.size()
-                    +servicos.size()+viagens.size()+feriados.size()+secoesItinerarios.size();
+                    +servicos.size()+viagens.size()+feriados.size()+historicosSecoes.size()+logsItinerarios.size()+logsParadas.size();
 
             if(registros > 0){
                 chamaAPI(registros, json, 0, baseUrl, token);
@@ -2539,6 +2602,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     break;
                 case "historico_secao":
                     db.historicoSecaoDAO().inserirTodos((List<HistoricoSecao>) params[0]);
+                    break;
+                case "log_itinerario":
+                    db.logConsultaDAO().inserirTodosItinerarios((List<LogItinerario>) params[0]);
+                    break;
+                case "log_parada":
+                    db.logConsultaDAO().inserirTodasParadas((List<LogParada>) params[0]);
                     break;
             }
 

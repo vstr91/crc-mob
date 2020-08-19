@@ -2,16 +2,13 @@ package br.com.vostre.circular.view.viewHolder;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
 
-import br.com.vostre.circular.databinding.LinhaServicosBinding;
 import br.com.vostre.circular.databinding.LinhaServicosFormBinding;
 import br.com.vostre.circular.model.Servico;
-import br.com.vostre.circular.view.form.FormServico;
 
 public class ServicoFormViewHolder extends RecyclerView.ViewHolder {
 

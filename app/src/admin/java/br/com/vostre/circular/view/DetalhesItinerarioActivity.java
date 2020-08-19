@@ -2,22 +2,25 @@ package br.com.vostre.circular.view;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.databinding.BindingAdapter;
-import android.databinding.DataBindingUtil;
-import android.databinding.InverseBindingAdapter;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.InverseBindingAdapter;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,32 +32,28 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.text.NumberFormat;
 import java.util.List;
-import java.util.TimerTask;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
-import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
-import br.com.vostre.circular.utils.DataHoraUtils;
 import br.com.vostre.circular.utils.DrawableUtils;
 import br.com.vostre.circular.view.adapter.ParadaItinerarioAdapter;
 import br.com.vostre.circular.view.form.FormHistorico;
@@ -62,12 +61,6 @@ import br.com.vostre.circular.view.form.FormItinerario;
 import br.com.vostre.circular.view.utils.SortListItemHelper;
 import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
 import br.com.vostre.circular.databinding.ActivityDetalhesItinerarioBinding;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -213,6 +206,77 @@ public class DetalhesItinerarioActivity extends BaseActivity {
 
         map.setMaxZoomLevel(19d);
         map.setMinZoomLevel(9d);
+
+    }
+
+    public void onFabBairroClick(View v){
+        List<Overlay> o = map.getOverlays();
+
+        for(Overlay ov : o){
+
+            if(ov instanceof RadiusMarkerClusterer){
+
+                List<Marker> ma = ((RadiusMarkerClusterer) ov).getItems();
+
+                for(Marker mk : ma){
+
+                    switch(mk.getSubDescription()){
+                        case "0":
+                            break;
+                        case "1":
+
+                            if(mk.getAlpha() == 1f){
+                                mk.setVisible(false);
+                                mk.setEnabled(false);
+                            } else{
+                                mk.setVisible(true);
+                                mk.setEnabled(true);
+                            }
+
+                            break;
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+    public void onFabCentroClick(View v){
+        List<Overlay> o = map.getOverlays();
+
+        for(Overlay ov : o){
+
+            if(ov instanceof RadiusMarkerClusterer){
+
+                List<Marker> ma = ((RadiusMarkerClusterer) ov).getItems();
+
+                for(Marker mk : ma){
+
+                    switch(mk.getSubDescription()){
+                        case "0":
+
+                            if(mk.getAlpha() == 1f){
+                                mk.setVisible(false);
+                                mk.setEnabled(false);
+                            } else{
+                                mk.setVisible(true);
+                                mk.setEnabled(true);
+                            }
+
+                            break;
+                        case "1":
+                            break;
+                    }
+
+                }
+
+            }
+
+        }
+
     }
 
     public void ocultarMapa(View v){
@@ -253,6 +317,8 @@ public class DetalhesItinerarioActivity extends BaseActivity {
 
         Toast.makeText(getApplicationContext(), "Atualizando dados de distância...", Toast.LENGTH_SHORT).show();
 
+        map.getTileProvider().clearTileCache();
+
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -261,7 +327,7 @@ public class DetalhesItinerarioActivity extends BaseActivity {
 
                 List<ParadaItinerarioBairro> paradas = viewModel.pits.getValue();
 
-                viewModel.calculaDistancia(paradas, false);
+                viewModel.calculaDistancia(viewModel.itinerario.getValue().getItinerario(), paradas, false);
             }
         });
     }
@@ -300,7 +366,7 @@ public class DetalhesItinerarioActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
 
-        if(map != null){
+        if(map != null && map.getOverlayManager() != null){
             map.onResume();
         }
 
@@ -312,7 +378,7 @@ public class DetalhesItinerarioActivity extends BaseActivity {
     protected void onPause() {
         super.onPause();
 
-        if(map != null){
+        if(map != null && map.getOverlayManager() != null){
             map.onPause();
         }
 
@@ -366,6 +432,15 @@ public class DetalhesItinerarioActivity extends BaseActivity {
 
         if(paradas != null){
 
+            RadiusMarkerClusterer poiMarkers = new RadiusMarkerClusterer(this);
+            poiMarkers.setRadius(200);
+
+            Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_cluster);
+            Bitmap clusterIcon = ((BitmapDrawable)clusterIconD).getBitmap();
+
+            map.getOverlays().add(poiMarkers);
+            poiMarkers.setIcon(clusterIcon);
+
             for(final ParadaBairro p : paradas){
 
                 Marker m = new Marker(map);
@@ -408,6 +483,7 @@ public class DetalhesItinerarioActivity extends BaseActivity {
                 m.setTitle(p.getParada().getNome());
                 m.setDraggable(true);
                 m.setId(p.getParada().getId());
+                m.setSubDescription(String.valueOf(p.getParada().getSentido()));
                 m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker, MapView mapView) {
@@ -420,33 +496,36 @@ public class DetalhesItinerarioActivity extends BaseActivity {
 //                        infoWindow.show(getSupportFragmentManager(), "infoWindow");
 //                        mapController.animateTo(marker.getPosition());
 
-                        ParadaItinerario paradaItinerario = new ParadaItinerario();
-                        paradaItinerario.setParada(p.getParada().getId());
-                        paradaItinerario.setDestaque(false);
-                        paradaItinerario.setValorAnterior(null);
-                        paradaItinerario.setValorSeguinte(null);
-                        paradaItinerario.setAtivo(true);
+                        if(marker.getAlpha() == 1f){
+                            ParadaItinerario paradaItinerario = new ParadaItinerario();
+                            paradaItinerario.setParada(p.getParada().getId());
+                            paradaItinerario.setDestaque(false);
+                            paradaItinerario.setValorAnterior(null);
+                            paradaItinerario.setValorSeguinte(null);
+                            paradaItinerario.setAtivo(true);
 
-                        ParadaItinerarioBairro pib = new ParadaItinerarioBairro();
-                        pib.setParadaItinerario(paradaItinerario);
-                        pib.setNomeParada(p.getParada().getNome());
-                        pib.setNomeBairro(p.getNomeBairro());
-                        pib.setNomeCidade(p.getNomeCidade());
+                            ParadaItinerarioBairro pib = new ParadaItinerarioBairro();
+                            pib.setParadaItinerario(paradaItinerario);
+                            pib.setNomeParada(p.getParada().getNome());
+                            pib.setNomeBairro(p.getNomeBairro());
+                            pib.setNomeCidade(p.getNomeCidade());
 
-                        if(viewModel.paradasItinerario.getValue().indexOf(pib) == -1){
-                            List<ParadaItinerarioBairro> paradasItinerario = viewModel.paradasItinerario.getValue();
-                            paradasItinerario.add(pib);
-                            viewModel.paradasItinerario.postValue(paradasItinerario);
+                            if(viewModel.paradasItinerario.getValue().indexOf(pib) == -1){
+                                List<ParadaItinerarioBairro> paradasItinerario = viewModel.paradasItinerario.getValue();
+                                paradasItinerario.add(pib);
+                                viewModel.paradasItinerario.postValue(paradasItinerario);
 //                            viewModel.paradasItinerario.getValue().add(pib);
-                            Toast.makeText(ctx, "Parada adicionada ao itinerário", Toast.LENGTH_SHORT).show();
-                        } else{
-                            Toast.makeText(ctx, "Parada já existe no itinerário", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ctx, "Parada adicionada ao itinerário", Toast.LENGTH_SHORT).show();
+                            } else{
+                                Toast.makeText(ctx, "Parada já existe no itinerário", Toast.LENGTH_SHORT).show();
+                            }
                         }
 
                         return true;
                     }
                 });
-                map.getOverlays().add(m);
+                poiMarkers.add(m);
+//                map.getOverlays().add(m);
             }
 
         }
@@ -510,8 +589,6 @@ public class DetalhesItinerarioActivity extends BaseActivity {
             map.getOverlays().add(overlayEvents);
             atualizarParadasMapa(paradas);
 
-            //viewModel.carregaDirections(map, paradas);
-
 //            List<Overlay> ov = map.getOverlays().;
 //            System.out.println(ov.size());
         }
@@ -546,6 +623,8 @@ public class DetalhesItinerarioActivity extends BaseActivity {
 //                    +binding.textViewBairroPartida.getText(), Toast.LENGTH_SHORT).show();
             binding.textViewBairroPartida.setText(viewModel.itinerario.getValue().getNomeBairroPartida());
             viewModel.iti.set(itinerario);
+
+            viewModel.carregaDirections(map, itinerario.getItinerario());
         }
     };
 

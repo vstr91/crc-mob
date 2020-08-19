@@ -1,18 +1,15 @@
 package br.com.vostre.circular.view.adapter;
 
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaFeriadosBinding;
-import br.com.vostre.circular.databinding.LinhaPaisesBinding;
 import br.com.vostre.circular.model.Feriado;
-import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.view.viewHolder.FeriadoViewHolder;
-import br.com.vostre.circular.view.viewHolder.PaisViewHolder;
 
 public class FeriadoAdapter extends RecyclerView.Adapter<FeriadoViewHolder> {
 

@@ -1,16 +1,14 @@
 package br.com.vostre.circular.view.adapter;
 
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaOnibusBinding;
-import br.com.vostre.circular.databinding.LinhaPaisesBinding;
 import br.com.vostre.circular.model.Onibus;
-import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.view.viewHolder.OnibusViewHolder;
 
 public class OnibusAdapter extends RecyclerView.Adapter<OnibusViewHolder> {

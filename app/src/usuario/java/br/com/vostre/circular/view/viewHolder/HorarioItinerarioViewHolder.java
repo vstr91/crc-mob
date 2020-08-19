@@ -1,10 +1,10 @@
 package br.com.vostre.circular.view.viewHolder;
 
-import android.arch.lifecycle.ViewModel;
-import android.databinding.BindingAdapter;
+import androidx.lifecycle.ViewModel;
+import androidx.databinding.BindingAdapter;
 import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;

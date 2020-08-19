@@ -1,10 +1,9 @@
 package br.com.vostre.circular.model.pojo;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Embedded;
-import android.arch.persistence.room.Ignore;
+import androidx.room.ColumnInfo;
+import androidx.room.Embedded;
+import androidx.room.Ignore;
 
-import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.PontoInteresse;
 
 public class PontoInteresseBairro {

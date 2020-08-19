@@ -1,16 +1,15 @@
 package br.com.vostre.circular.model.dao;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
+import androidx.lifecycle.LiveData;
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
 
-import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.Problema;
 import br.com.vostre.circular.model.pojo.ProblemaTipo;
 
@@ -19,6 +18,9 @@ public interface ProblemaDAO {
 
     @Query("SELECT * FROM problema ORDER BY data_cadastro DESC")
     LiveData<List<Problema>> listarTodos();
+
+    @Query("SELECT * FROM problema ORDER BY data_cadastro DESC")
+    List<Problema> listarTodosSync();
 
     @Query("SELECT * FROM problema WHERE imagemEnviada = 0 AND imagem IS NOT NULL")
     List<Problema> listarTodosImagemAEnviar();

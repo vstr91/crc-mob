@@ -2,14 +2,14 @@ package br.com.vostre.circular.viewModel;
 
 import android.accounts.Account;
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.databinding.ObservableBoolean;
-import android.databinding.ObservableField;
+import androidx.databinding.ObservableBoolean;
+import androidx.databinding.ObservableField;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
@@ -34,12 +34,14 @@ import java.util.List;
 import java.util.Observable;
 
 import br.com.vostre.circular.App;
-import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.EntidadeBase;
 import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.Feriado;
+import br.com.vostre.circular.model.HistoricoItinerario;
+import br.com.vostre.circular.model.HistoricoSecao;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.Itinerario;
@@ -51,13 +53,17 @@ import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.Parametro;
 import br.com.vostre.circular.model.ParametroInterno;
 import br.com.vostre.circular.model.PontoInteresse;
+import br.com.vostre.circular.model.Problema;
 import br.com.vostre.circular.model.SecaoItinerario;
+import br.com.vostre.circular.model.Servico;
+import br.com.vostre.circular.model.TipoProblema;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.dao.PaisDAO;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.Crypt;
+import br.com.vostre.circular.utils.DBUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.StringUtils;
 import br.com.vostre.circular.utils.Unique;
@@ -115,6 +121,8 @@ public class BaseViewModel extends AndroidViewModel {
         usuarioValidado.postValue(false);
         new baseUrlAsyncTask(appDatabase).execute();
         mensagensNaoLidas = appDatabase.mensagemDAO().listarTodosNaoLidos();
+
+
     }
 
     public void atualizarMensagens(){
@@ -376,6 +384,30 @@ public class BaseViewModel extends AndroidViewModel {
                 case "usuario":
                     db.usuarioDAO().deletarTodos();
                     db.usuarioDAO().inserirTodos((List<Usuario>) params[0]);
+                    break;
+                case "historico_itinerario":
+                    db.historicoItinerarioDAO().deletarTodos();
+                    db.historicoItinerarioDAO().inserirTodos((List<HistoricoItinerario>) params[0]);
+                    break;
+                case "tipo_problema":
+                    db.tipoProblemaDAO().deletarTodos();
+                    db.tipoProblemaDAO().inserirTodos((List<TipoProblema>) params[0]);
+                    break;
+                case "problema":
+                    db.problemaDAO().deletarTodos();
+                    db.problemaDAO().inserirTodos((List<Problema>) params[0]);
+                    break;
+                case "feriado":
+                    db.feriadoDAO().deletarTodos();
+                    db.feriadoDAO().inserirTodos((List<Feriado>) params[0]);
+                    break;
+                case "historico_secao":
+                    db.historicoSecaoDAO().deletarTodos();
+                    db.historicoSecaoDAO().inserirTodos((List<HistoricoSecao>) params[0]);
+                    break;
+                case "servico":
+                    db.servicoDAO().deletarTodos();
+                    db.servicoDAO().inserirTodos((List<Servico>) params[0]);
                     break;
                 case "parametro_interno":
                     db.parametroInternoDAO().inserir((ParametroInterno) params[0].get(0));

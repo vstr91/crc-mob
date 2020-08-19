@@ -27,7 +27,7 @@
             type="br.com.vostre.circular.model.pojo.BairroCidade" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/gradiente"
@@ -127,7 +127,7 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
-                    <android.support.constraint.ConstraintLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
 
@@ -144,7 +144,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
-                        <android.support.v7.widget.CardView
+                        <androidx.cardview.widget.CardView
                             android:id="@+id/cardViewListDestinoConsulta"
                             android:layout_width="0dp"
                             android:layout_height="0dp"
@@ -181,19 +181,19 @@
                                     android:text="Escolha a cidade para onde você deseja ir, pressionando o brasão ou o nome da cidade abaixo"
                                     android:textSize="8sp" />
 
-                                <android.support.v7.widget.RecyclerView
+                                <androidx.recyclerview.widget.RecyclerView
                                     android:id="@+id/listCidadesDestinoConsulta"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:stretchColumns="true"
-                                    app:layoutManager="android.support.v7.widget.GridLayoutManager"
+                                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                                     app:spanCount="3"
                                     tools:listitem="@layout/linha_cidades" />
                             </LinearLayout>
 
-                        </android.support.v7.widget.CardView>
+                        </androidx.cardview.widget.CardView>
 
-                        <android.support.v7.widget.CardView
+                        <androidx.cardview.widget.CardView
                             android:id="@+id/cardViewDestinoConsulta"
                             android:layout_width="match_parent"
                             android:layout_height="80dp"
@@ -206,7 +206,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/textView76">
 
-                            <android.support.constraint.ConstraintLayout
+                            <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1">
@@ -266,7 +266,7 @@
                                     app:layout_constraintTop_toBottomOf="@+id/textViewBairroPartidaConsulta"
                                     tools:text="Cidade Partida" />
 
-                                <android.support.v7.widget.AppCompatImageButton
+                                <androidx.appcompat.widget.AppCompatImageButton
                                     android:id="@+id/imageButtonConsulta"
                                     style="@style/botao_transparente"
                                     android:layout_width="wrap_content"
@@ -281,11 +281,11 @@
                                     app:layout_constraintTop_toBottomOf="@+id/textView96"
                                     app:srcCompat="@drawable/ic_edit_blue_24dp" />
 
-                            </android.support.constraint.ConstraintLayout>
+                            </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        </android.support.v7.widget.CardView>
+                        </androidx.cardview.widget.CardView>
 
-                        <android.support.v7.widget.RecyclerView
+                        <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/listItinerariosDestino"
                             android:layout_width="0dp"
                             android:layout_height="0dp"
@@ -293,14 +293,14 @@
                             android:layout_marginTop="8dp"
                             android:layout_marginEnd="16dp"
                             android:layout_marginBottom="8dp"
-                            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/cardViewDestinoConsulta"
                             tools:listitem="@layout/linha_itinerarios" />
 
-                    </android.support.constraint.ConstraintLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </LinearLayout>
 
@@ -310,7 +310,7 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
-                    <android.support.constraint.ConstraintLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
 
@@ -379,7 +379,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/textViewResultado" />
 
-                        <android.support.v7.widget.AppCompatImageButton
+                        <androidx.appcompat.widget.AppCompatImageButton
                             android:id="@+id/btnInverter"
                             android:layout_width="80dp"
                             android:layout_height="80dp"
@@ -400,7 +400,7 @@
                             app:layout_constraintTop_toBottomOf="@+id/cardViewPartida"
                             app:srcCompat="@drawable/ic_swap_vert_blue_24dp" />
 
-                        <android.support.v7.widget.CardView
+                        <androidx.cardview.widget.CardView
                             android:id="@+id/cardViewListPartida"
                             android:layout_width="0dp"
                             android:layout_height="0dp"
@@ -437,19 +437,19 @@
                                     android:text="Escolha a cidade na qual você iniciará a viagem, pressionando o brasão ou o nome da cidade abaixo"
                                     android:textSize="8sp" />
 
-                                <android.support.v7.widget.RecyclerView
+                                <androidx.recyclerview.widget.RecyclerView
                                     android:id="@+id/listCidadesPartida"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:stretchColumns="true"
-                                    app:layoutManager="android.support.v7.widget.GridLayoutManager"
+                                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                                     app:spanCount="3"
                                     tools:listitem="@layout/linha_cidades" />
                             </LinearLayout>
 
-                        </android.support.v7.widget.CardView>
+                        </androidx.cardview.widget.CardView>
 
-                        <android.support.v7.widget.CardView
+                        <androidx.cardview.widget.CardView
                             android:id="@+id/cardViewPartida"
                             android:layout_width="match_parent"
                             android:layout_height="80dp"
@@ -462,7 +462,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/textView72">
 
-                            <android.support.constraint.ConstraintLayout
+                            <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1">
@@ -522,7 +522,7 @@
                                     app:layout_constraintTop_toBottomOf="@+id/textViewBairroPartida"
                                     tools:text="Cidade Partida" />
 
-                                <android.support.v7.widget.AppCompatImageButton
+                                <androidx.appcompat.widget.AppCompatImageButton
                                     android:id="@+id/imageButton"
                                     style="@style/botao_transparente"
                                     android:layout_width="wrap_content"
@@ -537,11 +537,11 @@
                                     app:layout_constraintTop_toBottomOf="@+id/textView26"
                                     app:srcCompat="@drawable/ic_edit_blue_24dp" />
 
-                            </android.support.constraint.ConstraintLayout>
+                            </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        </android.support.v7.widget.CardView>
+                        </androidx.cardview.widget.CardView>
 
-                        <android.support.v7.widget.CardView
+                        <androidx.cardview.widget.CardView
                             android:id="@+id/cardViewListDestino"
                             android:layout_width="0dp"
                             android:layout_height="0dp"
@@ -578,19 +578,19 @@
                                     android:text="Escolha a cidade de destino, pressionando o brasão ou o nome da cidade abaixo"
                                     android:textSize="8sp" />
 
-                                <android.support.v7.widget.RecyclerView
+                                <androidx.recyclerview.widget.RecyclerView
                                     android:id="@+id/listCidades"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:stretchColumns="true"
-                                    app:layoutManager="android.support.v7.widget.GridLayoutManager"
+                                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                                     app:spanCount="3"
                                     tools:listitem="@layout/linha_cidades" />
                             </LinearLayout>
 
-                        </android.support.v7.widget.CardView>
+                        </androidx.cardview.widget.CardView>
 
-                        <android.support.v7.widget.CardView
+                        <androidx.cardview.widget.CardView
                             android:id="@+id/cardViewDestino"
                             android:layout_width="match_parent"
                             android:layout_height="80dp"
@@ -603,7 +603,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/cardViewPartida">
 
-                            <android.support.constraint.ConstraintLayout
+                            <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1">
@@ -664,13 +664,13 @@
                                     app:layout_constraintTop_toBottomOf="@+id/textViewBairroDestino"
                                     tools:text="Cidade Destino" />
 
-                                <android.support.constraint.ConstraintLayout
+                                <androidx.constraintlayout.widget.ConstraintLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent">
 
-                                </android.support.constraint.ConstraintLayout>
+                                </androidx.constraintlayout.widget.ConstraintLayout>
 
-                                <android.support.v7.widget.AppCompatImageButton
+                                <androidx.appcompat.widget.AppCompatImageButton
                                     android:id="@+id/imageButton2"
                                     style="@style/botao_transparente"
                                     android:layout_width="wrap_content"
@@ -685,11 +685,11 @@
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintTop_toBottomOf="@+id/textView27"
                                     app:srcCompat="@drawable/ic_edit_blue_24dp" />
-                            </android.support.constraint.ConstraintLayout>
+                            </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        </android.support.v7.widget.CardView>
+                        </androidx.cardview.widget.CardView>
 
-                        <android.support.v7.widget.CardView
+                        <androidx.cardview.widget.CardView
                             android:id="@+id/cardViewResultadoVazio"
                             android:layout_width="0dp"
                             android:layout_height="100dp"
@@ -702,7 +702,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/cardViewDestino">
 
-                            <android.support.constraint.ConstraintLayout
+                            <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent">
 
@@ -738,20 +738,20 @@
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent" />
-                            </android.support.constraint.ConstraintLayout>
+                            </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        </android.support.v7.widget.CardView>
+                        </androidx.cardview.widget.CardView>
 
-                        <android.support.v7.widget.RecyclerView
+                        <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/listResultados"
                             android:layout_width="match_parent"
                             android:layout_height="300dp"
                             android:layout_marginTop="8dp"
-                            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/textViewSubResultado"
-                            tools:listitem="@layout/linha_itinerarios_resultado"></android.support.v7.widget.RecyclerView>
+                            tools:listitem="@layout/linha_itinerarios_resultado"></androidx.recyclerview.widget.RecyclerView>
 
                         <!--                        <RadioGroup-->
                         <!--                            android:id="@+id/radioGroupConsulta"-->
@@ -806,7 +806,7 @@
                         <!--                            app:layout_constraintStart_toStartOf="parent"-->
                         <!--                            app:layout_constraintTop_toBottomOf="@+id/radioGroupConsulta" />-->
 
-                    </android.support.constraint.ConstraintLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </LinearLayout>
 
@@ -816,7 +816,7 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
-                    <android.support.constraint.ConstraintLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
 
@@ -830,7 +830,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
-                        <android.support.v7.widget.CardView
+                        <androidx.cardview.widget.CardView
                             android:id="@+id/cardView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -842,7 +842,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/textView75">
 
-                            <android.support.constraint.ConstraintLayout
+                            <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent">
 
@@ -860,7 +860,7 @@
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintTop_toTopOf="parent" />
 
-                                <android.support.design.widget.TextInputLayout
+                                <com.google.android.material.textfield.TextInputLayout
                                     android:id="@+id/textInputLayout"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
@@ -873,7 +873,7 @@
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent">
 
-                                    <android.support.design.widget.TextInputEditText
+                                    <com.google.android.material.textfield.TextInputEditText
                                         android:id="@+id/editTextLinha"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
@@ -885,27 +885,27 @@
                                         app:layout_constraintStart_toStartOf="parent"
                                         app:layout_constraintTop_toTopOf="parent" />
 
-                                </android.support.design.widget.TextInputLayout>
+                                </com.google.android.material.textfield.TextInputLayout>
 
-                            </android.support.constraint.ConstraintLayout>
+                            </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        </android.support.v7.widget.CardView>
+                        </androidx.cardview.widget.CardView>
 
-                        <android.support.v7.widget.RecyclerView
+                        <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/listItinerarios"
                             android:layout_width="0dp"
                             android:layout_height="0dp"
                             android:layout_marginStart="16dp"
                             android:layout_marginTop="8dp"
                             android:layout_marginEnd="16dp"
-                            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/cardView"
                             tools:listitem="@layout/linha_itinerarios" />
 
-                    </android.support.constraint.ConstraintLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </LinearLayout>
 
@@ -915,6 +915,6 @@
 
         </TabHost>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

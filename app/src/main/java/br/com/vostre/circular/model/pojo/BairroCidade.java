@@ -1,11 +1,13 @@
 package br.com.vostre.circular.model.pojo;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Embedded;
-import android.arch.persistence.room.Ignore;
+import androidx.room.ColumnInfo;
+import androidx.room.Embedded;
+import androidx.room.Ignore;
+
+import java.util.List;
 
 import br.com.vostre.circular.model.Bairro;
-import br.com.vostre.circular.model.Cidade;
+import br.com.vostre.circular.model.Parada;
 
 public class BairroCidade {
 
@@ -32,6 +34,17 @@ public class BairroCidade {
 
     @Ignore
     String nomeCidadeComEstado;
+
+    @Ignore
+    List<ParadaBairro> paradas;
+
+    public List<ParadaBairro> getParadas() {
+        return paradas;
+    }
+
+    public void setParadas(List<ParadaBairro> paradas) {
+        this.paradas = paradas;
+    }
 
     public String getBrasao() {
         return brasao;

@@ -1,6 +1,6 @@
 package br.com.vostre.circular.utils;
 
-import android.databinding.BindingAdapter;
+import androidx.databinding.BindingAdapter;
 import android.view.View;
 import android.widget.TextView;
 

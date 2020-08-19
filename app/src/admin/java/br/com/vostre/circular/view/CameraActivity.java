@@ -1,42 +1,24 @@
 package br.com.vostre.circular.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.content.Intent;
-import android.databinding.BindingAdapter;
-import android.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.Point;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.media.ExifInterface;
 import android.os.Bundle;
-import android.os.Environment;
-import android.renderscript.Allocation;
-import android.renderscript.Element;
-import android.renderscript.RenderScript;
-import android.renderscript.ScriptIntrinsicYuvToRGB;
-import android.renderscript.Type;
-import android.support.annotation.NonNull;
-import android.util.Log;
-import android.util.Size;
-import android.view.DragEvent;
-import android.view.MotionEvent;
-import android.view.SurfaceHolder;
+
+import androidx.annotation.NonNull;
+
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -48,27 +30,18 @@ import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 import com.google.firebase.ml.vision.text.RecognizedLanguage;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import br.com.vostre.circular.BuildConfig;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityCameraBinding;
-import br.com.vostre.circular.databinding.ActivitySobreBinding;
-import br.com.vostre.circular.model.ParametroInterno;
 import br.com.vostre.circular.utils.CameraPreview;
 import br.com.vostre.circular.utils.GraphicOverlay;
 import br.com.vostre.circular.utils.ImageUtils;
 import br.com.vostre.circular.utils.TextGraphic;
-import br.com.vostre.circular.viewModel.SobreViewModel;
 
 public class CameraActivity extends BaseActivity {
 

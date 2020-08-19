@@ -1,18 +1,15 @@
 package br.com.vostre.circular.utils;
 
-import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.view.MensagensActivity;
-import br.com.vostre.circular.view.MenuActivity;
 
 /**
  * Created by Almir on 24/03/2016.
@@ -53,7 +50,7 @@ public class NotificacaoUtils {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
-        android.support.v4.app.TaskStackBuilder stackBuilder = android.support.v4.app.TaskStackBuilder.create(context);
+        androidx.core.app.TaskStackBuilder stackBuilder = androidx.core.app.TaskStackBuilder.create(context);
         stackBuilder.addParentStack(anterior);
         stackBuilder.addNextIntent(intent);
 

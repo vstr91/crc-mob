@@ -1,13 +1,13 @@
 package br.com.vostre.circular.view.form;
 
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.BindingAdapter;
-import android.databinding.DataBindingUtil;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,9 +27,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.databinding.FormPaisBinding;
 import br.com.vostre.circular.databinding.FormSecaoBinding;
-import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.view.adapter.ParadaAdapterSpinner;

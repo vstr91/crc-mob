@@ -8,7 +8,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.view.MenuItemCompat;
+import androidx.core.view.MenuItemCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,8 +30,6 @@ import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.EntidadeBase;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.view.MensagensActivity;
-import br.com.vostre.circular.view.MenuActivity;
-import br.com.vostre.circular.view.ProblemasActivity;
 
 /**
  * Created by Almir on 16/12/2015.
@@ -174,6 +172,16 @@ public class ToolbarUtils {
 
                         List<? extends EntidadeBase> paradaSugestoes = new ArrayList<>();
 
+                        // v2.3.x
+                        List<? extends EntidadeBase> historicosParadas = appDatabase.historicoParadaDAO().listarTodosSync();
+                        List<? extends EntidadeBase> historicosItinerarios = appDatabase.historicoItinerarioDAO().listarTodosSync();
+                        List<? extends EntidadeBase> pontoInteresseSugestoes = new ArrayList<>();
+                        List<? extends EntidadeBase> tiposProblemas = appDatabase.tipoProblemaDAO().listarTodosSync();
+                        List<? extends EntidadeBase> problemas = appDatabase.problemaDAO().listarTodosSync();
+                        List<? extends EntidadeBase> servicos = appDatabase.servicoDAO().listarTodosSync();
+                        List<? extends EntidadeBase> feriados = appDatabase.feriadoDAO().listarTodosSync();
+                        List<? extends EntidadeBase> historicosSecoes = appDatabase.historicoSecaoDAO().listarTodosSync();
+
                         String strPaises = "\"paises\": " + JsonUtils.toJson((List<EntidadeBase>) paises);
                         String strEmpresas = "\"empresas\": " + JsonUtils.toJson((List<EntidadeBase>) empresas);
                         String strOnibus = "\"onibus\": " + JsonUtils.toJson((List<EntidadeBase>) onibus);
@@ -193,10 +201,23 @@ public class ToolbarUtils {
 
                         String strParadasSugestoes = "\"paradas_sugestoes\": " + JsonUtils.toJson((List<EntidadeBase>) paradaSugestoes);
 
+                        //v2.3.x
+                        String strHistoricosParadas = "\"historicos_paradas\": " + JsonUtils.toJson((List<EntidadeBase>) historicosParadas);
+                        String strHistoricosItinerarios = "\"historicos_itinerarios\": " + JsonUtils.toJson((List<EntidadeBase>) historicosItinerarios);
+                        String strPontoInteresseSugestoes = "\"pontos_interesse_sugestoes\": " + JsonUtils.toJson((List<EntidadeBase>) pontoInteresseSugestoes);
+                        String strTiposProblemas = "\"tipos_problemas\": " + JsonUtils.toJson((List<EntidadeBase>) tiposProblemas);
+                        String strProblemas = "\"problemas\": " + JsonUtils.toJson((List<EntidadeBase>) problemas);
+                        String strServicos = "\"servicos\": " + JsonUtils.toJson((List<EntidadeBase>) servicos);
+                        String strFeriados = "\"feriados\": " + JsonUtils.toJson((List<EntidadeBase>) feriados);
+                        String strHistoricosSecoes = "\"historicos_secoes\": " + JsonUtils.toJson((List<EntidadeBase>) historicosSecoes);
+
                         String json = "{" + strPaises + "," + strEmpresas + "," + strOnibus + "," + strEstados + "," + strCidades + ","
                                 + strBairros + "," + strParadas + "," + strItinerarios + "," + strHorarios + "," + strParadasItinerarios + ","
                                 + strSecoesItinerarios + "," + strHorariosItinerarios + "," + strMensagens + "," + strParametros + ","
-                                + strPontosInteresse + "," + strUsuarios + "," + strParadasSugestoes + "}";
+                                + strPontosInteresse + "," + strUsuarios + "," + strParadasSugestoes + ","
+                                + strHistoricosParadas + "," + strHistoricosItinerarios + "," + strPontoInteresseSugestoes
+                                + "," + strTiposProblemas + "," + strProblemas + "," + strServicos + "," + strFeriados + "," + strHistoricosSecoes
+                                + "}";
 
                         // EXPORTA ARQUIVO DE DADOS
 

@@ -1,12 +1,11 @@
 package br.com.vostre.circular.viewModel;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.Context;
-import android.databinding.BindingAdapter;
+import androidx.databinding.BindingAdapter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -19,7 +18,6 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.joda.time.DateTime;
 import org.json.JSONException;
@@ -34,9 +32,6 @@ import java.util.List;
 import java.util.UUID;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.model.Bairro;
-import br.com.vostre.circular.model.Estado;
-import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.Servico;
 import br.com.vostre.circular.model.api.CircularAPI;
@@ -376,6 +371,25 @@ public class ParadasViewModel extends AndroidViewModel {
                 }
             }
         };
+    }
+
+    public void atualizarRuaParadas(){
+
+        for(ParadaBairro p : paradas.getValue()){
+
+            if(p.getParada().getCep() == null || p.getParada().getCep().isEmpty()){
+                buscarRua(p.getParada());
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        }
+
     }
 
     public void buscarRua(final Parada parada){

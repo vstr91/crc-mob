@@ -1,12 +1,12 @@
 package br.com.vostre.circular.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
 import java.io.FileNotFoundException;
@@ -14,16 +14,11 @@ import java.io.InputStream;
 import java.util.List;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.databinding.ActivityPaisesBinding;
 import br.com.vostre.circular.databinding.ActivityServicosBinding;
-import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.Servico;
 import br.com.vostre.circular.utils.DialogUtils;
-import br.com.vostre.circular.view.adapter.PaisAdapter;
 import br.com.vostre.circular.view.adapter.ServicoAdapter;
-import br.com.vostre.circular.view.form.FormPais;
 import br.com.vostre.circular.view.form.FormServico;
-import br.com.vostre.circular.viewModel.PaisesViewModel;
 import br.com.vostre.circular.viewModel.ServicosViewModel;
 
 public class ServicosActivity extends BaseActivity {

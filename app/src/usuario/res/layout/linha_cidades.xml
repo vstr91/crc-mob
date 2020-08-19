@@ -11,7 +11,7 @@
             type="android.graphics.drawable.Drawable" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" android:id="@+id/cidade">
 
@@ -58,6 +58,6 @@
             app:layout_constraintTop_toBottomOf="@+id/circleView2"
             tools:text="cidade" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

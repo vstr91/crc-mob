@@ -1,5 +1,6 @@
 <resources>
-    <string name="texto_buscando_rota">Buscando rotas disponíveis!\nSó um momento, por favor!\n\nAtenção: Em rotas sem itinerário direto, com troca de ônibus, a busca pode demorar um pouco mais!</string>
+    <string name="texto_buscando_rota">Buscando rotas disponíveis!\nSó um momento, por favor!\n\nAtenção: Em rotas sem itinerário direto e/ou com troca de ônibus, a busca pode demorar um pouco mais!</string>
     <string name="texto_buscando_por_linha">Buscando itinerários disponíveis!\nSó um momento, por favor!</string>
     <string name="texto_buscando_por_destino">Buscando itinerários disponíveis!\nSó um momento, por favor!\n\nAtenção: Em destinos que possuem muitos itinerários, a busca pode demorar um pouco mais!</string>
+    <string name="key_google">AIzaSyDdo8cVftdY7wgvpCdWxS1LD0MvjDJaVrY</string>
 </resources>

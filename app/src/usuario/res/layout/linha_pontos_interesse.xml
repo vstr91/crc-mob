@@ -8,7 +8,7 @@
             type="br.com.vostre.circular.model.PontoInteresse" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -87,12 +87,12 @@
             app:layout_constraintTop_toBottomOf="@+id/textView41"
             tools:text="Venha participar da festa do bairro. Diversas atrações todos os dias!" />
 
-        <android.support.constraint.Guideline
+        <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintGuide_begin="199dp" />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

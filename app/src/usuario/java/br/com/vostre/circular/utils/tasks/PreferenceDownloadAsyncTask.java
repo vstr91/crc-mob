@@ -31,7 +31,9 @@ public class PreferenceDownloadAsyncTask extends AsyncTask<Void, Void, Void> {
 
         String baseUrl = db.parametroDAO().carregarPorSlug("servidor");
 
-        SyncAdapter.preferenceDownload(baseUrl, id, ctx);
+        if(baseUrl != null){
+            SyncAdapter.preferenceDownload(baseUrl, id, ctx);
+        }
 
         return null;
     }

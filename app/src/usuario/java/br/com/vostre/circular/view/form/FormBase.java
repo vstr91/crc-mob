@@ -1,6 +1,6 @@
 package br.com.vostre.circular.view.form;
 
-import android.support.v4.app.DialogFragment;
+import androidx.fragment.app.DialogFragment;
 
 import java.util.Calendar;
 

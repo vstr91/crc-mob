@@ -1,12 +1,11 @@
 package br.com.vostre.circular.model;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.PrimaryKey;
-import android.databinding.InverseMethod;
-import android.support.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.PrimaryKey;
+import androidx.databinding.InverseMethod;
+import androidx.annotation.NonNull;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 
 import java.util.UUID;
 

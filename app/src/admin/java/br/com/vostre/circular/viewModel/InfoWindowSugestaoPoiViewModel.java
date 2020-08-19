@@ -1,16 +1,14 @@
 package br.com.vostre.circular.viewModel;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
+import androidx.lifecycle.AndroidViewModel;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.io.File;
 
-import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.dao.AppDatabase;
-import br.com.vostre.circular.model.pojo.ParadaSugestaoBairro;
 import br.com.vostre.circular.model.pojo.PontoInteresseSugestaoBairro;
 
 public class InfoWindowSugestaoPoiViewModel extends AndroidViewModel {

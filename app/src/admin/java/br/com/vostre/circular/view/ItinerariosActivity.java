@@ -2,34 +2,26 @@ package br.com.vostre.circular.view;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.databinding.BindingAdapter;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.DrawableContainer;
-import android.graphics.drawable.LayerDrawable;
-import android.graphics.drawable.RotateDrawable;
 import android.location.Location;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationRequest;
@@ -48,13 +40,11 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityItinerariosBinding;
 import br.com.vostre.circular.model.Empresa;
-import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
@@ -65,7 +55,6 @@ import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ParadaItinerarioAdapter;
 import br.com.vostre.circular.view.form.FormItinerario;
 import br.com.vostre.circular.view.form.FormParada;
-import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.view.utils.SortListItemHelper;
 import br.com.vostre.circular.viewModel.ItinerariosViewModel;
 
@@ -164,6 +153,10 @@ public class ItinerariosActivity extends BaseActivity {
 
             viewModel.iniciarAtualizacoesPosicao();
 
+//            viewModel.atualizaTrajetoItinerarios(null);
+
+//            viewModel.atualizaItinerarios();
+
             ctx = this;
 
             MapEventsReceiver receiver = new MapEventsReceiver() {
@@ -226,8 +219,6 @@ public class ItinerariosActivity extends BaseActivity {
             ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
             touchHelper.attachToRecyclerView(listParadas);
         }
-
-
 
     }
 

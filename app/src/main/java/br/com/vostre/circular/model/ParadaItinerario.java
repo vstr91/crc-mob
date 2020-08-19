@@ -1,13 +1,10 @@
 package br.com.vostre.circular.model;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Index;
-import android.support.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.Index;
+import androidx.annotation.NonNull;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-
-import java.util.Date;
 
 @Entity(indices = {@Index(value = {"parada", "itinerario"},
         unique = true)}, tableName = "parada_itinerario")

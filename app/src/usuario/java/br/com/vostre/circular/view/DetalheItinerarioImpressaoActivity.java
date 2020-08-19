@@ -1,11 +1,11 @@
 package br.com.vostre.circular.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
-import android.databinding.BindingAdapter;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -13,12 +13,10 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
@@ -51,7 +49,6 @@ import java.util.List;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityDetalheItinerarioBinding;
 import br.com.vostre.circular.databinding.ActivityDetalheItinerarioImpressaoBinding;
-import br.com.vostre.circular.databinding.LinhaHorariosItinerariosBinding;
 import br.com.vostre.circular.databinding.LinhaHorariosItinerariosCompactoBinding;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.SecaoItinerario;
@@ -332,6 +329,41 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
         public void onChanged(ItinerarioPartidaDestino itinerario) {
 
             if(itinerario != null){
+
+                if(!viewModel.trechoIsolado){
+                    // ALIAS ITINERARIO
+
+                    if(itinerario.getItinerario().getAliasBairroPartida() != null && !itinerario.getItinerario().getAliasBairroPartida().isEmpty()){
+                        itinerario.setNomeBairroPartida(itinerario.getItinerario().getAliasBairroPartida());
+                        binding.textViewNome.setText(itinerario.getItinerario().getAliasBairroPartida());
+                    } else{
+                        binding.textViewNome.setText(itinerario.getNomeBairroPartida());
+                    }
+
+                    if(itinerario.getItinerario().getAliasCidadePartida() != null && !itinerario.getItinerario().getAliasCidadePartida().isEmpty()){
+                        itinerario.setNomeCidadePartida(itinerario.getItinerario().getAliasCidadePartida());
+                        binding.textViewBairro.setText(itinerario.getItinerario().getAliasCidadePartida());
+                    } else{
+                        binding.textViewBairro.setText(itinerario.getNomeCidadePartida());
+                    }
+
+                    if(itinerario.getItinerario().getAliasBairroDestino() != null && !itinerario.getItinerario().getAliasBairroDestino().isEmpty()){
+                        itinerario.setNomeBairroDestino(itinerario.getItinerario().getAliasBairroDestino());
+                        binding.textViewNomeDestino.setText(itinerario.getItinerario().getAliasBairroDestino());
+                    } else{
+                        binding.textViewNomeDestino.setText(itinerario.getNomeBairroDestino());
+                    }
+
+                    if(itinerario.getItinerario().getAliasCidadeDestino() != null && !itinerario.getItinerario().getAliasCidadeDestino().isEmpty()){
+                        itinerario.setNomeCidadeDestino(itinerario.getItinerario().getAliasCidadeDestino());
+                        binding.textViewBairroDestino.setText(itinerario.getItinerario().getAliasCidadeDestino());
+                    } else{
+                        binding.textViewBairroDestino.setText(itinerario.getNomeCidadeDestino());
+                    }
+
+                    // FIM ALIAS
+                }
+
                 binding.setItinerario(itinerario);
 
                 if(itinerario.getItinerario().getObservacao() == null || itinerario.getItinerario().getObservacao().isEmpty()){

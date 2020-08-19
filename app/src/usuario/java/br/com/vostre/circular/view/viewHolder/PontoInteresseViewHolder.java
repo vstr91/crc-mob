@@ -1,14 +1,13 @@
 package br.com.vostre.circular.view.viewHolder;
 
 import android.content.Intent;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
 import br.com.vostre.circular.databinding.LinhaPontosInteresseBinding;
-import br.com.vostre.circular.databinding.LinhaSecoesBinding;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.pojo.ParadaBairro;

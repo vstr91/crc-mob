@@ -1,12 +1,12 @@
 package br.com.vostre.circular.view.utils;
 
-import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.BindingAdapter;
-import android.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +19,6 @@ import org.joda.time.format.DateTimeFormat;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.InfowindowPoiBinding;
 import br.com.vostre.circular.model.PontoInteresse;
-import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.view.form.FormBase;
 import br.com.vostre.circular.view.form.FormPontoInteresse;
 import br.com.vostre.circular.viewModel.InfoWindowPOIViewModel;

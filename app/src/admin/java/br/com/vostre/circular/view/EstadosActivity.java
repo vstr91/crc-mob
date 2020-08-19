@@ -1,20 +1,18 @@
 package br.com.vostre.circular.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.DataBindingUtil;
-import android.support.v7.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.databinding.DataBindingUtil;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
-import android.widget.Spinner;
 
 import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityEstadosBinding;
 import br.com.vostre.circular.model.Estado;
-import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.view.adapter.EstadoAdapter;
 import br.com.vostre.circular.view.form.FormEstado;
 import br.com.vostre.circular.viewModel.EstadosViewModel;

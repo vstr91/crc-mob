@@ -1,25 +1,19 @@
 package br.com.vostre.circular.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
 import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityFeriadosBinding;
-import br.com.vostre.circular.databinding.ActivityPaisesBinding;
 import br.com.vostre.circular.model.Feriado;
-import br.com.vostre.circular.model.Pais;
-import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.view.adapter.FeriadoAdapter;
-import br.com.vostre.circular.view.adapter.PaisAdapter;
-import br.com.vostre.circular.view.form.FormPais;
 import br.com.vostre.circular.viewModel.FeriadosViewModel;
-import br.com.vostre.circular.viewModel.PaisesViewModel;
 
 public class FeriadosActivity extends BaseActivity {
 

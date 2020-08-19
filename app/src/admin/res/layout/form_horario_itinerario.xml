@@ -10,7 +10,7 @@
             type="br.com.vostre.circular.viewModel.HorariosItinerarioViewModel" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:minWidth="200dp"
@@ -225,7 +225,7 @@
 
         </LinearLayout>
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -238,7 +238,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/layoutDias">
 
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextObservacao"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -252,7 +252,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <Switch
             android:id="@+id/switchProgramado"
@@ -345,6 +345,6 @@
             app:layout_constraintBottom_toTopOf="@+id/switchAtivo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/switchProgramado" />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

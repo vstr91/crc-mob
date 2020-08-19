@@ -1,17 +1,17 @@
 package br.com.vostre.circular.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.location.LocationManager;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -59,7 +59,6 @@ import br.com.vostre.circular.model.Parametro;
 import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Usuario;
-import br.com.vostre.circular.utils.Constants;
 import br.com.vostre.circular.utils.DestaqueUtils;
 import br.com.vostre.circular.utils.NotificacaoUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
@@ -70,7 +69,6 @@ import br.com.vostre.circular.view.listener.MensagemListener;
 import br.com.vostre.circular.view.listener.ToolbarListener;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
-import br.com.vostre.circular.databinding.DrawerHeaderBinding;
 import io.fabric.sdk.android.Fabric;
 
 import static br.com.vostre.circular.utils.ToolbarUtils.PICK_FILE;
@@ -249,11 +247,12 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == PICK_FILE) {
 
-            if(data != null){
+            if (data != null) {
                 try {
                     InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(data.getData());
 
@@ -703,13 +702,13 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
         if(id == null || id.isEmpty() || id.equals("") || id.equals("null")){
 
             if(menu != null){
-                menu.getItem(1).setVisible(false);
+//                menu.getItem(1).setVisible(false);
             }
 
         } else{
 
             if(menu != null){
-                menu.getItem(1).setVisible(true);
+//                menu.getItem(1).setVisible(true);
             }
 
         }

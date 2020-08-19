@@ -1,6 +1,6 @@
 package br.com.vostre.circular.model.pojo;
 
-import android.arch.persistence.room.ColumnInfo;
+import androidx.room.ColumnInfo;
 
 public class AcessoTotal {
 

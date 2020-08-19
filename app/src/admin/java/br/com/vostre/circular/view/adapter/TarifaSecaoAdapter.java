@@ -2,8 +2,8 @@ package br.com.vostre.circular.view.adapter;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,14 +12,11 @@ import android.widget.TextView;
 
 import java.text.NumberFormat;
 import java.util.List;
-import java.util.Map;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.databinding.LinhaItinerariosTarifaBinding;
 import br.com.vostre.circular.databinding.LinhaTarifasSecoesBinding;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
-import br.com.vostre.circular.view.viewHolder.ItinerarioTarifaViewHolder;
 import br.com.vostre.circular.view.viewHolder.TarifaSecaoViewHolder;
 
 public class TarifaSecaoAdapter extends BaseExpandableListAdapter {

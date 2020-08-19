@@ -19,11 +19,40 @@
     <color name="cinzaClaro">#EEEEEE</color>
     <color name="cinzaMedio">#AAAAAA</color>
     <color name="cinzaInativo">#E3E3E3</color>
+
+    <color name="legenda_branco">#FFFFFF</color>
+    <color name="legenda_verde_claro">#00FF00</color>
+    <color name="legenda_verde_medio">#146D14</color>
+    <color name="legenda_verde_escuro">#1A2B1A</color>
+    <color name="legenda_ciano_claro">#00FFFF</color>
+    <color name="legenda_ciano_medio">#187575</color>
+    <color name="legenda_ciano_escuro">#233535</color>
+    <color name="legenda_azul_claro">#0000FF</color>
+    <color name="legenda_azul_medio">#191966</color>
+    <color name="legenda_azul_escuro">#1B1B31</color>
+    <color name="legenda_cinza_claro">#DDDDDD</color>
+    <color name="legenda_cinza_medio">#686868</color>
+    <color name="legenda_cinza_escuro">#353535</color>
+    <color name="legenda_roxo_claro">#860186</color>
+    <color name="legenda_roxo_medio">#4B134B</color>
+    <color name="legenda_roxo_escuro">#221222</color>
+
     <array name="cores_legenda">
-        <item>@color/azul</item>
-        <item>@color/ciano</item>
-        <item>@color/cinzaEscuro</item>
-        <item>@color/cianoEscuro</item>
-        <item>@color/verde</item>
+        <item>@color/legenda_azul_claro</item>
+        <item>@color/legenda_ciano_claro</item>
+        <item>@color/legenda_verde_claro</item>
+        <item>@color/legenda_cinza_claro</item>
+        <item>@color/legenda_roxo_claro</item>
+        <item>@color/legenda_azul_medio</item>
+        <item>@color/legenda_ciano_medio</item>
+        <item>@color/legenda_verde_medio</item>
+        <item>@color/legenda_cinza_medio</item>
+        <item>@color/legenda_roxo_medio</item>
+        <item>@color/legenda_azul_escuro</item>
+        <item>@color/legenda_ciano_escuro</item>
+        <item>@color/legenda_verde_escuro</item>
+        <item>@color/legenda_cinza_escuro</item>
+        <item>@color/legenda_roxo_escuro</item>
+        <item>@color/legenda_branco</item>
     </array>
 </resources>

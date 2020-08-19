@@ -1,45 +1,31 @@
 package br.com.vostre.circular.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
-import android.widget.TabHost;
 import android.widget.Toast;
 
-import org.json.JSONException;
-
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityDetalhesCidadeBinding;
-import br.com.vostre.circular.databinding.ActivityDetalhesEmpresaBinding;
 import br.com.vostre.circular.model.Bairro;
-import br.com.vostre.circular.model.Cidade;
-import br.com.vostre.circular.model.Empresa;
-import br.com.vostre.circular.model.Onibus;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
-import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.view.adapter.BairroAdapter;
-import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
-import br.com.vostre.circular.view.adapter.OnibusAdapter;
 import br.com.vostre.circular.view.form.FormBairro;
-import br.com.vostre.circular.view.form.FormOnibus;
 import br.com.vostre.circular.viewModel.BairrosViewModel;
 import br.com.vostre.circular.viewModel.DetalhesCidadeViewModel;
-import br.com.vostre.circular.viewModel.DetalhesEmpresaViewModel;
 
 public class DetalhesCidadeActivity extends BaseActivity {
 

@@ -1,21 +1,26 @@
 package br.com.vostre.circular.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
+import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.databinding.BindingAdapter;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
+
+import android.view.GestureDetector;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
@@ -33,9 +38,11 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
@@ -61,6 +68,7 @@ import br.com.vostre.circular.model.pojo.Legenda;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.CustomLayoutManager;
 import br.com.vostre.circular.utils.DestaqueUtils;
+import br.com.vostre.circular.utils.DrawableUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SnackbarHelper;
 import br.com.vostre.circular.utils.WidgetUtils;
@@ -73,6 +81,7 @@ import br.com.vostre.circular.view.listener.LegendaListener;
 import br.com.vostre.circular.view.listener.PartidaEDestinoListener;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.view.viewHolder.LegendaViewHolder;
+import br.com.vostre.circular.viewModel.AcompanharViagemViewModel;
 import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -132,12 +141,15 @@ public class DetalheItinerarioActivity extends BaseActivity {
     Long iniPartida;
     Long iniDestino;
 
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_itinerario);
         binding.getRoot().setDrawingCacheEnabled(true);
         binding.setVw(this);
         binding.setLifecycleOwner(this);
+
+        binding.imageButton4.setImageResource(R.drawable.ic_star_border_white_24dp);
 
         contaProcessamento = 0;
 
@@ -259,6 +271,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
         binding.textView37.setVisibility(View.GONE);
         binding.textViewObservacao.setVisibility(View.GONE);
+        binding.textViewRuas.setVisibility(View.GONE);
 
         geraModalLoading();
 
@@ -331,8 +344,8 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
         map = binding.map;
         map.setTileSource(TileSourceFactory.MAPNIK);
-        map.setBuiltInZoomControls(true);
-        map.setMultiTouchControls(true);
+        map.setBuiltInZoomControls(false);
+        map.setMultiTouchControls(false);
 
         mLocationOverlay = new MyLocationNewOverlay(
                 new GpsMyLocationProvider(getApplicationContext()),map);
@@ -340,12 +353,14 @@ public class DetalheItinerarioActivity extends BaseActivity {
         map.getOverlays().add(mLocationOverlay);
 
         mapController = map.getController();
-        mapController.setZoom(10.5d);
+        mapController.setZoom(10d);
 //        GeoPoint startPoint = new GeoPoint(-22.470804460339885, -43.82463455200195);
 //        mapController.setCenter(startPoint);
 
-        map.setMaxZoomLevel(19d);
-        map.setMinZoomLevel(8d);
+        map.setMaxZoomLevel(17d);
+        map.setMinZoomLevel(9d);
+
+        map.setZoomRounding(false);
 
 //        int preferenciaMapa = PreferenceUtils.carregarPreferenciaInt(ctx, "mapa");
 //
@@ -356,17 +371,13 @@ public class DetalheItinerarioActivity extends BaseActivity {
 //            mapaOculto = true;
 //        }
 
-        map.setBuiltInZoomControls(false);
-
-        //zoom ao tocar no mapa - inicia modo acompanhamento
+        //inicia modo acompanhamento
         MapEventsReceiver receiver = new MapEventsReceiver() {
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p) {
-                GeoPoint g = new GeoPoint(viewModel.paradas.getValue().get(0).getParada().getLatitude(), viewModel.paradas.getValue().get(0).getParada().getLongitude());
-
-                mapController.setCenter(g);
-                map.getController().animateTo(g, 18d, 1000L);
-
+                Intent i = new Intent(ctx, AcompanharViagemActivity.class);
+                i.putExtra("itinerario", itinerario);
+                ctx.startActivity(i);
                 return false;
             }
 
@@ -558,7 +569,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 binding.textViewLegenda.setVisibility(View.VISIBLE);
                 binding.textView51.setVisibility(View.VISIBLE);
                 binding.listLegenda.setVisibility(View.VISIBLE);
-                binding.listLegendaInfo.setVisibility(View.VISIBLE);
+//                binding.listLegendaInfo.setVisibility(View.VISIBLE);
                 binding.textViewObservacao.setVisibility(View.GONE);
 
                 binding.imageButton5.setVisibility(View.GONE);
@@ -587,6 +598,12 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
                     legenda.setCor(cores[cont]);
                     dados.add(legenda);
+
+//                    if(itinerario.getItinerario().getTrajeto() != null){
+//                        WidgetUtils.desenhaTrajetoMapa(itinerario.getItinerario(), map,
+//                                10, cores[cont]);
+//                    }
+
                     cont++;
                 }
 
@@ -616,10 +633,14 @@ public class DetalheItinerarioActivity extends BaseActivity {
                     }
                 });
                 binding.listLegenda.setAdapter(adapter);
-                binding.listLegendaInfo.setAdapter(adapter);
+//                binding.listLegendaInfo.setAdapter(adapter);
 
 //                if(!mapaOculto){
 //                    ocultarMapa(null, true);
+//                }
+
+//                if(viewModel.getParadas().getValue() != null){
+//                    atualizarParadasMapa(viewModel.paradas.getValue());
 //                }
 
             } else{
@@ -638,7 +659,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
                 binding.textViewLegenda.setVisibility(View.GONE);
                 binding.listLegenda.setVisibility(View.GONE);
-                binding.listLegendaInfo.setVisibility(View.GONE);
+//                binding.listLegendaInfo.setVisibility(View.GONE);
                 binding.textView51.setVisibility(View.GONE);
 
                 if(viewModel.secoes != null && viewModel.secoes.getValue() != null && viewModel.secoes.getValue().size() > 0){
@@ -721,15 +742,39 @@ public class DetalheItinerarioActivity extends BaseActivity {
     Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {
         @Override
         public void onChanged(List<ParadaBairro> paradas) {
-            viewModel.atualizaPontoMapa();
-
             //viewModel.carregaDirections(map, paradas);
 
-            atualizarParadasMapa(paradas);
-
             List<String> lstItinerarios = PreferenceUtils.carregaItinerariosFavoritos(getApplicationContext());
+            int[] cores = ctx.getResources().getIntArray(R.array.cores_legenda);
+
+            int cont = 0;
 
             List<ParadaBairro> listParadas = viewModel.paradas.getValue();
+            List<GeoPoint> geoPoints = new ArrayList<>();
+
+            for(ParadaBairro p : listParadas){
+                GeoPoint g = new GeoPoint(p.getLocation());
+                geoPoints.add(g);
+            }
+
+            if(map != null){
+
+                map.getController().zoomToSpan(BoundingBox.fromGeoPoints(geoPoints).getLatitudeSpan(),
+                        BoundingBox.fromGeoPoints(geoPoints).getLongitudeSpanWithDateLine());
+
+                for(ItinerarioPartidaDestino i : viewModel.qtdItinerarios){
+                    if(viewModel.itinerario.getValue() != null && viewModel.itinerario.getValue().getItinerario().getTrajeto() != null
+                            && viewModel.itinerario.getValue().getItinerario().getMostraRuas()){
+                        WidgetUtils.desenhaTrajetoMapa(i.getItinerario(), map,
+                                10, cores[cont]);
+                    }
+                    cont++;
+                }
+
+            }
+
+            atualizarParadasMapa(paradas);
+            viewModel.atualizaPontoMapa();
 
             if(paradaPartida == null || paradaDestino == null){
                 paradaPartida = listParadas.get(0).getParada().getId();
@@ -764,6 +809,47 @@ public class DetalheItinerarioActivity extends BaseActivity {
         public void onChanged(ItinerarioPartidaDestino itinerario) {
 
             if(itinerario != null){
+
+                if(!viewModel.trechoIsolado){
+                    // ALIAS ITINERARIO
+
+                    String partida = binding.textViewNome.getText().toString();
+                    String cidadePartida = binding.textViewBairro.getText().toString();
+
+                    String destino = binding.textViewNomeDestino.getText().toString();
+                    String cidadeDestino = binding.textViewBairroDestino.getText().toString();
+
+                    if(itinerario.getItinerario().getAliasBairroPartida() != null && !itinerario.getItinerario().getAliasBairroPartida().isEmpty()){
+                        itinerario.setNomeBairroPartida(itinerario.getItinerario().getAliasBairroPartida());
+                        binding.textViewNome.setText(itinerario.getItinerario().getAliasBairroPartida());
+                    } else{
+                        binding.textViewNome.setText(partida);
+                    }
+
+                    if(itinerario.getItinerario().getAliasCidadePartida() != null && !itinerario.getItinerario().getAliasCidadePartida().isEmpty()){
+                        itinerario.setNomeCidadePartida(itinerario.getItinerario().getAliasCidadePartida());
+                        binding.textViewBairro.setText(itinerario.getItinerario().getAliasCidadePartida());
+                    } else{
+                        binding.textViewBairro.setText(cidadePartida);
+                    }
+
+                    if(itinerario.getItinerario().getAliasBairroDestino() != null && !itinerario.getItinerario().getAliasBairroDestino().isEmpty()){
+                        itinerario.setNomeBairroDestino(itinerario.getItinerario().getAliasBairroDestino());
+                        binding.textViewNomeDestino.setText(itinerario.getItinerario().getAliasBairroDestino());
+                    } else{
+                        binding.textViewNomeDestino.setText(destino);
+                    }
+
+                    if(itinerario.getItinerario().getAliasCidadeDestino() != null && !itinerario.getItinerario().getAliasCidadeDestino().isEmpty()){
+                        itinerario.setNomeCidadeDestino(itinerario.getItinerario().getAliasCidadeDestino());
+                        binding.textViewBairroDestino.setText(itinerario.getItinerario().getAliasCidadeDestino());
+                    } else{
+                        binding.textViewBairroDestino.setText(cidadeDestino);
+                    }
+
+                    // FIM ALIAS
+                }
+
                 binding.setItinerario(itinerario);
 
                 if(itinerario.getItinerario().getSigla() == null || itinerario.getItinerario().getSigla().isEmpty() || itinerario.getItinerario().getSigla().equals("null")){
@@ -778,6 +864,8 @@ public class DetalheItinerarioActivity extends BaseActivity {
                     binding.textViewObservacao.setVisibility(View.VISIBLE);
                 }
 
+                int height = binding.cardViewMapa.getLayoutParams().height;
+
                 if(itinerario.getItinerario().getMostraRuas()){
                     mostraRuas = true;
                     viewModel.carregarRuas(itinerario.getItinerario().getId());
@@ -785,9 +873,12 @@ public class DetalheItinerarioActivity extends BaseActivity {
                     iniRuas = System.nanoTime();
 
                     viewModel.ruas.observe(ctx, ruasObserver);
+                    binding.textViewRuas.setVisibility(View.VISIBLE);
+                    binding.cardViewMapa.getLayoutParams().height = height;
                 } else{
                     mostraRuas = false;
                     binding.textViewRuas.setVisibility(View.GONE);
+                    binding.cardViewMapa.getLayoutParams().height = height * 2  ;
                 }
 
                 viewModel.paradas.observe(ctx, paradasObserver);
@@ -842,6 +933,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
             if(parada != null){
                 binding.setPartida(parada);
+                System.out.println("PARTIDA>> "+parada.getNomeBairroComCidade());
             }
 
             Long partidaFin = System.nanoTime();
@@ -914,22 +1006,29 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 m.setPosition(new GeoPoint(p.getParada().getLatitude(), p.getParada().getLongitude()));
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
                 m.setTitle(p.getParada().getNome());
-                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker_ponto));
+
+                if(viewModel.itinerario.getValue().getItinerario().getMostraRuas()){
+                    m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.icone_ponto_mapa));
+                } else{
+                    m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker_ponto));
+                }
+
+
                 m.setDraggable(false);
                 m.setId(p.getParada().getId());
                 m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker, MapView mapView) {
 
-                        ParadaBairro pb = getParadaFromMarker(marker, paradas);
+//                        ParadaBairro pb = getParadaFromMarker(marker, paradas);
+//
+//                        InfoWindow infoWindow = new InfoWindow();
+//                        infoWindow.setParada(pb);
+//                        infoWindow.setCtx(ctx);
+//                        infoWindow.show(getSupportFragmentManager(), "infoWindow");
+//                        mapController.animateTo(marker.getPosition());
 
-                        InfoWindow infoWindow = new InfoWindow();
-                        infoWindow.setParada(pb);
-                        infoWindow.setCtx(ctx);
-                        infoWindow.show(getSupportFragmentManager(), "infoWindow");
-                        mapController.animateTo(marker.getPosition());
-
-                        return true;
+                        return false;
                     }
                 });
                 map.getOverlays().add(m);

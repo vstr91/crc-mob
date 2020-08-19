@@ -1,8 +1,8 @@
 package br.com.vostre.circular.viewModel;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import android.os.AsyncTask;
 
 import org.joda.time.DateTime;
@@ -10,15 +10,10 @@ import org.joda.time.DateTime;
 import java.util.List;
 
 import br.com.vostre.circular.model.Bairro;
-import br.com.vostre.circular.model.Cidade;
-import br.com.vostre.circular.model.Empresa;
-import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Mensagem;
-import br.com.vostre.circular.model.Onibus;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
-import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 
 public class DetalhesCidadeViewModel extends AndroidViewModel {
 

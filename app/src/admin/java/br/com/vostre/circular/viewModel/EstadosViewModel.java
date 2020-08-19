@@ -1,14 +1,12 @@
 package br.com.vostre.circular.viewModel;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.databinding.BindingAdapter;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.databinding.BindingAdapter;
 import android.os.AsyncTask;
-import android.support.v7.widget.AppCompatSpinner;
-import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
+import androidx.appcompat.widget.AppCompatSpinner;
 
 import org.joda.time.DateTime;
 
@@ -17,8 +15,6 @@ import java.util.List;
 import br.com.vostre.circular.model.Estado;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.dao.AppDatabase;
-import br.com.vostre.circular.model.dao.EstadoDAO;
-import br.com.vostre.circular.model.dao.PaisDAO;
 import br.com.vostre.circular.utils.StringUtils;
 
 public class EstadosViewModel extends AndroidViewModel {

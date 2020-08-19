@@ -1,12 +1,11 @@
 package br.com.vostre.circular.view.viewHolder;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.databinding.LinhaLegendaBinding;
 import br.com.vostre.circular.databinding.LinhaLegendaCompartilhamentoBinding;
 import br.com.vostre.circular.model.pojo.Legenda;
 import br.com.vostre.circular.view.listener.LegendaListener;

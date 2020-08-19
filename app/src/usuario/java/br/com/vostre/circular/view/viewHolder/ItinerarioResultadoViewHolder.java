@@ -2,8 +2,8 @@ package br.com.vostre.circular.view.viewHolder;
 
 import android.Manifest;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -16,10 +16,12 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import java.util.List;
 
+import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.LinhaItinerariosResultadoBinding;
 
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.utils.DataHoraUtils;
+import br.com.vostre.circular.utils.DrawableUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.view.BaseActivity;
 import br.com.vostre.circular.view.DetalheItinerarioActivity;
@@ -52,15 +54,15 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
 //            binding.textViewObservacao.setVisibility(View.GONE);
 //        }
 
-        if(quantidade == 1){
-            binding.linearLayoutOrdem.setVisibility(View.GONE);
-        } else{
-            binding.linearLayoutOrdem.setVisibility(View.VISIBLE);
-        }
+//        if(quantidade == 1){
+//            binding.linearLayoutOrdem.setVisibility(View.GONE);
+//        } else{
+//            binding.linearLayoutOrdem.setVisibility(View.VISIBLE);
+//        }
+//
+//        binding.textViewOrdem.setText(String.valueOf(ordem));
 
-        binding.textViewOrdem.setText(String.valueOf(ordem));
-
-        if(dia.equals("") || hora.equals("")){
+        if(dia == null || dia.equals("") || hora == null || hora.equals("")){
             dia = DataHoraUtils.getDiaAtualFormatado();
             hora = DataHoraUtils.getHoraAtual();
         }
@@ -179,31 +181,40 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
             binding.imageView19.setVisibility(View.GONE);
         }
 
-        final View.OnClickListener listenerParada = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(ctx, DetalheParadaActivity.class);
-                i.putExtra("parada", itinerario.getIdPartida());
-                ctx.startActivity(i);
-            }
-        };
+//        final View.OnClickListener listenerParada = new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent i = new Intent(ctx, DetalheParadaActivity.class);
+//                i.putExtra("parada", itinerario.getIdPartida());
+//                ctx.startActivity(i);
+//            }
+//        };
 //
-        binding.textViewParada.setOnClickListener(listenerParada);
+//        binding.textViewParada.setOnClickListener(listenerParada);
 
-        String paramPartida = PreferenceUtils.carregarPreferencia(ctx, "param_mostrar_partida");
+//        String paramPartida = PreferenceUtils.carregarPreferencia(ctx, "param_mostrar_partida");
 
-        if(!paramPartida.equals("1")){
-            binding.textViewParada.setVisibility(View.GONE);
-            binding.imageView.setVisibility(View.GONE);
-        } else{
-            binding.textViewParada.setVisibility(View.VISIBLE);
-            binding.imageView.setVisibility(View.VISIBLE);
-        }
+//        if(!paramPartida.equals("1")){
+//            binding.textViewParada.setVisibility(View.GONE);
+//            binding.imageView.setVisibility(View.GONE);
+//        } else{
+//            binding.textViewParada.setVisibility(View.VISIBLE);
+//            binding.imageView.setVisibility(View.VISIBLE);
+//        }
 
-        if(itinerario.getItinerarioAnterior() != null && itinerario.getItinerarioSeguinte() != null){
+        String obsAnterior = "";
+        String obsSeguinte = "";
+
+        final String obsAnteriorFinal;
+        final String obsSeguinteFinal;
+
+        if((itinerario.getItinerarioAnterior() != null && !itinerario.isMesmoItinerario(itinerario.getItinerarioAnterior()))
+                || (itinerario.getItinerarioSeguinte() != null && !itinerario.isMesmoItinerario(itinerario.getItinerarioSeguinte()))){
 
             if(itinerario.getObservacaoProximoHorario() == null || (itinerario.getObservacaoProximoHorario().isEmpty() ||
-                    itinerario.getObservacaoProximoHorario().equals("null") || itinerario.getObservacaoProximoHorario().equals(""))){
+                    itinerario.getObservacaoProximoHorario().equals("null") || itinerario.getObservacaoProximoHorario().equals("")) &&
+                    !itinerario.getItinerarioAnterior().getPartidaEDestinoResumido().equals(itinerario.getPartidaEDestinoResumido())){
+
                 binding.textViewObservacao.setText(itinerario.getPartidaEDestinoResumido());
             } else{
                 binding.textViewObservacao.setText(itinerario.getPartidaEDestinoResumido()+" ("+itinerario.getObservacaoProximoHorario()+")");
@@ -211,49 +222,248 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
 
             if(itinerario.getObservacaoHorarioAnterior() == null || (itinerario.getObservacaoHorarioAnterior().isEmpty() ||
                     itinerario.getObservacaoHorarioAnterior().equals("null") || itinerario.getObservacaoHorarioAnterior().equals(""))){
-                binding.textViewObervacaoAnterior.setText(itinerario.getItinerarioAnterior().getPartidaEDestinoResumido());
+                //binding.textViewObervacaoAnterior.setText(itinerario.getItinerarioAnterior().getPartidaEDestinoResumido());
+
+                if(itinerario.getItinerarioAnterior() != null && itinerario.getItinerarioAnterior().getItinerario().getObservacao() != null
+                        && !itinerario.getItinerarioAnterior().getItinerario().getObservacao().isEmpty()){
+                    obsAnterior = itinerario.getItinerarioAnterior().getPartidaEDestinoResumido()+" ("
+                            +itinerario.getItinerarioAnterior().getItinerario().getObservacao()+")";
+                } else if(itinerario.getItinerarioAnterior() != null){
+                    obsAnterior = itinerario.getItinerarioAnterior().getPartidaEDestinoResumido();
+                }
+
+
+                binding.btnObsAnterior.setVisibility(View.VISIBLE);
             } else{
-                binding.textViewObervacaoAnterior.setText(itinerario.getItinerarioAnterior().getPartidaEDestinoResumido()+" ("+itinerario.getObservacaoHorarioAnterior()+")");
+//                binding.textViewObervacaoAnterior.setText(itinerario.getItinerarioAnterior().getPartidaEDestinoResumido()
+//                        +" ("+itinerario.getObservacaoHorarioAnterior()+")");
+
+                if(itinerario.getItinerarioAnterior() != null && itinerario.getItinerarioAnterior().getItinerario().getObservacao() != null
+                        && !itinerario.getItinerarioAnterior().getItinerario().getObservacao().isEmpty()){
+                    obsAnterior = itinerario.getItinerarioAnterior().getPartidaEDestinoResumido()
+                            +" ("+itinerario.getItinerarioAnterior().getItinerario().getObservacao()+" - "
+                            +itinerario.getObservacaoHorarioAnterior()+")";
+                } else if(itinerario.getItinerarioAnterior() != null){
+                    obsAnterior = itinerario.getItinerarioAnterior().getPartidaEDestinoResumido()
+                            +" ("+itinerario.getObservacaoHorarioAnterior()+")";
+                }
+
+
+                binding.btnObsAnterior.setVisibility(View.VISIBLE);
             }
 
             if(itinerario.getObservacaoHorarioSeguinte() == null || (itinerario.getObservacaoHorarioSeguinte().isEmpty() ||
                     itinerario.getObservacaoHorarioSeguinte().equals("null") || itinerario.getObservacaoHorarioSeguinte().equals(""))){
-                binding.textViewObervacaoSeguinte.setText(itinerario.getItinerarioSeguinte().getPartidaEDestinoResumido());
+//                binding.textViewObervacaoSeguinte.setText(itinerario.getItinerarioSeguinte().getPartidaEDestinoResumido());
+
+                if(itinerario.getItinerarioSeguinte() != null && itinerario.getItinerarioSeguinte().getItinerario().getObservacao() != null
+                        && !itinerario.getItinerarioSeguinte().getItinerario().getObservacao().isEmpty()){
+                    obsSeguinte = itinerario.getItinerarioSeguinte().getPartidaEDestinoResumido()+" ("
+                            +itinerario.getItinerarioSeguinte().getItinerario().getObservacao()+")";
+                } else if(itinerario.getItinerarioSeguinte() != null){
+                    obsSeguinte = itinerario.getItinerarioSeguinte().getPartidaEDestinoResumido();
+                }
+
+                binding.btnObsSeguinte.setVisibility(View.VISIBLE);
             } else{
-                binding.textViewObervacaoSeguinte.setText(itinerario.getItinerarioSeguinte().getPartidaEDestinoResumido()+" ("+itinerario.getObservacaoHorarioSeguinte()+")");
+//                binding.textViewObervacaoSeguinte.setText(itinerario.getItinerarioSeguinte().getPartidaEDestinoResumido()
+//                        +" ("+itinerario.getObservacaoHorarioSeguinte()+")");
+
+                if(itinerario.getItinerarioSeguinte() != null && itinerario.getItinerarioSeguinte().getItinerario().getObservacao() != null
+                        && !itinerario.getItinerarioSeguinte().getItinerario().getObservacao().isEmpty()){
+                    obsSeguinte = itinerario.getItinerarioSeguinte().getPartidaEDestinoResumido()
+                            +" ("+itinerario.getItinerarioSeguinte().getItinerario().getObservacao()+" - "
+                            +itinerario.getObservacaoHorarioSeguinte()+")";
+                } else if(itinerario.getItinerarioSeguinte() != null){
+                    obsSeguinte = itinerario.getItinerarioSeguinte().getPartidaEDestinoResumido()
+                            +" ("+itinerario.getObservacaoHorarioSeguinte()+")";
+                }
+
+                binding.btnObsSeguinte.setVisibility(View.VISIBLE);
             }
 
             binding.textViewObservacao.setVisibility(View.VISIBLE);
-            binding.textViewObervacaoAnterior.setVisibility(View.VISIBLE);
-            binding.textViewObervacaoSeguinte.setVisibility(View.VISIBLE);
+//            binding.textViewObervacaoAnterior.setVisibility(View.VISIBLE);
+//            binding.textViewObervacaoSeguinte.setVisibility(View.VISIBLE);
 
 
         } else{
 
+            // Comum - mesmo itinerario
+
             if(itinerario.getObservacaoProximoHorario() == null || (itinerario.getObservacaoProximoHorario().isEmpty() ||
                     itinerario.getObservacaoProximoHorario().equals("null") || itinerario.getObservacaoProximoHorario().equals(""))){
+                binding.textViewObservacao.setText("");
                 binding.textViewObservacao.setVisibility(View.GONE);
             } else{
                 binding.textViewObservacao.setText(itinerario.getObservacaoProximoHorario());
                 binding.textViewObservacao.setVisibility(View.VISIBLE);
             }
 
-            if(itinerario.getObservacaoHorarioAnterior() == null || (itinerario.getObservacaoHorarioAnterior().isEmpty() ||
-                    itinerario.getObservacaoHorarioAnterior().equals("null") || itinerario.getObservacaoHorarioAnterior().equals(""))){
-                binding.textViewObervacaoAnterior.setVisibility(View.GONE);
+            if(itinerario.getItinerario().getObservacao() == null || (itinerario.getItinerario().getObservacao().isEmpty() ||
+                    itinerario.getItinerario().getObservacao().equals("null") || itinerario.getItinerario().getObservacao().equals(""))){
+                binding.textViewObservacaoItinerario.setText("");
+                binding.textViewObservacaoItinerario.setVisibility(View.GONE);
             } else{
-                binding.textViewObervacaoAnterior.setText(itinerario.getObservacaoHorarioAnterior());
-                binding.textViewObervacaoAnterior.setVisibility(View.VISIBLE);
+                binding.textViewObservacaoItinerario.setText(itinerario.getItinerario().getObservacao());
+                binding.textViewObservacaoItinerario.setVisibility(View.VISIBLE);
             }
 
-            if(itinerario.getObservacaoHorarioSeguinte() == null || (itinerario.getObservacaoHorarioSeguinte().isEmpty() ||
-                    itinerario.getObservacaoHorarioSeguinte().equals("null") || itinerario.getObservacaoHorarioSeguinte().equals(""))){
-                binding.textViewObervacaoSeguinte.setVisibility(View.GONE);
+            // OBSERVACAO ANTERIOR
+
+            String obsItinerarioAnterior = "";
+            String obsHorarioAnterior = "";
+
+            if(itinerario.getObsHorarioAnterior() != null){
+                obsItinerarioAnterior = itinerario.getObsHorarioAnterior();
+                obsHorarioAnterior = itinerario.getObservacaoHorarioAnterior();
+
+                String obsAnteriorCompleta = "";
+
+                if(obsItinerarioAnterior != null && !obsItinerarioAnterior.isEmpty()){
+                    obsAnteriorCompleta = obsItinerarioAnterior;
+                }
+
+                if(obsHorarioAnterior != null && !obsHorarioAnterior.isEmpty()){
+
+                    if(obsAnteriorCompleta.isEmpty()){
+                        obsAnteriorCompleta = obsHorarioAnterior;
+                    } else{
+                        obsAnteriorCompleta = obsAnteriorCompleta.concat(" ("+obsHorarioAnterior+")");
+                    }
+
+                }
+
+                if(!obsAnteriorCompleta.isEmpty()){
+                    obsAnterior = obsAnteriorCompleta;
+                    binding.btnObsAnterior.setVisibility(View.VISIBLE);
+                } else{
+                    binding.btnObsAnterior.setVisibility(View.GONE);
+                }
+
             } else{
-                binding.textViewObervacaoSeguinte.setText(itinerario.getObservacaoHorarioSeguinte());
-                binding.textViewObervacaoSeguinte.setVisibility(View.VISIBLE);
+                binding.btnObsAnterior.setVisibility(View.GONE);
             }
 
+            // FIM OBSERVACAO ANTERIOR
+
+            // OBSERVACAO SEGUINTE
+
+            String obsItinerarioSeguinte = "";
+            String obsHorarioSeguinte = "";
+
+            if(itinerario.getObsHorarioSeguinte() != null){
+                obsItinerarioSeguinte = itinerario.getObsHorarioSeguinte();
+                obsHorarioSeguinte = itinerario.getObservacaoHorarioSeguinte();
+
+                String obsSeguinteCompleta = "";
+
+                if(obsItinerarioSeguinte != null && !obsItinerarioSeguinte.isEmpty()){
+                    obsSeguinteCompleta = obsItinerarioSeguinte;
+                }
+
+                if(obsHorarioSeguinte != null && !obsHorarioSeguinte.isEmpty()){
+
+                    if(obsSeguinteCompleta.isEmpty()){
+                        obsSeguinteCompleta = obsHorarioSeguinte;
+                    } else{
+                        obsSeguinteCompleta = obsSeguinteCompleta.concat(" ("+obsHorarioSeguinte+")");
+                    }
+
+                }
+
+                if(!obsSeguinteCompleta.isEmpty()){
+                    obsSeguinte = obsSeguinteCompleta;
+                    binding.btnObsSeguinte.setVisibility(View.VISIBLE);
+                } else{
+                    binding.btnObsSeguinte.setVisibility(View.GONE);
+                }
+
+            } else{
+                binding.btnObsSeguinte.setVisibility(View.GONE);
+            }
+
+            // FIM OBSERVACAO SEGUINTE
+
+//            if(itinerario.getObservacaoHorarioAnterior() == null || (itinerario.getObservacaoHorarioAnterior().isEmpty() ||
+//                    itinerario.getObservacaoHorarioAnterior().equals("null") || itinerario.getObservacaoHorarioAnterior().equals(""))){
+////                binding.textViewObervacaoAnterior.setText("");
+////                binding.textViewObervacaoAnterior.setVisibility(View.GONE);
+//
+//                binding.btnObsAnterior.setVisibility(View.GONE);
+//            } else{
+////                binding.textViewObervacaoAnterior.setText(itinerario.getObservacaoHorarioAnterior());
+////                binding.textViewObervacaoAnterior.setVisibility(View.VISIBLE);
+//                obsAnterior = itinerario.getObservacaoHorarioAnterior();
+//                binding.btnObsAnterior.setVisibility(View.VISIBLE);
+//            }
+//
+//            if(itinerario.getObservacaoHorarioSeguinte() == null || (itinerario.getObservacaoHorarioSeguinte().isEmpty() ||
+//                    itinerario.getObservacaoHorarioSeguinte().equals("null") || itinerario.getObservacaoHorarioSeguinte().equals(""))){
+//                binding.textViewObervacaoSeguinte.setText("");
+//                binding.textViewObervacaoSeguinte.setVisibility(View.GONE);
+//                binding.btnObsSeguinte.setVisibility(View.GONE);
+//            } else{
+////                binding.textViewObervacaoSeguinte.setText(itinerario.getObservacaoHorarioSeguinte());
+////                binding.textViewObervacaoSeguinte.setVisibility(View.VISIBLE);
+//                obsSeguinte = itinerario.getObservacaoHorarioSeguinte();
+//                binding.btnObsSeguinte.setVisibility(View.VISIBLE);
+//            }
+
+        }
+
+        if(itinerario.getDistanciaTrechoMetros() == null && itinerario.getDistanciaTrecho() != null){
+            itinerario.setDistanciaTrechoMetros(itinerario.getDistanciaTrecho()*1000);
+        }
+
+        if(itinerario.getItinerario().getDistanciaMetros() == null && itinerario.getItinerario().getDistancia() != null){
+            itinerario.getItinerario().setDistanciaMetros(itinerario.getItinerario().getDistancia()*1000);
+        }
+
+        // ALIAS ITINERARIO
+
+        if(itinerario.getItinerario().getAliasBairroPartida() != null && !itinerario.getItinerario().getAliasBairroPartida().isEmpty()){
+            itinerario.setNomeBairroPartida(itinerario.getItinerario().getAliasBairroPartida());
+        }
+
+        if(itinerario.getItinerario().getAliasCidadePartida() != null && !itinerario.getItinerario().getAliasCidadePartida().isEmpty()){
+            itinerario.setNomeCidadePartida(itinerario.getItinerario().getAliasCidadePartida());
+        }
+
+        if(itinerario.getItinerario().getAliasBairroDestino() != null && !itinerario.getItinerario().getAliasBairroDestino().isEmpty()){
+            itinerario.setNomeBairroDestino(itinerario.getItinerario().getAliasBairroDestino());
+        }
+
+        if(itinerario.getItinerario().getAliasCidadeDestino() != null && !itinerario.getItinerario().getAliasCidadeDestino().isEmpty()){
+            itinerario.setNomeCidadeDestino(itinerario.getItinerario().getAliasCidadeDestino());
+        }
+
+        // FIM ALIAS
+
+        obsAnteriorFinal = obsAnterior;
+        obsSeguinteFinal = obsSeguinte;
+
+        View.OnClickListener listenerAnterior = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(ctx, obsAnteriorFinal, Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        View.OnClickListener listenerSeguinte = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(ctx, obsSeguinteFinal, Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        binding.btnObsAnterior.setOnClickListener(listenerAnterior);
+        binding.btnObsSeguinte.setOnClickListener(listenerSeguinte);
+
+        if(itinerario.getItinerario().getAcessivel()){
+            binding.imageView8.setImageDrawable(ctx.getResources().getDrawable(R.drawable.ic_accessible_blue_24dp));
+        } else{
+            binding.imageView8.setImageDrawable(ctx.getResources().getDrawable(R.drawable.ic_baseline_accessible_gray_24));
         }
 
         binding.executePendingBindings();

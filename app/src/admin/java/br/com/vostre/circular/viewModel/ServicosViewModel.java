@@ -1,28 +1,18 @@
 package br.com.vostre.circular.viewModel;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.Context;
-import android.databinding.BindingAdapter;
+import androidx.databinding.BindingAdapter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-
 import org.joda.time.DateTime;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.osmdroid.util.GeoPoint;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,19 +22,10 @@ import java.util.List;
 import java.util.UUID;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.Servico;
-import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
-import br.com.vostre.circular.model.pojo.BairroCidade;
-import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.ImageUtils;
 import br.com.vostre.circular.utils.StringUtils;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ServicosViewModel extends AndroidViewModel {
 

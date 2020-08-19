@@ -1,8 +1,7 @@
 package br.com.vostre.circular.model;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Index;
-import android.support.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.Index;
 
 @Entity(tableName = "parada_sugestao")
 public class ParadaSugestao extends Parada {

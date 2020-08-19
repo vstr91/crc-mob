@@ -1,11 +1,20 @@
 package br.com.vostre.circular.view.viewHolder;
 
+import android.Manifest;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
+import android.widget.Toast;
+
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import java.text.NumberFormat;
+import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaItinerariosCompactaBinding;
 import br.com.vostre.circular.databinding.LinhaItinerariosFavoritosBinding;
@@ -56,14 +65,58 @@ public class ItinerarioCompactoViewHolder extends RecyclerView.ViewHolder {
         final View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(ctx, DetalheItinerarioActivity.class);
-                i.putExtra("itinerario", itinerario.getItinerario().getId());
-                ctx.startActivity(i);
+                Dexter.withActivity(ctx)
+                        .withPermissions(
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        ).withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+
+                        if(report.areAllPermissionsGranted()){
+                            Intent i = new Intent(ctx, DetalheItinerarioActivity.class);
+                            i.putExtra("itinerario", itinerario.getItinerario().getId());
+                            ctx.startActivity(i);
+                        } else{
+                            Toast.makeText(ctx.getApplicationContext(), "Acesso ao armazenamento externo é utilizado para " +
+                                    "salvar partes do mapa e permitir o acesso offline. O mapa não funcionará corretamente sem essa permissão.", Toast.LENGTH_LONG).show();
+                            Intent i = new Intent(ctx, DetalheItinerarioActivity.class);
+                            i.putExtra("itinerario", itinerario.getItinerario().getId());
+                            ctx.startActivity(i);
+                        }
+
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                }).check();
+
             }
         };
 //
         binding.cardView2.setOnClickListener(listener);
 //        binding.textViewNome.setOnClickListener(listener);
+
+        // ALIAS ITINERARIO
+
+        if(itinerario.getItinerario().getAliasBairroPartida() != null && !itinerario.getItinerario().getAliasBairroPartida().isEmpty()){
+            itinerario.setNomeBairroPartida(itinerario.getItinerario().getAliasBairroPartida());
+        }
+
+        if(itinerario.getItinerario().getAliasCidadePartida() != null && !itinerario.getItinerario().getAliasCidadePartida().isEmpty()){
+            itinerario.setNomeCidadePartida(itinerario.getItinerario().getAliasCidadePartida());
+        }
+
+        if(itinerario.getItinerario().getAliasBairroDestino() != null && !itinerario.getItinerario().getAliasBairroDestino().isEmpty()){
+            itinerario.setNomeBairroDestino(itinerario.getItinerario().getAliasBairroDestino());
+        }
+
+        if(itinerario.getItinerario().getAliasCidadeDestino() != null && !itinerario.getItinerario().getAliasCidadeDestino().isEmpty()){
+            itinerario.setNomeCidadeDestino(itinerario.getItinerario().getAliasCidadeDestino());
+        }
+
+        // FIM ALIAS
 
         binding.executePendingBindings();
     }

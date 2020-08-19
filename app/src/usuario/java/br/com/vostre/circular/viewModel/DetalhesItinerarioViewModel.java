@@ -1,10 +1,10 @@
 package br.com.vostre.circular.viewModel;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.persistence.db.SimpleSQLiteQuery;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.sqlite.db.SimpleSQLiteQuery;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
@@ -75,9 +75,9 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
         this.itinerario = appDatabase.itinerarioDAO().carregarSimplificado(itinerario);
 
         if(trechoIsolado){
-            this.paradas = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairroTrecho(partidaConsulta, destinoConsulta);
+            this.paradas = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairroTrechoSimplificado(partidaConsulta, destinoConsulta);
         } else{
-            this.paradas = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairro(itinerario);
+            this.paradas = appDatabase.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairroSimplificado(itinerario);
         }
 
         if(paradaPartida == null || paradaDestino == null){
@@ -198,7 +198,7 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
             System.out.println("TEMPO INICIAL: "+ini);
             System.out.println("TEMPO INICIAL PARADAS: "+ini);
 
-            List<ParadaBairro> paradas = db.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairroSync(itinerario);
+            List<ParadaBairro> paradas = db.paradaItinerarioDAO().listarParadasAtivasPorItinerarioComBairroSimplificadoSync(itinerario);
 
             Long finPar = System.nanoTime();
             Long totPar = finPar - ini;
@@ -247,19 +247,6 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
                     //}
 
                 }
-
-
-//                Long finIti = System.nanoTime();
-//                Long totIti = finIti - iniIti;
-//
-//                System.out.println("TEMPO FINAL ITI: "+finIti);
-//                System.out.println("TEMPO TOTAL ITI: "+TimeUnit.SECONDS.convert(totIti, TimeUnit.NANOSECONDS));
-
-//                SimpleSQLiteQuery queryOpcoes = new SimpleSQLiteQuery(
-//                        ItinerariosViewModel.geraQueryItinerarios(bairroPartida, bairroDestino));
-//
-//                qtdItinerarios = db.itinerarioDAO()
-//                        .carregarOpcoesPorPartidaEDestinoSync(queryOpcoes)
 
                 if(itinerarioARemover != null && !itinerarioARemover.isEmpty()){
 

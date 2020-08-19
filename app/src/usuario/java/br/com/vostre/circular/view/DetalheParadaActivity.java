@@ -1,23 +1,23 @@
 package br.com.vostre.circular.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.databinding.BindingAdapter;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -201,6 +201,24 @@ public class DetalheParadaActivity extends BaseActivity {
         binding.textViewCarregando.setVisibility(View.GONE);
         binding.progressBar.setIndeterminate(true);
         binding.progressBar.setVisibility(View.GONE);
+    }
+
+    public void onClickBtnStreetView(View v){
+        // STREET VIEW
+
+        // Create a Uri from an intent string. Use the result to create an Intent.
+        Uri gmmIntentUri = Uri.parse("google.streetview:cbll="+viewModel.parada.getValue().getParada().getLatitude()+","
+                +viewModel.parada.getValue().getParada().getLongitude());
+
+        // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        // Make the Intent explicit by setting the Google Maps package
+        mapIntent.setPackage("com.google.android.apps.maps");
+
+        // Attempt to start an activity that can handle the Intent
+        startActivity(mapIntent);
+
+        // STREET VIEW
     }
 
     public void onClickBtnMapa(View v){
@@ -485,8 +503,10 @@ public class DetalheParadaActivity extends BaseActivity {
                 false, true, 2));
         targets.add(DestaqueUtils.geraTapTarget(binding.imageButton4, "Favoritos", "Aqui você pode adicionar ou remover a parada dos favoritos!",
                 false, true, 3));
+        targets.add(DestaqueUtils.geraTapTarget(binding.imageButton5, "Ver no Street View", "Aqui você pode ver o entorno da parada no Google Street View!",
+                false, true, 4));
         targets.add(DestaqueUtils.geraTapTarget(binding.listItinerarios.findViewHolderForAdapterPosition(0).itemView.findViewById(R.id.textView23),
-                "Próximas Saídas", "Aqui você verá os próximos itinerários que sairão ou passarão pela parada!", false, true, 4));
+                "Próximas Saídas", "Aqui você verá os próximos itinerários que sairão ou passarão pela parada!", false, true, 5));
 
         return targets;
     }

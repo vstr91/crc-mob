@@ -4,77 +4,53 @@ import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
-import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
+
+import androidx.annotation.NonNull;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
-import com.daimajia.androidanimations.library.Techniques;
-import com.daimajia.androidanimations.library.YoYo;
-import com.getkeepsafe.taptargetview.TapTarget;
-import com.getkeepsafe.taptargetview.TapTargetSequence;
-import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
-import net.danlew.android.joda.JodaTimeAndroid;
-
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalTime;
-import org.joda.time.format.DateTimeFormat;
-import org.json.JSONException;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.TimeZone;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityMenuBinding;
 import br.com.vostre.circular.model.ParametroInterno;
-import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.APIUtils;
 import br.com.vostre.circular.utils.DBUtils;
-import br.com.vostre.circular.utils.DestaqueUtils;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
 public class MenuActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -230,8 +206,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 //            }
 //        });
 
-
-
     }
 
     public void onClickBtnPaises(View v){
@@ -292,6 +266,21 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     public void onClickBtnFeriados(View v){
         Intent i = new Intent(getApplicationContext(), FeriadosActivity.class);
         startActivity(i);
+    }
+
+    public void onClickBtnPush(View v){
+
+        Intent i = new Intent(getApplicationContext(), PushActivity.class);
+        startActivity(i);
+
+//        String dados = "{" +
+//                "\"app_id\": \"02ec2fb2-4df1-41c4-828e-4db1a7247276\"," +
+//                "\"included_segments\": [\"All\"],"+
+//                "\"data\": {\"atualizar\": \"1\", \"mostrar\": \"1\"}, "+
+//                "\"contents\": {\"en\": \"Mensagem de Teste para todos os idiomas!\"}"+
+//                "}";
+//
+//        APIUtils.enviaNotificacaoPush(getApplicationContext(), dados);
     }
 
     public void onClickBtnSobre(View v){

@@ -1,13 +1,13 @@
 package br.com.vostre.circular.model;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Index;
-import android.support.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.Index;
+import androidx.annotation.NonNull;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
-@Entity()
+@Entity
 public class Feriado extends EntidadeSlug {
 
     @NonNull

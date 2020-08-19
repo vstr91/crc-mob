@@ -1,19 +1,18 @@
 package br.com.vostre.circular.model.dao;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.persistence.db.SupportSQLiteQuery;
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.RawQuery;
-import android.arch.persistence.room.Update;
+import androidx.lifecycle.LiveData;
+import androidx.sqlite.db.SupportSQLiteQuery;
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
+import androidx.room.RawQuery;
+import androidx.room.Update;
 
 import java.util.List;
 
 import br.com.vostre.circular.model.HorarioItinerario;
-import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 
@@ -172,78 +171,38 @@ public interface HorarioItinerarioDAO {
     @Query("SELECT DISTINCT i.*," +
             "                (" +
             "                    SELECT b.nome" +
-            "                      FROM parada_itinerario pi" +
-            "                           INNER JOIN" +
-            "                           parada pp ON pp.id = pi.parada" +
+            "                      FROM parada pp " +
             "                           INNER JOIN" +
             "                           bairro b ON b.id = pp.bairro" +
-            "                     WHERE pi.ordem = (" +
-            "                                          SELECT MIN(ordem) " +
-            "                                            FROM parada_itinerario" +
-            "                                           WHERE itinerario = i.id AND " +
-            "                                                 ativo = 1" +
-            "                                      )" +
-            "AND " +
-            "                           pi.itinerario = i.id AND " +
-            "                           pi.ativo = 1" +
+            "                     WHERE pp.id = i.paradaInicial" +
             "                )" +
             "                AS bairroPartida," +
             "                (" +
             "                    SELECT b.nome" +
-            "                      FROM parada_itinerario pi" +
-            "                           INNER JOIN" +
-            "                           parada pp ON pp.id = pi.parada" +
+            "                      FROM parada pp " +
             "                           INNER JOIN" +
             "                           bairro b ON b.id = pp.bairro" +
-            "                     WHERE pi.ordem = (" +
-            "                                          SELECT MAX(ordem) " +
-            "                                            FROM parada_itinerario" +
-            "                                           WHERE itinerario = i.id AND " +
-            "                                                 ativo = 1" +
-            "                                      )" +
-            "AND" +
-            "                           pi.itinerario = i.id AND " +
-            "                           pi.ativo = 1" +
+            "                     WHERE pp.id = i.paradaFinal" +
             "                )" +
             "                AS bairroDestino," +
             "                (" +
             "                    SELECT c.nome" +
-            "                      FROM parada_itinerario pi" +
-            "                           INNER JOIN" +
-            "                           parada pp ON pp.id = pi.parada" +
+            "                      FROM parada pp " +
             "                           INNER JOIN" +
             "                           bairro b ON b.id = pp.bairro" +
             "                           INNER JOIN" +
             "                           cidade c ON c.id = b.cidade" +
-            "                     WHERE pi.ordem = (" +
-            "                                          SELECT MIN(ordem) " +
-            "                                            FROM parada_itinerario" +
-            "                                           WHERE itinerario = i.id AND " +
-            "                                                 ativo = 1" +
-            "                                      )" +
-            "AND " +
-            "                           pi.itinerario = i.id AND " +
-            "                           pi.ativo = 1" +
+            "                     WHERE pp.id = i.paradaInicial" +
             "                )" +
             "                AS cidadePartida," +
             "                (" +
             "                    SELECT c.nome" +
-            "                      FROM parada_itinerario pi" +
-            "                           INNER JOIN" +
-            "                           parada pp ON pp.id = pi.parada" +
+            "                      FROM parada pp " +
             "                           INNER JOIN" +
             "                           bairro b ON b.id = pp.bairro" +
             "                           INNER JOIN" +
             "                           cidade c ON c.id = b.cidade" +
-            "                     WHERE pi.ordem = (" +
-            "                                          SELECT MAX(ordem) " +
-            "                                            FROM parada_itinerario" +
-            "                                           WHERE itinerario = i.id AND " +
-            "                                                 ativo = 1" +
-            "                                      )" +
-            "AND " +
-            "                           pi.itinerario = i.id AND " +
-            "                           pi.ativo = 1" +
+            "                     WHERE pp.id = i.paradaFinal" +
             "                )" +
             "                AS cidadeDestino" +
             "  FROM itinerario i" +
@@ -287,6 +246,10 @@ public interface HorarioItinerarioDAO {
 
     @Query("SELECT observacao FROM horario_itinerario WHERE id = :idHorarioItinerario")
     String carregarObservacaoPorHorario(String idHorarioItinerario);
+
+    @Query("SELECT observacao FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario " +
+            "WHERE TIME(h.nome/1000, 'unixepoch', 'localtime') = :horario AND hi.itinerario = :itinerario")
+    String carregarObservacaoPorHorarioNovo(String horario, String itinerario);
 
     @Query("SELECT hi.*, h.id AS idHorario, h.nome AS nomeHorario FROM horario_itinerario hi " +
             "INNER JOIN horario h ON h.id = hi.horario WHERE itinerario IN (SELECT pi.itinerario " +

@@ -1,13 +1,13 @@
 package br.com.vostre.circular.view.form;
 
 import android.app.Application;
-import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.BindingAdapter;
-import android.databinding.DataBindingUtil;
-import android.databinding.InverseBindingAdapter;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.InverseBindingAdapter;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
+import androidx.annotation.Nullable;
+import com.google.android.material.textfield.TextInputEditText;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,9 +24,7 @@ import java.util.TimeZone;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.FormOnibusBinding;
-import br.com.vostre.circular.databinding.FormPaisBinding;
 import br.com.vostre.circular.model.Onibus;
-import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.viewModel.DetalhesEmpresaViewModel;
 
 public class FormOnibus extends FormBase {

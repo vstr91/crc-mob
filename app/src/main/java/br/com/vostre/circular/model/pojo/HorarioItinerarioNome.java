@@ -1,13 +1,12 @@
 package br.com.vostre.circular.model.pojo;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Embedded;
-import android.arch.persistence.room.Ignore;
+import androidx.room.ColumnInfo;
+import androidx.room.Embedded;
+import androidx.room.Ignore;
 
 import java.io.Serializable;
 
 import br.com.vostre.circular.model.HorarioItinerario;
-import br.com.vostre.circular.model.Parada;
 
 public class HorarioItinerarioNome implements Serializable {
 

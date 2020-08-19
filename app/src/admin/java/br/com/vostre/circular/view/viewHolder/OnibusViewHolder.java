@@ -1,17 +1,15 @@
 package br.com.vostre.circular.view.viewHolder;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
 import org.joda.time.format.DateTimeFormat;
 
 import br.com.vostre.circular.databinding.LinhaOnibusBinding;
-import br.com.vostre.circular.databinding.LinhaPaisesBinding;
 import br.com.vostre.circular.model.Onibus;
-import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.view.DetalhesOnibusActivity;
 import br.com.vostre.circular.view.form.FormOnibus;
 

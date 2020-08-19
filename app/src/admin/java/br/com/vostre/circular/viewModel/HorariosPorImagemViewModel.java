@@ -1,19 +1,15 @@
 package br.com.vostre.circular.viewModel;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.databinding.ObservableField;
-import android.os.AsyncTask;
-
-import org.joda.time.DateTime;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.databinding.ObservableField;
 
 import java.util.List;
 
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
-import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;

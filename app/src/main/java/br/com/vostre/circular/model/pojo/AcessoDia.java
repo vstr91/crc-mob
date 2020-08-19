@@ -1,8 +1,6 @@
 package br.com.vostre.circular.model.pojo;
 
-import android.arch.persistence.room.ColumnInfo;
-
-import org.joda.time.DateTime;
+import androidx.room.ColumnInfo;
 
 public class AcessoDia {
 

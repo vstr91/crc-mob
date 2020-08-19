@@ -2,11 +2,11 @@ package br.com.vostre.circular.viewModel;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.Context;
-import android.databinding.BindingAdapter;
+import androidx.databinding.BindingAdapter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,7 +50,7 @@ public class ParadasViewModel extends AndroidViewModel {
 
     public LiveData<List<CidadeEstado>> cidades;
 
-    public LiveData<List<ParadaBairro>> paradas;
+    public static MutableLiveData<List<BairroCidade>> bairros;
 
     public BairroCidade bairro;
 
@@ -82,7 +83,7 @@ public class ParadasViewModel extends AndroidViewModel {
 
     public void setCidade(String cidade) {
         this.cidade = appDatabase.cidadeDAO().carregar(cidade);
-        paradas = appDatabase.paradaDAO().listarTodosAtivosComBairroPorCidadeComItinerario(cidade);
+        carregarBairros(cidade);
     }
 
     public ParadasViewModel(Application app){
@@ -90,7 +91,9 @@ public class ParadasViewModel extends AndroidViewModel {
         appDatabase = AppDatabase.getAppDatabase(this.getApplication());
         cidades = appDatabase.cidadeDAO().listarTodosAtivasComEstado();
         cidade = appDatabase.cidadeDAO().carregar("");
-        paradas = appDatabase.paradaDAO().listarTodosAtivosComBairroPorCidadeComItinerario("");
+
+        bairros = new MutableLiveData<>();
+        bairros.postValue(null);
 
         retorno = new MutableLiveData<>();
         retorno.setValue(-1);
@@ -259,5 +262,49 @@ public class ParadasViewModel extends AndroidViewModel {
     }
 
     // fim editar
+
+    public void carregarBairros(String cidade) {
+        new carregarBairrosAsyncTask(appDatabase, cidade).execute();
+    }
+
+    private static class carregarBairrosAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        private AppDatabase db;
+        private List<BairroCidade> brs;
+        private String cidade;
+
+        carregarBairrosAsyncTask(AppDatabase appDatabase, String cidade) {
+            db = appDatabase;
+            this.cidade = cidade;
+        }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+
+            this.brs = appDatabase.bairroDAO().listarTodosAtivosComCidadePorCidadeSync(cidade);
+            List<BairroCidade> comParadas = new ArrayList<>();
+
+            for(BairroCidade b : brs){
+                List<ParadaBairro> paradas = db.paradaDAO().listarTodosAtivosComBairroPorBairroComItinerarioSync(b.getBairro().getId());
+
+                if(paradas != null && paradas.size() > 0){
+                    b.setParadas(paradas);
+                    comParadas.add(b);
+                }
+
+            }
+
+            bairros.postValue(comParadas);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+//            TarifasViewModel.retorno.setValue(1);
+
+        }
+
+    }
 
 }

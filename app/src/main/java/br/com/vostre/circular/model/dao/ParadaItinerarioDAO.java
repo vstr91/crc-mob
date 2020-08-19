@@ -1,22 +1,19 @@
 package br.com.vostre.circular.model.dao;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
-
-import org.joda.time.DateTime;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
 
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
-import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 
@@ -55,7 +52,17 @@ public interface ParadaItinerarioDAO {
             "WHERE pi.ativo = 1 AND pi.itinerario = :itinerario AND pi.ativo = 1 ORDER BY pi.ordem")
     LiveData<List<ParadaBairro>> listarParadasAtivasPorItinerarioComBairro(String itinerario);
 
-    @Query("SELECT p.id, p.nome, p.latitude, p.longitude, p.imagem, p.cep, p.rua, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado " +
+    @Query("SELECT p.*, MIN(pi.ordem), MAX(pi.ordem) " +
+            "FROM parada_itinerario pi INNER JOIN " +
+            "     parada p ON p.id = pi.parada " +
+            "WHERE itinerario = :itinerario " +
+            "AND pi.ativo = 1 " +
+            "AND p.ativo = 1 " +
+            "GROUP BY p.rua " +
+            "ORDER BY pi.itinerario, pi.ordem")
+    List<Parada> listarParadasAtivasPorItinerarioERuaSync(String itinerario);
+
+    @Query("SELECT p.id, /*p.nome,*/ p.latitude, p.longitude/*, p.imagem, p.cep, p.rua, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado*/ " +
             "FROM parada_itinerario pi " +
             "INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado " +
             "WHERE pi.ativo = 1 AND pi.itinerario = :itinerario AND pi.ativo = 1 ORDER BY pi.ordem")
@@ -77,7 +84,7 @@ public interface ParadaItinerarioDAO {
             ") AND pi.ativo = 1 ORDER BY pi.ordem")
     LiveData<List<ParadaBairro>> listarParadasAtivasPorItinerarioComBairroTrecho(String partida, String destino);
 
-    @Query("SELECT p.id, p.nome, p.latitude, p.longitude, p.imagem, p.cep, p.rua, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado " +
+    @Query("SELECT p.id, /*p.nome,*/ p.latitude, p.longitude/*, p.imagem, p.cep, p.rua, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado*/ " +
             "FROM parada_itinerario pi " +
             "INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado " +
             "WHERE pi.ativo = 1 AND pi.itinerario IN(" +
@@ -98,6 +105,13 @@ public interface ParadaItinerarioDAO {
             "INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado " +
             "WHERE pi.ativo = 1 AND pi.itinerario = :itinerario AND pi.ativo = 1 ORDER BY pi.ordem")
     List<ParadaBairro> listarParadasAtivasPorItinerarioComBairroSync(String itinerario);
+
+    @Query("SELECT p.id, p.nome, p.latitude, p.longitude, b.nome AS nomeBairro, c.nome AS nomeCidade, e.nome AS nomeEstado, " +
+            "e.sigla AS siglaEstado " +
+            "FROM parada_itinerario pi " +
+            "INNER JOIN parada p ON p.id = pi.parada INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado " +
+            "WHERE pi.ativo = 1 AND pi.itinerario = :itinerario AND pi.ativo = 1 ORDER BY pi.ordem")
+    List<ParadaBairro> listarParadasAtivasPorItinerarioComBairroSimplificadoSync(String itinerario);
 
     @Query("SELECT pi.* "+
             "FROM parada_itinerario pi " +
@@ -141,14 +155,14 @@ public interface ParadaItinerarioDAO {
             "AND pi.ordem >= " +
             "(" +
             "SELECT pi2.ordem FROM parada_itinerario pi2 INNER JOIN itinerario i ON i.id = pi2.itinerario INNER JOIN parada p ON p.id = pi2.parada " +
-            "WHERE p.bairro = :partida " +
-            "AND i.id = :itinerario" +
+            "WHERE p.bairro = :partida AND pi.ativo = 1 " +
+            "AND i.id = :itinerario ORDER BY pi2.ordem DESC LIMIT 1" +
             ")" +
             "AND pi.ordem < " +
             "(" +
             "SELECT pi2.ordem FROM parada_itinerario pi2 INNER JOIN itinerario i ON i.id = pi2.itinerario INNER JOIN parada p ON p.id = pi2.parada " +
-            "WHERE p.bairro = :destino " +
-            "AND i.id = :itinerario" +
+            "WHERE p.bairro = :destino AND pi.ativo = 1 " +
+            "AND i.id = :itinerario ORDER BY pi2.ordem DESC LIMIT 1" +
             ")" +
             "ORDER BY pi.ordem")
     List<ParadaItinerario> listarTrechosIntervalo(String itinerario, String partida, String destino);

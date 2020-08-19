@@ -1,10 +1,8 @@
 package br.com.vostre.circular.model;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
-import android.support.annotation.NonNull;
-
-import org.joda.time.DateTime;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.annotation.NonNull;
 
 @Entity
 public class Onibus extends EntidadeBase {

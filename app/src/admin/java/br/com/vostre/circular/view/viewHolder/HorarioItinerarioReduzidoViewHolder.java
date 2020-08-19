@@ -1,18 +1,14 @@
 package br.com.vostre.circular.view.viewHolder;
 
-import android.databinding.BindingAdapter;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.databinding.BindingAdapter;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.joda.time.format.DateTimeFormat;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.databinding.LinhaHorariosItinerariosBinding;
 import br.com.vostre.circular.databinding.LinhaHorariosItinerariosReduzidaBinding;
 import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;

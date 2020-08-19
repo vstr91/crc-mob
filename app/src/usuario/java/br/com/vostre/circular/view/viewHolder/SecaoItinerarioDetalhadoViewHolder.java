@@ -1,9 +1,8 @@
 package br.com.vostre.circular.view.viewHolder;
 
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
-import br.com.vostre.circular.databinding.LinhaSecoesBinding;
 import br.com.vostre.circular.databinding.LinhaSecoesDetalhadaBinding;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.pojo.SecaoItinerarioParada;

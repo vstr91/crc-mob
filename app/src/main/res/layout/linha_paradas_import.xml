@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="parada"
+            type="br.com.vostre.circular.model.pojo.ParadaBairroImport" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardview"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:cardCornerRadius="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/imageViewSentido"
+                    android:layout_width="20dp"
+                    android:layout_height="0dp"
+                    android:background="@color/azul"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"></ImageView>
+
+                <TextView
+                    android:id="@+id/textViewNome"
+                    style="@style/texto_lista"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingRight="10dp"
+                    android:text="@{parada.parada.nome}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/imageViewSentido"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Nome" />
+
+                <TextView
+                    android:id="@+id/textViewRua"
+                    style="@style/texto_lista_menor"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingRight="10dp"
+                    android:text="@{parada.parada.rua+` - `+parada.parada.cep}"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/imageViewSentido"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewNome"
+                    tools:text="Rua ABC - 27000-000" />
+
+                <TextView
+                    android:id="@+id/textViewTipo"
+                    style="@style/texto_lista_menor"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="0dp"
+                    android:paddingRight="10dp"
+                    android:paddingBottom="10dp"
+                    android:text="@{parada.nomeBairroComCidade}"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/imageViewSentido"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewRua"
+                    tools:text="Bairro, Cidade" />
+
+                <TextView
+                    android:id="@+id/textViewLatLng"
+                    style="@style/texto_lista_menor"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="0dp"
+                    android:paddingRight="10dp"
+                    android:paddingBottom="10dp"
+                    android:text="@{parada.parada.latitude+`,`+parada.parada.longitude}"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/imageViewSentido"
+                    app:layout_constraintTop_toBottomOf="@id/textViewTipo"
+                    tools:text="-22.354763, -43.654893" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/btnEditar"
+                    style="@style/botao_transparente"
+                    srcCompat=""
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:padding="5dp"
+                    android:text="Button"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/imageViewSentido"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewLatLng"
+                    app:srcCompat="@drawable/ic_edit_blue_24dp" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/btnEndereco"
+                    style="@style/botao_transparente"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:padding="5dp"
+                    android:onClick="onClickBtnEndereco"
+                    app:srcCompat="@drawable/ic_directions_blue_24dp"
+                    android:text="Button"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/btnExcluir"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewLatLng" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/btnExcluir"
+                    style="@style/botao_transparente"
+                    srcCompat=""
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:padding="5dp"
+                    app:srcCompat="@drawable/ic_close_blue_24dp"
+                    android:text="Button"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/btnEditar"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewLatLng" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/btnLocal"
+                    style="@style/botao_transparente"
+                    srcCompat=""
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:padding="5dp"
+                    android:text="Button"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/btnEndereco"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewLatLng"
+                    app:srcCompat="@drawable/ic_place_blue_24dp" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/btnStreetView"
+                    style="@style/botao_transparente"
+                    srcCompat=""
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="Button"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/btnLocal"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewLatLng"
+                    app:srcCompat="@drawable/person" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

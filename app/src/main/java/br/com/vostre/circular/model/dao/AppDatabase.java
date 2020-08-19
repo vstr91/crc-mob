@@ -1,11 +1,11 @@
 package br.com.vostre.circular.model.dao;
 
-import android.arch.persistence.db.SupportSQLiteDatabase;
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.Room;
-import android.arch.persistence.room.RoomDatabase;
-import android.arch.persistence.room.TypeConverters;
-import android.arch.persistence.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+import androidx.room.Database;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
+import androidx.room.migration.Migration;
 import android.content.Context;
 
 import br.com.vostre.circular.model.Acesso;
@@ -38,7 +38,10 @@ import br.com.vostre.circular.model.TipoProblema;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.model.UsuarioPreferencia;
 import br.com.vostre.circular.model.ViagemItinerario;
+import br.com.vostre.circular.model.log.LogItinerario;
+import br.com.vostre.circular.model.log.LogParada;
 import br.com.vostre.circular.utils.Converters;
+import br.com.vostre.circular.utils.DBUtils;
 
 @Database(entities = {Pais.class, Estado.class, Cidade.class, Bairro.class,
         Empresa.class, Parametro.class, Usuario.class, Mensagem.class, MensagemResposta.class,
@@ -46,7 +49,7 @@ import br.com.vostre.circular.utils.Converters;
         Horario.class, HorarioItinerario.class, SecaoItinerario.class, Onibus.class,
         ParametroInterno.class, ParadaSugestao.class, HistoricoParada.class, UsuarioPreferencia.class,
         HistoricoItinerario.class, Acesso.class, PontoInteresseSugestao.class, TipoProblema.class, Problema.class, Servico.class,
-        ViagemItinerario.class, Feriado.class, HistoricoSecao.class},
+        ViagemItinerario.class, Feriado.class, HistoricoSecao.class, LogItinerario.class, LogParada.class},
         version = 12)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
@@ -97,10 +100,11 @@ public abstract class AppDatabase extends RoomDatabase {
 
     // 2.2.4 - v11 bd = forçando recriação do BD para eliminar problemas
 
-    // 2.3.0 - v12 bd = inserindo tabela para registrar viagem
+    // 2.3.0 - v12 bd = inserindo tabela para registrar viagem, feriado, historico da secao e log de consulta (a ser implementado)
     public abstract ViagemItinerarioDAO viagemItinerarioDAO();
     public abstract FeriadoDAO feriadoDAO();
     public abstract HistoricoSecaoDAO historicoSecaoDAO();
+    public abstract LogConsultaDAO logConsultaDAO();
 
     public static AppDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {
@@ -249,15 +253,30 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
             database.execSQL("CREATE TABLE IF NOT EXISTS 'viagem_itinerario' ('itinerario' TEXT NOT NULL, 'trajeto' TEXT NOT NULL, 'horaInicial' INTEGER, 'horaFinal' INTEGER, 'trajetoEnviado' INTEGER NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
-            database.execSQL("CREATE UNIQUE INDEX 'index_viagem_itinerario_itinerario_trajeto' ON 'viagem_itinerario' ('itinerario', 'trajeto')");
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS 'index_viagem_itinerario_itinerario_trajeto' ON 'viagem_itinerario' ('itinerario', 'trajeto')");
 
-            database.execSQL("CREATE TABLE IF NOT EXISTS 'feriado' ('data' INTEGER NOT NULL, 'cidade' TEXT, 'tipo' INTEGER NOT NULL, 'descricao' TEXT, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'Feriado' ('data' INTEGER NOT NULL, 'cidade' TEXT, 'tipo' INTEGER NOT NULL, 'descricao' TEXT, 'nome' TEXT NOT NULL, 'slug' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
 
             database.execSQL("CREATE TABLE IF NOT EXISTS 'historico_secao' ('secao' TEXT NOT NULL, 'tarifa' REAL NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
-            database.execSQL("CREATE UNIQUE INDEX 'index_historico_secao_secao_tarifa' ON 'historico_secao' ('secao', 'tarifa')");
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS 'index_historico_secao_secao_tarifa' ON 'historico_secao' ('secao', 'tarifa')");
 
             database.execSQL("ALTER TABLE 'parada_itinerario' ADD COLUMN 'distanciaSeguinteMetros' REAL");
             database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'distanciaMetros' REAL");
+
+            database.execSQL("DROP INDEX IF EXISTS 'index_Parada_nome_bairro'");
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS 'index_Parada_nome_bairro_sentido' ON 'parada' ('nome', 'bairro', 'sentido')");
+            database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'aliasBairroPartida' TEXT");
+            database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'aliasCidadePartida' TEXT");
+            database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'aliasBairroDestino' TEXT");
+            database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'aliasCidadeDestino' TEXT");
+
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'log_itinerario' ('partida' TEXT, 'destino' TEXT, 'itinerario' TEXT, 'linha' TEXT, 'data_inicio' INTEGER NOT NULL, 'data_fim' INTEGER NOT NULL, 'tipo' TEXT NOT NULL, 'local' TEXT NOT NULL, 'uid' TEXT NOT NULL, 'versao' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'log_parada' ('parada' TEXT NOT NULL, 'data_inicio' INTEGER NOT NULL, 'data_fim' INTEGER NOT NULL, 'tipo' TEXT NOT NULL, 'local' TEXT NOT NULL, 'uid' TEXT NOT NULL, 'versao' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+
+            database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'paradaInicial' TEXT");
+            database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'paradaFinal' TEXT");
+            database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'totalParadas' INTEGER NOT NULL DEFAULT 0");
+            database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'trajeto' TEXT");
         }
     };
 

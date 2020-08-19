@@ -1,10 +1,10 @@
 package br.com.vostre.circular.view.viewHolder;
 
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.ViewModelProviders;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
@@ -12,7 +12,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 
 import br.com.vostre.circular.databinding.LinhaParadasItinerariosBinding;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;

@@ -9,12 +9,12 @@
             type="br.com.vostre.circular.view.MenuActivity" />
     </data>
 
-        <android.support.v4.widget.DrawerLayout
+        <androidx.drawerlayout.widget.DrawerLayout
             android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/gradiente"
@@ -31,13 +31,13 @@
                     android:id="@+id/imageView2"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginBottom="32dp"
-                    android:layout_marginEnd="24dp"
-                    android:layout_marginLeft="24dp"
-                    android:layout_marginRight="24dp"
                     android:layout_marginStart="24dp"
-                    android:onClick="onClickBtnLogo"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginRight="24dp"
+                    android:layout_marginBottom="32dp"
                     android:contentDescription="Logo do projeto. Ônibus dentro de um círculo estilizado"
+                    android:onClick="onClickBtnLogo"
                     android:src="@mipmap/ic_onibus_branco"
                     app:layout_constraintBottom_toTopOf="@+id/guideline"
                     app:layout_constraintEnd_toEndOf="@+id/circleView"
@@ -49,11 +49,11 @@
                     android:id="@+id/circleView"
                     android:layout_width="200dp"
                     android:layout_height="200dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
                     android:layout_marginTop="50dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
                     app:corArcoMaior="@color/branco"
                     app:corArcoMenor="@color/branco"
                     app:espessuraArcoMaior="15"
@@ -67,11 +67,11 @@
                     style="@style/botao_branco"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
                     android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
                     android:drawableLeft="@mipmap/itinerarios"
                     android:drawablePadding="10dp"
                     android:gravity="left|center_vertical"
@@ -91,11 +91,11 @@
                     style="@style/botao_branco"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
                     android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
                     android:drawableLeft="@mipmap/paradas"
                     android:drawablePadding="10dp"
                     android:gravity="left|center_vertical"
@@ -114,11 +114,11 @@
                     style="@style/botao_branco"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
                     android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
                     android:drawableLeft="@mipmap/mapa"
                     android:drawablePadding="10dp"
                     android:gravity="left|center_vertical"
@@ -139,11 +139,11 @@
                     style="@style/botao_branco"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
                     android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
                     android:drawableLeft="@mipmap/qr"
                     android:drawablePadding="10dp"
                     android:gravity="left|center_vertical"
@@ -157,14 +157,14 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/button3" />
 
-                <android.support.constraint.Guideline
+                <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guideline"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     app:layout_constraintGuide_begin="241dp" />
 
-                <android.support.constraint.Guideline
+                <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guideline2"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -188,10 +188,10 @@
                     android:id="@+id/textViewDistancia"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
                     android:onClick="onClickBtnLogo"
                     android:textAppearance="@style/texto_branco"
                     android:textSize="10sp"
@@ -231,9 +231,61 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/circleView" />
 
-            </android.support.constraint.ConstraintLayout>
+                <TextView
+                    android:id="@+id/textViewAlerta"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@color/legenda_azul_medio"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:textAllCaps="false"
+                    android:textColor="@color/branco80"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btnAviso"
+                    tools:text="Esta é uma mensagem de alerta de algo grave no sistema.
+                    Pode ser um alerta de greve ou inconsistências nos horários ofertados por
+                    alguma(s) empresa(s), por exemplo. Fica aqui até que seja desabilitado pelo
+                    administrador e pode possuir várias linhas." />
 
-            <android.support.design.widget.NavigationView
+<!--                <Button-->
+<!--                    android:id="@+id/btnFacebook"-->
+<!--                    style="@style/botao_transparente"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginStart="8dp"-->
+<!--                    android:layout_marginBottom="8dp"-->
+<!--                    android:drawableLeft="@drawable/ic_f_icon"-->
+<!--                    android:text="Vostrè"-->
+<!--                    android:onClickListener="@{view::onClickBtnFacebook}"-->
+<!--                    android:textColor="@color/branco"-->
+<!--                    app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                    app:layout_constraintEnd_toStartOf="@+id/btnInstagram"-->
+<!--                    app:layout_constraintHorizontal_bias="0.5"-->
+<!--                    app:layout_constraintStart_toStartOf="parent" />-->
+
+<!--                <Button-->
+<!--                    android:id="@+id/btnInstagram"-->
+<!--                    style="@style/botao_transparente"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginEnd="8dp"-->
+<!--                    android:layout_marginBottom="8dp"-->
+<!--                    android:drawableLeft="@drawable/ic_instagram_logo"-->
+<!--                    android:drawablePadding="5dp"-->
+<!--                    android:text="\@vostre.oficial"-->
+<!--                    android:onClickListener="@{view::onClickBtnInstagram}"-->
+<!--                    app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintHorizontal_bias="0.5"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/btnFacebook" />-->
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.navigation.NavigationView
                 android:id="@+id/nav"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -241,7 +293,7 @@
                 android:fitsSystemWindows="true"
                 app:headerLayout="@layout/drawer_header">
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
@@ -404,10 +456,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </android.support.design.widget.NavigationView>
+            </com.google.android.material.navigation.NavigationView>
 
-        </android.support.v4.widget.DrawerLayout>
+        </androidx.drawerlayout.widget.DrawerLayout>
 
 </layout>

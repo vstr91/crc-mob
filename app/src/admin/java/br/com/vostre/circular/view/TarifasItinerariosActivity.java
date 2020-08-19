@@ -1,16 +1,14 @@
 package br.com.vostre.circular.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.BindingAdapter;
-import android.databinding.DataBindingUtil;
-import android.databinding.InverseBindingAdapter;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.InverseBindingAdapter;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ExpandableListView;
-import android.widget.TextView;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -20,14 +18,9 @@ import java.util.Locale;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityTarifasItinerariosBinding;
-import br.com.vostre.circular.databinding.ActivityTarifasSecoesBinding;
-import br.com.vostre.circular.model.Itinerario;
-import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.view.adapter.TarifaItinerarioAdapter;
-import br.com.vostre.circular.view.adapter.TarifaSecaoAdapter;
 import br.com.vostre.circular.viewModel.TarifasItinerariosViewModel;
-import br.com.vostre.circular.viewModel.TarifasSecoesViewModel;
 
 public class TarifasItinerariosActivity extends BaseActivity {
 

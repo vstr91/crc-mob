@@ -1,15 +1,14 @@
 package br.com.vostre.circular.viewModel;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.Context;
-import android.databinding.ObservableField;
+import androidx.databinding.ObservableField;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -17,10 +16,6 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
@@ -30,26 +25,14 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Polyline;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.vostre.circular.model.Empresa;
-import br.com.vostre.circular.model.HistoricoItinerario;
-import br.com.vostre.circular.model.Itinerario;
-import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.ViagemItinerario;
-import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
-import br.com.vostre.circular.utils.DataHoraUtils;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class RegistraViagemViewModel extends AndroidViewModel {
 

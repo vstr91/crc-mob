@@ -1,6 +1,6 @@
 package br.com.vostre.circular.model;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public class EntidadeSlug extends EntidadeBase {
 

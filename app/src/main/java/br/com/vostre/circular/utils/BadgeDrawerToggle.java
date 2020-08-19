@@ -2,9 +2,9 @@ package br.com.vostre.circular.utils;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 

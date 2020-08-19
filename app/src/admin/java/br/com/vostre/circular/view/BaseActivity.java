@@ -1,31 +1,26 @@
 package br.com.vostre.circular.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.databinding.DataBindingUtil;
-import android.location.GpsStatus;
+import androidx.databinding.DataBindingUtil;
+
 import android.location.Location;
 import android.location.LocationManager;
-import android.provider.ContactsContract;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.common.util.JsonUtils;
 import com.google.firebase.auth.FirebaseUser;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,8 +53,6 @@ import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.utils.ToolbarUtils;
 import br.com.vostre.circular.view.listener.GpsListener;
 import br.com.vostre.circular.viewModel.BaseViewModel;
-
-import br.com.vostre.circular.databinding.DrawerHeaderBinding;
 
 import static br.com.vostre.circular.utils.ToolbarUtils.PICK_FILE;
 
@@ -95,9 +88,12 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        if(getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
 
         viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
 

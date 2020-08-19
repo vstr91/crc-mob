@@ -2,11 +2,10 @@ package br.com.vostre.circular.view.viewHolder;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
-import br.com.vostre.circular.databinding.LinhaParadasBinding;
 import br.com.vostre.circular.databinding.LinhaParadasFavoritasBinding;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.view.DetalheParadaActivity;

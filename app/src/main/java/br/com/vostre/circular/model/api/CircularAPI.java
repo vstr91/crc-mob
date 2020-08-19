@@ -56,10 +56,23 @@ public interface CircularAPI {
     @GET("route/v1/driving/{partida};{destino}?overview=false")
     Call<String> carregaDistancia(@Path("partida") String partida, @Path("destino") String destino);
 
+    @GET("route/v1/driving/{geopoints}?overview=simplified&geometries=polyline")
+    Call<String> carregaCaminhoItinerario(@Path("geopoints") String geopoints);
+
     @GET("reverse")
     Call<String> carregaRua(@Query("format") String format, @Query("lat") Double latitude, @Query("lon") Double longitude, @Query("zoom") Integer zoom, @Query("addressdetails") Integer details);
 
+    @GET("maps/api/geocode/json")
+    Call<String> carregaEnderecoGoogle(@Query("latlng") String latLng, @Query("key") String key);
+
     @GET(".")
     Call<String> consultaFeriados(@Query("ano") String ano, @Query("estado") String estado, @Query("cidade") String cidade, @Query("token") String token, @Query("json") String json);
+
+    @Headers({
+            "Content-Type: application/json",
+            "Authorization: Basic Mjk4Mzc5MjAtNzE0Ny00ODRmLWI5MGUtYTFkOTM4NTAwNTc1"
+    })
+    @POST("api/v1/notifications")
+    Call<String> enviaNotificacaoPush(@Body String json);
 
 }

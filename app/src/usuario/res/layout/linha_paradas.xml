@@ -11,7 +11,7 @@
             type="android.graphics.drawable.Drawable" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/transparente">
@@ -43,12 +43,13 @@
             android:text="@{parada.nomeBairro}"
             android:textColor="@color/branco"
             android:textStyle="bold"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Bairro" />
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -58,40 +59,78 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textViewBairro">
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <TextView
                     android:id="@+id/textViewNome"
+                    style="@style/texto_lista"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
                     android:text="@{parada.parada.nome}"
-                    app:layout_constraintBottom_toBottomOf="@+id/circleView2"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/textView86"
                     app:layout_constraintStart_toEndOf="@+id/circleView2"
-                    app:layout_constraintTop_toTopOf="@+id/circleView2"
+                    app:layout_constraintTop_toTopOf="parent"
                     tools:text="parada" />
 
                 <ImageView
                     android:id="@+id/circleView2"
                     android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_height="0dp"
                     android:scaleType="centerCrop"
                     app:imagem="@{parada.parada.imagem}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-            </android.support.constraint.ConstraintLayout>
-        </android.support.v7.widget.CardView>
+                <TextView
+                    android:id="@+id/textViewRua"
+                    style="@style/texto_lista_menor"
+                    text="@{parada.parada.rua}"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/textView86"
+                    app:layout_constraintStart_toStartOf="@+id/textViewNome"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewNome"
+                    tools:text="Nome da Rua" />
 
-    </android.support.constraint.ConstraintLayout>
+                <TextView
+                    android:id="@+id/textView86"
+                    style="@style/texto_lista_menor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="Sentido"
+                    android:textColor="@color/cinzaEscuro"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/textViewSentido"
+                    style="@style/texto_lista"
+                    text="@{parada.parada.sentidoTexto}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/texto_azul"
+                    android:textColor="@{parada.parada.sentido == 1 ? @color/ciano : @color/azul}"
+                    app:layout_constraintEnd_toEndOf="@+id/textView86"
+                    app:layout_constraintStart_toStartOf="@+id/textView86"
+                    app:layout_constraintTop_toBottomOf="@+id/textView86"
+                    tools:text="Centro" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

@@ -5,15 +5,15 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.databinding.DataBindingUtil;
-import android.databinding.Observable;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.Observable;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -22,16 +22,17 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
+import androidx.annotation.NonNull;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import br.com.vostre.circular.BuildConfig;
+
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -68,6 +69,7 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.onesignal.OneSignal;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
@@ -95,7 +97,6 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import br.com.vostre.circular.App;
-import br.com.vostre.circular.BuildConfig;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityMenuBinding;
 import br.com.vostre.circular.model.Mensagem;
@@ -175,6 +176,10 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         setViewAtual(binding.getRoot());
 
         carregaImagens();
+
+        //v2.3.x - forca atualizacao bd - campos novos no itinerario
+        DBUtils.populaBancoDeDados(this);
+
         mAuth = FirebaseAuth.getInstance();
 
         if(!PreferenceUtils.carregarPreferenciaBoolean(getApplicationContext(), "init")){
@@ -191,9 +196,15 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                 public void run() {
                     String identificadorUnico = Unique.geraIdentificadorUnico();
                     PreferenceUtils.salvarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".id_unico", identificadorUnico);
+                    OneSignal.sendTag("id_unico", identificadorUnico);
                 }
             });
 
+        } else{
+            OneSignal.sendTag("id_unico",
+                    PreferenceUtils
+                            .carregarPreferencia(getApplicationContext(),
+                                    getApplicationContext().getPackageName()+".id_unico"));
         }
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -370,6 +381,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         String prefQr = PreferenceUtils.carregarPreferencia(getApplicationContext(), "param_qr");
         String prefVersao = PreferenceUtils.carregarPreferencia(getApplicationContext(), "param_versao");
+        String prefMostrarAlerta = PreferenceUtils.carregarPreferencia(getApplicationContext(), "param_mostrar_alerta");
+        String prefAlerta = PreferenceUtils.carregarPreferencia(getApplicationContext(), "param_alerta");
 
         if(prefQr.equals("1")){
             binding.btnQrCode.setVisibility(View.VISIBLE);
@@ -387,14 +400,19 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         versaoAtual = versaoAtual == -1 ? BuildConfig.VERSION_CODE : versaoAtual;
 
+        //alerta de versao antiga
         if(prefVersao.equalsIgnoreCase(String.valueOf(BuildConfig.VERSION_CODE)) || prefVersao.isEmpty()
-                || versaoAtual < BuildConfig.VERSION_CODE){
+                || versaoAtual < br.com.vostre.circular.BuildConfig.VERSION_CODE){
             binding.btnAviso.setVisibility(View.GONE);
         } else{
             binding.btnAviso.setText("Esta versão do Circular não é a mais atual. " +
                     "Clique aqui para atualizar e tenha acesso a correções e/ou novas funções! Versão instalada: "+BuildConfig.VERSION_CODE+", versão atual: "+prefVersao);
             binding.btnAviso.setVisibility(View.VISIBLE);
         }
+
+        binding.textViewAlerta.setVisibility(View.GONE);
+
+        exibeAlerta(prefMostrarAlerta, prefAlerta);
 
         FirebaseUser account = FirebaseAuth.getInstance().getCurrentUser();
         updateUI(account);
@@ -407,6 +425,16 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 //            PreferenceUtils.salvarPreferencia(getApplicationContext(), "novidades_230", true);
 //        }
 
+    }
+
+    private void exibeAlerta(String prefMostrarAlerta, String prefAlerta) {
+        //alerta de aviso urgente
+        if(prefMostrarAlerta.equals("1") && prefAlerta != null && !prefAlerta.trim().isEmpty()){
+            binding.textViewAlerta.setText(prefAlerta);
+            binding.textViewAlerta.setVisibility(View.VISIBLE);
+        } else{
+            binding.textViewAlerta.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -719,6 +747,18 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         Toast.makeText(getApplicationContext(), "Iniciando sincronização", Toast.LENGTH_SHORT).show();
     }
 
+//    public void onClickBtnFacebook(View v){
+//        Uri uri = Uri.parse("facebook://page/vostre");
+//        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+//        startActivity(intent);
+//    }
+//
+//    public void onClickBtnInstagram(View v){
+//        Uri uri = Uri.parse("https://www.instagram.com/vostre.oficial");
+//        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+//        startActivity(intent);
+//    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -849,6 +889,11 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         super.onResume();
         configuraActivity();
 
+        String prefMostrarAlerta = PreferenceUtils.carregarPreferencia(getApplicationContext(), "param_mostrar_alerta");
+        String prefAlerta = PreferenceUtils.carregarPreferencia(getApplicationContext(), "param_alerta");
+
+        exibeAlerta(prefMostrarAlerta, prefAlerta);
+
     }
 
     @Override
@@ -866,7 +911,9 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if(requestCode == RC_SIGN_IN){
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
 
             try {
@@ -877,14 +924,14 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                 // Google Sign In failed, update UI appropriately
                 Log.w("login", "Google sign in failed", e);
 
-                if(progressBar != null){
+                if (progressBar != null) {
                     progressBar.setVisibility(View.GONE);
                 }
             }
 //            handleSignInResult(task);
             binding.btnLogin.setEnabled(true);
 
-            if(progressBar != null){
+            if (progressBar != null) {
                 progressBar.setVisibility(View.VISIBLE);
             }
 
@@ -1190,7 +1237,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         //geraAvisoAjuda();
 
         if(menu != null){
-            menu.getItem(1).setVisible(false);
+//            menu.getItem(1).setVisible(false);
         }
 
     }
@@ -1313,7 +1360,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                 targets.add(DestaqueUtils.geraTapTarget(v, "Mudança de Layout",
                         "Os ícones de mensagem e atualização manual agora ficam dentro do menu principal! Fique atento à sinalização (ponto azul) aqui. " +
                                 "Ela avisa quando há mensagens não lidas!",
-                        false, false, 2));
+                        false, false, targets.size()+1));
             }
 
             PreferenceUtils.salvarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".alerta_mensagens", true);

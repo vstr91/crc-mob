@@ -9,16 +9,16 @@
             type="br.com.vostre.circular.view.MenuActivity" />
     </data>
 
-    <android.support.v4.widget.DrawerLayout
+    <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v4.widget.NestedScrollView
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/gradiente"
@@ -206,7 +206,6 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
                     android:layout_marginTop="8dp"
                     android:onClick="@{view::onClickBtnFeriados}"
                     android:text="Feriados"
@@ -214,6 +213,24 @@
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/button12"
+                    app:layout_constraintTop_toBottomOf="@+id/button9" />
+
+                <Button
+                    android:id="@+id/button12"
+                    style="@style/botao_transparente"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:onClick="@{view::onClickBtnPush}"
+                    android:text="Notificação Push"
+                    android:textAllCaps="false"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@+id/button11"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/button9" />
@@ -261,10 +278,10 @@
                     android:background="@color/transparente"
                     android:onClick="@{view::onClickBtnCamera}"
                     android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/ic_photo_camera_white_24dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/circleView"
-                    app:layout_constraintTop_toTopOf="@+id/guideline2" />
+                    app:layout_constraintTop_toTopOf="@+id/guideline2"
+                    app:srcCompat="@drawable/ic_photo_camera_white_24dp" />
 
                 <ImageButton
                     android:id="@+id/btnServicos"
@@ -294,37 +311,6 @@
                     app:layout_constraintStart_toStartOf="@+id/circleView"
                     app:layout_constraintTop_toTopOf="@+id/guideline2"
                     app:srcCompat="@mipmap/ic_onibus_branco" />
-
-                <android.support.constraint.Guideline
-                    android:id="@+id/guideline"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layout_constraintGuide_begin="224dp" />
-
-                <android.support.constraint.Guideline
-                    android:id="@+id/guideline2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layout_constraintGuide_begin="74dp" />
-
-                <br.com.vostre.circleview.CircleView
-                    android:id="@+id/circleView"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginTop="32dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    app:corArcoMaior="@color/branco"
-                    app:corArcoMenor="@color/branco"
-                    app:espessuraArcoMaior="45"
-                    app:espessuraArcoMenor="5"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/textViewBairroAtual"
@@ -358,17 +344,48 @@
                     app:layout_constraintStart_toStartOf="@+id/circleView"
                     app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_begin="224dp" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_begin="74dp" />
+
+                <br.com.vostre.circleview.CircleView
+                    android:id="@+id/circleView"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
+                    app:corArcoMaior="@color/branco"
+                    app:corArcoMenor="@color/branco"
+                    app:espessuraArcoMaior="45"
+                    app:espessuraArcoMenor="5"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
                 <include
                     layout="@layout/toolbar"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"></include>
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </android.support.v4.widget.NestedScrollView>
+        </androidx.core.widget.NestedScrollView>
 
-        <android.support.design.widget.NavigationView
+        <com.google.android.material.navigation.NavigationView
             android:id="@+id/nav"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -376,7 +393,7 @@
             android:fitsSystemWindows="true"
             app:headerLayout="@layout/drawer_header">
 
-            <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
@@ -399,10 +416,10 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </android.support.design.widget.NavigationView>
+        </com.google.android.material.navigation.NavigationView>
 
-    </android.support.v4.widget.DrawerLayout>
+    </androidx.drawerlayout.widget.DrawerLayout>
 
 </layout>

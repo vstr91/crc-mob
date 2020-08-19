@@ -15,12 +15,12 @@
             type="android.view.View" />
     </data>
 
-    <android.support.v4.widget.DrawerLayout
+    <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/gradiente"
@@ -60,7 +60,7 @@
                             android:layout_height="match_parent"
                             android:orientation="vertical">
 
-                            <android.support.v7.widget.RecyclerView
+                            <androidx.recyclerview.widget.RecyclerView
                                 android:id="@+id/listHorarios"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
@@ -69,7 +69,7 @@
                                 android:layout_marginEnd="0dp"
                                 android:layout_marginRight="0dp"
                                 android:layout_marginBottom="0dp"
-                                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintHorizontal_bias="0.0"
@@ -85,7 +85,7 @@
                             android:layout_height="match_parent"
                             android:orientation="vertical">
 
-                            <android.support.v7.widget.RecyclerView
+                            <androidx.recyclerview.widget.RecyclerView
                                 android:id="@+id/listHorariosCadastrados"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
@@ -95,7 +95,7 @@
                                 android:layout_marginRight="0dp"
                                 android:layout_marginBottom="0dp"
                                 android:clickable="false"
-                                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintHorizontal_bias="0.0"
@@ -149,17 +149,27 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
                 android:onClick="onClickBtnProcessarImagem"
                 android:padding="5dp"
-                android:text="Carregar Horários Por Foto"
+                android:text="Carregar Por Foto"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
-        </android.support.constraint.ConstraintLayout>
+            <Button
+                android:id="@+id/btnInvalidar"
+                style="@style/botao_principal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="Invalidar Todos"
+                android:onClick="onClickBtnInvalidar"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
-    </android.support.v4.widget.DrawerLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.drawerlayout.widget.DrawerLayout>
 
 </layout>

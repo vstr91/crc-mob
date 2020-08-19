@@ -17,11 +17,11 @@
         android:contentDescription="Ícone de Ajuda"
         app:showAsAction="always" />
 
-    <item android:id="@+id/icon_incidente"
-        android:title="Incidente"
-        app:actionLayout="@layout/toolbar_incidente_icon"
-        android:contentDescription="Ícone de Incidente"
-        app:showAsAction="always" />
+<!--    <item android:id="@+id/icon_incidente"-->
+<!--        android:title="Incidente"-->
+<!--        app:actionLayout="@layout/toolbar_incidente_icon"-->
+<!--        android:contentDescription="Ícone de Incidente"-->
+<!--        app:showAsAction="always" />-->
 
 <!--    <item android:id="@+id/icon_sync"-->
 <!--        android:title="Sincronização"-->

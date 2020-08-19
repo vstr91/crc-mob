@@ -1,10 +1,9 @@
 package br.com.vostre.circular.model;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Index;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Index;
+import androidx.annotation.NonNull;
 
 import org.joda.time.DateTime;
 
@@ -32,9 +31,91 @@ public class Itinerario extends EntidadeBase {
 
     private Boolean mostraRuas;
 
+    private String aliasBairroPartida;
+
+    private String aliasCidadePartida;
+
+    private String aliasBairroDestino;
+
+    private String aliasCidadeDestino;
+
+    private String paradaInicial;
+
+    private String paradaFinal;
+
+    @NonNull
+    private int totalParadas = 0;
+
+    private String trajeto;
+
     public Itinerario(){
         this.setAcessivel(false);
         this.setMostraRuas(false);
+        this.totalParadas = 0;
+    }
+
+    public String getTrajeto() {
+        return trajeto;
+    }
+
+    public void setTrajeto(String trajeto) {
+        this.trajeto = trajeto;
+    }
+
+    public String getParadaInicial() {
+        return paradaInicial;
+    }
+
+    public void setParadaInicial(String paradaInicial) {
+        this.paradaInicial = paradaInicial;
+    }
+
+    public String getParadaFinal() {
+        return paradaFinal;
+    }
+
+    public void setParadaFinal(String paradaFinal) {
+        this.paradaFinal = paradaFinal;
+    }
+
+    public int getTotalParadas() {
+        return totalParadas;
+    }
+
+    public void setTotalParadas(@NonNull int totalParadas) {
+        this.totalParadas = totalParadas;
+    }
+
+    public String getAliasBairroPartida() {
+        return aliasBairroPartida;
+    }
+
+    public void setAliasBairroPartida(String aliasBairroPartida) {
+        this.aliasBairroPartida = aliasBairroPartida;
+    }
+
+    public String getAliasCidadePartida() {
+        return aliasCidadePartida;
+    }
+
+    public void setAliasCidadePartida(String aliasCidadePartida) {
+        this.aliasCidadePartida = aliasCidadePartida;
+    }
+
+    public String getAliasBairroDestino() {
+        return aliasBairroDestino;
+    }
+
+    public void setAliasBairroDestino(String aliasBairroDestino) {
+        this.aliasBairroDestino = aliasBairroDestino;
+    }
+
+    public String getAliasCidadeDestino() {
+        return aliasCidadeDestino;
+    }
+
+    public void setAliasCidadeDestino(String aliasCidadeDestino) {
+        this.aliasCidadeDestino = aliasCidadeDestino;
     }
 
     public Double getDistanciaMetros() {

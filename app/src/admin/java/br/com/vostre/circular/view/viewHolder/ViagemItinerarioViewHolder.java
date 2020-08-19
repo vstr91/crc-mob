@@ -5,19 +5,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.os.Environment;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
-import org.joda.time.format.DateTimeFormat;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,7 +24,6 @@ import org.osmdroid.bonuspack.kml.KmlPlacemark;
 import org.osmdroid.bonuspack.kml.KmlPoint;
 import org.osmdroid.bonuspack.kml.KmlPolygon;
 import org.osmdroid.bonuspack.kml.KmlTrack;
-import org.osmdroid.bonuspack.kml.Style;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.overlay.FolderOverlay;
@@ -39,20 +34,14 @@ import org.osmdroid.views.overlay.Polyline;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.vostre.circular.databinding.LinhaParadasBinding;
 import br.com.vostre.circular.databinding.LinhaViagensBinding;
-import br.com.vostre.circular.listener.ParadaListener;
 import br.com.vostre.circular.listener.ViagemListener;
 import br.com.vostre.circular.model.ViagemItinerario;
-import br.com.vostre.circular.model.pojo.ParadaBairro;
-import br.com.vostre.circular.view.ViagensActivity;
-import br.com.vostre.circular.view.form.FormParada;
 
 public class ViagemItinerarioViewHolder extends RecyclerView.ViewHolder {
 

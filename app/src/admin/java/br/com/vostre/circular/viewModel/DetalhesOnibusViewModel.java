@@ -1,31 +1,20 @@
 package br.com.vostre.circular.viewModel;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
-import org.joda.time.DateTime;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import br.com.vostre.circular.model.Empresa;
-import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Onibus;
-import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
-import br.com.vostre.circular.model.pojo.ParadaBairro;
-import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 
 public class DetalhesOnibusViewModel extends AndroidViewModel {
 

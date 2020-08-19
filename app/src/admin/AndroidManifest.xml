@@ -24,6 +24,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
+<!--        <meta-data android:name="com.onesignal.NotificationOpened.DEFAULT" android:value="DISABLE" />-->
+
         <meta-data
             android:name="CLOUDINARY_URL"
             android:value="cloudinary://@vostre"/>
@@ -38,6 +40,15 @@
         <activity android:name=".view.HorarioPorImagemActivity"></activity>
         <activity android:name=".view.DetalheAcessoActivity" />
         <activity android:name=".view.DashboardActivity" />
+
+<!--        <service-->
+<!--                android:name=".utils.NotificationExtender"-->
+<!--            android:permission="android.permission.BIND_JOB_SERVICE"-->
+<!--            android:exported="false">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="com.onesignal.NotificationExtender" />-->
+<!--            </intent-filter>-->
+<!--        </service>-->
 
         <service android:name=".model.service.AuthenticatorService">
             <intent-filter>
@@ -111,6 +122,11 @@
         <activity android:name=".view.TarifasSecoesActivity" android:screenOrientation="portrait" />
         <activity android:name=".view.TarifasItinerariosActivity" android:screenOrientation="portrait" />
         <activity android:name=".view.CameraResultadoOnibusActivity" android:screenOrientation="portrait" />
+        <activity android:name=".view.ImportarParadasActivity" android:screenOrientation="portrait" />
+        <activity android:name=".view.PushActivity" android:screenOrientation="portrait" />
+        <activity android:name=".view.ListaItinerariosActivity" android:screenOrientation="portrait" />
+        <activity android:name=".view.ListaParadasActivity" android:screenOrientation="portrait" />
+        <activity android:name=".view.ListaPontosInteresseActivity" android:screenOrientation="portrait" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />

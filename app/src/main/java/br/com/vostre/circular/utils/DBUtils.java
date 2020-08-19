@@ -1,7 +1,7 @@
 package br.com.vostre.circular.utils;
 
 import android.app.Activity;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
@@ -26,6 +26,9 @@ import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.Feriado;
+import br.com.vostre.circular.model.HistoricoItinerario;
+import br.com.vostre.circular.model.HistoricoSecao;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.Itinerario;
@@ -36,8 +39,12 @@ import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.Parametro;
 import br.com.vostre.circular.model.PontoInteresse;
+import br.com.vostre.circular.model.Problema;
 import br.com.vostre.circular.model.SecaoItinerario;
+import br.com.vostre.circular.model.Servico;
+import br.com.vostre.circular.model.TipoProblema;
 import br.com.vostre.circular.model.Usuario;
+import br.com.vostre.circular.model.ViagemItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.view.BaseActivity;
 import br.com.vostre.circular.viewModel.BaseViewModel;
@@ -52,7 +59,7 @@ public class DBUtils {
             File dbFile = new File(ctx.getDatabasePath(DATABASE_NAME).getAbsolutePath());
             FileInputStream fis = new FileInputStream(dbFile);
 
-            File f = new File(Environment.getExternalStorageDirectory(), DATABASE_NAME+".db");
+            File f = new File(Environment.getExternalStorageDirectory(), DATABASE_NAME+"_exp.db");
 
             // Open the empty db as the output stream
             OutputStream output = new FileOutputStream(f);
@@ -150,6 +157,15 @@ public class DBUtils {
         JSONArray mensagens = arrayObject.getJSONArray("mensagens");
         JSONArray parametros = arrayObject.getJSONArray("parametros");
         JSONArray usuarios = arrayObject.getJSONArray("usuarios");
+
+        //v2.3.x
+        JSONArray historicosParadas = arrayObject.getJSONArray("historicos_paradas");
+        JSONArray historicosItinerarios = arrayObject.getJSONArray("historicos_itinerarios");
+        JSONArray tiposProblema = arrayObject.getJSONArray("tipos_problemas");
+        JSONArray problemas = arrayObject.getJSONArray("problemas");
+        JSONArray servicos = arrayObject.getJSONArray("servicos");
+        JSONArray feriados = arrayObject.getJSONArray("feriados");
+        JSONArray historicosSecoes = arrayObject.getJSONArray("historicos_secoes");
 
         // PAISES
 
@@ -484,6 +500,143 @@ public class DBUtils {
             }
 
             viewModel.add(lstUsuarios, "usuario");
+
+        }
+
+        // HISTORICOS ITINERARIOS
+
+        if(historicosItinerarios != null && historicosItinerarios.length() > 0){
+
+            int total = historicosItinerarios.length();
+            List<HistoricoItinerario> lstHistoricos = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                HistoricoItinerario historicoItinerario;
+                JSONObject obj = historicosItinerarios.getJSONObject(i);
+
+                historicoItinerario = (HistoricoItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), HistoricoItinerario.class, 0);
+
+                lstHistoricos.add(historicoItinerario);
+
+            }
+
+            viewModel.add(lstHistoricos, "historico_itinerario");
+
+        }
+
+        // TIPOS PROBLEMA
+
+        if(tiposProblema != null && tiposProblema.length() > 0){
+
+            int total = tiposProblema.length();
+            List<TipoProblema> lstTiposProblema = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                TipoProblema tipoProblema;
+                JSONObject obj = tiposProblema.getJSONObject(i);
+
+                tipoProblema = (TipoProblema) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), TipoProblema.class, 0);
+                tipoProblema.setEnviado(true);
+
+                lstTiposProblema.add(tipoProblema);
+
+            }
+
+            viewModel.add(lstTiposProblema, "tipo_problema");
+
+        }
+
+        // PROBLEMAS
+
+        if(problemas != null && problemas.length() > 0){
+
+            int total = problemas.length();
+            List<Problema> lstProblemas = new ArrayList<>();
+
+            //System.out.println("PROBLEMAS: "+problemas.toString());
+
+            for(int i = 0; i < total; i++){
+                Problema problema;
+                JSONObject obj = problemas.getJSONObject(i);
+
+                problema = (Problema) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Problema.class, 0);
+
+                lstProblemas.add(problema);
+
+//                if(problema.getImagem() != null && !problema.getImagem().isEmpty()){
+//                    File imagem = new File(.getApplicationContext().getFilesDir(), problema.getImagem());
+//
+//                    if(!imagem.exists() || !imagem.canWrite()){
+//                        imageDownload(baseUrl, problema.getImagem());
+//                    }
+//                }
+
+            }
+
+            viewModel.add(lstProblemas, "problema");
+
+        }
+
+        // FERIADOS
+
+        if(feriados.length() > 0){
+
+            int total = feriados.length();
+            List<Feriado> lstFeriados = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                Feriado feriado;
+                JSONObject obj = feriados.getJSONObject(i);
+
+                feriado = (Feriado) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Feriado.class, 0);
+
+                lstFeriados.add(feriado);
+
+            }
+
+            viewModel.add(lstFeriados, "feriado");
+
+        }
+
+        // HISTORICOS SECOES
+
+        if(historicosSecoes != null && historicosSecoes.length() > 0){
+
+            int total = historicosSecoes.length();
+            List<HistoricoSecao> lstHistoricosSecoes = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                HistoricoSecao historicoSecao;
+                JSONObject obj = historicosSecoes.getJSONObject(i);
+
+                historicoSecao = (HistoricoSecao) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), HistoricoSecao.class, 0);
+
+                lstHistoricosSecoes.add(historicoSecao);
+
+            }
+
+            viewModel.add(lstHistoricosSecoes, "historico_secao");
+
+        }
+
+        // SERVICOS
+
+        if(servicos.length() > 0){
+
+            int total = servicos.length();
+            List<Servico> lstServicos = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                Servico servico;
+                JSONObject obj = servicos.getJSONObject(i);
+
+                servico = (Servico) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Servico.class, 0);
+
+                lstServicos.add(servico);
+
+            }
+
+            viewModel.add(lstServicos, "servico");
 
         }
 

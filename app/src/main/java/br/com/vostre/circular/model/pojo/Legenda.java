@@ -1,9 +1,7 @@
 package br.com.vostre.circular.model.pojo;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Embedded;
-
-import br.com.vostre.circular.model.Cidade;
+import androidx.room.ColumnInfo;
+import androidx.room.Embedded;
 
 public class Legenda {
 

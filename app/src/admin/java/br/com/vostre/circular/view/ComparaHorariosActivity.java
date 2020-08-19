@@ -1,32 +1,24 @@
 package br.com.vostre.circular.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
-import android.widget.TabHost;
 import android.widget.Toast;
-
-import org.joda.time.format.DateTimeFormat;
 
 import java.util.List;
 
 import br.com.vostre.circular.R;
 //import br.com.vostre.circular.databinding.ActivityComparaHorariosBinding;
 import br.com.vostre.circular.databinding.ActivityComparaHorariosBinding;
-import br.com.vostre.circular.databinding.ActivityHorariosItinerarioBinding;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
-import br.com.vostre.circular.view.adapter.HorarioItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.HorarioItinerarioReduzidoAdapter;
 import br.com.vostre.circular.viewModel.ComparaHorariosViewModel;
-import br.com.vostre.circular.viewModel.HorariosItinerarioViewModel;
 
 public class ComparaHorariosActivity extends BaseActivity {
 

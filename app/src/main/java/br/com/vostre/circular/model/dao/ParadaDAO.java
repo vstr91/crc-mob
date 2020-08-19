@@ -1,17 +1,15 @@
 package br.com.vostre.circular.model.dao;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
+import androidx.lifecycle.LiveData;
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
 
-import br.com.vostre.circular.model.Estado;
-import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 
@@ -54,30 +52,49 @@ public interface ParadaDAO {
             "estado e ON e.id = c.estado WHERE b.id = :bairro ORDER BY b.nome, p.nome")
     LiveData<List<ParadaBairro>> listarTodosComBairroPorBairro(String bairro);
 
+    @Query("SELECT DISTINCT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
+            "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada p " +
+            "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
+            "estado e ON e.id = c.estado WHERE b.id = :bairro ORDER BY b.nome, p.nome")
+    List<ParadaBairro> listarTodosComBairroPorBairroSync(String bairro);
+
     @Query("SELECT DISTINCT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, " +
             "e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_itinerario pi INNER JOIN parada p ON pi.parada = p.id " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
-            "estado e ON e.id = c.estado WHERE c.id = :cidade AND pi.ordem < " +
-            "(SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = pi.itinerario) ORDER BY b.nome, p.nome")
+            "estado e ON e.id = c.estado INNER JOIN itinerario i ON i.id = pi.itinerario " +
+            "WHERE c.id = :cidade AND pi.ativo = 1 AND i.ativo = 1 AND pi.ordem < " +
+            "(SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = pi.itinerario AND pi3.ativo = 1) ORDER BY b.nome, p.nome, p.sentido")
     LiveData<List<ParadaBairro>> listarTodosAtivosComBairroPorCidadeComItinerario(String cidade);
 
     @Query("SELECT DISTINCT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, " +
             "e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_itinerario pi INNER JOIN parada p ON pi.parada = p.id " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
+            "estado e ON e.id = c.estado INNER JOIN itinerario i ON i.id = pi.itinerario " +
+            "WHERE b.id = :bairro AND pi.ativo = 1 AND i.ativo = 1 AND pi.ordem < i.totalParadas AND p.ativo = 1 ORDER BY b.nome, p.nome, p.sentido")
+    List<ParadaBairro> listarTodosAtivosComBairroPorBairroComItinerarioSync(String bairro);
+
+    @Query("SELECT DISTINCT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, " +
+            "e.id AS idEstado, " +
+            "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_itinerario pi INNER JOIN parada p ON pi.parada = p.id " +
+            "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
             "estado e ON e.id = c.estado WHERE pi.ordem < " +
-            "(SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = pi.itinerario) ORDER BY b.nome, p.nome")
+            "(SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = pi.itinerario AND pi3.ativo = 1) " +
+            "AND pi.ativo = 1 AND p.ativo = 1 ORDER BY b.nome, p.nome")
     LiveData<List<ParadaBairro>> listarTodosAtivosComBairroComItinerario();
 
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada p " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
-            "estado e ON e.id = c.estado WHERE p.ativo = 1")
+            "estado e ON e.id = c.estado WHERE p.ativo = 1 ORDER BY c.nome, b.nome, p.nome")
     LiveData<List<ParadaBairro>> listarTodosAtivosComBairro();
 
     @Query("SELECT * FROM parada WHERE ativo = 1")
-    List<Parada> listarTodosAtivos();
+    LiveData<List<Parada>> listarTodosAtivos();
+
+    @Query("SELECT * FROM parada WHERE ativo = 1")
+    List<Parada> listarTodosAtivosSync();
 
     @Query("SELECT COUNT(id) FROM parada WHERE ativo = 1")
     LiveData<Integer> contarTodosAtivos();

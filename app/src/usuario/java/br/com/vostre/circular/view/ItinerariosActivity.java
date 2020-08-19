@@ -1,12 +1,12 @@
 package br.com.vostre.circular.view;
 
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.databinding.BindingAdapter;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -14,10 +14,10 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.InputFilter;
 import android.view.Menu;
 import android.view.View;
@@ -41,6 +41,7 @@ import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.vision.clearcut.LogUtils;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.joda.time.DateTime;
@@ -60,13 +61,18 @@ import br.com.vostre.circleview.CircleView;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityItinerariosBinding;
 import br.com.vostre.circular.model.Bairro;
+import br.com.vostre.circular.model.log.LogConsulta;
+import br.com.vostre.circular.model.log.LogItinerario;
+import br.com.vostre.circular.model.log.TiposLog;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.utils.DBUtils;
 import br.com.vostre.circular.utils.DataHoraUtils;
 import br.com.vostre.circular.utils.DestaqueUtils;
+import br.com.vostre.circular.utils.LogConsultaUtils;
 import br.com.vostre.circular.utils.WidgetUtils;
 import br.com.vostre.circular.view.adapter.CidadeAdapter;
 import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
@@ -133,6 +139,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     Location ultimoLocal;
 
     Bairro bairroAtual;
+
+//    LogItinerario log;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -268,12 +276,24 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
         // fim tab por linha
 
+        //DBUtils.exportDB(ctx);
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
         boolean retorno = super.onCreateOptionsMenu(menu);
+
+        if(menu != null){
+
+            if(tabHost.getCurrentTab() == 0){
+                menu.getItem(0).setVisible(true);
+            } else{
+                menu.getItem(0).setVisible(false);
+            }
+
+        }
 
         this.menu = menu;
 
@@ -287,6 +307,16 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED){
             startLocationUpdates();
+        }
+
+        if(menu != null){
+
+            if(tabHost.getCurrentTab() == 0){
+                menu.getItem(0).setVisible(true);
+            } else{
+                menu.getItem(0).setVisible(false);
+            }
+
         }
 
     }
@@ -332,12 +362,16 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
     // Tab por linha
 
     public void onClickBtnProcurarPorLinha(View v){
-        viewModel.buscarPorLinha(binding.editTextLinha.getText().toString().trim().replace(" ", "").replace("-", "").replace("_", ""));
+        String linha = binding.editTextLinha.getText().toString().trim().replace(" ", "").replace("-", "").replace("_", "");
+        viewModel.buscarPorLinha(linha);
 
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
         viewModel.itinerariosPorLinha.observe(this, itinerarioPorLinhaObserver);
+
+//        log = (LogItinerario) iniciaLog(TiposLog.ITINERARIO_POR_LINHA.name());
+//        log.setLinha(linha);
 
         geraModalLoading(1);
     }
@@ -368,6 +402,11 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         consultaDiaSeguinte = false;
         viewModel.partidaEscolhida = false;
         viewModel.destinoEscolhido = false;
+        inversao = false;
+
+        bairroPartida = null;
+        viewModel.setBairroPartida(null);
+        viewModel.setBairroDestino(null);
 
         //log
         bundle = new Bundle();
@@ -387,6 +426,9 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         consultaDiaSeguinte = false;
         viewModel.destinoEscolhido = false;
 
+        bairroDestino = null;
+        inversao = false;
+
         bundle = new Bundle();
         mFirebaseAnalytics.logEvent("edicao_destino", bundle);
     }
@@ -404,11 +446,17 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     public void onClickBtnInverter(View v){
 
+        System.out.println("BAIRRO P>> "+bairroPartida.getBairro().getNome()+" - "+bairroPartida.getNomeCidadeComEstado());
+        System.out.println("BAIRRO D>> "+bairroDestino.getBairro().getNome()+" - "+bairroDestino.getNomeCidadeComEstado());
+
         inversao = !inversao;
         //viewModel.escolhaAtual = 0;
         BairroCidade bairro = bairroPartida;
         bairroPartida = bairroDestino;
         bairroDestino = bairro;
+
+        System.out.println("BAIRRO P-D>> "+bairroPartida.getBairro().getNome()+" - "+bairroPartida.getNomeCidadeComEstado());
+        System.out.println("BAIRRO D-D>> "+bairroDestino.getBairro().getNome()+" - "+bairroDestino.getNomeCidadeComEstado());
 
         binding.setPartida(bairroPartida);
         binding.setDestino(bairroDestino);
@@ -418,10 +466,18 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         String diaSeguinte = DataHoraUtils.getDiaSeguinte();
         String diaAnterior = DataHoraUtils.getDiaAnterior();
 
+        System.out.println("MYPartida Antes>> "+viewModel.myPartida.getBairro()+" - "+viewModel.myPartida.getNomeCidadeComEstado());
+        System.out.println("MYDestino Antes>> "+viewModel.myDestino.getBairro()+" - "+viewModel.myDestino.getNomeCidadeComEstado());
+
         viewModel.myPartida = bairroPartida;
         viewModel.myDestino = bairroDestino;
 
-        viewModel.carregaResultadoInvertido(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte, diaAnterior);
+        System.out.println("MYPartida>> "+viewModel.myPartida.getBairro()+" - "+viewModel.myPartida.getNomeCidadeComEstado());
+        System.out.println("MYDestino>> "+viewModel.myDestino.getBairro()+" - "+viewModel.myDestino.getNomeCidadeComEstado());
+
+//        log = (LogItinerario) iniciaLog(TiposLog.ITINERARIO_INVERSAO.name());
+
+        viewModel.carregaResultadoNovo(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte, diaAnterior, inversao);
 
         geraModalLoading(0);
 
@@ -510,6 +566,12 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
                     bundle.putString(FirebaseAnalytics.Param.END_DATE, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(DateTime.now()));
                     bundle.putBoolean("sucesso", true);
 
+//                    if(log != null && bairroPartida != null && bairroDestino != null){
+//                        log.setPartida(bairroPartida.getBairro().getId());
+//                        log.setDestino(bairroDestino.getBairro().getId());
+//                        finalizaLog();
+//                    }
+
                     mFirebaseAnalytics.logEvent("consulta_itinerario", bundle);
                 }
 
@@ -536,6 +598,13 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
                 bundle.putBoolean("sucesso", false);
 
                 mFirebaseAnalytics.logEvent("consulta_itinerario", bundle);
+
+//                if(log != null && bairroPartida != null && bairroDestino != null){
+//                    log.setPartida(bairroPartida.getBairro().getId());
+//                    log.setDestino(bairroDestino.getBairro().getId());
+//                    finalizaLog();
+//                }
+
             }
 
             adapterResultado.notifyDataSetChanged();
@@ -728,13 +797,29 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
                 adapterItinerariosPorLinha.itinerarios = itinerarios;
                 adapterItinerariosPorLinha.notifyDataSetChanged();
             } else{
+                adapterItinerariosPorLinha.itinerarios = new ArrayList<>();
+                adapterItinerariosPorLinha.notifyDataSetChanged();
                 Toast.makeText(getApplicationContext(), "Nenhum itinerário encontrado...", Toast.LENGTH_SHORT).show();
             }
+
+//            if(log != null){
+//                finalizaLog();
+//            }
 
             ocultaModalLoading();
 
         }
     };
+
+//    private LogConsulta iniciaLog(String tipo){
+//        log = (LogItinerario) LogConsultaUtils.iniciaLog(getApplicationContext());
+//        log.setTipo(tipo);
+//        return log;
+//    }
+
+//    private void finalizaLog() {
+//        LogConsultaUtils.finalizaLog(ctx, log, ctx.getLocalClassName());
+//    }
 
     Observer<List<ItinerarioPartidaDestino>> itinerarioPorDestinoObserver = new Observer<List<ItinerarioPartidaDestino>>() {
         @Override
@@ -751,6 +836,12 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
             } else{
                 Toast.makeText(getApplicationContext(), "Nenhum itinerário encontrado...", Toast.LENGTH_SHORT).show();
             }
+
+//            if(log != null){
+//                log.setTipo(TiposLog.ITINERARIO_POR_DESTINO.name());
+//            }
+//
+//            finalizaLog();
 
             ocultaModalLoading();
 
@@ -886,17 +977,19 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
             if(bairroPartida != null && bairroDestino != null){
 
                 if(isFeriado){
-                    viewModel.carregaResultado(horaEscolhida, "domingo", DataHoraUtils.getDiaSeguinteSelecionado(dataEscolhida),
+                    viewModel.carregaResultadoNovo(horaEscolhida, "domingo", DataHoraUtils.getDiaSeguinteSelecionado(dataEscolhida),
                             DataHoraUtils.getDiaAnteriorSelecionado(dataEscolhida), inversao);
                     binding.textViewFeriado.setVisibility(View.VISIBLE);
                 } else{
-                    viewModel.carregaResultado(horaEscolhida, DataHoraUtils.getDiaSelecionado(dataEscolhida), DataHoraUtils.getDiaSeguinteSelecionado(dataEscolhida),
+                    viewModel.carregaResultadoNovo(horaEscolhida, DataHoraUtils.getDiaSelecionado(dataEscolhida), DataHoraUtils.getDiaSeguinteSelecionado(dataEscolhida),
                             DataHoraUtils.getDiaAnteriorSelecionado(dataEscolhida), inversao);
                     binding.textViewFeriado.setVisibility(View.GONE);
                 }
 
-                adapterResultado.setDia(DataHoraUtils.getDiaSelecionadoFormatado(dataEscolhida));
-                adapterResultado.setHora(DateTimeFormat.forPattern("HH:mm:ss").print(dataEscolhida.getTimeInMillis()));
+                if(dataEscolhida != null){
+                    adapterResultado.setDia(DataHoraUtils.getDiaSelecionadoFormatado(dataEscolhida));
+                    adapterResultado.setHora(DateTimeFormat.forPattern("HH:mm:ss").print(dataEscolhida.getTimeInMillis()));
+                }
 
                 //log
                 bundle = new Bundle();
@@ -909,6 +1002,13 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
                 bundle.putString("data_hora", DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss").print(new DateTime(dataEscolhida)));
                 bundle.putBoolean("sucesso", true);
+
+//                if(log != null){
+//                    log.setPartida(bairroPartida.getBairro().getId());
+//                    log.setDestino(bairroDestino.getBairro().getId());
+//                    log.setTipo(TiposLog.ITINERARIO_INVERSAO.name());
+//                    LogConsultaUtils.finalizaLog(getApplicationContext(), log, ctx.getLocalClassName());
+//                }
 
                 mFirebaseAnalytics.logEvent("consulta_itinerario_data_mod", bundle);
             }
@@ -923,6 +1023,10 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         switch(tabHost.getCurrentTab()) {
             case 0:
                 // consulta tradicional
+
+
+
+//                log = (LogItinerario) iniciaLog(TiposLog.ITINERARIO_TRADICIONAL.name());
 
                 formBairro = new FormBairro();
 
@@ -944,6 +1048,9 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
                 break;
             case 2:
                 // consulta nova
+
+//                log = (LogItinerario) LogConsultaUtils.iniciaLog(getApplicationContext());
+//                log.setDataInicio(DateTime.now());
 
                 formBairro = new FormBairro();
 
@@ -974,11 +1081,21 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
                 bairroCidade.getBairro().setId(id);
 
                 if(viewModel.partidaEscolhida == false){
+
+//                    if(log != null){
+//                        log.setPartida(id);
+//                    }
+
                     bairroPartida = bairroCidade;
                     viewModel.setBairroPartida(bairroCidade);
                     viewModel.bairroPartida.observe(this, bairroObserver);
                     viewModel.partidaEscolhida = true;
                 } else{
+
+//                    if(log != null){
+//                        log.setDestino(id);
+//                    }
+
                     //viewModel.setBairroPartida(bairroPartida);
                     viewModel.setBairroDestino(bairroCidade);
                     bairroDestino = bairroCidade;
@@ -986,11 +1103,20 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
                     viewModel.destinoEscolhido = true;
                 }
 
+//                if(log != null){
+//                    log.setTipo(TiposLog.ITINERARIO_TRADICIONAL.name());
+//                }
+
                 break;
             case 2:
                 // consulta nova
                 BairroCidade bairroCidadeConsulta = new BairroCidade();
                 bairroCidadeConsulta.getBairro().setId(id);
+
+//                if(log != null){
+//                    log.setDestino(id);
+//                    log.setTipo(TiposLog.ITINERARIO_POR_DESTINO.name());
+//                }
 
                 bairroDestinoConsulta = bairroCidadeConsulta;
                 viewModel.setBairroDestinoConsulta(bairroCidadeConsulta);
@@ -1018,9 +1144,10 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 //        viewModel.setTodos(R.id.radioButtonTodos == idRadio);
 
         if(viewModel.isFeriado.getValue()){
-            viewModel.carregaResultado(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), "domingo", diaSeguinte, diaAnterior, false);
+            viewModel.carregaResultadoNovo(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), "domingo", diaSeguinte, diaAnterior, inversao);
         } else{
-            viewModel.carregaResultado(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte, diaAnterior, false);
+//            viewModel.carregaResultadoNovo(DateTimeFormat.forPattern("10:00:00").print(dateTime), dia, diaSeguinte, diaAnterior, false);
+            viewModel.carregaResultadoNovo(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte, diaAnterior, inversao);
         }
 
         viewModel.itinerario.observe(this, itinerarioObserver);

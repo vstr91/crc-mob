@@ -1,14 +1,14 @@
 package br.com.vostre.circular.viewModel;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.persistence.db.SimpleSQLiteQuery;
-import android.arch.persistence.db.SupportSQLiteQuery;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.sqlite.db.SimpleSQLiteQuery;
+import androidx.sqlite.db.SupportSQLiteQuery;
 import android.content.Context;
-import android.databinding.Bindable;
-import android.databinding.BindingAdapter;
+import androidx.databinding.Bindable;
+import androidx.databinding.BindingAdapter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -137,6 +137,7 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
                 "WHERE itinerario = i.id AND "+dia+" = 1 AND hi.ativo = 1 AND TIME(h.nome/1000, 'unixepoch', 'localtime') >= '"+hora+"' " +
                 "ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ), ( SELECT h.id FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario " +
                 "WHERE itinerario = i.id AND "+diaSeguinte+" = 1 AND hi.ativo = 1 ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ) ) AS 'idProximoHorario', " +
+
                 "IFNULL( ( SELECT strftime('%H:%M', TIME(h.nome/1000, 'unixepoch', 'localtime')) FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario " +
                 "WHERE itinerario = i.id AND "+dia+" = 1 AND hi.ativo = 1 AND TIME(h.nome/1000, 'unixepoch', 'localtime') < " +
                 "( SELECT strftime('%H:%M:%S', TIME(h.nome/1000, 'unixepoch', 'localtime')) FROM horario_itinerario hi INNER JOIN horario h ON h.id = hi.horario " +
@@ -178,36 +179,33 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
                 "WHERE itinerario = i.id AND "+diaSeguinte+" = 1 AND hi.ativo = 1 ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ) ) ) " +
                 "ORDER BY TIME(h.nome/1000, 'unixepoch', 'localtime') LIMIT 1 ) ) AS 'idHorarioSeguinte', " +
 
-                "( SELECT pp.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario " +
-                "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'idPartida', " +
+                "( SELECT pp.id FROM parada pp WHERE pp.id = i.paradaInicial ) AS 'idPartida', " +
 
-                "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada " +
-                "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'nomePartida', " +
+                "( SELECT nome FROM parada pp " +
+                "WHERE pp.id = i.paradaInicial ) AS 'nomePartida', " +
 
-                "( SELECT nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario " +
-                "WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1) AS 'nomeDestino', " +
+                "( SELECT nome FROM parada pp WHERE pp.id = i.paradaFinal) AS 'nomeDestino', " +
 
-                "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN bairro b ON b.id = pp.bairro " +
-                "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'idBairroPartida', " +
+                "( SELECT b.id FROM parada pp INNER JOIN bairro b ON b.id = pp.bairro " +
+                "WHERE pp.id = i.paradaInicial) AS 'idBairroPartida', " +
 
-                "( SELECT b.id FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN bairro b ON b.id = pp.bairro " +
-                "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'idBairroDestino', " +
+                "( SELECT b.id FROM parada pp INNER JOIN bairro b ON b.id = pp.bairro " +
+                "WHERE pp.id = i.paradaFinal) AS 'idBairroDestino', " +
 
-                "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN bairro b ON b.id = pp.bairro " +
-                "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'bairroPartida', " +
+                "( SELECT b.nome FROM parada pp INNER JOIN bairro b ON b.id = pp.bairro " +
+                "WHERE pp.id = i.paradaInicial ) AS 'bairroPartida', " +
 
-                "( SELECT b.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN bairro b ON b.id = pp.bairro " +
-                "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'bairroDestino', " +
+                "( SELECT b.nome FROM parada pp INNER JOIN bairro b ON b.id = pp.bairro " +
+                "WHERE pp.id = i.paradaFinal ) AS 'bairroDestino', " +
 
-                "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
-                "WHERE pi.ordem = ( SELECT MIN(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'cidadePartida', " +
+                "( SELECT c.nome FROM parada pp INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
+                "WHERE pp.id = i.paradaInicial ) AS 'cidadePartida', " +
 
-                "( SELECT c.nome FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
-                "WHERE pi.ordem = ( SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1 ) AND pi.itinerario = i.id AND pi.ativo = 1 ) AS 'cidadeDestino' " +
+                "( SELECT c.nome FROM parada pp INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade " +
+                "WHERE pp.id = i.paradaFinal ) AS 'cidadeDestino' " +
 
                 "FROM itinerario i INNER JOIN empresa e ON e.id = i.empresa WHERE i.id IN (SELECT pi.itinerario FROM parada_itinerario pi INNER JOIN parada p ON p.id = pi.parada " +
-                "WHERE p.id = '"+parada+"' AND pi.ativo = 1 AND p.id <> (SELECT pi.parada FROM parada_itinerario pi INNER JOIN parada pp ON pp.id = pi.parada WHERE pi.ordem = " +
-                "(SELECT MAX(ordem) FROM parada_itinerario WHERE itinerario = i.id AND ativo = 1) AND pi.itinerario = i.id AND pi.ativo = 1) AND proximoHorario IS NOT NULL) " +
+                "WHERE p.id = '"+parada+"' AND pi.ativo = 1 AND p.id <> (SELECT pp.id FROM parada pp WHERE pp.id = i.paradaFinal) AND proximoHorario IS NOT NULL) " +
                 "ORDER BY flagDia, proximoHorario");
 
         AsyncTask.execute(new Runnable() {

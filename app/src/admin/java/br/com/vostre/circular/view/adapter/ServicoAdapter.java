@@ -1,16 +1,14 @@
 package br.com.vostre.circular.view.adapter;
 
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import java.util.List;
 
-import br.com.vostre.circular.databinding.LinhaPaisesBinding;
 import br.com.vostre.circular.databinding.LinhaServicosBinding;
 import br.com.vostre.circular.model.Servico;
-import br.com.vostre.circular.view.viewHolder.PaisViewHolder;
 import br.com.vostre.circular.view.viewHolder.ServicoViewHolder;
 
 public class ServicoAdapter extends RecyclerView.Adapter<ServicoViewHolder> {

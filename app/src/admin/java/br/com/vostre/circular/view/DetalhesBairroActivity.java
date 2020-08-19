@@ -1,12 +1,12 @@
 package br.com.vostre.circular.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
@@ -19,18 +19,11 @@ import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityDetalhesBairroBinding;
-import br.com.vostre.circular.databinding.ActivityDetalhesCidadeBinding;
-import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.pojo.BairroCidade;
-import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
-import br.com.vostre.circular.view.adapter.BairroAdapter;
 import br.com.vostre.circular.view.adapter.ParadaAdapter;
-import br.com.vostre.circular.view.form.FormBairro;
-import br.com.vostre.circular.viewModel.BairrosViewModel;
 import br.com.vostre.circular.viewModel.DetalhesBairroViewModel;
-import br.com.vostre.circular.viewModel.DetalhesCidadeViewModel;
 import br.com.vostre.circular.viewModel.ParadasViewModel;
 
 public class DetalhesBairroActivity extends BaseActivity {

@@ -5,7 +5,14 @@ public class Constants {
 //    public static String BASE_URL = "http://192.168.42.113/crc-web/web/app_dev.php/";
     public static String BASE_URL = "http://circular.atwebpages.com/web/";
 
-    public static String BASE_URL_DEBUG = "http://172.16.0.189/crc-web/web/";
+    public static String BASE_URL_DEBUG = "http://192.168.0.105/crc-web/web/";
 
     public static final int ID_NOTIFICACAO_MSG = 2;
+
+    // The authority for the sync adapter's content provider
+    public static final String AUTHORITY = "br.com.vostre.circular.admin.datasync.provider";
+    // An account type, in the form of a domain name
+    public static final String ACCOUNT_TYPE = "br.com.vostre.circular.admin";
+    // The account name
+    public static final String ACCOUNT = "dummyaccount";
 }

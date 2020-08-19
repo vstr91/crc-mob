@@ -1,19 +1,19 @@
 package br.com.vostre.circular.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
-import android.support.v7.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.TabHost;
+import android.widget.Toast;
 
 import java.util.List;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
@@ -85,6 +85,11 @@ public class HorariosItinerarioActivity extends BaseActivity {
         startActivity(i);
     }
 
+    public void onClickBtnInvalidar(View v){
+        viewModel.invalidarHorarios(getIntent().getStringExtra("itinerario"));
+        viewModel.retorno.observe(this, retornoObserver);
+    }
+
     Observer<List<HorarioItinerarioNome>> horariosObserver = new Observer<List<HorarioItinerarioNome>>() {
         @Override
         public void onChanged(List<HorarioItinerarioNome> horarios) {
@@ -107,6 +112,21 @@ public class HorariosItinerarioActivity extends BaseActivity {
 //            Toast.makeText(getApplicationContext(), viewModel.itinerario.getValue().getNomeBairroPartida()+" | AAAAAAAAAAAAA >> "
 //                    +binding.textViewBairroPartida.getText(), Toast.LENGTH_SHORT).show();
             viewModel.iti.set(itinerario);
+        }
+    };
+
+    Observer<Integer> retornoObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer retorno) {
+
+            if(retorno == 2){
+                Toast.makeText(getApplicationContext(), "Horários invalidados!", Toast.LENGTH_SHORT).show();
+            } else if(retorno == -1){
+                Toast.makeText(getApplicationContext(),
+                        "Erro ao invalidar horários. Por favor tente novamente.",
+                        Toast.LENGTH_SHORT).show();
+            }
+
         }
     };
 

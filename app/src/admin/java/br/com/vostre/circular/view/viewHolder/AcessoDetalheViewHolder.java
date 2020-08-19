@@ -1,14 +1,12 @@
 package br.com.vostre.circular.view.viewHolder;
 
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
-import br.com.vostre.circular.databinding.LinhaAcessosBinding;
 import br.com.vostre.circular.databinding.LinhaAcessosDetalheBinding;
 import br.com.vostre.circular.model.Acesso;
-import br.com.vostre.circular.model.pojo.AcessoTotal;
 
 public class AcessoDetalheViewHolder extends RecyclerView.ViewHolder {
 

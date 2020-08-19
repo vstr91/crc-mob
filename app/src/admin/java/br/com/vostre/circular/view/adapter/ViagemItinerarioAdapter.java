@@ -1,19 +1,15 @@
 package br.com.vostre.circular.view.adapter;
 
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import java.util.List;
 
-import br.com.vostre.circular.databinding.LinhaParadasBinding;
 import br.com.vostre.circular.databinding.LinhaViagensBinding;
-import br.com.vostre.circular.listener.ParadaListener;
 import br.com.vostre.circular.listener.ViagemListener;
 import br.com.vostre.circular.model.ViagemItinerario;
-import br.com.vostre.circular.model.pojo.ParadaBairro;
-import br.com.vostre.circular.view.viewHolder.ParadaViewHolder;
 import br.com.vostre.circular.view.viewHolder.ViagemItinerarioViewHolder;
 
 public class ViagemItinerarioAdapter extends RecyclerView.Adapter<ViagemItinerarioViewHolder> {

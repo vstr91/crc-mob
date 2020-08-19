@@ -3,40 +3,167 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="br.com.vostre.circular">
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission
-        android:name="android.permission.AUTHENTICATE_ACCOUNTS"
-        android:maxSdkVersion="22" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
-    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
-    <uses-permission android:name="android.permission.CAMERA" />
-
-    <uses-feature android:name="android.hardware.location.gps" />
-
     <application
         android:name=".App"
-        tools:replace="android:allowBackup"
         android:allowBackup="false"
-        android:icon="@drawable/icon"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/icon"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:replace="android:allowBackup">
+
+        <meta-data android:name="com.onesignal.NotificationOpened.DEFAULT" android:value="DISABLE" />
+
+        <activity android:name=".view.AcompanharViagemActivity"></activity>
+
+        <activity
+            android:name=".view.LoginActivity"
+            android:noHistory="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".view.MenuActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".view.BaseActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.FavoritosActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".view.ParadasSugeridasActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".view.DetalheParadaActivity"
+            android:screenOrientation="portrait">
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
+                <data
+                    android:host="vostre.com.br"
+                    android:pathPrefix="/circular/paradas"
+                    android:scheme="http" />
+                <!-- note that the leading "/" is required for pathPrefix -->
+            </intent-filter>
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
+                <data
+                    android:host="www.vostre.com.br"
+                    android:pathPrefix="/circular/paradas"
+                    android:scheme="http" />
+                <!-- note that the leading "/" is required for pathPrefix -->
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".view.ParadasActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.ItinerariosActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.PontosInteresseActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.EmpresasActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.ParametrosActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.UsuariosActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.MensagensActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.DetalhesEmpresaActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.DetalhesOnibusActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.DetalheItinerarioActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.DetalheItinerarioImpressaoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.MapaActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.HorariosItinerarioActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.SobreActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.OpcoesActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.DetalhePontoInteresseActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.QRCodeActivity"
+            android:noHistory="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.ListaItinerariosActivity"
+            android:noHistory="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.ListaParadasActivity"
+            android:noHistory="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.ListaPontosInteresseActivity"
+            android:noHistory="true"
+            android:screenOrientation="portrait" />
         <meta-data
             android:name="CLOUDINARY_URL"
-            android:value="cloudinary://@vostre"/>
+            android:value="cloudinary://@vostre" />
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="048b5dba17da58b2de2b7470cf50a3def5e51fb3" />
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="br.com.vostre.circular.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
+        <provider
+            android:name=".utils.DataProviderUsuario"
+            android:authorities="br.com.vostre.circular.datasync.provider"
+            android:exported="false"
+            android:syncable="true" />
+
+        <service
+            android:name=".utils.NotificationExtender"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.onesignal.NotificationExtender" />
+            </intent-filter>
+        </service>
 
         <service android:name=".model.service.AuthenticatorService">
             <intent-filter>
@@ -47,6 +174,7 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
+
         <service
             android:name=".model.service.SyncService"
             android:exported="true"
@@ -59,71 +187,19 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/syncadapter" />
         </service>
-
-        <provider
-            android:name=".utils.DataProviderUsuario"
-            android:authorities="br.com.vostre.circular.datasync.provider"
-            android:exported="false"
-            android:syncable="true" />
-
-        <activity
-            android:name=".view.LoginActivity"
-            android:screenOrientation="portrait"
-            android:noHistory="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".view.MenuActivity" android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".view.BaseActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.FavoritosActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.ParadasSugeridasActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.DetalheParadaActivity" android:screenOrientation="portrait">
-            <intent-filter android:label="@string/app_name">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
-                <data android:scheme="http"
-                    android:host="vostre.com.br"
-                    android:pathPrefix="/circular/paradas" />
-                <!-- note that the leading "/" is required for pathPrefix-->
-            </intent-filter>
-            <intent-filter android:label="@string/app_name">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
-                <data android:scheme="http"
-                    android:host="www.vostre.com.br"
-                    android:pathPrefix="/circular/paradas" />
-                <!-- note that the leading "/" is required for pathPrefix-->
-            </intent-filter>
-        </activity>
-        <activity android:name=".view.ParadasActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.ItinerariosActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.PontosInteresseActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.EmpresasActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.ParametrosActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.UsuariosActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.MensagensActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.DetalhesEmpresaActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.DetalhesOnibusActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.DetalheItinerarioActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.DetalheItinerarioImpressaoActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.MapaActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.HorariosItinerarioActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.SobreActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.OpcoesActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.DetalhePontoInteresseActivity" android:screenOrientation="portrait" />
-        <activity android:name=".view.QRCodeActivity" android:screenOrientation="portrait"
-            android:noHistory="true"></activity>
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="048b5dba17da58b2de2b7470cf50a3def5e51fb3" />
     </application>
+    <uses-feature android:name="android.hardware.location.gps" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission
+        android:name="android.permission.AUTHENTICATE_ACCOUNTS"
+        android:maxSdkVersion="22" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
 
 </manifest>

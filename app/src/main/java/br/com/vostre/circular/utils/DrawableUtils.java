@@ -5,7 +5,7 @@ import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 
 public class DrawableUtils {
 
@@ -27,6 +27,18 @@ public class DrawableUtils {
     {
         ColorMatrix matrix = new ColorMatrix();
         matrix.setSaturation(0);
+
+        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
+
+        drawable.setColorFilter(filter);
+
+        return drawable;
+    }
+
+    public static Drawable convertToRed(Drawable drawable)
+    {
+        ColorMatrix matrix = new ColorMatrix();
+        matrix.setScale(100f, 0, 0, 0);
 
         ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
 

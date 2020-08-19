@@ -10,7 +10,7 @@
             type="br.com.vostre.circular.view.ParadasSugeridasActivity" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/gradiente"
@@ -55,12 +55,12 @@
                         android:layout_height="match_parent"
                         android:orientation="vertical">
 
-                        <android.support.v4.widget.NestedScrollView
+                        <androidx.core.widget.NestedScrollView
                             android:overScrollMode="never"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent">
 
-                            <android.support.constraint.ConstraintLayout
+                            <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent">
 
@@ -81,20 +81,20 @@
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent" />
 
-                                <android.support.v7.widget.RecyclerView
+                                <androidx.recyclerview.widget.RecyclerView
                                     android:id="@+id/listSugestoes"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="8dp"
                                     android:maxHeight="200dp"
                                     android:paddingBottom="20dp"
-                                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toBottomOf="@+id/textView26"
                                     tools:listitem="@layout/linha_paradas_sugeridas">
 
-                                </android.support.v7.widget.RecyclerView>
+                                </androidx.recyclerview.widget.RecyclerView>
 
                                 <TextView
                                     android:id="@+id/textViewParadaPendenteVazia"
@@ -132,20 +132,20 @@
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toBottomOf="@+id/textViewParadaPendenteVazia" />
 
-                                <android.support.v7.widget.RecyclerView
+                                <androidx.recyclerview.widget.RecyclerView
                                     android:id="@+id/listSugestoesPois"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="8dp"
                                     android:maxHeight="200dp"
                                     android:paddingBottom="20dp"
-                                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toBottomOf="@+id/textView29"
                                     tools:listitem="@layout/linha_pois_sugeridos">
 
-                                </android.support.v7.widget.RecyclerView>
+                                </androidx.recyclerview.widget.RecyclerView>
 
                                 <TextView
                                     android:id="@+id/textViewPoiPendenteVazia"
@@ -165,9 +165,9 @@
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toBottomOf="@+id/listSugestoesPois" />
 
-                            </android.support.constraint.ConstraintLayout>
+                            </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        </android.support.v4.widget.NestedScrollView>
+                        </androidx.core.widget.NestedScrollView>
 
                     </LinearLayout>
 
@@ -177,12 +177,12 @@
                         android:layout_height="match_parent"
                         android:orientation="vertical">
 
-                        <android.support.v4.widget.NestedScrollView
+                        <androidx.core.widget.NestedScrollView
                             android:overScrollMode="never"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent">
 
-                            <android.support.constraint.ConstraintLayout
+                            <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent">
 
@@ -203,20 +203,20 @@
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent" />
 
-                                <android.support.v7.widget.RecyclerView
+                                <androidx.recyclerview.widget.RecyclerView
                                     android:id="@+id/listAceitas"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="8dp"
                                     android:maxHeight="200dp"
                                     android:paddingBottom="20dp"
-                                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toBottomOf="@+id/textView27"
                                     tools:listitem="@layout/linha_paradas_sugeridas">
 
-                                </android.support.v7.widget.RecyclerView>
+                                </androidx.recyclerview.widget.RecyclerView>
 
                                 <TextView
                                     android:id="@+id/textViewParadaAceitaVazia"
@@ -254,20 +254,20 @@
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toBottomOf="@+id/textViewParadaAceitaVazia" />
 
-                                <android.support.v7.widget.RecyclerView
+                                <androidx.recyclerview.widget.RecyclerView
                                     android:id="@+id/listAceitasPois"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="8dp"
                                     android:maxHeight="200dp"
                                     android:paddingBottom="20dp"
-                                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toBottomOf="@+id/textView30"
                                     tools:listitem="@layout/linha_pois_sugeridos">
 
-                                </android.support.v7.widget.RecyclerView>
+                                </androidx.recyclerview.widget.RecyclerView>
 
                                 <TextView
                                     android:id="@+id/textViewPoiAceitaVazia"
@@ -287,9 +287,9 @@
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toBottomOf="@+id/listAceitasPois" />
 
-                            </android.support.constraint.ConstraintLayout>
+                            </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        </android.support.v4.widget.NestedScrollView>
+                        </androidx.core.widget.NestedScrollView>
 
                     </LinearLayout>
 
@@ -299,12 +299,12 @@
                         android:layout_height="match_parent"
                         android:orientation="vertical">
 
-                        <android.support.v4.widget.NestedScrollView
+                        <androidx.core.widget.NestedScrollView
                             android:overScrollMode="never"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent">
 
-                            <android.support.constraint.ConstraintLayout
+                            <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent">
 
@@ -325,19 +325,19 @@
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent" />
 
-                                <android.support.v7.widget.RecyclerView
+                                <androidx.recyclerview.widget.RecyclerView
                                     android:id="@+id/listRejeitadas"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="8dp"
                                     android:maxHeight="150dp"
-                                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toBottomOf="@+id/textView31"
                                     tools:listitem="@layout/linha_paradas_sugeridas">
 
-                                </android.support.v7.widget.RecyclerView>
+                                </androidx.recyclerview.widget.RecyclerView>
 
                                 <TextView
                                     android:id="@+id/textViewParadaRejeitadaVazia"
@@ -375,19 +375,19 @@
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toBottomOf="@+id/textViewParadaRejeitadaVazia" />
 
-                                <android.support.v7.widget.RecyclerView
+                                <androidx.recyclerview.widget.RecyclerView
                                     android:id="@+id/listRejeitadasPois"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="8dp"
                                     android:maxHeight="70dp"
-                                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toBottomOf="@+id/textView32"
                                     tools:listitem="@layout/linha_pois_sugeridos">
 
-                                </android.support.v7.widget.RecyclerView>
+                                </androidx.recyclerview.widget.RecyclerView>
 
                                 <TextView
                                     android:id="@+id/textViewPoiRejeitadoVazia"
@@ -407,9 +407,9 @@
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toBottomOf="@+id/listRejeitadasPois" />
 
-                            </android.support.constraint.ConstraintLayout>
+                            </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        </android.support.v4.widget.NestedScrollView>
+                        </androidx.core.widget.NestedScrollView>
 
                     </LinearLayout>
                 </FrameLayout>
@@ -417,6 +417,6 @@
         </TabHost>
 
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

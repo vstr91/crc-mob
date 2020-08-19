@@ -1,16 +1,13 @@
 package br.com.vostre.circular.model;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Index;
+import androidx.room.Entity;
+import androidx.room.Index;
 import android.content.Context;
 import android.location.Location;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.joda.time.DateTime;
-import org.joda.time.Duration;
-import org.joda.time.Hours;
 import org.joda.time.Minutes;
-import org.joda.time.format.DateTimeFormat;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.kml.KmlPlacemark;
 
@@ -19,7 +16,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity(indices = {@Index(value = {"itinerario", "trajeto"},

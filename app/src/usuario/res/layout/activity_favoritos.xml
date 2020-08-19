@@ -10,7 +10,7 @@
             type="br.com.vostre.circular.view.FavoritosActivity" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/gradiente"
@@ -61,17 +61,17 @@
                         android:layout_height="match_parent"
                         android:orientation="vertical">
 
-                        <android.support.v7.widget.RecyclerView
+                        <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/listItinerarios"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             tools:layout_editor_absoluteY="487dp"
                             tools:listitem="@layout/linha_itinerarios">
 
-                        </android.support.v7.widget.RecyclerView>
+                        </androidx.recyclerview.widget.RecyclerView>
                     </LinearLayout>
 
                     <LinearLayout
@@ -80,23 +80,23 @@
                         android:layout_height="match_parent"
                         android:orientation="vertical">
 
-                        <android.support.v7.widget.RecyclerView
+                        <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/listParadas"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             tools:layout_editor_absoluteY="487dp"
                             tools:listitem="@layout/linha_paradas">
 
-                        </android.support.v7.widget.RecyclerView>
+                        </androidx.recyclerview.widget.RecyclerView>
                     </LinearLayout>
 
                 </FrameLayout>
             </LinearLayout>
         </TabHost>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

@@ -1,10 +1,12 @@
 package br.com.vostre.circular.viewModel;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
@@ -15,21 +17,26 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.bonuspack.utils.PolylineEncoder;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.overlay.Polyline;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.HistoricoItinerario;
-import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.Itinerario;
+import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
@@ -219,6 +226,166 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
     }
 
+    public void atualizaTrajetoItinerarios(final String itinerario){
+
+        if(itinerario != null && !itinerario.isEmpty()){
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+
+                    ItinerarioPartidaDestino iti = appDatabase.itinerarioDAO().carregarSync(itinerario);
+
+                    if(iti != null){
+                        Itinerario i = iti.getItinerario();
+
+                        List<Parada> paradas = appDatabase.paradaItinerarioDAO()
+                                .listarParadasAtivasPorItinerarioERuaSync(i.getId());
+
+                        if (paradas != null) {
+
+                            ArrayList<String> points = new ArrayList<>();
+
+                            for(Parada p : paradas){
+                                points.add(p.getLongitude()+","+p.getLatitude());
+                            }
+
+                            buscaTrajeto(i, points);
+
+                        }
+
+                    }
+
+                }
+            });
+        } else{
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+
+                    List<Itinerario> itinerarios = appDatabase.itinerarioDAO().listarTodosSync();
+
+                    for(Itinerario iti : itinerarios) {
+
+                        if(iti.getTrajeto() == null || iti.getTrajeto().isEmpty()){
+                            List<Parada> paradas = appDatabase.paradaItinerarioDAO()
+                                    .listarParadasAtivasPorItinerarioERuaSync(iti.getId());
+
+                            if (paradas != null) {
+
+                                ArrayList<String> points = new ArrayList<>();
+
+                                for(Parada p : paradas){
+                                    points.add(p.getLongitude()+","+p.getLatitude());
+                                }
+
+                                buscaTrajeto(iti, points);
+
+                            }
+                        }
+
+                        //pausa para nao sobrecarregar o servico remoto
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+
+                }
+            });
+        }
+
+
+    }
+
+    private void buscaTrajeto(final Itinerario iti, final ArrayList<String> points) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://router.project-osrm.org/")
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .build();
+        CircularAPI api = retrofit.create(CircularAPI.class);
+        Call<String> call = api.carregaCaminhoItinerario(StringUtils.join(points, ";"));
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                try {
+
+                    if(response.body() != null && response.code() == 200){
+                        JSONObject obj = new JSONObject(response.body().toString());
+                        JSONArray routes = obj.getJSONArray("routes");
+                        String polyline = routes.getJSONObject(0).getString("geometry");
+
+                        if(polyline != null && !polyline.isEmpty()){
+                            iti.setTrajeto(polyline);
+
+                            edit(iti);
+                        }
+
+//                            if(!isEdicao){
+//                                editarItinerario();
+//                            }
+                    } else{
+                        Toast.makeText(getApplication().getApplicationContext(), "Erro ao buscar o caminho do itinerário! "+response.message(), Toast.LENGTH_SHORT).show();
+                    }
+
+
+
+                    //System.out.println(obj);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public void atualizaItinerarios() {
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                List<Itinerario> itinerarios = appDatabase.itinerarioDAO().listarTodosSync();
+
+                for(Itinerario iti : itinerarios){
+                    List<ParadaItinerarioBairro> paradas = appDatabase.paradaItinerarioDAO()
+                            .listarTodosPorItinerarioComBairroSync(iti.getId());
+
+                    if(paradas != null){
+
+                        int qtd = paradas.size();
+
+                        if(qtd > 1){
+                            ParadaItinerarioBairro paradaInicial = paradas.get(0);
+                            ParadaItinerarioBairro paradaFinal = paradas.get(qtd-1);
+
+                            iti.setTotalParadas(qtd);
+                            iti.setParadaInicial(paradaInicial.getParadaItinerario().getParada());
+                            iti.setParadaFinal(paradaFinal.getParadaItinerario().getParada());
+
+                            iti.setEnviado(false);
+                            iti.setUltimaAlteracao(DateTime.now());
+
+//                            System.out.println("ITI: "+iti.getId()+" - "+iti.getTotalParadas()+" | "
+//                                    +iti.getParadaInicial()+";"+iti.getParadaFinal());
+
+                            appDatabase.itinerarioDAO().editar(iti);
+                        }
+
+                    }
+
+                }
+
+            }
+        });
+
+    }
+
     public void atualizarDistancias(Context ctx){
         new atualizaDistanciasAsyncTask(appDatabase, ctx, this).execute();
     }
@@ -245,10 +412,10 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 List<ParadaItinerarioBairro> pis = db.paradaItinerarioDAO()
                         .listarTodosPorItinerarioComBairroSync(itinerario.getItinerario().getId());
 
-                // atualiza distancia itinerario
-                if(itinerario.getDistanciaTrechoMetros() == null || itinerario.getItinerario().getDistanciaMetros() == null){
-                    thiz.calculaDistancia(pis, itinerario.getItinerario());
-                }
+//                // atualiza distancia itinerario
+//                if(itinerario.getDistanciaTrechoMetros() == null || itinerario.getItinerario().getDistanciaMetros() == null){
+//                    thiz.calculaDistancia(pis, itinerario.getItinerario());
+//                }
 
                 ParadaItinerarioBairro paradaAnterior = null;
 
@@ -286,6 +453,9 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                                         String distancia = objDados.getString("distance");
                                         int tempo = objDados.getInt("duration");
+
+                                        //somando 45% para simular tempo de onibus. Padrao da api eh carro
+                                        tempo = tempo + ((Double)(tempo * 0.45d)).intValue();
 
                                         Double distanciaMetros = Double.parseDouble(distancia);
                                         String tempoFormatado = DataHoraUtils.segundosParaHoraFormatado(tempo);
@@ -347,9 +517,19 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                 }
 
+                // atualiza distancia itinerario
+                //if(itinerario.getDistanciaTrechoMetros() == null || itinerario.getItinerario().getDistanciaMetros() == null){
+                    thiz.calculaDistancia(itinerario.getItinerario(), pis, false);
+                //}
+
             }
 
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            Toast.makeText(ctx, "Atualização de distâncias finalizada!", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -445,6 +625,18 @@ public class ItinerariosViewModel extends AndroidViewModel {
             cont++;
         }
 
+        if(pibs != null && pibs.size() > 1){
+            itinerario.setTotalParadas(pibs.size());
+            itinerario.setParadaInicial(pibs.get(0).getParadaItinerario().getParada());
+            itinerario.setParadaFinal(pibs.get(pibs.size()-1).getParadaItinerario().getParada());
+            itinerario.setEnviado(false);
+            itinerario.setUltimaAlteracao(DateTime.now());
+
+            edit(itinerario);
+
+            atualizaTrajetoItinerarios(itinerario.getId());
+
+        }
 
 
     }
@@ -571,6 +763,57 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 }
             }
         };
+    }
+
+    public void calculaDistancia(final Itinerario itin, List<ParadaItinerarioBairro> paradas, final boolean isEdicao) {
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                AppDatabase db = AppDatabase.getAppDatabase(getApplication());
+
+                List<ParadaItinerarioBairro> pis = db.paradaItinerarioDAO()
+                        .listarTodosPorItinerarioComBairroSync(itin.getId());
+
+                Double distancia = 0d;
+
+                Period p = Period.ZERO;
+                PeriodFormatter parser = new PeriodFormatterBuilder().appendHours()
+                        .appendLiteral(":").appendMinutes()
+                        .appendLiteral(":").appendSeconds().toFormatter();
+
+                PeriodFormatter printer =
+                        new PeriodFormatterBuilder()
+                                .printZeroAlways().minimumPrintedDigits(2)
+                                //.appendDays().appendLiteral(":") // remove original code
+                                .appendHours().appendLiteral(":")
+                                .appendMinutes().appendLiteral(":")
+                                .appendSeconds().toFormatter();
+
+                for(ParadaItinerarioBairro pi : pis){
+
+                    if(pi.getParadaItinerario().getDistanciaSeguinteMetros() != null){
+                        distancia += pi.getParadaItinerario().getDistanciaSeguinteMetros();
+                    }
+
+                    if(pi.getParadaItinerario().getTempoSeguinte() != null){
+                        p = p.plus(parser.parsePeriod(DateTimeFormat.forPattern("HH:mm:ss").print(pi.getParadaItinerario().getTempoSeguinte())));
+                    }
+
+                }
+
+                itin.setTempo(DateTimeFormat.forPattern("HH:mm:ss")
+                        .parseDateTime(printer.print(p.normalizedStandard())));
+
+                itin.setDistanciaMetros(distancia);
+
+                if(!isEdicao){
+                    editarItinerario(itin);
+                }
+
+            }
+        });
+
     }
 
 }

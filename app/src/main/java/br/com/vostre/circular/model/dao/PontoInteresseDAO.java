@@ -1,12 +1,12 @@
 package br.com.vostre.circular.model.dao;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
+import androidx.lifecycle.LiveData;
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
 
@@ -24,6 +24,12 @@ public interface PontoInteresseDAO {
 
     @Query("SELECT * FROM ponto_interesse WHERE ativo = 1")
     LiveData<List<PontoInteresse>> listarTodosAtivos();
+
+    @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
+            "            e.nome AS nomeEstado, e.sigla AS siglaEstado FROM ponto_interesse p " +
+            "            INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
+            "            estado e ON e.id = c.estado")
+    LiveData<List<PontoInteresseBairro>> listarTodosAtivosComBairro();
 
     @Query("SELECT * FROM ponto_interesse WHERE enviado = 0")
     List<PontoInteresse> listarTodosAEnviar();

@@ -1,8 +1,8 @@
 package br.com.vostre.circular;
 
-import android.arch.persistence.db.SupportSQLiteDatabase;
-import android.arch.persistence.db.framework.FrameworkSQLiteOpenHelperFactory;
-import android.arch.persistence.room.testing.MigrationTestHelper;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory;
+import androidx.room.testing.MigrationTestHelper;
 
 import androidx.test.InstrumentationRegistry;
 import androidx.test.runner.AndroidJUnit4;
@@ -136,6 +136,17 @@ public class DBTest {
         db.close();
 
         db = helper.runMigrationsAndValidate(TEST_DB, 10, true, AppDatabase.MIGRATION_9_10);
+
+        db.execSQL("SELECT * FROM parametro_interno");
+    }
+
+    @Test
+    public void migrate11To12Steps() throws IOException {
+        SupportSQLiteDatabase db = helper.createDatabase(TEST_DB, 11);
+
+        db.close();
+
+        db = helper.runMigrationsAndValidate(TEST_DB, 12, true, AppDatabase.MIGRATION_11_12);
 
         db.execSQL("SELECT * FROM parametro_interno");
     }

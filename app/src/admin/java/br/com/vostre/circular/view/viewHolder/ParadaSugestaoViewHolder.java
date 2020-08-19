@@ -2,23 +2,17 @@ package br.com.vostre.circular.view.viewHolder;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
-import android.widget.Toast;
 
-import org.joda.time.DateTimeUtils;
 import org.joda.time.format.DateTimeFormat;
 
 import java.io.File;
 
-import br.com.vostre.circular.databinding.LinhaParadasBinding;
 import br.com.vostre.circular.databinding.LinhaParadasSugeridasBinding;
 import br.com.vostre.circular.listener.ParadaSugestaoListener;
-import br.com.vostre.circular.model.Parada;
-import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaSugestaoBairro;
-import br.com.vostre.circular.view.form.FormParada;
 
 public class ParadaSugestaoViewHolder extends RecyclerView.ViewHolder {
 

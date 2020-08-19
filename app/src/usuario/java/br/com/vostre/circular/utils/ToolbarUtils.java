@@ -2,14 +2,14 @@ package br.com.vostre.circular.utils;
 
 import android.accounts.Account;
 import android.app.Activity;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AppCompatActivity;
+import androidx.core.view.MenuItemCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,7 +36,7 @@ public class ToolbarUtils {
     static TextView textViewBadgeMsg;
 //    static ImageButton imageButtonMsg;
     static ImageButton imageButtonAjuda;
-    static ImageButton imageButtonIncidente;
+//    static ImageButton imageButtonIncidente;
     static ImageButton imageButtonFavoritos;
 //    static ImageButton imageButtonSync;
     static View.OnClickListener mListener;
@@ -62,8 +62,8 @@ public class ToolbarUtils {
         MenuItem itemAjuda = menu.findItem(R.id.icon_ajuda);
         MenuItemCompat.getActionView(itemAjuda).setOnClickListener(listener);
 
-        MenuItem itemIncidente = menu.findItem(R.id.icon_incidente);
-        MenuItemCompat.getActionView(itemIncidente).setOnClickListener(listener);
+//        MenuItem itemIncidente = menu.findItem(R.id.icon_incidente);
+//        MenuItemCompat.getActionView(itemIncidente).setOnClickListener(listener);
 
         MenuItem itemFavoritos = menu.findItem(R.id.icon_favoritos);
         MenuItemCompat.getActionView(itemFavoritos).setOnClickListener(listener);
@@ -79,8 +79,8 @@ public class ToolbarUtils {
         imageButtonAjuda = MenuItemCompat.getActionView(itemAjuda).findViewById(R.id.imageButtonAjuda);
         imageButtonAjuda.setOnClickListener(mListener);
 
-        imageButtonIncidente = MenuItemCompat.getActionView(itemIncidente).findViewById(R.id.imageButtonIncidente);
-        imageButtonIncidente.setOnClickListener(mListener);
+//        imageButtonIncidente = MenuItemCompat.getActionView(itemIncidente).findViewById(R.id.imageButtonIncidente);
+//        imageButtonIncidente.setOnClickListener(mListener);
 
         imageButtonFavoritos = MenuItemCompat.getActionView(itemFavoritos).findViewById(R.id.imageButtonFavoritos);
         imageButtonFavoritos.setOnClickListener(mListener);
@@ -117,11 +117,11 @@ public class ToolbarUtils {
             case R.id.icon_ajuda:
                 activity.onToolbarItemSelected(v);
                 break;
-            case R.id.imageButtonIncidente:
-            case R.id.incidente:
-            case R.id.icon_incidente:
-                Toast.makeText(activity, "Incidente", Toast.LENGTH_SHORT).show();
-                break;
+//            case R.id.imageButtonIncidente:
+//            case R.id.incidente:
+//            case R.id.icon_incidente:
+//                Toast.makeText(activity, "Incidente", Toast.LENGTH_SHORT).show();
+//                break;
             case R.id.imageButtonFavoritos:
             case R.id.favoritos:
             case R.id.icon_favoritos:

@@ -1,12 +1,16 @@
 package br.com.vostre.circular.viewModel;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.Context;
-import android.database.Observable;
-import android.databinding.ObservableField;
+
+import androidx.databinding.ObservableField;
+
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
@@ -17,8 +21,17 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.DateTimeField;
+import org.joda.time.DateTimeUtils;
+import org.joda.time.Duration;
+import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimePrinter;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,14 +39,18 @@ import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
+import org.osmdroid.bonuspack.utils.PolylineEncoder;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Polyline;
 
 import java.io.File;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.HistoricoItinerario;
@@ -185,6 +202,9 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
                                 String distancia = objDados.getString("distance");
                                 int tempo = objDados.getInt("duration");
 
+                                //somando 45% para simular tempo de onibus. Padrao da api eh carro
+                                tempo = tempo + ((Double)(tempo * 0.45d)).intValue();
+
                                 Double distanciaMetros = Double.parseDouble(distancia);
                                 String tempoFormatado = DataHoraUtils.segundosParaHoraFormatado(tempo);
                                 Double distanciaKm = distanciaMetros/1000;
@@ -256,7 +276,7 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
             add(umItinerario);
             addParadas(this.paradasItinerario.getValue());
 
-            calculaDistancia(this.paradasItinerario.getValue(), false);
+            calculaDistancia(umItinerario, this.paradasItinerario.getValue(), false);
 
         } else{
             retorno.setValue(0);
@@ -314,6 +334,26 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
             new addParadaAsyncTask(appDatabase).execute(pib.getParadaItinerario());
 
             cont++;
+        }
+
+        if(pibs != null && pibs.size() > 1){
+            // atualiza paradas inicial e final do itinerario, assim como numero de paradas
+            final Itinerario iti = itinerario.getValue().getItinerario();
+
+            iti.setTotalParadas(pibs.size());
+            iti.setParadaInicial(pibs.get(0).getParadaItinerario().getParada());
+            iti.setParadaFinal(pibs.get(pibs.size()-1).getParadaItinerario().getParada());
+
+            iti.setUltimaAlteracao(DateTime.now());
+            iti.setEnviado(false);
+
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    appDatabase.itinerarioDAO().editar(iti);
+                    atualizaTrajetoItinerarios(iti.getId());
+                }
+            });
         }
 
         paradasItinerario.postValue(appDatabase.paradaItinerarioDAO().listarTodosAtivosPorItinerarioComBairro(itinerario.getValue().getItinerario().getId()).getValue());
@@ -463,65 +503,297 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
         };
     }
 
-    public void calculaDistancia(List<ParadaItinerarioBairro> paradas, final boolean isEdicao) {
+    public void calculaDistancia(final Itinerario itin, List<ParadaItinerarioBairro> paradas, final boolean isEdicao) {
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                AppDatabase db = AppDatabase.getAppDatabase(getApplication());
+
+                List<ParadaItinerarioBairro> pis = db.paradaItinerarioDAO()
+                        .listarTodosPorItinerarioComBairroSync(itin.getId());
+
+                Double distancia = 0d;
+                DateTime tempo = DateTimeFormat.forPattern("HH:mm:ss").parseDateTime("00:00:00");
+
+                Period p = Period.ZERO;
+                PeriodFormatter parser = new PeriodFormatterBuilder().appendHours()
+                        .appendLiteral(":").appendMinutes()
+                        .appendLiteral(":").appendSeconds().toFormatter();
+
+                PeriodFormatter printer =
+                        new PeriodFormatterBuilder()
+                                .printZeroAlways().minimumPrintedDigits(2)
+                                //.appendDays().appendLiteral(":") // remove original code
+                                .appendHours().appendLiteral(":")
+                                .appendMinutes().appendLiteral(":")
+                                .appendSeconds().toFormatter();
+
+                for(ParadaItinerarioBairro pi : pis){
+
+                    if(pi.getParadaItinerario().getDistanciaSeguinteMetros() != null){
+                        distancia += pi.getParadaItinerario().getDistanciaSeguinteMetros();
+                    }
+
+                    if(pi.getParadaItinerario().getTempoSeguinte() != null){
+                        p = p.plus(parser.parsePeriod(DateTimeFormat.forPattern("HH:mm:ss").print(pi.getParadaItinerario().getTempoSeguinte())));
+                    }
+
+                }
+
+                itinerario.getValue().getItinerario().setTempo(DateTimeFormat.forPattern("HH:mm:ss")
+                        .parseDateTime(printer.print(p.normalizedStandard())));
+
+                itinerario.getValue().getItinerario().setDistanciaMetros(distancia);
+
+                if(!isEdicao){
+                    editarItinerario();
+                }
+
+            }
+        });
+
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl("http://router.project-osrm.org/")
+//                .addConverterFactory(ScalarsConverterFactory.create())
+//                .build();
+//        CircularAPI api = retrofit.create(CircularAPI.class);
+//        Call<String> call = api.carregaDistancia(paradas.get(0).getLongitude()
+//                +","+paradas.get(0).getLatitude(),paradas.get(paradas.size()-1).getLongitude()
+//                +","+paradas.get(paradas.size()-1).getLatitude());
+//
+//        call.enqueue(new Callback<String>() {
+//            @Override
+//            public void onResponse(Call<String> call, Response<String> response) {
+//
+//                try {
+//
+//                    if(response.body() != null){
+//                        JSONObject obj = new JSONObject(response.body().toString());
+//                        JSONArray routes = obj.getJSONArray("routes");
+//                        JSONObject objDados = routes.getJSONObject(0);
+//
+//                        String distancia = objDados.getString("distance");
+//                        int tempo = objDados.getInt("duration");
+//
+//                        //somando 1/3 para simular tempo de onibus. Padrao da api eh carro
+//                        tempo = tempo + tempo/3;
+//
+////                        if(tempo > umMinuto && tempo <= umMinuto * 10){
+////                            //tempo += 60;
+////                        } else if(tempo > umMinuto * 10){
+////                            tempo += umMinuto * (tempo % 5);
+////                        }
+//
+//                        Double distanciaMetros = Double.parseDouble(distancia);
+//                        String tempoFormatado = DataHoraUtils.segundosParaHoraFormatado(tempo);
+//                        Double distanciaKm = distanciaMetros/1000;
+//
+//                        long distMetros = (long) distanciaMetros.doubleValue();
+//                        long distKm = (long) distanciaKm.doubleValue();
+//
+//                        // distancia em metros - v2.3
+//                        if(distMetros > 0){
+//                            itinerario.getValue().getItinerario()
+//                                    .setDistanciaMetros(Double.parseDouble(String.valueOf(distMetros)));
+//                        }
+//
+//                        // distancia em km - versoes anteriores
+//                        if(distKm > 0){
+//                            itinerario.getValue().getItinerario()
+//                                    .setDistancia(Double.parseDouble(String.valueOf(distKm)));
+//                        }
+//
+//                        if(tempoFormatado != null){
+//                            itinerario.getValue().getItinerario()
+//                                    .setTempo(DateTimeFormat.forPattern("HH:mm:ss").parseDateTime(tempoFormatado));
+//                        }
+//
+//                        if(!isEdicao){
+//                            editarItinerario();
+//                        }
+//                    } else{
+//                        Toast.makeText(getApplication().getApplicationContext(), "Erro ao buscar distância do itinerário! "+response.message(), Toast.LENGTH_SHORT).show();
+//                    }
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<String> call, Throwable t) {
+//                System.out.println(call.request().body());
+//            }
+//        });
+    }
+
+    public void carregaDirections(MapView map, Itinerario itinerario) {
+
+        new directionsAsyncTask(map, itinerario, appDatabase, getApplication().getApplicationContext()).execute();
+    }
+
+    private static class directionsAsyncTask extends AsyncTask<String, Void, Void> {
+
+        MapView map;
+        Itinerario itinerario;
+        Polyline rota;
+        Context ctx;
+        AppDatabase db;
+
+        directionsAsyncTask(MapView map, Itinerario itinerario, AppDatabase db, Context ctx) {
+            this.map = map;
+            this.itinerario = itinerario;
+            this.ctx = ctx;
+            this.db = db;
+        }
+
+        @Override
+        protected Void doInBackground(final String... params) {
+            List<Parada> paradas = db.paradaItinerarioDAO().listarParadasAtivasPorItinerarioERuaSync(itinerario.getId());
+
+            ArrayList<String> points = new ArrayList<>();
+
+            for(Parada p : paradas){
+                points.add(p.getLongitude()+","+p.getLatitude());
+            }
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl("http://router.project-osrm.org/")
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .build();
+            CircularAPI api = retrofit.create(CircularAPI.class);
+            Call<String> call = api.carregaCaminhoItinerario(StringUtils.join(points, ";"));
+
+            call.enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    try {
+
+                        if(response.body() != null && response.code() == 200){
+                            JSONObject obj = new JSONObject(response.body().toString());
+                            JSONArray routes = obj.getJSONArray("routes");
+                            String objDados = routes.getJSONObject(0).getString("geometry");
+
+                            List<GeoPoint> pontos = PolylineEncoder.decode(objDados, 10, false);
+
+                            Polyline line = new Polyline();
+                            line.setPoints(pontos);
+                            line.getOutlinePaint().setStrokeWidth(20);
+                            line.getOutlinePaint().setColor(Color.RED);
+
+                            line.getOutlinePaint().setStrokeJoin(Paint.Join.ROUND);
+                            line.getOutlinePaint().setStrokeCap(Paint.Cap.ROUND);
+
+                            if(map != null){
+                                map.getOverlayManager().add(line);
+                                map.invalidate();
+                            }
+
+                            System.out.printf(objDados);
+
+//                            if(!isEdicao){
+//                                editarItinerario();
+//                            }
+                        } else{
+                            Toast.makeText(ctx.getApplicationContext(), "Erro ao buscar o caminho do itinerário! "+response.message(), Toast.LENGTH_SHORT).show();
+                        }
+
+
+
+                        //System.out.println(obj);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+
+                }
+            });
+
+            //PolylineEncoder.decode("", 3, false);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+//            if(map != null){
+//                map.getOverlays().add(rota);
+//                map.invalidate();
+//            }
+
+        }
+    }
+
+    public void atualizaTrajetoItinerarios(final String itinerario){
+
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+
+                    ItinerarioPartidaDestino iti = appDatabase.itinerarioDAO().carregarSync(itinerario);
+
+                    if(iti != null){
+                        Itinerario i = iti.getItinerario();
+
+                        List<Parada> paradas = appDatabase.paradaItinerarioDAO()
+                                .listarParadasAtivasPorItinerarioERuaSync(i.getId());
+
+                        if (paradas != null) {
+
+                            ArrayList<String> points = new ArrayList<>();
+
+                            for(Parada p : paradas){
+                                points.add(p.getLongitude()+","+p.getLatitude());
+                            }
+
+                            buscaTrajeto(i, points);
+
+                        }
+
+                    }
+
+                }
+            });
+
+    }
+
+    private void buscaTrajeto(final Itinerario iti, ArrayList<String> points) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://router.project-osrm.org/")
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .build();
         CircularAPI api = retrofit.create(CircularAPI.class);
-        Call<String> call = api.carregaDistancia(paradas.get(0).getLongitude()
-                +","+paradas.get(0).getLatitude(),paradas.get(paradas.size()-1).getLongitude()
-                +","+paradas.get(paradas.size()-1).getLatitude());
+        Call<String> call = api.carregaCaminhoItinerario(StringUtils.join(points, ";"));
 
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-
                 try {
 
-                    if(response.body() != null){
+                    if(response.body() != null && response.code() == 200){
                         JSONObject obj = new JSONObject(response.body().toString());
                         JSONArray routes = obj.getJSONArray("routes");
-                        JSONObject objDados = routes.getJSONObject(0);
+                        String polyline = routes.getJSONObject(0).getString("geometry");
 
-                        String distancia = objDados.getString("distance");
-                        int tempo = objDados.getInt("duration");
-
-                        if(tempo > umMinuto && tempo <= umMinuto * 10){
-                            //tempo += 60;
-                        } else if(tempo > umMinuto * 10){
-                            tempo += umMinuto * (tempo % 5);
+                        if(polyline != null && !polyline.isEmpty()){
+                            iti.setTrajeto(polyline);
+                        } else{
+                            iti.setTrajeto(null);
                         }
 
-                        Double distanciaMetros = Double.parseDouble(distancia);
-                        String tempoFormatado = DataHoraUtils.segundosParaHoraFormatado(tempo);
-                        Double distanciaKm = distanciaMetros/1000;
+                        edit(iti);
 
-                        long distMetros = (long) distanciaMetros.doubleValue();
-                        long distKm = (long) distanciaKm.doubleValue();
-
-                        // distancia em metros - v2.3
-                        if(distMetros > 0){
-                            itinerario.getValue().getItinerario()
-                                    .setDistanciaMetros(Double.parseDouble(String.valueOf(distMetros)));
-                        }
-
-                        // distancia em km - versoes anteriores
-                        if(distKm > 0){
-                            itinerario.getValue().getItinerario()
-                                    .setDistancia(Double.parseDouble(String.valueOf(distKm)));
-                        }
-
-                        if(tempoFormatado != null){
-                            itinerario.getValue().getItinerario()
-                                    .setTempo(DateTimeFormat.forPattern("HH:mm:ss").parseDateTime(tempoFormatado));
-                        }
-
-                        if(!isEdicao){
-                            editarItinerario();
-                        }
+//                            if(!isEdicao){
+//                                editarItinerario();
+//                            }
                     } else{
-                        Toast.makeText(getApplication().getApplicationContext(), "Erro ao buscar distância do itinerário! "+response.message(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplication().getApplicationContext(), "Erro ao buscar o caminho do itinerário! "+response.message(), Toast.LENGTH_SHORT).show();
                     }
 
 
@@ -534,55 +806,9 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                System.out.println(call.request().body());
+
             }
         });
     }
-
-    public void carregaDirections(MapView map, List<ParadaBairro> paradas) {
-
-        new directionsAsyncTask(map, paradas, getApplication().getApplicationContext()).execute();
-    }
-
-    private static class directionsAsyncTask extends AsyncTask<String, Void, Void> {
-
-        MapView map;
-        List<ParadaBairro> paradas;
-        Polyline rota;
-        Context ctx;
-
-        directionsAsyncTask(MapView map, List<ParadaBairro> paradas, Context ctx) {
-            this.map = map;
-            this.paradas = paradas;
-            this.ctx = ctx;
-        }
-
-        @Override
-        protected Void doInBackground(final String... params) {
-            RoadManager roadManager = new OSRMRoadManager(ctx);
-
-            ArrayList<GeoPoint> points = new ArrayList<>();
-            points.add(new GeoPoint(paradas.get(0).getParada().getLatitude(), paradas.get(0).getParada().getLongitude()));
-            points.add(new GeoPoint(paradas.get(paradas.size()-1).getParada().getLatitude(), paradas.get(paradas.size()-1).getParada().getLongitude()));
-
-            Road road = roadManager.getRoad(points);
-            rota = RoadManager.buildRoadOverlay(road);
-
-            KmlDocument kml = new KmlDocument();
-            kml.mKmlRoot.addOverlay(rota, kml);
-            File localFile = kml.getDefaultPathForAndroid("kml_teste.kml");
-            kml.saveAsKML(localFile);
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            map.getOverlays().add(rota);
-            map.invalidate();
-        }
-    }
-
 
 }

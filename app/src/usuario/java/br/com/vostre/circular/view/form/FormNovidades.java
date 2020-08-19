@@ -1,11 +1,11 @@
 package br.com.vostre.circular.view.form;
 
 import android.app.Dialog;
-import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.view.ViewPager;
+import androidx.annotation.Nullable;
+import androidx.viewpager.widget.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +14,6 @@ import android.widget.Toast;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.databinding.FormMensagemBinding;
 import br.com.vostre.circular.databinding.FormNovidadesBinding;
 import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.utils.PreferenceUtils;

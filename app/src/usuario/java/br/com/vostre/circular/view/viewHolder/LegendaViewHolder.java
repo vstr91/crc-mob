@@ -1,13 +1,12 @@
 package br.com.vostre.circular.view.viewHolder;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.databinding.LinhaBairrosBinding;
 import br.com.vostre.circular.databinding.LinhaLegendaBinding;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.Legenda;

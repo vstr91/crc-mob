@@ -1,16 +1,21 @@
 package br.com.vostre.circular.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.BindingAdapter;
-import android.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
+
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
+
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -30,8 +35,8 @@ import java.util.List;
 
 import br.com.vostre.circleview.CircleView;
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.databinding.ActivityItinerariosBinding;
 import br.com.vostre.circular.databinding.ActivityParadasBinding;
+import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.CidadeEstado;
@@ -41,6 +46,7 @@ import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.DestaqueUtils;
 import br.com.vostre.circular.view.adapter.CidadeAdapter;
 import br.com.vostre.circular.view.adapter.ParadaAdapter;
+import br.com.vostre.circular.view.adapter.ParadaCollapseAdapter;
 import br.com.vostre.circular.view.form.FormBairro;
 import br.com.vostre.circular.view.listener.ItemListener;
 import br.com.vostre.circular.view.listener.SelectListener;
@@ -54,8 +60,8 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
     RecyclerView listCidades;
     CidadeAdapter adapter;
 
-    RecyclerView listParadas;
-    ParadaAdapter adapterParadas;
+    ExpandableListView listParadas;
+    ParadaCollapseAdapter adapterParadas;
 
     static AppCompatActivity ctx;
 
@@ -77,7 +83,7 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
 
         viewModel = ViewModelProviders.of(this).get(ParadasViewModel.class);
         viewModel.cidades.observe(this, cidadesObserver);
-        viewModel.paradas.observe(this, paradasObserver);
+        viewModel.bairros.observe(this, bairrosObserver);
         viewModel.cidade.observe(this, cidadeObserver);
 
         binding.setViewModel(viewModel);
@@ -89,9 +95,11 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
         listCidades.setAdapter(adapter);
 
         listParadas = binding.listParadas;
-        adapterParadas = new ParadaAdapter(viewModel.paradas.getValue(), this);
+        adapterParadas = new ParadaCollapseAdapter(viewModel.bairros.getValue(), this);
 
         listParadas.setAdapter(adapterParadas);
+
+        binding.textViewDica.setVisibility(View.GONE);
     }
 
     @Override
@@ -102,6 +110,18 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
     @Override
     protected void onPause() {
         super.onPause();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        boolean retorno = super.onCreateOptionsMenu(menu);
+
+        if(menu != null){
+            menu.getItem(1).setVisible(false);
+        }
+
+        return retorno;
     }
 
     @BindingAdapter("app:imagem")
@@ -141,6 +161,7 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
         binding.cardViewCidade.setVisibility(View.GONE);
         binding.listParadas.setVisibility(View.GONE);
         binding.cardViewListCidade.setVisibility(View.VISIBLE);
+        binding.textViewDica.setVisibility(View.GONE);
     }
 
     Observer<List<CidadeEstado>> cidadesObserver = new Observer<List<CidadeEstado>>() {
@@ -189,19 +210,18 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
         }
     };
 
-    Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {
+    Observer<List<BairroCidade>> bairrosObserver = new Observer<List<BairroCidade>>() {
         @Override
-        public void onChanged(List<ParadaBairro> paradas) {
+        public void onChanged(List<BairroCidade> bairros) {
 
-            if(paradas != null){
-                adapterParadas.paradas = paradas;
+            if(bairros != null){
+                adapterParadas.bairros = bairros;
                 adapterParadas.bairroAtual = "";
-                adapterParadas.notifyDataSetChanged();
-                binding.listParadas.scheduleLayoutAnimation();
-                binding.listParadas.setVisibility(View.VISIBLE);
+
+                carregarLista(bairros);
 
                 if(bundle != null){
-                    bundle.putInt("qtd_paradas", paradas.size());
+                    //bundle.putInt("qtd_paradas", bairros.size());
 
                     mFirebaseAnalytics.logEvent("paradas_consultadas", bundle);
                 }
@@ -215,7 +235,7 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
     public String onSelected(String id) {
         viewModel.setCidade(id);
         viewModel.cidade.observe(this, cidadeObserver);
-        viewModel.paradas.observe(this, paradasObserver);
+        viewModel.bairros.observe(this, bairrosObserver);
 
         return id;
     }
@@ -232,11 +252,65 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
         public void onTargetClick(TapTargetView view) {
             super.onTargetClick(view);
 
-            binding.listParadas.findViewHolderForAdapterPosition(1).itemView.findViewById(R.id.circleView2).performClick();
+//            binding.listParadas.getExpandableListAdapter().getChildView(0, 1).findViewHolderForAdapterPosition(1).itemView.findViewById(R.id.circleView2).performClick();
 
             exibindoTour = false;
         }
     };
+
+    private void carregarLista(final List<BairroCidade> bairros) {
+
+        if(bairros != null){
+            final List<String> titulos = new ArrayList<>();
+
+            for(BairroCidade b : bairros){
+                titulos.add(b.getBairro().getNome());
+            }
+
+            adapterParadas = new ParadaCollapseAdapter(bairros,this);
+
+            listParadas.setAdapter(adapterParadas);
+
+            listParadas.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+
+                @Override
+                public void onGroupExpand(int groupPosition) {
+//                    Toast.makeText(getApplicationContext(),
+//                            titulos.get(groupPosition) + " List Expanded.",
+//                            Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            listParadas.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
+
+                @Override
+                public void onGroupCollapse(int groupPosition) {
+//                    Toast.makeText(getApplicationContext(),
+//                            titulos.get(groupPosition) + " List Collapsed.",
+//                            Toast.LENGTH_SHORT).show();
+
+                }
+            });
+
+            listParadas.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+                @Override
+                public boolean onChildClick(ExpandableListView parent, View v,
+                                            int groupPosition, int childPosition, long id) {
+                    Intent i = new Intent(ctx, DetalheParadaActivity.class);
+                    i.putExtra("parada", bairros.get(groupPosition).getParadas().get(childPosition).getParada().getId());
+                    ctx.startActivity(i);
+                    return false;
+                }
+            });
+
+        }
+
+        adapterParadas.notifyDataSetChanged();
+        binding.listParadas.scheduleLayoutAnimation();
+        binding.listParadas.setVisibility(View.VISIBLE);
+        binding.textViewDica.setVisibility(View.VISIBLE);
+
+    }
 
     @Override
     public List<TapTarget> criaTour() {
@@ -253,13 +327,13 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
                             @Override
                             public void run() {
 
-                                DestaqueUtils.geraDestaqueUnico(ctx, binding.listParadas.findViewHolderForAdapterPosition(1).itemView.findViewById(R.id.circleView2),
-                                        "Escolha a parada", "Escolha então a parada e veja os detalhes, como próximas saídas e localização no mapa!", l2, false, true);
+//                                DestaqueUtils.geraDestaqueUnico(ctx, binding.listParadas.findViewHolderForAdapterPosition(1).itemView.findViewById(R.id.circleView2),
+//                                        "Escolha a parada", "Escolha então a parada e veja os detalhes, como próximas saídas e localização no mapa!", l2, false, true);
                             }
                         }, 300);
 
                     }
-                }, false, true);
+                }, true, true);
 
         List<TapTarget> targets = new ArrayList<>();
 

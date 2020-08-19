@@ -1,20 +1,17 @@
 package br.com.vostre.circular.view;
 
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.Rect;
-import android.hardware.Camera;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.View;
 import android.widget.Toast;
 
@@ -25,38 +22,20 @@ import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
-import com.google.firebase.ml.vision.text.RecognizedLanguage;
-
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.ParseException;
-import java.time.DateTimeException;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.databinding.ActivityCameraBinding;
 import br.com.vostre.circular.databinding.ActivityCameraResultadoBinding;
-import br.com.vostre.circular.model.HorarioItinerario;
 import br.com.vostre.circular.model.pojo.ocr.Bloco;
-import br.com.vostre.circular.utils.CameraPreview;
 import br.com.vostre.circular.utils.GraphicOverlay;
-import br.com.vostre.circular.utils.ImageUtils;
 import br.com.vostre.circular.utils.TextGraphic;
 
 public class CameraResultadoActivity extends BaseActivity {

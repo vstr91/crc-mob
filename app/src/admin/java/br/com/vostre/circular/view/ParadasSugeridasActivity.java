@@ -2,30 +2,26 @@ package br.com.vostre.circular.view;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
-import android.databinding.BindingAdapter;
-import android.databinding.DataBindingUtil;
+
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TabHost;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationRequest;
@@ -41,36 +37,28 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.List;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.databinding.ActivityParadasBinding;
 import br.com.vostre.circular.databinding.ActivityParadasSugeridasBinding;
 import br.com.vostre.circular.listener.ParadaSugestaoListener;
 import br.com.vostre.circular.listener.PontoInteresseSugestaoListener;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaSugestao;
-import br.com.vostre.circular.model.PontoInteresse;
 import br.com.vostre.circular.model.PontoInteresseSugestao;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaSugestaoBairro;
 import br.com.vostre.circular.model.pojo.PontoInteresseSugestaoBairro;
-import br.com.vostre.circular.utils.DialogUtils;
 import br.com.vostre.circular.utils.DrawableUtils;
 import br.com.vostre.circular.view.adapter.ParadaSugestaoAdapter;
 import br.com.vostre.circular.view.adapter.PontoInteresseSugestaoAdapter;
-import br.com.vostre.circular.view.form.FormParada;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.view.utils.InfoWindowSugestao;
 import br.com.vostre.circular.view.utils.InfoWindowSugestaoPoi;
 import br.com.vostre.circular.viewModel.ParadasSugeridasViewModel;
-import br.com.vostre.circular.viewModel.ParadasViewModel;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 

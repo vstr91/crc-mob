@@ -12,7 +12,7 @@ public class Constants {
     // The account name
     public static final String ACCOUNT = "dummyaccount";
 
-    public static String BASE_URL_DEBUG = "http://172.16.0.189/crc-web/web/";
+    public static String BASE_URL_DEBUG = "http://192.168.0.105/crc-web/web/";
 
     public static final int ID_NOTIFICACAO_MSG = 2;
 }

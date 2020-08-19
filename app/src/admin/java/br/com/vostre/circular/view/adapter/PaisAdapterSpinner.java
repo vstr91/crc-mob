@@ -1,13 +1,12 @@
 package br.com.vostre.circular.view.adapter;
 
 import android.app.Application;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.SpinnerAdapter;
 
 import java.util.List;
 

@@ -1,19 +1,15 @@
 package br.com.vostre.circular.view.adapter;
 
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import java.util.List;
 
 import br.com.vostre.circular.databinding.LinhaAcessosBinding;
-import br.com.vostre.circular.databinding.LinhaPaisesBinding;
-import br.com.vostre.circular.model.Acesso;
-import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.pojo.AcessoTotal;
 import br.com.vostre.circular.view.viewHolder.AcessoViewHolder;
-import br.com.vostre.circular.view.viewHolder.PaisViewHolder;
 
 public class AcessoAdapter extends RecyclerView.Adapter<AcessoViewHolder> {
 

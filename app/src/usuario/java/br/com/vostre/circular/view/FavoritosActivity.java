@@ -1,10 +1,10 @@
 package br.com.vostre.circular.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.Menu;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -18,7 +18,6 @@ import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityFavoritosBinding;
-import br.com.vostre.circular.databinding.ActivityMensagensBinding;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
@@ -99,6 +98,7 @@ public class FavoritosActivity extends BaseActivity {
 
         if(menu != null){
             menu.getItem(0).setVisible(false);
+            menu.getItem(1).setVisible(false);
         }
 
         return retorno;

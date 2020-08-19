@@ -15,7 +15,7 @@
             type="String" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/transparente">
@@ -34,7 +34,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:id="@+id/cardViewResultado"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -49,94 +49,77 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <TextView
-                    android:id="@+id/textView6"
+                <ImageButton
+                    android:id="@+id/btnObsAnterior"
+                    style="@style/botao_transparente"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:scaleType="centerInside"
+                    app:layout_constraintBottom_toBottomOf="@+id/textViewHorarioAnterior"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/textViewHorarioAnterior"
+                    app:srcCompat="@drawable/ic_info_outline_blue_24dp" />
+
+                <ImageButton
+                    android:id="@+id/btnObsSeguinte"
+                    style="@style/botao_transparente"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:scaleType="centerInside"
+                    app:layout_constraintBottom_toBottomOf="@+id/textViewHorarioSeguinte"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/textViewHorarioSeguinte"
+                    app:srcCompat="@drawable/ic_info_outline_blue_24dp" />
+
+                <ImageView
+                    android:id="@+id/imageView4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="45dp"
-                    android:text="Partida"
-                    android:textAppearance="@style/texto_azul"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="16dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toBottomOf="@+id/textViewCidadeDestinoResultado"
+                    app:srcCompat="@drawable/ic_directions_bus_blue_24dp" />
 
-                <TextView
-                    android:id="@+id/textView9"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginStart="8dp"
-                    android:text="Destino"
-                    android:textAppearance="@style/texto_azul"
-                    app:layout_constraintBottom_toTopOf="@+id/textViewBairroPartidaResultado"
-                    app:layout_constraintStart_toStartOf="@+id/guideline3" />
-
-                <TextView
-                    android:id="@+id/textViewBairroPartidaResultado"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginStart="16dp"
-                    android:text="@{itinerario.nomeBairroPartida}"
-                    android:textColor="@color/cinzaEscuro"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView6"
-                    tools:text="Bairro Partida" />
-
-                <TextView
-                    android:id="@+id/textViewBairroDestinoResultado"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginStart="8dp"
-                    android:text="@{itinerario.nomeBairroDestino}"
-                    android:textColor="@color/cinzaEscuro"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="@+id/guideline3"
-                    app:layout_constraintTop_toBottomOf="@+id/textView9"
-                    tools:text="Bairro Destino" />
-
-                <TextView
-                    android:id="@+id/textViewCidadePartidaResultado"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginStart="16dp"
-                    android:text="@{itinerario.nomeCidadePartida}"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewBairroPartidaResultado"
-                    tools:text="Cidade Partida" />
-
-                <TextView
-                    android:id="@+id/textViewCidadeDestinoResultado"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginStart="8dp"
-                    android:text="@{itinerario.nomeCidadeDestino}"
-                    app:layout_constraintStart_toStartOf="@+id/guideline3"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewBairroDestinoResultado"
-                    tools:text="Cidade Destino" />
+                <ImageView
+                    android:id="@+id/imageView8"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="16dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/linearLayout3"
+                    app:layout_constraintEnd_toStartOf="@+id/linearLayout3"
+                    app:layout_constraintTop_toTopOf="@+id/linearLayout3"
+                    app:srcCompat="@drawable/ic_accessible_blue_24dp" />
 
                 <LinearLayout
                     android:id="@+id/linearLayoutHora"
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
+                    android:layout_marginStart="8dp"
                     android:background="@drawable/dia_rounded_corner_azul"
                     android:orientation="vertical"
                     android:paddingBottom="5dp"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/textViewHora"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@{hora}"
+                        android:textAppearance="@style/texto_branco"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        tools:text="10:00" />
 
                     <TextView
                         android:id="@+id/textViewDia"
@@ -152,17 +135,6 @@
                         android:textStyle="bold"
                         tools:text="Sexta-feira" />
 
-                    <TextView
-                        android:id="@+id/textViewHora"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="@{hora}"
-                        android:textAppearance="@style/texto_branco"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        tools:text="10:00" />
-
                     <ImageView
                         android:id="@+id/imageView19"
                         android:layout_width="70dp"
@@ -174,222 +146,16 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/linearLayoutOrdem"
-                    android:layout_width="100dp"
-                    android:layout_height="0dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginStart="16dp"
-                    android:background="@drawable/dia_rounded_corner_azul"
-                    android:orientation="vertical"
-                    app:layout_constraintBottom_toBottomOf="@+id/linearLayoutHora"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <TextView
-                        android:id="@+id/textViewOrdem"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:text="1"
-                        android:textAppearance="@style/texto_branco"
-                        android:textStyle="bold"
-                        tools:text="1" />
-                </LinearLayout>
-
-                <android.support.constraint.Guideline
-                    android:id="@+id/guideline3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintGuide_begin="176dp" />
-
-                <ImageView
-                    android:id="@+id/imageView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginTop="8dp"
-                    app:srcCompat="@drawable/ic_place_blue_24dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewCidadePartidaResultado" />
-
-                <LinearLayout
-                    android:id="@+id/linearLayout"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintBottom_toBottomOf="@+id/imageView"
-                    app:layout_constraintEnd_toStartOf="@+id/guideline3"
-                    app:layout_constraintStart_toEndOf="@+id/imageView"
-                    app:layout_constraintTop_toTopOf="@+id/imageView">
-
-                    <TextView
-                        android:id="@+id/textViewParada"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginRight="0dp"
-                        android:layout_marginBottom="0dp"
-                        android:ellipsize="none"
-                        android:maxLines="2"
-                        android:text="@{itinerario.nomePartida}"
-                        android:textColor="@color/cinzaEscuro"
-                        android:textSize="11sp"
-                        tools:text="Parada Saída Que pode ter mais de uma linha" />
-
-                    <ImageView
-                        android:id="@+id/imageView18"
-                        android:layout_width="match_parent"
-                        android:layout_height="5dp"
-                        android:layerType="software"
-                        android:paddingRight="8dp"
-                        android:src="@drawable/dashed" />
-
-                </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/imageView4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    app:srcCompat="@drawable/ic_directions_bus_blue_24dp"
-                    app:layout_constraintStart_toStartOf="@+id/guideline3"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewCidadeDestinoResultado" />
-
-                <TextView
-                    android:id="@+id/textView11"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:ellipsize="none"
-                    android:maxLines="2"
-                    android:text="@{itinerario.nomeEmpresa}"
-                    android:textColor="@color/cinzaEscuro"
-                    android:textSize="11sp"
-                    app:layout_constraintBottom_toBottomOf="@+id/imageView4"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/imageView4"
-                    app:layout_constraintTop_toTopOf="@+id/imageView4"
-                    tools:text="Empresa Responsável pela linha de transporte público" />
-
-                <ImageView
-                    android:id="@+id/imageView5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginLeft="16dp"
-                    app:srcCompat="@drawable/ic_attach_money_blue_24dp"
-                    app:layout_constraintEnd_toStartOf="@+id/imageView6"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
-
-                <ImageView
-                    android:id="@+id/imageView6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginLeft="16dp"
-                    app:srcCompat="@drawable/ic_access_time_blue_24dp"
-                    app:layout_constraintEnd_toStartOf="@+id/guideline3"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/imageView5"
-                    app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
-
-                <ImageView
-                    android:id="@+id/imageView7"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
-                    app:srcCompat="@drawable/ic_directions_blue_24dp"
-                    app:layout_constraintEnd_toStartOf="@+id/imageView8"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/guideline3"
-                    app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
-
-                <ImageView
-                    android:id="@+id/imageView8"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
-                    app:srcCompat="@drawable/ic_accessible_blue_24dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/imageView7"
-                    app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
-
-                <TextView
-                    android:id="@+id/textViewTarifa"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/cinzaEscuro"
-                    android:textSize="12sp"
-                    app:layout_constraintEnd_toEndOf="@+id/imageView5"
-                    app:layout_constraintStart_toStartOf="@+id/imageView5"
-                    app:layout_constraintTop_toBottomOf="@+id/imageView5"
-                    app:tarifa="@{itinerario.tarifaTrecho == null ? itinerario.itinerario.tarifa : itinerario.tarifaTrecho}"
-                    tools:text="R$ 0,00" />
-
-                <TextView
-                    android:id="@+id/textViewDuracao"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/cinzaEscuro"
-                    android:textSize="12sp"
-                    app:layout_constraintEnd_toEndOf="@+id/imageView6"
-                    app:layout_constraintStart_toStartOf="@+id/imageView6"
-                    app:layout_constraintTop_toBottomOf="@+id/imageView6"
-                    app:tempo="@{itinerario.tempoTrecho == null ? itinerario.itinerario.tempo : itinerario.tempoTrecho}"
-                    tools:text="00 min." />
-
-                <TextView
-                    android:id="@+id/textViewDistancia"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/cinzaEscuro"
-                    android:textSize="12sp"
-                    app:distancia="@{itinerario.distanciaTrechoMetros == null ? itinerario.itinerario.distanciaMetros : itinerario.distanciaTrechoMetros}"
-                    app:layout_constraintEnd_toEndOf="@+id/imageView7"
-                    app:layout_constraintStart_toStartOf="@+id/imageView7"
-                    app:layout_constraintTop_toBottomOf="@+id/imageView6"
-                    tools:text="0 Km" />
-
-                <LinearLayout
                     android:id="@+id/linearLayout3"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
-                    android:layout_marginStart="90dp"
-                    android:layout_marginLeft="100dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="90dp"
-                    android:layout_marginRight="100dp"
-                    android:layout_marginBottom="-4dp"
-                    android:background="@drawable/horario_rounded_corner_azul_top"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/horario_rounded_corner_azul_left"
                     android:orientation="vertical"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@+id/textViewCidadeDestinoResultado"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewDuracao">
-
-                    <TextView
-                        android:id="@+id/textView13"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="Próximo Horário"
-                        android:textAppearance="@style/texto_branco"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toEndOf="@+id/linearLayout3"
-                        app:layout_constraintStart_toStartOf="@+id/linearLayout3"
-                        app:layout_constraintTop_toTopOf="@+id/linearLayout3" />
+                    app:layout_constraintStart_toEndOf="@id/textView83"
+                    app:layout_constraintTop_toTopOf="@+id/textViewBairroPartidaResultado">
 
                     <TextView
                         android:id="@+id/textViewHorario"
@@ -406,170 +172,356 @@
                         android:id="@+id/textViewObservacao"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
+                        android:layout_margin="2dp"
                         android:ellipsize="none"
+                        android:gravity="center"
                         android:maxLines="2"
                         android:textAppearance="@style/texto_branco"
                         android:textSize="10sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        tools:text="Observação horário" />
 
                     <TextView
                         android:id="@+id/textViewObservacaoItinerario"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
                         android:ellipsize="none"
+                        android:gravity="center"
                         android:maxLines="2"
                         android:text="@{itinerario.itinerario.observacao}"
                         android:textColor="@color/branco"
-                        android:textSize="8sp" />
+                        android:textSize="7sp"
+                        tools:text="Observação Itinerário" />
+
+                    <TextView
+                        android:id="@+id/textViewObervacaoSeguinte"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="0dp"
+                        android:layout_marginLeft="0dp"
+                        android:layout_marginEnd="0dp"
+                        android:layout_marginRight="0dp"
+                        android:ellipsize="none"
+                        android:gravity="center"
+                        android:maxLines="4"
+                        android:textColor="@color/cinzaEscuro"
+                        android:textSize="7sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:text="Observação de horário que pode ser um pouco longa" />
+
+                    <TextView
+                        android:id="@+id/textViewObsItinerarioSeguinte"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="0dp"
+                        android:layout_marginLeft="0dp"
+                        android:layout_marginEnd="0dp"
+                        android:layout_marginRight="0dp"
+                        android:ellipsize="none"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:text="@{itinerario.obsHorarioSeguinte}"
+                        android:textSize="9sp"
+                        android:visibility="gone"
+                        tools:text="Observação de horário que pode ser um pouco longa" />
+
+                    <TextView
+                        android:id="@+id/textViewObervacaoAnterior"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="0dp"
+                        android:layout_marginLeft="0dp"
+                        android:layout_marginEnd="0dp"
+                        android:layout_marginRight="0dp"
+                        android:ellipsize="none"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:textColor="@color/cinzaEscuro"
+                        android:textSize="7sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:text="Observação de horário que pode ser um pouco longa" />
+
+                    <TextView
+                        android:id="@+id/textViewObsItinerarioAnterior"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="0dp"
+                        android:layout_marginLeft="0dp"
+                        android:layout_marginEnd="0dp"
+                        android:layout_marginRight="0dp"
+                        android:ellipsize="none"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:text="@{itinerario.obsHorarioAnterior}"
+                        android:textSize="7sp"
+                        android:visibility="gone"
+                        tools:text="Observação de horário que pode ser um pouco longa" />
+
+                    <TextView
+                        android:id="@+id/textView13"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="2dp"
+                        android:gravity="center"
+                        android:text="Próximo Horário"
+                        android:textAppearance="@style/texto_branco"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="@+id/linearLayout3"
+                        app:layout_constraintStart_toStartOf="@+id/linearLayout3"
+                        app:layout_constraintTop_toTopOf="@+id/linearLayout3" />
 
                     <Button
                         android:id="@+id/btnVerTodos"
-                        style="@style/botao_branco"
-                        android:layout_width="wrap_content"
+                        style="@style/botao_transparente"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:text="Ver Todos" />
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="0dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="4dp"
+                        android:minHeight="12dip"
+                        android:padding="0dp"
+                        android:text="Ver Todos"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
                 </LinearLayout>
 
                 <TextView
-                    android:id="@+id/textView7"
+                    android:id="@+id/textViewBairroPartidaResultado"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="16dp"
-                    android:text="Anterior"
-                    android:textAppearance="@style/texto_azul"
-                    android:textSize="12sp"
-                    app:layout_constraintEnd_toStartOf="@+id/linearLayout3"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewTarifa" />
+                    android:layout_marginTop="8dp"
+                    android:text="@{itinerario.nomeBairroPartida}"
+                    android:textColor="@color/cinzaEscuro"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/imageView5"
+                    app:layout_constraintTop_toBottomOf="@+id/linearLayoutHora"
+                    tools:text="Bairro Partida" />
 
                 <TextView
-                    android:id="@+id/textView8"
+                    android:id="@+id/textViewBairroDestinoResultado"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@{itinerario.nomeBairroDestino}"
+                    android:textColor="@color/cinzaEscuro"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/imageView6"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewCidadePartidaResultado"
+                    tools:text="Bairro Destino" />
+
+                <TextView
+                    android:id="@+id/textViewCidadePartidaResultado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{itinerario.nomeCidadePartida}"
+                    app:layout_constraintStart_toStartOf="@+id/textViewBairroPartidaResultado"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewBairroPartidaResultado"
+                    tools:text="Cidade Partida" />
+
+                <TextView
+                    android:id="@+id/textViewCidadeDestinoResultado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{itinerario.nomeCidadeDestino}"
+                    app:layout_constraintStart_toStartOf="@+id/textViewBairroDestinoResultado"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewBairroDestinoResultado"
+                    tools:text="Cidade Destino" />
+
+                <TextView
+                    android:id="@+id/textView11"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:text="Seguinte"
-                    android:textAppearance="@style/texto_azul"
+                    android:layout_marginBottom="8dp"
+                    android:ellipsize="none"
+                    android:maxLines="2"
+                    android:text="@{itinerario.nomeEmpresa}"
+                    android:textColor="@color/cinzaEscuro"
+                    android:textSize="11sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/imageView4"
+                    app:layout_constraintEnd_toStartOf="@+id/textViewHorarioSeguinte"
+                    app:layout_constraintStart_toEndOf="@+id/imageView4"
+                    app:layout_constraintTop_toTopOf="@+id/imageView4"
+                    tools:text="Empresa Responsável pela linha de transporte público" />
+
+                <TextView
+                    android:id="@+id/textViewTarifa"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/cinzaEscuro"
                     android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="@+id/textView9"
+                    app:layout_constraintStart_toStartOf="@+id/textView9"
+                    app:layout_constraintTop_toBottomOf="@+id/textView9"
+                    app:tarifa="@{itinerario.tarifaTrecho == null ? itinerario.itinerario.tarifa : itinerario.tarifaTrecho}"
+                    tools:text="R$ 00,00" />
+
+                <TextView
+                    android:id="@+id/textViewDuracao"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:textColor="@color/cinzaEscuro"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="@+id/textView79"
+                    app:layout_constraintStart_toStartOf="@+id/textView79"
+                    app:layout_constraintTop_toBottomOf="@+id/textView79"
+                    app:tempo="@{itinerario.tempoTrecho == null ? itinerario.itinerario.tempo : itinerario.tempoTrecho}"
+                    tools:text="00 min." />
+
+                <TextView
+                    android:id="@+id/textViewDistancia"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textColor="@color/cinzaEscuro"
+                    android:textSize="12sp"
+                    android:visibility="gone"
+                    app:distancia="@{itinerario.distanciaTrechoMetros == null ? itinerario.itinerario.distanciaMetros : itinerario.distanciaTrechoMetros}"
+                    app:layout_constraintEnd_toEndOf="@+id/textView83"
+                    app:layout_constraintStart_toStartOf="@+id/textView83"
+                    app:layout_constraintTop_toBottomOf="@+id/textView83"
+                    tools:text="0 Km" />
+
+                <TextView
+                    android:id="@+id/textView7"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Anterior"
+                    android:textAlignment="center"
+                    android:textAppearance="@style/texto_branco"
+                    android:textColor="@color/azul"
+                    android:textSize="8sp"
+                    app:layout_constraintBottom_toTopOf="@+id/textViewHorarioAnterior"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/linearLayout3"
-                    app:layout_constraintTop_toTopOf="@+id/textView7" />
+                    app:layout_constraintStart_toStartOf="@+id/linearLayout3" />
 
                 <TextView
                     android:id="@+id/textViewHorarioAnterior"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
                     android:text="@{itinerario.horarioAnterior}"
+                    android:textAlignment="center"
                     android:textColor="@color/azul"
                     android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
                     app:layout_constraintEnd_toEndOf="@+id/textView7"
-                    app:layout_constraintStart_toStartOf="@+id/textView7"
-                    app:layout_constraintTop_toBottomOf="@+id/textView7"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="@+id/linearLayout3"
                     tools:text="00:00" />
 
                 <TextView
-                    android:id="@+id/textViewHorarioSeguinte"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/textView8"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:text="Seguinte"
+                    android:textAlignment="center"
+                    android:textAppearance="@style/texto_azul"
+                    android:textColor="@color/azul"
+                    android:textSize="8sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/linearLayout3"
+                    app:layout_constraintTop_toBottomOf="@+id/linearLayout3" />
+
+                <TextView
+                    android:id="@+id/textViewHorarioSeguinte"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
                     android:text="@{itinerario.horarioSeguinte}"
+                    android:textAlignment="center"
                     android:textColor="@color/azul"
                     android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="@+id/textView8"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/textView8"
                     app:layout_constraintTop_toBottomOf="@+id/textView8"
                     tools:text="00:00" />
 
                 <TextView
-                    android:id="@+id/textViewObervacaoAnterior"
-                    android:layout_width="0dp"
+                    android:id="@+id/textView9"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:text="Tarifa"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toEndOf="@+id/linearLayoutHora"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/textView79"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="4dp"
+                    android:text="Tempo"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toEndOf="@+id/textView9"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/textView83"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Distância"
+                    android:textSize="12sp"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toEndOf="@+id/textView79"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/imageView5"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:ellipsize="none"
-                    android:gravity="center"
-                    android:maxLines="4"
-                    android:textColor="@color/cinzaEscuro"
-                    android:textSize="9sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/linearLayout3"
+                    app:layout_constraintBottom_toBottomOf="@+id/textViewBairroPartidaResultado"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewHorarioAnterior"
-                    tools:text="Observação de horário que pode ser um pouco longa" />
+                    app:layout_constraintTop_toTopOf="@+id/textViewBairroPartidaResultado"
+                    app:srcCompat="@drawable/bg_rounded_corner_azul" />
 
-                <TextView
-                    android:id="@+id/textViewObervacaoSeguinte"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                <ImageView
+                    android:id="@+id/imageView6"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:ellipsize="none"
-                    android:gravity="center"
-                    android:maxLines="4"
-                    android:textColor="@color/cinzaEscuro"
-                    android:textSize="9sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/linearLayout3"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewHorarioSeguinte"
-                    tools:text="Observação de horário que pode ser um pouco longa" />
-
-                <TextView
-                    android:id="@+id/textViewObsItinerarioAnterior"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:ellipsize="none"
-                    android:gravity="center"
-                    android:maxLines="2"
-                    android:text="@{itinerario.obsHorarioAnterior}"
-                    android:textSize="9sp"
-                    app:layout_constraintEnd_toStartOf="@+id/linearLayout3"
+                    app:layout_constraintBottom_toBottomOf="@+id/textViewBairroDestinoResultado"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewObervacaoAnterior"
-                    tools:text="Observação de horário que pode ser um pouco longa" />
+                    app:layout_constraintTop_toTopOf="@+id/textViewBairroDestinoResultado"
+                    app:srcCompat="@drawable/bg_rounded_corner_ciano" />
 
-                <TextView
-                    android:id="@+id/textViewObsItinerarioSeguinte"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:ellipsize="none"
-                    android:gravity="center"
-                    android:maxLines="2"
-                    android:text="@{itinerario.obsHorarioSeguinte}"
-                    android:textSize="9sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/linearLayout3"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewObervacaoSeguinte"
-                    tools:text="Observação de horário que pode ser um pouco longa" />
+                <ImageView
+                    android:id="@+id/imageView18"
+                    android:layout_width="50dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="1dp"
+                    android:layerType="software"
+                    app:layout_constraintBottom_toTopOf="@+id/imageView6"
+                    app:layout_constraintEnd_toEndOf="@+id/imageView5"
+                    app:layout_constraintStart_toStartOf="@+id/imageView6"
+                    app:layout_constraintTop_toBottomOf="@+id/imageView5"
+                    app:srcCompat="@drawable/dashed_claro_90" />
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

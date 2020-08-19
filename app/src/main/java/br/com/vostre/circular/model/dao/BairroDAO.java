@@ -1,20 +1,18 @@
 package br.com.vostre.circular.model.dao;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
 
 import br.com.vostre.circular.model.Bairro;
-import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.pojo.BairroCidade;
-import br.com.vostre.circular.model.pojo.CidadeEstado;
 
 @Dao
 public interface BairroDAO {
@@ -44,6 +42,11 @@ public interface BairroDAO {
             "ORDER BY b.nome")
     LiveData<List<BairroCidade>> listarTodosAtivosComCidadePorCidade(String cidade);
 
+    @Query("SELECT DISTINCT b.*, c.id AS idCidade, c.nome AS nomeCidade, c.brasao AS brasao, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado FROM bairro b " +
+            "INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado INNER JOIN parada p ON p.bairro = b.id INNER JOIN parada_itinerario pi ON pi.parada = p.id WHERE b.cidade = :cidade " +
+            "ORDER BY b.nome")
+    List<BairroCidade> listarTodosAtivosComCidadePorCidadeSync(String cidade);
+
     @Query("SELECT b.*, c.id AS idCidade, c.nome AS nomeCidade, c.brasao AS brasao, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado FROM bairro b " +
             "INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado WHERE b.cidade = :cidade AND b.id != :bairro")
     LiveData<List<BairroCidade>> listarTodosComCidadePorCidadeFiltro(String cidade, String bairro);
@@ -66,6 +69,9 @@ public interface BairroDAO {
 
     @Query("SELECT * FROM bairro WHERE nome LIKE :nome LIMIT 1")
     Bairro encontrarPorNome(String nome);
+
+    @Query("SELECT * FROM bairro b INNER JOIN cidade c ON c.id = b.cidade WHERE b.nome LIKE :nome AND c.nome LIKE :cidade LIMIT 1")
+    Bairro encontrarPorNomeECidade(String nome, String cidade);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<Bairro> bairros);

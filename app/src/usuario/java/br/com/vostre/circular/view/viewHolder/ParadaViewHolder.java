@@ -3,15 +3,14 @@ package br.com.vostre.circular.view.viewHolder;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
 import java.io.File;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.databinding.LinhaCidadesBinding;
 import br.com.vostre.circular.databinding.LinhaParadasBinding;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.pojo.CidadeEstado;

@@ -12,7 +12,7 @@
             type="br.com.vostre.circular.viewModel.ParadasViewModel" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/gradiente"
@@ -25,27 +25,53 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"></include>
 
-        <android.support.v7.widget.CardView
+        <Button
+            android:id="@+id/btnImportar"
+            style="@style/botao_principal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:onClick="onBtnImportarClick"
+            android:text="Importar do Arquivo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+        <Button
+            android:id="@+id/btnBuscarRua"
+            style="@style/botao_principal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:onClick="onBtnRuasClick"
+            android:text="Atualizar Ruas"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+        <androidx.cardview.widget.CardView
             android:id="@+id/cardview"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="64dp"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             app:cardCornerRadius="10dp"
             app:layout_constraintBottom_toTopOf="@+id/listParadas"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/btnImportar">
 
             <org.osmdroid.views.MapView
                 android:id="@+id/map"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:center="@{viewModel.centroMapa}" />
+                app:center="@{viewModel.centroMapa}">
 
-        </android.support.v7.widget.CardView>
+            </org.osmdroid.views.MapView>
 
-        <android.support.design.widget.FloatingActionButton
+        </androidx.cardview.widget.CardView>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/floatingActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -59,22 +85,21 @@
             app:layout_constraintBottom_toBottomOf="@id/cardview"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/floatingActionButton2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="24dp"
-            android:layout_marginRight="24dp"
-            android:layout_marginTop="32dp"
             android:onClick="@{view::onFabSugestaoClick}"
             android:src="@drawable/ic_add_location_blue_24dp"
             android:tint="@color/branco"
             app:backgroundTint="@color/azul"
             app:fabSize="normal"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+            app:layout_constraintTop_toTopOf="@+id/cardview" />
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -91,7 +116,7 @@
             app:layout_constraintEnd_toEndOf="@+id/floatingActionButton"
             app:layout_constraintStart_toStartOf="@+id/floatingActionButton" />
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/listParadas"
             android:layout_width="0dp"
             android:layout_height="200dp"
@@ -99,14 +124,14 @@
             android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
             android:minHeight="200dp"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             tools:listitem="@layout/linha_paradas">
 
-        </android.support.v7.widget.RecyclerView>
+        </androidx.recyclerview.widget.RecyclerView>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

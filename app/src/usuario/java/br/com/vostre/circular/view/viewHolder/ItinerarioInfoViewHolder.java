@@ -1,8 +1,8 @@
 package br.com.vostre.circular.view.viewHolder;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
 import org.joda.time.format.DateTimeFormat;
@@ -37,7 +37,14 @@ public class ItinerarioInfoViewHolder extends RecyclerView.ViewHolder {
         nfDinheiro.setMaximumFractionDigits(2);
 
         binding.textViewTarifa.setText(nfDinheiro.format(itinerario.getItinerario().getTarifa()));
-        binding.textViewDistancia.setText(nf.format(itinerario.getItinerario().getDistanciaMetros()/1000)+" Km");
+
+        if(itinerario.getItinerario().getDistanciaMetros() != null){
+            binding.textViewDistancia.setText(nf.format(itinerario.getItinerario().getDistanciaMetros()/1000)+" Km");
+        } else{
+            binding.textViewDistancia.setText(nf.format(itinerario.getItinerario().getDistancia())+" Km");
+        }
+
+
         binding.textViewTempo.setText(DateTimeFormat.forPattern("HH:mm").print(itinerario.getItinerario().getTempo()));
 
         if(cor != -1){
@@ -76,6 +83,26 @@ public class ItinerarioInfoViewHolder extends RecyclerView.ViewHolder {
 //
 //        binding.cardView2.setOnClickListener(listener);
 //        binding.textViewNome.setOnClickListener(listener);
+
+        // ALIAS ITINERARIO
+
+        if(itinerario.getItinerario().getAliasBairroPartida() != null && !itinerario.getItinerario().getAliasBairroPartida().isEmpty()){
+            itinerario.setNomeBairroPartida(itinerario.getItinerario().getAliasBairroPartida());
+        }
+
+        if(itinerario.getItinerario().getAliasCidadePartida() != null && !itinerario.getItinerario().getAliasCidadePartida().isEmpty()){
+            itinerario.setNomeCidadePartida(itinerario.getItinerario().getAliasCidadePartida());
+        }
+
+        if(itinerario.getItinerario().getAliasBairroDestino() != null && !itinerario.getItinerario().getAliasBairroDestino().isEmpty()){
+            itinerario.setNomeBairroDestino(itinerario.getItinerario().getAliasBairroDestino());
+        }
+
+        if(itinerario.getItinerario().getAliasCidadeDestino() != null && !itinerario.getItinerario().getAliasCidadeDestino().isEmpty()){
+            itinerario.setNomeCidadeDestino(itinerario.getItinerario().getAliasCidadeDestino());
+        }
+
+        // FIM ALIAS
 
         binding.executePendingBindings();
     }

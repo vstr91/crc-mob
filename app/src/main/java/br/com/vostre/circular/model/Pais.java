@@ -1,18 +1,8 @@
 package br.com.vostre.circular.model;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Index;
-import android.support.annotation.NonNull;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import org.joda.time.DateTime;
-
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.List;
-
-import br.com.vostre.circular.utils.JsonUtils;
+import androidx.room.Entity;
+import androidx.room.Index;
+import androidx.annotation.NonNull;
 
 @Entity(indices = {@Index(value = {"nome"},
         unique = true)})

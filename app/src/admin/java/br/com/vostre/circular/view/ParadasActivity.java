@@ -2,72 +2,67 @@ package br.com.vostre.circular.view;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
-import android.databinding.BindingAdapter;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.net.Uri;
+import android.os.AsyncTask;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
-import android.view.MotionEvent;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Toast;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.events.MapEventsReceiver;
-import org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants;
 import org.osmdroid.tileprovider.tilesource.MapBoxTileSource;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
-import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityParadasBinding;
 import br.com.vostre.circular.listener.ParadaListener;
 import br.com.vostre.circular.model.Parada;
-import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.model.pojo.ParadaBairroImport;
 import br.com.vostre.circular.utils.DialogUtils;
 import br.com.vostre.circular.utils.DrawableUtils;
 import br.com.vostre.circular.view.adapter.ParadaAdapter;
-import br.com.vostre.circular.view.adapter.ParametroAdapter;
 import br.com.vostre.circular.view.form.FormParada;
 import br.com.vostre.circular.view.utils.InfoWindow;
 import br.com.vostre.circular.viewModel.ParadasViewModel;
@@ -93,6 +88,9 @@ public class ParadasActivity extends BaseActivity implements ParadaListener {
     RecyclerView listParadas;
     List<ParadaBairro> paradas;
     ParadaAdapter adapter;
+
+    List<ParadaBairroImport> paradasImport;
+    Integer contParadaRepetida = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,10 +180,97 @@ public class ParadasActivity extends BaseActivity implements ParadaListener {
 
             overlayEvents = new MapEventsOverlay(getBaseContext(), receiver);
 
+            paradasImport = new ArrayList<>();
+
         }
 
 
 
+    }
+
+    public void processaParadasPorLote(final String arquivo, final List<ParadaBairroImport> paradas,
+                                       List<ParadaBairro> paradasCadastradas) {
+        try {
+
+            BufferedReader r = new BufferedReader(
+                    new InputStreamReader(getBaseContext().getAssets().open(arquivo)));
+            StringBuilder dados = new StringBuilder();
+            String[] line = new String[1];
+
+            while ((line[0] = r.readLine()) != null) {
+
+                String[] a = line[0].split("\t");
+
+                String latitude = a[1].substring(0, 3).concat(".").concat(a[1].substring(3, 9));
+                String longitude = a[2].substring(0, 3).concat(".").concat(a[2].substring(3, 9));
+
+                ParadaBairroImport pbi = new ParadaBairroImport();
+                Parada parada = new Parada();
+
+                parada.setLatitude(Double.parseDouble(latitude));
+                parada.setLongitude(Double.parseDouble(longitude));
+                parada.setSentido(1); // sentido bairro
+                parada.setImagemEnviada(true);
+                parada.setAtivo(true);
+                parada.setNome(a[0]+"-"+arquivo);
+
+                pbi.setParada(parada);
+
+                int index = paradas.indexOf(pbi);
+
+                if(index > -1){
+                    contParadaRepetida++;
+                    System.out.println("PARADA JÁ EXISTE!!! "+contParadaRepetida+" - "+parada.getNome()
+                            +" | "+paradas.get(index).getParada().getNome());
+                } else{
+                    paradas.add(pbi);
+                }
+
+            }
+
+//            Toast.makeText(ctx, "Finalizou!", Toast.LENGTH_SHORT).show();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void filtraParadasProximas(List<ParadaBairroImport> paradas, List<ParadaBairro> paradasCadastradas) {
+
+        List<ParadaBairroImport> pbiRemover = new ArrayList<>();
+
+        for(ParadaBairroImport pbi2 : paradas){
+
+            GeoPoint g2 = new GeoPoint(pbi2.getParada().getLatitude(), pbi2.getParada().getLongitude());
+
+            for(ParadaBairro p : paradasCadastradas){
+                GeoPoint g1 = new GeoPoint(p.getParada().getLatitude(), p.getParada().getLongitude());
+
+                System.out.println("DISTANCIA: "+g2.distanceToAsDouble(g1)+" - "
+                        +pbi2.getParada().getNome()+" | "+p.getParada().getNome());
+
+                if(g2.distanceToAsDouble(g1) < 20 /*&& (p.getParada().getSentido() == pbi2.getParada().getSentido())*/){
+                    System.out.println("PARADA PROXIMA JÁ EXISTE!!! - "+pbi2.getParada().getNome()
+                            +" | "+p.getParada().getNome());
+
+                    pbi2.setDistancia(-1f);
+
+//                    pbiRemover.add(pbi2);
+
+                }
+
+            }
+
+
+        }
+
+//        paradas.removeAll(pbiRemover);
+
+        atualizarParadasImportMapa(paradasImport);
+
+        System.out.println("TOTAL PARADAS IMPORTADAS POS: "+paradas.size());
     }
 
     private void configuraMapa() {
@@ -234,6 +319,23 @@ public class ParadasActivity extends BaseActivity implements ParadaListener {
     public void onFabSugestaoClick(View v){
         Intent i = new Intent(this, ParadasSugeridasActivity.class);
         startActivity(i);
+    }
+
+    public void onBtnImportarClick(View v){
+        Intent i = new Intent(this, ImportarParadasActivity.class);
+        startActivity(i);
+    }
+
+    public void onBtnRuasClick(View v){
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                viewModel.atualizarRuaParadas();
+            }
+        });
+
+        Toast.makeText(ctx, "Buscando ruas...", Toast.LENGTH_SHORT).show();
     }
 
     public void onFabLocationClick(View v){
@@ -320,6 +422,26 @@ public class ParadasActivity extends BaseActivity implements ParadaListener {
 
             adapter.paradas = paradas;
             adapter.notifyDataSetChanged();
+
+//            try {
+//                String[] arquivos = getAssets().list("");
+//
+//                for(String a : arquivos){
+//
+//                    if(a.endsWith(".txt")){
+//                        processaParadasPorLote(a, paradasImport, paradas);
+//                    }
+//
+//                }
+//
+//                System.out.println("TOTAL PARADAS IMPORTADAS PRE: "+paradasImport.size());
+//
+//                filtraParadasProximas(paradasImport, paradas);
+//
+//                System.out.println(arquivos.length);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
 
 //            int cont = 0;
 //            final Handler handler = new Handler();
@@ -478,6 +600,124 @@ public class ParadasActivity extends BaseActivity implements ParadaListener {
 
     }
 
+    private void atualizarParadasImportMapa(final List<ParadaBairroImport> paradas){
+
+        if(paradas != null){
+
+            this.paradasImport = paradas;
+
+            RadiusMarkerClusterer poiMarkers = new RadiusMarkerClusterer(this);
+            poiMarkers.setRadius(200);
+
+            Drawable clusterIconD = getResources().getDrawable(R.drawable.marker_cluster);
+            Bitmap clusterIcon = ((BitmapDrawable)clusterIconD).getBitmap();
+
+            map.getOverlays().add(poiMarkers);
+            poiMarkers.setIcon(clusterIcon);
+
+            for(ParadaBairroImport p : paradas){
+
+                Marker m = new Marker(map);
+                m.setPosition(new GeoPoint(p.getParada().getLatitude(), p.getParada().getLongitude()));
+                m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                m.setDragOffset(10);
+                m.setDraggable(false);
+                m.setTitle(p.getParada().getNome());
+
+                if(p.getDistancia() != null && p.getDistancia() == -1f){
+                    m.setIcon(DrawableUtils.convertToRed(
+                            getApplicationContext().getResources().getDrawable(R.drawable.marker_ponto_conflito_bairro)));
+                } else{
+                    m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker_ponto_bairro));
+                }
+
+//                if(p.getParada().getAtivo()){
+//
+//                    switch(p.getParada().getSentido()){
+//                        case 0:
+//                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.centro));
+//                            break;
+//                        case 1:
+//                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.bairro));
+//                            break;
+//                        default:
+//                            m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
+//                            break;
+//                    }
+//
+//                } else{
+//
+//                    switch(p.getParada().getSentido()){
+//                        case 0:
+//                            m.setIcon(DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
+//                                    mergeDrawable(this, R.drawable.marker, R.drawable.centro).mutate()));
+//                            break;
+//                        case 1:
+//                            m.setIcon(DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
+//                                    mergeDrawable(this, R.drawable.marker, R.drawable.bairro).mutate()));
+//                            break;
+//                        default:
+//                            m.setIcon(DrawableUtils.convertToGrayscale(getApplicationContext().getResources().getDrawable(R.drawable.marker).mutate()));
+//                            break;
+//                    }
+//
+//                }
+
+                m.setId(p.getParada().getId());
+
+                m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker, MapView mapView) {
+
+                        ParadaBairroImport pb = getParadaImportFromMarker(marker, paradasImport);
+
+                        Toast.makeText(getApplicationContext(), pb.getParada().getNome()+" - "
+                                +pb.getParada().getLatitude()+","+pb.getParada().getLongitude(), Toast.LENGTH_SHORT).show();
+
+                        // STREET VIEW
+
+                        // Create a Uri from an intent string. Use the result to create an Intent.
+                        Uri gmmIntentUri = Uri.parse("google.streetview:cbll="+pb.getParada().getLatitude()+","+pb.getParada().getLongitude());
+
+                        // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
+                        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                        // Make the Intent explicit by setting the Google Maps package
+                        mapIntent.setPackage("com.google.android.apps.maps");
+
+                        // Attempt to start an activity that can handle the Intent
+                        startActivity(mapIntent);
+
+                        // STREET VIEW
+
+                        // FORM
+
+                        viewModel.parada = new ParadaBairro();
+                        formParada = new FormParada();
+                        formParada.setLatitude(pb.getParada().getLatitude());
+                        formParada.setLongitude(pb.getParada().getLongitude());
+                        formParada.setParada(null);
+                        formParada.setCtx(getApplication());
+                        formParada.show(getSupportFragmentManager(), "formParadaImport");
+
+                        // FORM
+
+//                        InfoWindow infoWindow = new InfoWindow();
+//                        infoWindow.setParada(pb);
+//                        infoWindow.setCtx(ctx);
+//                        infoWindow.show(getSupportFragmentManager(), "infoWindow");
+                        mapController.animateTo(marker.getPosition());
+                        return true;
+                    }
+                });
+
+                poiMarkers.add(m);
+                //map.getOverlays().add(m);
+            }
+
+        }
+
+    }
+
     @NonNull
     private ParadaBairro getParadaFromMarker(Marker marker, List<ParadaBairro> paradas) {
         Parada p = new Parada();
@@ -487,6 +727,20 @@ public class ParadasActivity extends BaseActivity implements ParadaListener {
         parada.setParada(p);
 
         ParadaBairro pb = paradas.get(paradas.indexOf(parada));
+        pb.getParada().setLatitude(marker.getPosition().getLatitude());
+        pb.getParada().setLongitude(marker.getPosition().getLongitude());
+        return pb;
+    }
+
+    @NonNull
+    private ParadaBairroImport getParadaImportFromMarker(Marker marker, List<ParadaBairroImport> paradas) {
+        Parada p = new Parada();
+        p.setId(marker.getId());
+
+        ParadaBairroImport parada = new ParadaBairroImport();
+        parada.setParada(p);
+
+        ParadaBairroImport pb = paradas.get(paradas.indexOf(parada));
         pb.getParada().setLatitude(marker.getPosition().getLatitude());
         pb.getParada().setLongitude(marker.getPosition().getLongitude());
         return pb;

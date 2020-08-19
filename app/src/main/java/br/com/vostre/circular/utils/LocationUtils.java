@@ -1,6 +1,6 @@
 package br.com.vostre.circular.utils;
 
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.LiveData;
 import android.content.Context;
 import android.location.Location;
 

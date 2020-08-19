@@ -1,25 +1,19 @@
 package br.com.vostre.circular.view;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.widget.TabHost;
 
 import java.util.List;
 
 import br.com.vostre.circular.R;
-import br.com.vostre.circular.databinding.ActivityMensagensBinding;
 import br.com.vostre.circular.databinding.ActivityProblemasBinding;
-import br.com.vostre.circular.model.Mensagem;
-import br.com.vostre.circular.model.Problema;
 import br.com.vostre.circular.model.pojo.ProblemaTipo;
-import br.com.vostre.circular.view.adapter.MensagemAdapter;
 import br.com.vostre.circular.view.adapter.ProblemaAdapter;
-import br.com.vostre.circular.view.form.FormMensagem;
-import br.com.vostre.circular.viewModel.MensagensViewModel;
 import br.com.vostre.circular.viewModel.ProblemasViewModel;
 
 public class ProblemasActivity extends BaseActivity {

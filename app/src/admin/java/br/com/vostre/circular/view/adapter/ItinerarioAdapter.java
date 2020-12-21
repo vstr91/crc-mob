@@ -68,7 +68,9 @@ public class ItinerarioAdapter extends RecyclerView.Adapter<ItinerarioViewHolder
 
                     for(ItinerarioPartidaDestino i : itinerariosOriginal){
 
-                        if(i.getNomeCidadePartida().toLowerCase().contains(charString.toLowerCase()) ||
+                        if(     i.getNomeBairroPartida().toLowerCase().contains(charString.toLowerCase()) ||
+                                i.getNomeBairroDestino().toLowerCase().contains(charString.toLowerCase()) ||
+                                i.getNomeCidadePartida().toLowerCase().contains(charString.toLowerCase()) ||
                                 i.getNomeCidadeDestino().toLowerCase().contains(charString.toLowerCase()) ||
                                 (i.getItinerario().getSigla() != null && i.getItinerario().getSigla().toLowerCase().contains(charString.toLowerCase()))){
                             listaFiltrada.add(i);

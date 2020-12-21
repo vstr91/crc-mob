@@ -124,6 +124,20 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
         return retorno;
     }
 
+    private void geraModalLoading() {
+        binding.fundo.setVisibility(View.VISIBLE);
+        binding.textViewCarregando.setVisibility(View.VISIBLE);
+        binding.progressBar.setIndeterminate(true);
+        binding.progressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void ocultaModalLoading(){
+        binding.fundo.setVisibility(View.GONE);
+        binding.textViewCarregando.setVisibility(View.GONE);
+        binding.progressBar.setIndeterminate(true);
+        binding.progressBar.setVisibility(View.GONE);
+    }
+
     @BindingAdapter("app:imagem")
     public static void setimagem(ImageView view, String imagem){
 
@@ -169,6 +183,8 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
         public void onChanged(List<CidadeEstado> cidades) {
             adapter.cidades = cidades;
             adapter.notifyDataSetChanged();
+
+            ocultaModalLoading();
 
             binding.textView14.getViewTreeObserver().addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
@@ -236,6 +252,10 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
         viewModel.setCidade(id);
         viewModel.cidade.observe(this, cidadeObserver);
         viewModel.bairros.observe(this, bairrosObserver);
+
+        if(id != null){
+            geraModalLoading();
+        }
 
         return id;
     }
@@ -309,6 +329,8 @@ public class ParadasActivity extends BaseActivity implements SelectListener {
         binding.listParadas.scheduleLayoutAnimation();
         binding.listParadas.setVisibility(View.VISIBLE);
         binding.textViewDica.setVisibility(View.VISIBLE);
+
+        ocultaModalLoading();
 
     }
 

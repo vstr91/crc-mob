@@ -99,29 +99,56 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <ImageView
+                <TextView
+                    android:id="@+id/textViewSentidoParada"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/branco"
+                    android:text="Bairro"
+                    android:textAlignment="center"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="@+id/textView88"
+                    app:layout_constraintStart_toStartOf="@+id/textView88"
+                    app:layout_constraintTop_toBottomOf="@+id/textView88" />
+
+                <TextView
+                    android:id="@+id/textView88"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@color/branco"
+                    android:text="Sentido"
+                    android:textAlignment="center"
+                    android:textSize="10sp"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.jama.carouselview.CarouselView
                     android:id="@+id/imageView9"
                     android:contentDescription="Imagem da parada"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="centerCrop" />
+                    android:scaleType="centerCrop" >
+
+                </com.jama.carouselview.CarouselView>
 
                 <TextView
                     android:id="@+id/textView16"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
                     android:background="@drawable/dia_rounded_corner_azul"
                     android:gravity="center"
                     android:padding="5dp"
-                    app:textTaxa="@{umaParada.parada.taxaDeEmbarque}"
                     android:textColor="@color/branco"
+                    android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
+                    app:textTaxa="@{umaParada.parada.taxaDeEmbarque}"
                     tools:text="Não há taxa de embarque" />
 
                 <TextView
@@ -196,6 +223,7 @@
                             android:paddingBottom="5dp"
                             android:text="@{umaParada.nomeBairro+` - `+umaParada.nomeCidade}"
                             android:textColor="@color/branco"
+                            android:textSize="10sp"
                             tools:text="CCC" />
                     </LinearLayout>
 
@@ -231,17 +259,29 @@
                     android:id="@+id/imageButton5"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="13dp"
-                    android:layout_marginBottom="16dp"
                     android:layout_weight=".5"
-                    android:background="@color/cinzaEscuro80"
+                    android:background="@color/branco"
                     android:contentDescription="Botão ver no Street View"
                     android:onClick="onClickBtnStreetView"
-                    android:padding="5dp"
-                    android:tooltipText="Ver nos Street View"
+                    android:padding="8dp"
+                    android:tooltipText="Ver no Street View"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_baseline_streetview_24" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/imageButton6"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".5"
+                    android:background="@color/branco"
+                    android:contentDescription="Botão Enviar Foto"
+                    android:onClick="onClickBtnFoto"
+                    android:padding="8dp"
+                    android:tooltipText="Enviar Foto"
                     app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:srcCompat="@drawable/ic_streetview_white_24dp" />
+                    app:srcCompat="@drawable/ic_baseline_add_a_photo_24" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -329,7 +369,7 @@
             android:text="* Estimativa de passagem pela parada"
             android:textColor="@color/cianoEscuro"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/fundo"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 

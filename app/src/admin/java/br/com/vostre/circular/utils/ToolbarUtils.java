@@ -47,13 +47,6 @@ public class ToolbarUtils {
 
     public static final Integer PICK_FILE = 310;
 
-    // The authority for the sync adapter's content provider
-    public static final String AUTHORITY = "br.com.vostre.circular.admin.datasync.provider";
-    // An account type, in the form of a domain name
-    public static final String ACCOUNT_TYPE = "br.com.vostre.circular.admin";
-    // The account name
-    public static final String ACCOUNT = "dummyaccount";
-
     public static void preparaMenu(Menu menu, Activity activity, View.OnClickListener listener) {
 
         activity.getMenuInflater().inflate(R.menu.main, menu);
@@ -130,17 +123,8 @@ public class ToolbarUtils {
             case R.id.icon_sync:
             case R.id.sync:
 
-                // Pass the settings flags by inserting them in a bundle
-                Bundle settingsBundle = new Bundle();
-                settingsBundle.putBoolean(
-                        ContentResolver.SYNC_EXTRAS_MANUAL, true);
-                settingsBundle.putBoolean(
-                        ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-                /*
-                 * Request the sync for the default account, authority, and
-                 * manual sync settings
-                 */
-                ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
+                WorksUtils.iniciaWorkAtualizacaoSingle(activity.getApplicationContext(), "sync-single");
+
                 Toast.makeText(activity.getApplicationContext(), "Iniciando sincronização", Toast.LENGTH_SHORT).show();
 
                 break;
@@ -182,6 +166,13 @@ public class ToolbarUtils {
                         List<? extends EntidadeBase> feriados = appDatabase.feriadoDAO().listarTodosSync();
                         List<? extends EntidadeBase> historicosSecoes = appDatabase.historicoSecaoDAO().listarTodosSync();
 
+                        // v2.4.x
+                        List<? extends EntidadeBase> imagensParadas = appDatabase.imagemParadaDAO().listarTodosSync();
+                        List<? extends EntidadeBase> feedbacksItinerarios = appDatabase.feedbackItinerarioDAO().listarTodosSync();
+
+                        List<? extends EntidadeBase> tprs = appDatabase.temporariasDAO().listarTodosTemp1Sync();
+                        List<? extends EntidadeBase> tpr2s = appDatabase.temporariasDAO().listarTodosTemp2Sync();
+
                         String strPaises = "\"paises\": " + JsonUtils.toJson((List<EntidadeBase>) paises);
                         String strEmpresas = "\"empresas\": " + JsonUtils.toJson((List<EntidadeBase>) empresas);
                         String strOnibus = "\"onibus\": " + JsonUtils.toJson((List<EntidadeBase>) onibus);
@@ -211,12 +202,20 @@ public class ToolbarUtils {
                         String strFeriados = "\"feriados\": " + JsonUtils.toJson((List<EntidadeBase>) feriados);
                         String strHistoricosSecoes = "\"historicos_secoes\": " + JsonUtils.toJson((List<EntidadeBase>) historicosSecoes);
 
+                        //v2.4.x
+                        String strImagensParadas = "\"imagens_paradas\": " + JsonUtils.toJson((List<EntidadeBase>) imagensParadas);
+                        String strFeedbacksItinerarios = "\"feedbacks_itinerarios\": " + JsonUtils.toJson((List<EntidadeBase>) feedbacksItinerarios);
+                        String strTprs = "\"tprs\": " + JsonUtils.toJson((List<EntidadeBase>) tprs);
+                        String strTpr2s = "\"tpr2s\": " + JsonUtils.toJson((List<EntidadeBase>) tpr2s);
+
+
                         String json = "{" + strPaises + "," + strEmpresas + "," + strOnibus + "," + strEstados + "," + strCidades + ","
                                 + strBairros + "," + strParadas + "," + strItinerarios + "," + strHorarios + "," + strParadasItinerarios + ","
                                 + strSecoesItinerarios + "," + strHorariosItinerarios + "," + strMensagens + "," + strParametros + ","
                                 + strPontosInteresse + "," + strUsuarios + "," + strParadasSugestoes + ","
                                 + strHistoricosParadas + "," + strHistoricosItinerarios + "," + strPontoInteresseSugestoes
                                 + "," + strTiposProblemas + "," + strProblemas + "," + strServicos + "," + strFeriados + "," + strHistoricosSecoes
+                                + "," + strImagensParadas + "," + strFeedbacksItinerarios + "," + strTprs + "," + strTpr2s
                                 + "}";
 
                         // EXPORTA ARQUIVO DE DADOS

@@ -4,6 +4,9 @@ import android.app.Application;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.sqlite.db.SimpleSQLiteQuery;
+import androidx.work.Worker;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -33,6 +36,7 @@ import org.osmdroid.views.overlay.Polyline;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.vostre.circular.TarefaAssincronaListener;
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.Itinerario;
@@ -43,12 +47,17 @@ import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
+import br.com.vostre.circular.model.works.TemporariasWorker;
 import br.com.vostre.circular.utils.DataHoraUtils;
+import br.com.vostre.circular.utils.WorksUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
+
+import static br.com.vostre.circular.utils.DBUtils.populaTabelaTemp;
+import static br.com.vostre.circular.utils.DBUtils.populaTabelaTemp2;
 
 public class ItinerariosViewModel extends AndroidViewModel {
 
@@ -387,7 +396,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
     }
 
     public void atualizarDistancias(Context ctx){
-        new atualizaDistanciasAsyncTask(appDatabase, ctx, this).execute();
+        new atualizaDistanciasAsyncTask(appDatabase, ctx, this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private static class atualizaDistanciasAsyncTask extends AsyncTask<List<ParadaItinerario>, Void, Void> {
@@ -405,9 +414,11 @@ public class ItinerariosViewModel extends AndroidViewModel {
         @Override
         protected Void doInBackground(final List<ParadaItinerario>... params) {
 
-            List<ItinerarioPartidaDestino> itinerarios = db.itinerarioDAO().listarTodosAtivosSync();
+            List<ItinerarioPartidaDestino> itinerarios = db.itinerarioDAO().listarTodosAtivosSimplificadoSync();
 
             for(ItinerarioPartidaDestino itinerario : itinerarios){
+
+                System.out.println("ITI: "+itinerario.getItinerario().getId());
 
                 List<ParadaItinerarioBairro> pis = db.paradaItinerarioDAO()
                         .listarTodosPorItinerarioComBairroSync(itinerario.getItinerario().getId());
@@ -443,7 +454,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
                         call.enqueue(new Callback<String>() {
                             @Override
                             public void onResponse(Call<String> call, Response<String> response) {
-                                System.out.println(response);
+                                System.out.println("RES DIST: "+response);
                                 try {
 
                                     if(response.body() != null){
@@ -486,6 +497,8 @@ public class ItinerariosViewModel extends AndroidViewModel {
                                                 finalParadaAnterior.getParadaItinerario().setEnviado(false);
                                                 finalParadaAnterior.getParadaItinerario().setUltimaAlteracao(DateTime.now());
                                                 db.paradaItinerarioDAO().editar(finalParadaAnterior.getParadaItinerario());
+
+
                                             }
                                         });
                                     } else{
@@ -667,7 +680,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
         itinerario.setUltimaAlteracao(new DateTime());
         itinerario.setEnviado(false);
 
-        new addAsyncTask(appDatabase).execute(itinerario);
+        new addAsyncTask(appDatabase).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, itinerario);
     }
 
     private static class addAsyncTask extends AsyncTask<Itinerario, Void, Void> {
@@ -699,7 +712,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
         itinerario.setUltimaAlteracao(new DateTime());
         itinerario.setEnviado(false);
 
-        new editAsyncTask(appDatabase, tarifaAntiga).execute(itinerario);
+        new editAsyncTask(appDatabase, tarifaAntiga).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, itinerario);
     }
 
     private static class editAsyncTask extends AsyncTask<Itinerario, Void, Void> {
@@ -811,9 +824,18 @@ public class ItinerariosViewModel extends AndroidViewModel {
                     editarItinerario(itin);
                 }
 
+                db.paradaItinerarioDAO().calculaDistanciaAcumuladaPorItinerario(itin.getId());
+
+                db.paradaItinerarioDAO().atualizaDistanciaItinerario(itin.getId());
+
             }
         });
 
+    }
+
+    public void atualizaTemporarias(){
+        WorksUtils.iniciaWorkTempsSingle(getApplication().getApplicationContext(), "temps");
+//        new atualizaTemporariasAsyncTask(appDatabase, getApplication().getApplicationContext()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
 }

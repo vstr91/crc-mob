@@ -311,13 +311,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="4dp"
                     android:text="@{itinerario.nomeBairroDestino}"
                     android:textColor="@color/cinzaEscuro"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toEndOf="@+id/imageView6"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewCidadePartidaResultado"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewDesembarque"
                     tools:text="Bairro Destino" />
 
                 <TextView
@@ -325,6 +325,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@{itinerario.nomeCidadePartida}"
+                    android:textSize="12sp"
                     app:layout_constraintStart_toStartOf="@+id/textViewBairroPartidaResultado"
                     app:layout_constraintTop_toBottomOf="@+id/textViewBairroPartidaResultado"
                     tools:text="Cidade Partida" />
@@ -334,6 +335,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@{itinerario.nomeCidadeDestino}"
+                    android:textSize="12sp"
                     app:layout_constraintStart_toStartOf="@+id/textViewBairroDestinoResultado"
                     app:layout_constraintTop_toBottomOf="@+id/textViewBairroDestinoResultado"
                     tools:text="Cidade Destino" />
@@ -509,14 +511,65 @@
                 <ImageView
                     android:id="@+id/imageView18"
                     android:layout_width="50dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="1dp"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
                     android:layerType="software"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
                     app:layout_constraintBottom_toTopOf="@+id/imageView6"
                     app:layout_constraintEnd_toEndOf="@+id/imageView5"
                     app:layout_constraintStart_toStartOf="@+id/imageView6"
                     app:layout_constraintTop_toBottomOf="@+id/imageView5"
                     app:srcCompat="@drawable/dashed_claro_90" />
+
+                <TextView
+                    android:id="@+id/textViewEmbarque"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="TextView"
+                    android:textColor="@color/azul"
+                    android:textSize="8sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/btnPontosEmbarque"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewCidadePartidaResultado"
+                    tools:text="Embarque em\nConservatória, Barra do Piraí" />
+
+                <TextView
+                    android:id="@+id/textViewDesembarque"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="TextView"
+                    android:textColor="@color/azul"
+                    android:textSize="8sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/btnPontosDesembarque"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewEmbarque"
+                    tools:text="Desembarque em\nConservatória, Barra do Piraí" />
+
+                <ImageButton
+                    android:id="@+id/btnPontosEmbarque"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:background="@color/transparente"
+                    android:scaleType="centerInside"
+                    app:layout_constraintBottom_toBottomOf="@+id/textViewEmbarque"
+                    app:layout_constraintStart_toStartOf="@+id/textViewCidadePartidaResultado"
+                    app:layout_constraintTop_toTopOf="@+id/textViewEmbarque"
+                    app:srcCompat="@drawable/ic_place_blue_24dp" />
+
+                <ImageButton
+                    android:id="@+id/btnPontosDesembarque"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:background="@color/transparente"
+                    android:scaleType="centerInside"
+                    app:layout_constraintBottom_toBottomOf="@+id/textViewDesembarque"
+                    app:layout_constraintStart_toStartOf="@+id/textViewCidadePartidaResultado"
+                    app:layout_constraintTop_toTopOf="@+id/textViewDesembarque"
+                    app:srcCompat="@drawable/ic_place_blue_24dp" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

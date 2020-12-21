@@ -274,9 +274,9 @@
                     android:layout_height="wrap_content"
                     android:digits="0123456789,."
                     android:ems="10"
-                    android:hint="Distância (Km)"
+                    android:hint="Distância (m)"
                     android:inputType="numberDecimal|number"
-                    android:text="@={viewModel.itinerario.distancia}"
+                    android:text="@={viewModel.itinerario.distanciaMetros}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

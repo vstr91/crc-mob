@@ -8,7 +8,7 @@ import org.joda.time.DateTime;
 
 import br.com.vostre.circular.model.EntidadeBase;
 
-@Entity()
+@Entity
 public class LogConsulta extends EntidadeBase {
 
     @NonNull

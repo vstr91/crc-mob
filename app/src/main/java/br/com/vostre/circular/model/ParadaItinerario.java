@@ -32,6 +32,16 @@ public class ParadaItinerario extends EntidadeBase {
 
     private Double distanciaSeguinteMetros;
 
+    private Double distanciaAcumulada;
+
+    public Double getDistanciaAcumulada() {
+        return distanciaAcumulada;
+    }
+
+    public void setDistanciaAcumulada(Double distanciaAcumulada) {
+        this.distanciaAcumulada = distanciaAcumulada;
+    }
+
     public Double getDistanciaSeguinteMetros() {
         return distanciaSeguinteMetros;
     }

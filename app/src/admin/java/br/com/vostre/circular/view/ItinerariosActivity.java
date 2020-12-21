@@ -16,6 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -47,6 +49,7 @@ import br.com.vostre.circular.databinding.ActivityItinerariosBinding;
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
+import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
@@ -153,6 +156,14 @@ public class ItinerariosActivity extends BaseActivity {
 
             viewModel.iniciarAtualizacoesPosicao();
 
+//            AsyncTask.execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    AppDatabase db = AppDatabase.getAppDatabase(getApplicationContext());
+//                    db.paradaItinerarioDAO().calculaDistanciaAcumulada();
+//                }
+//            });
+
 //            viewModel.atualizaTrajetoItinerarios(null);
 
 //            viewModel.atualizaItinerarios();
@@ -238,7 +249,7 @@ public class ItinerariosActivity extends BaseActivity {
 //        GeoPoint startPoint = new GeoPoint(-22.470804460339885, -43.82463455200195);
 //        mapController.setCenter(startPoint);
 
-        map.setMaxZoomLevel(19d);
+        map.setMaxZoomLevel(25d);
         map.setMinZoomLevel(5d);
     }
 
@@ -310,6 +321,11 @@ public class ItinerariosActivity extends BaseActivity {
     public void onClickDistanciasItinerarios(View v){
         viewModel.atualizarDistancias(getApplicationContext());
         Toast.makeText(getApplicationContext(), "Atualizando distâncias...", Toast.LENGTH_SHORT).show();
+    }
+
+    public void onClickBtnAtualizaTemporarias(View v){
+        viewModel.atualizaTemporarias();
+        Toast.makeText(getApplicationContext(), "Atualizando tabelas temporárias...", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -457,10 +473,10 @@ public class ItinerariosActivity extends BaseActivity {
 
                     switch(p.getParada().getSentido()){
                         case 0:
-                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.centro));
+                            m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker_centro));
                             break;
                         case 1:
-                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.bairro));
+                            m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker_bairro));
                             break;
                         default:
                             m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
@@ -471,15 +487,16 @@ public class ItinerariosActivity extends BaseActivity {
 
                     switch(p.getParada().getSentido()){
                         case 0:
-                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
-                                    mergeDrawable(this, R.drawable.marker, R.drawable.centro).mutate()));
+                            m.setIcon(DrawableUtils
+                                    .convertToGrayscale(getApplicationContext().getResources().getDrawable(R.drawable.marker_centro).mutate()));
                             break;
                         case 1:
-                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
-                                    mergeDrawable(this, R.drawable.marker, R.drawable.bairro).mutate()));
+                            m.setIcon(DrawableUtils
+                                    .convertToGrayscale(getApplicationContext().getResources().getDrawable(R.drawable.marker_bairro).mutate()));
                             break;
                         default:
-                            m.setIcon(DrawableUtils.convertToGrayscale(getApplicationContext().getResources().getDrawable(R.drawable.marker).mutate()));
+                            m.setIcon(DrawableUtils
+                                    .convertToGrayscale(getApplicationContext().getResources().getDrawable(R.drawable.marker).mutate()));
                             break;
                     }
 

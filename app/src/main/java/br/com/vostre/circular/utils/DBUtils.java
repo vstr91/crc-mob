@@ -2,6 +2,8 @@ package br.com.vostre.circular.utils;
 
 import android.app.Activity;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.sqlite.db.SimpleSQLiteQuery;
+
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
@@ -26,11 +28,13 @@ import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.FeedbackItinerario;
 import br.com.vostre.circular.model.Feriado;
 import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.HistoricoSecao;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
+import br.com.vostre.circular.model.ImagemParada;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.Onibus;
@@ -43,9 +47,13 @@ import br.com.vostre.circular.model.Problema;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Servico;
 import br.com.vostre.circular.model.TipoProblema;
+import br.com.vostre.circular.model.Tpr;
+import br.com.vostre.circular.model.Tpr2;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.model.ViagemItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
+import br.com.vostre.circular.model.log.LogItinerario;
+import br.com.vostre.circular.model.log.LogParada;
 import br.com.vostre.circular.view.BaseActivity;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
@@ -166,6 +174,16 @@ public class DBUtils {
         JSONArray servicos = arrayObject.getJSONArray("servicos");
         JSONArray feriados = arrayObject.getJSONArray("feriados");
         JSONArray historicosSecoes = arrayObject.getJSONArray("historicos_secoes");
+
+        //v2.4.x
+//        JSONArray logsItinerarios = arrayObject.getJSONArray("logs_itinerarios");
+//        JSONArray logsParadas = arrayObject.getJSONArray("logs_paradas");
+
+        JSONArray imagensParadas = arrayObject.getJSONArray("imagens_paradas");
+        JSONArray feedbacksItinerarios = arrayObject.getJSONArray("feedbacks_itinerarios");
+
+        JSONArray tprs = arrayObject.getJSONArray("tprs");
+        JSONArray tpr2s = arrayObject.getJSONArray("tpr2s");
 
         // PAISES
 
@@ -640,8 +658,293 @@ public class DBUtils {
 
         }
 
+        // v2.4.x
+//        // LOGS ITINERARIOS
+//
+//        if(logsItinerarios != null && logsItinerarios.length() > 0){
+//
+//            int total = logsItinerarios.length();
+//            List<LogItinerario> lstLogsItinerarios = new ArrayList<>();
+//
+//            for(int i = 0; i < total; i++){
+//                LogItinerario log;
+//                JSONObject obj = logsItinerarios.getJSONObject(i);
+//
+//                log = (LogItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), LogItinerario.class, 1);
+//                log.setEnviado(true);
+//
+//                lstLogsItinerarios.add(log);
+//
+//            }
+//
+//            viewModel.add(lstLogsItinerarios, "log_itinerario");
+//
+//        }
+//
+//        // LOGS PARADAS
+//
+//        if(logsParadas != null && logsParadas.length() > 0){
+//
+//            int total = logsParadas.length();
+//            List<LogParada> lstLogsParadas = new ArrayList<>();
+//
+//            for(int i = 0; i < total; i++){
+//                LogParada log;
+//                JSONObject obj = logsParadas.getJSONObject(i);
+//
+//                log = (LogParada) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), LogParada.class, 1);
+//                log.setEnviado(true);
+//
+//                lstLogsParadas.add(log);
+//
+//            }
+//
+//            viewModel.add(lstLogsParadas, "log_parada");
+//
+//        }
+
+        // IMAGENS PARADAS
+
+        if(imagensParadas.length() > 0){
+
+            int total = imagensParadas.length();
+            List<ImagemParada> lstImagensParadas = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                ImagemParada parada;
+                JSONObject obj = imagensParadas.getJSONObject(i);
+
+                parada = (ImagemParada) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), ImagemParada.class, 0);
+                parada.setEnviado(true);
+                parada.setImagemEnviada(true);
+
+                lstImagensParadas.add(parada);
+
+            }
+
+            viewModel.add(lstImagensParadas, "imagem_parada");
+
+        }
+
+        // FEEDBACKS ITINERARIOS
+
+        if(feedbacksItinerarios.length() > 0){
+
+            int total = feedbacksItinerarios.length();
+            List<FeedbackItinerario> lstFeedbacksItinerarios = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                FeedbackItinerario fi;
+                JSONObject obj = feedbacksItinerarios.getJSONObject(i);
+
+                fi = (FeedbackItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), FeedbackItinerario.class,  0);
+                fi.setEnviado(true);
+                fi.setImagemEnviada(true);
+
+                lstFeedbacksItinerarios.add(fi);
+
+            }
+
+            viewModel.add(lstFeedbacksItinerarios, "feedback_itinerario");
+
+        }
+
+        // TPR 1
+
+        if(tprs.length() > 0){
+
+            int total = tprs.length();
+            List<Tpr> lstTprs = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                Tpr tpr;
+                JSONObject obj = tprs.getJSONObject(i);
+
+                tpr = (Tpr) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Tpr.class, 0);
+                tpr.setEnviado(true);
+                tpr.setTarifa(0d);
+
+                lstTprs.add(tpr);
+            }
+
+            viewModel.add(lstTprs, "tpr");
+
+        }
+
+        // TPR 2
+
+        if(tpr2s.length() > 0){
+
+            int total = tpr2s.length();
+            List<Tpr2> lstTpr2s = new ArrayList<>();
+
+            for(int i = 0; i < total; i++){
+                Tpr2 tpr2;
+                JSONObject obj = tpr2s.getJSONObject(i);
+
+                tpr2 = (Tpr2) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Tpr2.class, 0);
+                tpr2.setEnviado(true);
+
+                lstTpr2s.add(tpr2);
+            }
+
+            viewModel.add(lstTpr2s, "tpr2");
+
+        }
+
         PreferenceUtils.salvarPreferencia(activity.getApplicationContext(), "init", true);
 
+    }
+
+    public static String geraTabelaTemp(){
+        return "CREATE TABLE IF NOT EXISTS tpr(" +
+                "  distanciaAcumuladaInicial REAL," +
+                "  distanciaAcumulada REAL," +
+                "  tempo INT," +
+                "  id TEXT," +
+                "  idBairroPartida TEXT," +
+                "  idBairroDestino TEXT," +
+                "  distanciaTrechoMetros," +
+                "  tempoTrecho," +
+                "  tarifaTrecho," +
+                "  inicio," +
+                "  fim" +
+                ")";
+    }
+
+    public static String populaTabelaTemp(){
+        return "INSERT INTO tpr (id, distanciaAcumuladaInicial, distanciaAcumulada, tempo, idItinerario, idBairroPartida, idBairroDestino, " +
+                "             distanciaTrechoMetros, tempoTrecho, tarifaTrecho, inicio, fim, ativo, enviado, data_cadastro, ultima_alteracao) " +
+                "                                               SELECT lower(hex( randomblob(4)) || '-' || hex( randomblob(2)) || '-' || '4' || " +
+                "                                                substr( hex( randomblob(2)), 2) || '-' || substr('AB89', 1 + (abs(random()) % 4) , 1)  || " +
+                "                                                substr(hex(randomblob(2)), 2) || '-' || hex(randomblob(6))), " +
+                "                              (   " +
+                "                                                SELECT pi2.distanciaAcumulada FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada AND pi2.itinerario = pi.itinerario  " +
+                "                                                INNER JOIN bairro b2 ON b2.id = p2.bairro  " +
+                "                                                WHERE pi2.ordem =  (  " +
+                "                                                SELECT MAX(pi2.ordem) FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada AND pi2.itinerario = pi.itinerario  " +
+                "                                                INNER JOIN bairro b2 ON b2.id = p2.bairro   " +
+                "                                                WHERE b2.id = ( SELECT b2.id FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada AND pi2.itinerario = pi.itinerario  " +
+                "                                                                INNER JOIN bairro b2 ON b2.id = p2.bairro   " +
+                "                                                                WHERE pi2.ordem = (SELECT MAX(pi.ordem))  " +
+                "                                                                )  " +
+                "                                               )  " +
+                "                                               ) AS 'distanciaAcumuladaInicial',  " +
+                "                               (  " +
+                "                                                SELECT pi2.distanciaAcumulada FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada AND pi2.itinerario = pi.itinerario  " +
+                "                                                INNER JOIN bairro b2 ON b2.id = p2.bairro   " +
+                "                                                WHERE pi2.ordem =  (   " +
+                "                                                SELECT MAX(pi2.ordem) FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada AND pi2.itinerario = pi.itinerario " +
+                "                                                INNER JOIN bairro b2 ON b2.id = p2.bairro   " +
+                "                                                WHERE b2.id = ( SELECT b2.id FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada AND pi2.itinerario = pi.itinerario  " +
+                "                                                                INNER JOIN bairro b2 ON b2.id = p2.bairro   " +
+                "                                                                WHERE pi2.ordem = (SELECT MAX(pi.ordem)+1)  " +
+                "                                                                )  " +
+                "                                               )  " +
+                "                                               ) - (  " +
+                "                                                SELECT pi2.distanciaAcumulada FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada AND pi2.itinerario = pi.itinerario  " +
+                "                                                INNER JOIN bairro b2 ON b2.id = p2.bairro   " +
+                "                                                WHERE pi2.ordem =  (   " +
+                "                                                SELECT MAX(pi2.ordem) FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada AND pi2.itinerario = pi.itinerario  " +
+                "                                                INNER JOIN bairro b2 ON b2.id = p2.bairro   " +
+                "                                                WHERE b2.id = ( SELECT b2.id FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada AND pi2.itinerario = pi.itinerario  " +
+                "                                                                INNER JOIN bairro b2 ON b2.id = p2.bairro   " +
+                "                                                                WHERE pi2.ordem = (SELECT MAX(pi.ordem))   " +
+                "                                                                )  " +
+                "                                               )  " +
+                "                                               ) AS 'distanciaAcumulada',   " +
+
+                "                              i.tempo AS 'tempo',  " +
+                "                                               i.id,  " +
+                "                                               b.id as 'idBairroPartida',  " +
+                "                                               (   " +
+                "                                                SELECT b2.id FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada AND pi2.itinerario = pi.itinerario " +
+                "                                                INNER JOIN bairro b2 ON b2.id = p2.bairro  " +
+                "                                                WHERE pi2.ordem = (SELECT MAX(pi.ordem)+1)   " +
+                "                                               ) AS 'idBairroDestino',  " +
+
+                "                                                IFNULL(SUM(pi.distanciaSeguinteMetros), 0) AS 'distanciaTrechoMetros',  " +
+                "                                                IFNULL(SUM(pi.tempoSeguinte), 0) AS 'tempoTrecho', " +
+                "                                               IFNULL(SUM(pi.valorSeguinte), 0) AS 'tarifaTrecho',  " +
+                "                                               MIN(pi.ordem) AS 'inicio', MAX(pi.ordem) AS 'fim', 1, 0, datetime('now'), datetime('now')  " +
+
+                "                                                FROM parada_itinerario pi INNER JOIN   " +
+                "                                                    parada p ON p.id = pi.parada INNER JOIN  " +
+                "                                                    bairro b ON b.id = p.bairro INNER JOIN  " +
+                "                                                    itinerario i ON i.id = pi.itinerario  " +
+
+                "                                                WHERE pi.ativo = 1 AND i.ativo = 1  " +
+                "                                                GROUP BY i.id, b.id  " +
+                "                                                HAVING idBairroDestino != ''  " +
+                "                                                ORDER BY pi.itinerario, pi.ordem;";
+    }
+
+    public static String geraTabelaTemp2(){
+        return " CREATE TABLE IF NOT EXISTS tpr2 (id TEXT, distanciaMetros REAL, idBairroPartida TEXT, " +
+                " idBairroDestino TEXT, distanciaTrechoMetros REAL, flagTrecho INT);";
+    }
+
+    public static String populaTabelaTemp2(){
+        return "INSERT INTO tpr2 (id, idItinerario, distanciaMetros, idBairroPartida, idBairroDestino, distanciaTrechoMetros, flagTrecho, ativo, enviado, data_cadastro, ultima_alteracao) " +
+                "                                               SELECT DISTINCT lower(hex( randomblob(4)) || '-' || hex( randomblob(2)) || '-' || '4' ||  " +
+                "                                                substr( hex( randomblob(2)), 2) || '-' || substr('AB89', 1 + (abs(random()) % 4) , 1)  ||  " +
+                "                                                substr(hex(randomblob(2)), 2) || '-' || hex(randomblob(6))), t1.id, 0,   " +
+                "                                                      t1.idBairroPartida,   " +
+                "                                                      t2.idBairroDestino,  " +
+
+                "                                                      t2.distanciaAcumuladaInicial + t2.distanciaAcumulada - t1.distanciaAcumuladaInicial,  " +
+                "                                                      CASE WHEN (t1.inicio = 1 AND (   " +
+                "                                                                 t2.idBairroDestino = (   " +
+                "                                                                                          SELECT p3.bairro  " +
+                "                                                                                            FROM parada_itinerario pi3  " +
+                "                                                                                                 INNER JOIN  " +
+                "                                                                                                 parada p3 ON p3.id = pi3.parada  " +
+                "                                                                                           WHERE pi3.itinerario = t1.id  " +
+                "                                                                                           ORDER BY pi3.ordem DESC  " +
+                "                                                                                           LIMIT 1  " +
+                "                                                                                      ) )  " +
+                "                                                          ) THEN 0 ELSE 1 END, 1, 0, datetime('now'), datetime('now') " +
+                "                                                 FROM tpr t1 INNER JOIN  " +
+                "                                                      tpr t2 ON t1.id = t2.id AND   " +
+                "                                                                t1.fim <= t2.fim WHERE t1.ativo = 1 AND t2.ativo = 1  " +
+                "                                                ORDER BY t1.id,   " +
+                "                                                         t1.inicio,  " +
+                "                                                         t2.inicio";
+    }
+
+    public static void criaTabelasTemporarias(AppDatabase db){
+
+        // deleta tabelas (estrutura mudou)
+        SimpleSQLiteQuery queryDelTemp = new SimpleSQLiteQuery("DROP TABLE IF EXISTS tpr");
+        db.itinerarioDAO().geraTabelaTemp(queryDelTemp);
+
+        SimpleSQLiteQuery queryDelTemp2 = new SimpleSQLiteQuery("DROP TABLE IF EXISTS tpr2");
+        db.itinerarioDAO().geraTabelaTemp(queryDelTemp2);
+        // fim deleta tabela
+
+        SimpleSQLiteQuery queryTemp = new SimpleSQLiteQuery(geraTabelaTemp());
+        db.itinerarioDAO().geraTabelaTemp(queryTemp);
+
+        SimpleSQLiteQuery queryTemp2 = new SimpleSQLiteQuery(geraTabelaTemp2());
+        db.itinerarioDAO().geraTabelaTemp(queryTemp2);
+    }
+
+    public static void iniciaTabelasTemporarias(AppDatabase appDatabase, boolean criaTabelas) {
+
+        if(criaTabelas){
+            criaTabelasTemporarias(appDatabase);
+        }
+
+        appDatabase.itinerarioDAO().deletaTabelaTemp(new SimpleSQLiteQuery("DELETE FROM tpr"));
+
+        SimpleSQLiteQuery queryPopula = new SimpleSQLiteQuery(populaTabelaTemp());
+        appDatabase.itinerarioDAO().populaTabelaTemp(queryPopula);
+
+        // temp 2
+        appDatabase.itinerarioDAO().deletaTabelaTemp(new SimpleSQLiteQuery("DELETE FROM tpr2"));
+
+        SimpleSQLiteQuery queryPopula2 = new SimpleSQLiteQuery(populaTabelaTemp2());
+        appDatabase.itinerarioDAO().populaTabelaTemp(queryPopula2);
     }
 
 }

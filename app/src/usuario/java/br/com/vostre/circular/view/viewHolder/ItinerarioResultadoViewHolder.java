@@ -19,6 +19,8 @@ import java.util.List;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.LinhaItinerariosResultadoBinding;
 
+import br.com.vostre.circular.listener.ParadaItinerarioListener;
+import br.com.vostre.circular.listener.ParadaListener;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.utils.DataHoraUtils;
 import br.com.vostre.circular.utils.DrawableUtils;
@@ -34,33 +36,19 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
     private final LinhaItinerariosResultadoBinding binding;
     AppCompatActivity ctx;
     BaseActivity parent;
+    ParadaItinerarioListener paradaListener;
 
-    public ItinerarioResultadoViewHolder(LinhaItinerariosResultadoBinding binding, AppCompatActivity context, BaseActivity parent) {
+    public ItinerarioResultadoViewHolder(LinhaItinerariosResultadoBinding binding, AppCompatActivity context, BaseActivity parent, ParadaItinerarioListener listener) {
         super(binding.getRoot());
         this.binding = binding;
         this.ctx = context;
         this.parent = parent;
+        this.paradaListener = listener;
     }
 
-    public void bind(final ItinerarioPartidaDestino itinerario, int ordem, boolean ocultaSeta, String dia, String hora, int quantidade) {
+    public void bind(final ItinerarioPartidaDestino itinerario, int ordem, boolean ocultaSeta, String dia, String hora,
+                     int quantidade, final ItinerarioPartidaDestino itinerarioSeguinte) {
         binding.setItinerario(itinerario);
-
-//        if(!itinerario.getItinerario().getAcessivel()){
-//            binding.imageView12.setVisibility(View.GONE);
-//        }
-
-//        if(itinerario.getItinerario().getObservacao() == null || (itinerario.getItinerario().getObservacao().isEmpty() ||
-//                itinerario.getItinerario().getObservacao().equals("null") || itinerario.getItinerario().getObservacao().equals(""))){
-//            binding.textViewObservacao.setVisibility(View.GONE);
-//        }
-
-//        if(quantidade == 1){
-//            binding.linearLayoutOrdem.setVisibility(View.GONE);
-//        } else{
-//            binding.linearLayoutOrdem.setVisibility(View.VISIBLE);
-//        }
-//
-//        binding.textViewOrdem.setText(String.valueOf(ordem));
 
         if(dia == null || dia.equals("") || hora == null || hora.equals("")){
             dia = DataHoraUtils.getDiaAtualFormatado();
@@ -84,16 +72,67 @@ public class ItinerarioResultadoViewHolder extends RecyclerView.ViewHolder {
             binding.imageView12.setVisibility(View.VISIBLE);
         }
 
-        //binding.circleView2.setImagem(null);
+        // local de embarque diferente do local inicial do itinerario
+        if(itinerario.getNomePartida() != null && !itinerario.getNomePartida().isEmpty()){
+            binding.textViewEmbarque.setText("Embarque em\n"+itinerario.getNomePartida());
+            binding.textViewEmbarque.setVisibility(View.VISIBLE);
+            binding.btnPontosEmbarque.setVisibility(View.VISIBLE);
+        } else{
+            binding.textViewEmbarque.setText("");
+            binding.textViewEmbarque.setVisibility(View.GONE);
+            binding.btnPontosEmbarque.setVisibility(View.GONE);
+        }
 
-//        final File brasao = new File(ctx.getApplicationContext().getFilesDir(),  cidade.getCidade().getBrasao());
-//
-//        if(brasao.exists() && brasao.canRead()){
-//            final Drawable drawable = Drawable.createFromPath(brasao.getAbsolutePath());
-//            binding.circleView2.setImagem(drawable);
-//        }
-//
-//        binding.textViewNome.setText(cidade.getCidade().getNome());
+        // local de desembarque diferente do local final do itinerario
+        if(itinerario.getNomeDestino() != null && !itinerario.getNomeDestino().isEmpty()){
+            binding.textViewDesembarque.setText("Desembarque em\n"+itinerario.getNomeDestino());
+            binding.textViewDesembarque.setVisibility(View.VISIBLE);
+            binding.btnPontosDesembarque.setVisibility(View.VISIBLE);
+        } else{
+            binding.textViewDesembarque.setText("");
+            binding.textViewDesembarque.setVisibility(View.GONE);
+            binding.btnPontosDesembarque.setVisibility(View.GONE);
+        }
+
+        // listener dos botoes de pontos de embarque e desembarque
+        final View.OnClickListener listenerEmbarque = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(itinerarioSeguinte != null){
+                    paradaListener.onSelected(itinerario.getItinerario().getId(), itinerario.getBairroConsultaPartida(),
+                            itinerarioSeguinte.getItinerario().getId());
+                } else{
+                    paradaListener.onSelected(itinerario.getItinerario().getId(), itinerario.getBairroConsultaPartida(),
+                            null);
+                }
+
+//                Toast.makeText(ctx, itinerario.getBairroConsultaPartida(), Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        final View.OnClickListener listenerDesembarque = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(itinerarioSeguinte != null){
+                    paradaListener.onSelected(itinerario.getItinerario().getId(), itinerario.getBairroConsultaDestino(),
+                            itinerarioSeguinte.getItinerario().getId());
+                } else{
+                    paradaListener.onSelected(itinerario.getItinerario().getId(), itinerario.getBairroConsultaDestino(),
+                            null);
+                }
+
+
+//                Toast.makeText(ctx, itinerario.getBairroConsultaDestino(), Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        binding.textViewEmbarque.setOnClickListener(listenerEmbarque);
+        binding.btnPontosEmbarque.setOnClickListener(listenerEmbarque);
+
+        binding.textViewDesembarque.setOnClickListener(listenerDesembarque);
+        binding.btnPontosDesembarque.setOnClickListener(listenerDesembarque);
 
         final View.OnClickListener listener = new View.OnClickListener() {
             @Override

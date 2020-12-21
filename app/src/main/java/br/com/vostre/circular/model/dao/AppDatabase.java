@@ -11,14 +11,17 @@ import android.content.Context;
 import br.com.vostre.circular.model.Acesso;
 import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Cidade;
+import br.com.vostre.circular.model.ClimaCidade;
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.FeedbackItinerario;
 import br.com.vostre.circular.model.Feriado;
 import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.HistoricoParada;
 import br.com.vostre.circular.model.HistoricoSecao;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
+import br.com.vostre.circular.model.ImagemParada;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.MensagemResposta;
@@ -35,6 +38,8 @@ import br.com.vostre.circular.model.Problema;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Servico;
 import br.com.vostre.circular.model.TipoProblema;
+import br.com.vostre.circular.model.Tpr;
+import br.com.vostre.circular.model.Tpr2;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.model.UsuarioPreferencia;
 import br.com.vostre.circular.model.ViagemItinerario;
@@ -49,8 +54,9 @@ import br.com.vostre.circular.utils.DBUtils;
         Horario.class, HorarioItinerario.class, SecaoItinerario.class, Onibus.class,
         ParametroInterno.class, ParadaSugestao.class, HistoricoParada.class, UsuarioPreferencia.class,
         HistoricoItinerario.class, Acesso.class, PontoInteresseSugestao.class, TipoProblema.class, Problema.class, Servico.class,
-        ViagemItinerario.class, Feriado.class, HistoricoSecao.class, LogItinerario.class, LogParada.class},
-        version = 12)
+        ViagemItinerario.class, Feriado.class, HistoricoSecao.class, LogItinerario.class, LogParada.class,
+        ClimaCidade.class, ImagemParada.class, FeedbackItinerario.class, Tpr.class, Tpr2.class},
+        version = 13)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -106,6 +112,15 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract HistoricoSecaoDAO historicoSecaoDAO();
     public abstract LogConsultaDAO logConsultaDAO();
 
+    //2.4.0 - v13 bd = inserindo id de cidade para buscar dados na api de clima, alem de latitude e longitude e dados do clima da cidade
+    //                 tabela de imagem da parada para criacao do album de fotos da parada
+    //                 tabela de feedback do usuario em relacao ao itinerario (dados inconsistentes, etc.)
+    //                 tabelas temporarias 'views' para acelerar consulta de rotas
+    public abstract ClimaCidadeDAO climaCidadeDAO();
+    public abstract ImagemParadaDAO imagemParadaDAO();
+    public abstract FeedbackItinerarioDAO feedbackItinerarioDAO();
+    public abstract TemporariasDAO temporariasDAO();
+
     public static AppDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {
             INSTANCE =
@@ -114,7 +129,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             // Don't do this on a real app! See PersistenceBasicSample for an example.
                             //.allowMainThreadQueries()
                             .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
-                                    MIGRATION_6_10, MIGRATION_7_10, MIGRATION_8_10, MIGRATION_9_10, MIGRATION_11_12)
+                                    MIGRATION_6_10, MIGRATION_7_10, MIGRATION_8_10, MIGRATION_9_10, MIGRATION_11_12, MIGRATION_12_13)
                             .fallbackToDestructiveMigration()
                             .build();
         }
@@ -277,6 +292,28 @@ public abstract class AppDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'paradaFinal' TEXT");
             database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'totalParadas' INTEGER NOT NULL DEFAULT 0");
             database.execSQL("ALTER TABLE 'itinerario' ADD COLUMN 'trajeto' TEXT");
+        }
+    };
+
+    // v2.4.0 - v13 bd
+    public static final Migration MIGRATION_12_13 = new Migration(12, 13) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE 'cidade' ADD COLUMN 'id_clima' INTEGER");
+            database.execSQL("ALTER TABLE 'cidade' ADD COLUMN 'latitude' REAL");
+            database.execSQL("ALTER TABLE 'cidade' ADD COLUMN 'longitude' REAL");
+
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'clima_cidade' ('idClima' TEXT NOT NULL, 'clima' TEXT NOT NULL, 'icone' TEXT NOT NULL, 'descricao' TEXT NOT NULL, 'temperatura' REAL NOT NULL, 'sensacao' REAL NOT NULL, 'tempMinima' REAL NOT NULL, 'tempMaxima' REAL NOT NULL, 'umidade' REAL NOT NULL, 'nascerDoSol' INTEGER NOT NULL, 'porDoSol' INTEGER NOT NULL, 'cidade' TEXT NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'imagem_parada' ('parada' TEXT NOT NULL, 'imagem' TEXT NOT NULL, 'descricao' TEXT, 'status' INTEGER NOT NULL, 'imagemEnviada' INTEGER NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'feedback_itinerario' ('itinerario' TEXT NOT NULL, 'descricao' TEXT NOT NULL, 'imagem' TEXT, 'imagemEnviada' INTEGER NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+
+            database.execSQL("ALTER TABLE 'parada_itinerario' ADD COLUMN 'distanciaAcumulada' REAL");
+
+            database.execSQL("DROP TABLE IF EXISTS 'tpr'");
+            database.execSQL("DROP TABLE IF EXISTS 'tpr2'");
+
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'tpr' ('sigla' TEXT, 'tarifa' REAL NOT NULL, 'distanciaAcumuladaInicial' REAL NOT NULL, 'distanciaAcumulada' REAL NOT NULL, 'tempo' INTEGER NOT NULL, 'acessivel' INTEGER NOT NULL, 'empresa' TEXT NOT NULL, 'observacao' TEXT, 'mostraRua' INTEGER NOT NULL, 'idItinerario' TEXT NOT NULL, 'idBairroPartida' TEXT NOT NULL, 'bairroPartida' TEXT NOT NULL, 'cidadePartida' TEXT NOT NULL, 'idBairroDestino' TEXT NOT NULL, 'bairroDestino' TEXT NOT NULL, 'cidadeDestino' TEXT NOT NULL, 'distanciaTrechoMetros' REAL, 'tempoTrecho' INTEGER, 'tarifaTrecho' REAL, 'inicio' INTEGER NOT NULL, 'fim' INTEGER NOT NULL, 'aliasBairroPartida' TEXT, 'aliasCidadePartida' TEXT, 'aliasBairroDestino' TEXT, 'aliasCidadeDestino' TEXT, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS 'tpr2' ('idItinerario' TEXT NOT NULL, 'distanciaMetros' REAL NOT NULL, 'idBairroPartida' TEXT NOT NULL, 'idBairroDestino' TEXT NOT NULL, 'distanciaTrechoMetros' REAL NOT NULL, 'flagTrecho' INTEGER NOT NULL, 'id' TEXT NOT NULL, 'ativo' INTEGER NOT NULL, 'enviado' INTEGER NOT NULL, 'data_cadastro' INTEGER NOT NULL, 'usuario_cadastro' TEXT, 'ultima_alteracao' INTEGER NOT NULL, 'usuario_ultima_alteracao' TEXT, 'programado_para' INTEGER, PRIMARY KEY('id'))");
         }
     };
 

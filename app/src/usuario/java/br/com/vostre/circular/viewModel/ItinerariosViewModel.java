@@ -30,10 +30,13 @@ import org.joda.time.format.PeriodFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Consumer;
 
@@ -62,7 +65,16 @@ import es.usc.citius.hipster.graph.GraphBuilder;
 import es.usc.citius.hipster.graph.GraphEdge;
 import es.usc.citius.hipster.graph.GraphSearchProblem;
 import es.usc.citius.hipster.graph.HipsterDirectedGraph;
+import es.usc.citius.hipster.model.Transition;
+import es.usc.citius.hipster.model.function.ActionFunction;
+import es.usc.citius.hipster.model.function.CostFunction;
+import es.usc.citius.hipster.model.function.TransitionFunction;
+import es.usc.citius.hipster.model.function.impl.StateTransitionFunction;
+import es.usc.citius.hipster.model.problem.ProblemBuilder;
 import es.usc.citius.hipster.model.problem.SearchProblem;
+
+import static br.com.vostre.circular.utils.DBUtils.populaTabelaTemp;
+import static br.com.vostre.circular.utils.DBUtils.populaTabelaTemp2;
 
 public class ItinerariosViewModel extends AndroidViewModel {
 
@@ -117,6 +129,8 @@ public class ItinerariosViewModel extends AndroidViewModel {
     public MutableLiveData<Location> localAtual;
     public LiveData<List<ParadaBairro>> paradasProximas;
     public boolean destacaItinerario = false;
+
+    public LiveData<List<ParadaBairro>> paradasItinerario;
 
     public boolean isTodos() {
         return todos;
@@ -225,26 +239,26 @@ public class ItinerariosViewModel extends AndroidViewModel {
         isFeriado = new MutableLiveData<>();
         isFeriado.setValue(false);
 
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                iniciaTabelaTemporaria();
-            }
-        });
+        paradasItinerario = appDatabase.paradaItinerarioDAO()
+                .listarTodosAtivosPorItinerarioEBairro("", "");
+
+//        AsyncTask.execute(new Runnable() {
+//            @Override
+//            public void run() {
+//                iniciaTabelaTemporaria();
+//                iniciaTabelaTemporaria2();
+//            }
+//        });
 
         localAtual = new MutableLiveData<>();
         localAtual.postValue(new Location(LocationManager.GPS_PROVIDER));
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplication());
+
     }
 
-    private void iniciaTabelaTemporaria() {
-        SimpleSQLiteQuery queryTemp = new SimpleSQLiteQuery(geraTabelaTemp());
-        appDatabase.itinerarioDAO().geraTabelaTemp(queryTemp);
-
-        appDatabase.itinerarioDAO().deletaTabelaTemp(new SimpleSQLiteQuery("DELETE FROM tpr"));
-
-        SimpleSQLiteQuery queryPopula = new SimpleSQLiteQuery(populaTabelaTemp());
-        appDatabase.itinerarioDAO().populaTabelaTemp(queryPopula);
+    public void carregaParadasItinerario(String itinerario, String bairro, String itinerarioSeguinte){
+        paradasItinerario = appDatabase.paradaItinerarioDAO()
+                .listarTodosAtivosPorItinerarioEBairro(itinerario, bairro);
     }
 
     public void iniciarAtualizacoesPosicao(){
@@ -676,6 +690,8 @@ public class ItinerariosViewModel extends AndroidViewModel {
                     }
 
                     if(itinerario != null && itinerario.getProximoHorario() != null){
+                        checaPontosDeEmbarqueEDesembarque(itinerario);
+
                         itinerarios.add(itinerario);
                         resultadosItinerarios.postValue(itinerarios);
                     }
@@ -685,7 +701,8 @@ public class ItinerariosViewModel extends AndroidViewModel {
                     GraphBuilder<String, Double> builder = GraphBuilder.create();
 
                     //testa e popula tabela temporaria para consulta
-                    verificaTabelaTemporaria();
+//                    verificaTabelaTemporaria();
+//                    verificaTabelaTemporaria2();
 
                     SimpleSQLiteQuery queryConsulta = new SimpleSQLiteQuery(consultaTabelaTempSimplificado());
 
@@ -693,7 +710,7 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                     //preparando algoritmo de busca
                     Algorithm.SearchResult result = preparaAStar(builder);
-                    List<List> caminhos = result.getOptimalPaths();
+                    List<List> caminhos = result.getOptimalPaths(getApplication().getApplicationContext(), myDestino.getBairro().getId());
 
                     //processando caminho encontrado
                     for(List<List> caminho : caminhos){
@@ -765,8 +782,20 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                                 //busca proximo itinerario do caminho
                                 // NOVO v2.3.x - busca por trecho isolado caso não encontre nas formas anteriores
-                                String itinerariosDisponiveis = TextUtils.join("','",
-                                        appDatabase.itinerarioDAO().carregarOpcoesPorPartidaEDestinoTrechoSync(bairroAnterior.getBairro().getId(), b.getBairro().getId()));
+
+                                // testa se existe itinerario direto no trecho
+                                SimpleSQLiteQuery queryOpcoesDij = new SimpleSQLiteQuery(
+                                        geraQueryItinerarios(bairroAnterior.getBairro().getId(), b.getBairro().getId(), todos));
+
+                                String itinerariosDisponiveis = TextUtils.join("','", appDatabase.itinerarioDAO()
+                                        .carregarOpcoesPorPartidaEDestinoSync(queryOpcoesDij));
+
+                                // nao existe itinerario direto no trecho
+                                if(itinerariosDisponiveis == null || itinerariosDisponiveis.isEmpty()){
+                                    itinerariosDisponiveis = TextUtils.join("','",
+                                            appDatabase.itinerarioDAO()
+                                                    .carregarOpcoesPorPartidaEDestinoTrechoSync(bairroAnterior.getBairro().getId(), b.getBairro().getId()));
+                                }
 
                                 if(!itinerariosDisponiveis.isEmpty()){
                                     trechoIsolado = true;
@@ -867,6 +896,9 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
                                     itinerarioAnterior = itinerario;
 
+                                    // verifica locais de embarque e desembarque
+                                    checaPontosDeEmbarqueEDesembarque(itinerario);
+
                                     //adiciona trecho a lista de itinerarios do caminho encontrado
                                     itinerarios.add(itinerario);
                                     bairroAnterior = b;
@@ -885,6 +917,27 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
     }
 
+    private void checaPontosDeEmbarqueEDesembarque(ItinerarioPartidaDestino itinerario) {
+        // verifica locais de embarque e desembarque
+        if (!itinerario.getIdBairroPartida().equals(itinerario.getBairroConsultaPartida())) {
+            BairroCidade bairroEmbarque = appDatabase.bairroDAO().carregarSync(itinerario.getBairroConsultaPartida());
+
+            if (bairroEmbarque != null) {
+                itinerario.setNomePartida(bairroEmbarque.getBairro().getNome() + ", " + bairroEmbarque.getNomeCidade());
+            }
+
+        }
+
+        if (!itinerario.getIdBairroDestino().equals(itinerario.getBairroConsultaDestino())) {
+            BairroCidade bairroDesembarque = appDatabase.bairroDAO().carregarSync(itinerario.getBairroConsultaDestino());
+
+            if (bairroDesembarque != null) {
+                itinerario.setNomeDestino(bairroDesembarque.getBairro().getNome() + ", " + bairroDesembarque.getNomeCidade());
+            }
+
+        }
+    }
+
     private boolean checaHoraDiaSeguinte(DateTime horaDaConsulta, String hora) {
         DateTime horaConsulta = DateTimeFormat.forPattern("HH:mm:ss").parseDateTime(hora);
 
@@ -895,34 +948,15 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
         for(ItinerarioPartidaDestino i : itinerarios){
 
-            if(i.isFlagTrecho()){
-
-                //aumentando distancias dos trechos para priorizar itinerarios 'inteiros' ao inves de 'partidos'
-                if(i.getDistanciaTrechoMetros() != null){
-                    Double soma = i.getDistanciaTrechoMetros().doubleValue()+50000;
-                    builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(soma);
-                } else{
-                    builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(100000d);
-                }
-
+            if(i.getItinerario() != null && i.getDistanciaTrechoMetros() != null){
+                builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino())
+                        .withEdge(i.getDistanciaTrechoMetros());
             } else{
-                //itinerario 'inteiro' menor que 50Km - prioridade maxima na busca. Diminuindo distancia
-                if(i.getItinerario() != null && i.getItinerario().getDistanciaMetros() != null && i.getItinerario().getDistanciaMetros() <= 50000){
-                    builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino()).withEdge(1d);
-                } else{
-                    //usando distancia real do itinerario
-                    if(i.getItinerario() != null && i.getItinerario().getDistanciaMetros() != null){
-                        builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino())
-                                .withEdge(i.getItinerario().getDistanciaMetros());
-                    } else{
-                        //excecao aos filtros acima - prioridade minima
-                        builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino())
-                                .withEdge(100000d);
-                    }
-
-                }
-
+                //excecao aos filtros acima - prioridade minima
+                builder.connect(i.getIdBairroPartida()).to(i.getIdBairroDestino())
+                        .withEdge(100000d);
             }
+
         }
 
         HipsterDirectedGraph<String,Double> graph = builder.createDirectedGraph();
@@ -946,6 +980,17 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
             SimpleSQLiteQuery queryPopula = new SimpleSQLiteQuery(populaTabelaTemp());
             appDatabase.itinerarioDAO().populaTabelaTemp(queryPopula);
+        }
+    }
+
+    private void verificaTabelaTemporaria2() {
+        List<ItinerarioPartidaDestino> rows = appDatabase.itinerarioDAO().testarTabelaTemp(new SimpleSQLiteQuery("SELECT * FROM tpr2"));
+
+        if (rows.size() == 0 || rows.get(0) == null) {
+            appDatabase.itinerarioDAO().deletaTabelaTemp(new SimpleSQLiteQuery("DELETE FROM tpr2"));
+
+            SimpleSQLiteQuery queryPopula2 = new SimpleSQLiteQuery(populaTabelaTemp2());
+            appDatabase.itinerarioDAO().populaTabelaTemp(queryPopula2);
         }
     }
 
@@ -1006,7 +1051,43 @@ public class ItinerariosViewModel extends AndroidViewModel {
 
         }
 
+        verificarAlias(itinerario);
+
         return itinerario;
+    }
+
+    private void verificarAlias(ItinerarioPartidaDestino itinerario) {
+        String bairroPartida, cidadePartida, bairroDestino, cidadeDestino, observacao;
+
+        bairroPartida = itinerario.getNomeBairroPartida();
+        cidadePartida = itinerario.getNomeCidadePartida();
+        bairroDestino = itinerario.getNomeBairroDestino();
+        cidadeDestino = itinerario.getNomeCidadeDestino();
+
+        bairroPartida = (itinerario.getItinerario().getAliasBairroPartida() == null ||
+                itinerario.getItinerario().getAliasBairroPartida().isEmpty()) ?
+                bairroPartida :
+                itinerario.getItinerario().getAliasBairroPartida();
+
+        cidadePartida = (itinerario.getItinerario().getAliasCidadePartida() == null ||
+                itinerario.getItinerario().getAliasCidadePartida().isEmpty()) ?
+                cidadePartida :
+                itinerario.getItinerario().getAliasCidadePartida();
+
+        bairroDestino = (itinerario.getItinerario().getAliasBairroDestino() == null ||
+                itinerario.getItinerario().getAliasBairroDestino().isEmpty()) ?
+                bairroDestino :
+                itinerario.getItinerario().getAliasBairroDestino();
+
+        cidadeDestino = (itinerario.getItinerario().getAliasCidadeDestino() == null ||
+                itinerario.getItinerario().getAliasCidadeDestino().isEmpty()) ?
+                cidadeDestino :
+                itinerario.getItinerario().getAliasCidadeDestino();
+
+        itinerario.setNomeBairroPartida(bairroPartida);
+        itinerario.setNomeCidadePartida(cidadePartida);
+        itinerario.setNomeBairroDestino(bairroDestino);
+        itinerario.setNomeCidadeDestino(cidadeDestino);
     }
 
     private ItinerarioPartidaDestino ordenaConsultaProximoHorario(SimpleSQLiteQuery query) {
@@ -1546,134 +1627,29 @@ public class ItinerariosViewModel extends AndroidViewModel {
                 + DateTimeFormat.forPattern("HH:mm:ss").print(DateTime.now().plusHours(8)) +"' ORDER BY proximoHorario LIMIT 1*/";
     }
 
-    private String geraTabelaTemp(){
-        return "CREATE TABLE IF NOT EXISTS tpr(" +
-                "  sigla TEXT," +
-                "  tarifa REAL," +
-                "  distancia REAL," +
-                "  distanciaMetros REAL," +
-                "  tempo INT," +
-                "  acessivel INT," +
-                "  empresa TEXT," +
-                "  observacao TEXT," +
-                "  mostraRuas INT," +
-                "  id TEXT," +
-                "  ativo INT," +
-                "  enviado INT," +
-                "  data_cadastro INT," +
-                "  usuario_cadastro TEXT," +
-                "  ultima_alteracao INT," +
-                "  usuario_ultima_alteracao TEXT," +
-                "  programado_para INT," +
-                "  \"tempo:1\" INT," +
-                "  idBairroPartida TEXT," +
-                "  bairroPartida TEXT," +
-                "  cidadePartida TEXT," +
-                "  idBairroDestino TEXT," +
-                "  bairroDestino TEXT," +
-                "  cidadeDestino TEXT," +
-                "  distanciaTrecho," +
-                "  distanciaTrechoMetros," +
-                "  tempoTrecho," +
-                "  tarifaTrecho," +
-                "  inicio," +
-                "  fim," +
-                "  \"bairroDestino:1\" TEXT," +
-                "  \"cidadeDestino:1\" TEXT, " +
-                "  aliasBairroPartida TEXT," +
-                "  aliasCidadePartida TEXT," +
-                "  aliasBairroDestino TEXT," +
-                "  aliasCidadeDestino TEXT" +
-                ")";
-    }
-
-    private String populaTabelaTemp(){
-        return "INSERT INTO tpr (sigla, tarifa, distancia, distanciaMetros, tempo, acessivel, empresa, observacao, mostraRuas, " +
-                "id, ativo, enviado, data_cadastro, usuario_cadastro, ultima_alteracao, usuario_ultima_alteracao, programado_para, " +
-                "idBairroPartida, bairroPartida, cidadePartida, idBairroDestino, bairroDestino, cidadeDestino, distanciaTrecho, " +
-                "distanciaTrechoMetros, tempoTrecho, tarifaTrecho, inicio, fim, aliasBairroPartida, aliasCidadePartida, " +
-                "aliasBairroDestino, aliasCidadeDestino)" +
-
-                "SELECT i.sigla, i.tarifa, i.distancia, i.distanciaMetros, i.tempo AS 'tempo', i.acessivel, i.empresa, i.observacao, " +
-                "i.mostraRuas, i.id, i.ativo, i.enviado, i.data_cadastro, i.usuario_cadastro, i.ultima_alteracao, " +
-                "i.usuario_ultima_alteracao, i.programado_para, " +
-                "b.id as 'idBairroPartida', " +
-                "b.nome AS 'bairroPartida', c.nome AS 'cidadePartida', " +
-
-                "(" +
-                " SELECT b2.id FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada AND pi2.itinerario = pi.itinerario" +
-                " INNER JOIN bairro b2 ON b2.id = p2.bairro" +
-                " WHERE pi2.ordem = (SELECT MAX(pi.ordem)+1)" +
-                ") AS 'idBairroDestino'," +
-                "(" +
-                " SELECT b2.nome FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada AND pi2.itinerario = pi.itinerario" +
-                " INNER JOIN bairro b2 ON b2.id = p2.bairro" +
-                " WHERE pi2.ordem = (SELECT MAX(pi.ordem)+1)" +
-                ") AS 'bairroDestino'," +
-                "(" +
-                " SELECT c2.nome FROM parada_itinerario pi2 INNER JOIN parada p2 ON p2.id = pi2.parada AND pi2.itinerario = pi.itinerario" +
-                " INNER JOIN bairro b2 ON b2.id = p2.bairro INNER JOIN cidade c2 ON c2.id = b2.cidade" +
-                " WHERE pi2.ordem = (SELECT MAX(pi.ordem)+1)" +
-                ") AS 'cidadeDestino', " +
-                " SUM(pi.distanciaSeguinte) AS 'distanciaTrecho', SUM(pi.distanciaSeguinteMetros) AS 'distanciaTrechoMetros', " +
-                " SUM(pi.tempoSeguinte) AS 'tempoTrecho', SUM(pi.valorSeguinte) AS 'tarifaTrecho', " +
-                "MIN(pi.ordem) AS 'inicio', MAX(pi.ordem) AS 'fim', i.aliasBairroPartida, i.aliasCidadePartida, " +
-                "i.aliasBairroDestino, i.aliasCidadeDestino" +
-
-                " FROM parada_itinerario pi INNER JOIN " +
-                "     parada p ON p.id = pi.parada INNER JOIN " +
-                "     bairro b ON b.id = p.bairro INNER JOIN " +
-                "     cidade c ON c.id = b.cidade INNER JOIN" +
-                "     itinerario i ON i.id = pi.itinerario" +
-                "     " +
-                " WHERE pi.ativo = 1" +
-                " GROUP BY i.id, b.id, b.nome, c.nome, i.tarifa" +
-                " HAVING bairroDestino != ''" +
-                " ORDER BY pi.itinerario, pi.ordem; ";
-    }
-
-    public String consultaTabelaTemp(){
-        return "SELECT t1.sigla, t1.tarifa, t1.distancia, " +
-                "CASE WHEN t1.distanciaMetros IS NULL THEN t1.distancia * 1000 ELSE t1.distanciaMetros END AS distanciaMetros, " +
-                "t1.tempo, t1.id, t1.idBairroPartida, t1.bairroPartida AS 'bairroPartida', t1.cidadePartida AS 'cidadePartida', " +
-                "t2.idBairroDestino, t2.bairroDestino AS 'bairroDestino', t2.cidadeDestino AS 'cidadeDestino'," +
-
-        "CASE WHEN t1.fim = t2.fim THEN t1.distanciaTrecho ELSE (t2.distanciaTrecho + t1.distanciaTrecho) END AS 'distanciaTrecho'," +
-                "CASE WHEN t1.fim = t2.fim THEN t1.distanciaTrechoMetros ELSE (t2.distanciaTrechoMetros + t1.distanciaTrechoMetros) END AS 'distanciaTrechoMetros'," +
-                "CASE WHEN t1.fim = t2.fim THEN t1.tempoTrecho ELSE (t2.tempoTrecho + t1.tempoTrecho) END AS 'tempoTrecho'," +
-                "CASE WHEN t1.fim = t2.fim THEN t1.tarifaTrecho ELSE (t2.tarifaTrecho + t1.tarifaTrecho) END AS 'tarifaTrecho', " +
-                " " +
-                "CASE WHEN (t1.inicio = 1 AND t2.idBairroDestino = (" +
-                " SELECT p3.bairro " +
-                " FROM parada_itinerario pi3 INNER JOIN parada p3 ON p3.id = pi3.parada " +
-                " WHERE pi3.itinerario = t1.id " +
-                " ORDER BY pi3.ordem DESC LIMIT 1 " +
-                "    )) THEN 0 ELSE 1 END AS 'flagTrecho' " +
-                "" +
-                " FROM tpr t1 INNER JOIN tpr t2 ON t1.id = t2.id AND t1.fim <= t2.fim " +
-
-                " ORDER BY t1.id, t1.inicio, t2.inicio";
-    }
-
     public String consultaTabelaTempSimplificado(){
-        return "SELECT " +
-                "CASE WHEN t1.distanciaMetros IS NULL THEN t1.distancia * 1000 ELSE t1.distanciaMetros END AS distanciaMetros, " +
-                "t1.idBairroPartida, " +
-                "t2.idBairroDestino, " +
-
-                "CASE WHEN t1.fim = t2.fim THEN t1.distanciaTrecho ELSE (t2.distanciaTrecho + t1.distanciaTrecho) END AS 'distanciaTrecho'," +
-                "CASE WHEN t1.fim = t2.fim THEN t1.distanciaTrechoMetros ELSE (t2.distanciaTrechoMetros + t1.distanciaTrechoMetros) END AS 'distanciaTrechoMetros'," +
-                " " +
-                "CASE WHEN (t1.inicio = 1 AND t2.idBairroDestino = (" +
-                " SELECT p3.bairro " +
-                " FROM parada_itinerario pi3 INNER JOIN parada p3 ON p3.id = pi3.parada " +
-                " WHERE pi3.itinerario = t1.id " +
-                " ORDER BY pi3.ordem DESC LIMIT 1 " +
-                "    )) THEN 0 ELSE 1 END AS 'flagTrecho' " +
-                "" +
-                " FROM tpr t1 INNER JOIN tpr t2 ON t1.id = t2.id AND t1.fim <= t2.fim " +
-
-                " ORDER BY t1.id, t1.inicio, t2.inicio";
+        return "SELECT t1.id, 0, " +
+                "                        t1.idBairroPartida, " +
+                "                        t2.idBairroDestino," +
+                "                        " +
+                "                        t2.distanciaAcumuladaInicial + t2.distanciaAcumulada - t1.distanciaAcumuladaInicial AS distanciaTrechoMetros," +
+                "                        CASE WHEN (t1.inicio = 1 AND ( " +
+                "                                   t2.idBairroDestino = ( " +
+                "                                                            SELECT p3.bairro " +
+                "                                                              FROM parada_itinerario pi3 " +
+                "                                                                   INNER JOIN " +
+                "                                                                   parada p3 ON p3.id = pi3.parada " +
+                "                                                             WHERE pi3.itinerario = t1.id " +
+                "                                                             ORDER BY pi3.ordem DESC " +
+                "                                                             LIMIT 1 " +
+                "                                                        ) ) " +
+                "                            ) THEN 0 ELSE 1 END AS flag_trecho " +
+                "                   FROM tpr t1 INNER JOIN " +
+                "                        tpr t2 ON t1.id = t2.id AND  " +
+                "                                  t1.fim <= t2.fim " +
+                "                  ORDER BY t1.id, " +
+                "                           t1.inicio, " +
+                "                           t2.inicio";
     }
 
 }

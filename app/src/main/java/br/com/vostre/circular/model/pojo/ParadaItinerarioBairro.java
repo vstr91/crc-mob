@@ -35,6 +35,9 @@ public class ParadaItinerarioBairro {
     @ColumnInfo(name = "longitude")
     String longitude;
 
+    @ColumnInfo(name = "rua")
+    String rua;
+
     @Ignore
     String bairroComCidade;
 
@@ -118,6 +121,14 @@ public class ParadaItinerarioBairro {
 
     public void setLongitude(String longitude) {
         this.longitude = longitude;
+    }
+
+    public String getRua() {
+        return rua;
+    }
+
+    public void setRua(String rua) {
+        this.rua = rua;
     }
 
     @Override

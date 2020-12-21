@@ -16,6 +16,8 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.sqlite.db.SimpleSQLiteQuery;
+
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
@@ -54,11 +56,13 @@ import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.EntidadeBase;
 import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.FeedbackItinerario;
 import br.com.vostre.circular.model.Feriado;
 import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.HistoricoSecao;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
+import br.com.vostre.circular.model.ImagemParada;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.Onibus;
@@ -74,6 +78,8 @@ import br.com.vostre.circular.model.Problema;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Servico;
 import br.com.vostre.circular.model.TipoProblema;
+import br.com.vostre.circular.model.Tpr;
+import br.com.vostre.circular.model.Tpr2;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.model.UsuarioPreferencia;
 import br.com.vostre.circular.model.ViagemItinerario;
@@ -89,6 +95,7 @@ import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.view.MensagensActivity;
 import br.com.vostre.circular.view.MenuActivity;
 import br.com.vostre.circular.viewModel.CidadesViewModel;
+import br.com.vostre.circular.viewModel.DetalhesItinerarioViewModel;
 import br.com.vostre.circular.viewModel.EmpresasViewModel;
 import br.com.vostre.circular.viewModel.ParadasSugeridasViewModel;
 import br.com.vostre.circular.viewModel.ParadasViewModel;
@@ -103,6 +110,11 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
+
+import static br.com.vostre.circular.utils.DBUtils.geraTabelaTemp2;
+import static br.com.vostre.circular.utils.DBUtils.iniciaTabelasTemporarias;
+import static br.com.vostre.circular.utils.DBUtils.populaTabelaTemp;
+import static br.com.vostre.circular.utils.DBUtils.populaTabelaTemp2;
 
 /**
  * Handle the transfer of data between a server and an
@@ -161,6 +173,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
 //    List<? extends EntidadeBase> tiposProblema;
 //    List<? extends EntidadeBase> problemas;
+
+    List<? extends EntidadeBase> imagensParadas;
+    List<? extends EntidadeBase> feedbacksItinerarios;
+    List<? extends EntidadeBase> tprs;
+    List<? extends EntidadeBase> tpr2s;
 
     br.com.vostre.circular.utils.Crypt crypt;
 
@@ -525,6 +542,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             final String idFinal = id;
 
             Call<String> call = api.recebeDados(token, data, id);
+            System.out.println("URL: "+call.request().url().url().toString());
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
@@ -604,9 +622,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
     private void processaJson(Response<String> response, final boolean admin) throws JSONException {
 
         String dados = response.body();
-        //System.out.println("RESPON: "+response.body());
+        System.out.println("RESPON: "+response.body());
 
-        System.out.println(dados);
+        //System.out.println(dados);
 
         if(dados != null){
 
@@ -653,7 +671,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 JSONArray logsItinerarios = null;
                 JSONArray logsParadas = null;
 
-                //System.out.println("PAR_SUG: "+arrayObject.optJSONArray("paradas_sugestoes"));
+                JSONArray imagensParadas = null;
+                JSONArray feedbacksItinerarios = null;
+
+                JSONArray tprs = null;
+                JSONArray tpr2s = null;
+
+                System.out.println("CID: "+arrayObject.optJSONArray("cidades"));
 
                 if(arrayObject.optJSONArray("paradas_sugestoes") != null){
                     paradasSugestoes = arrayObject.getJSONArray("paradas_sugestoes");
@@ -705,6 +729,22 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 if(arrayObject.optJSONArray("logs_paradas") != null){
                     logsParadas = arrayObject.getJSONArray("logs_paradas");
+                }
+
+                if(arrayObject.optJSONArray("imagens_paradas") != null){
+                    imagensParadas = arrayObject.getJSONArray("imagens_paradas");
+                }
+
+                if(arrayObject.optJSONArray("feedbacks_itinerarios") != null){
+                    feedbacksItinerarios = arrayObject.getJSONArray("feedbacks_itinerarios");
+                }
+
+                if(arrayObject.optJSONArray("tprs") != null){
+                    tprs = arrayObject.getJSONArray("tprs");
+                }
+
+                if(arrayObject.optJSONArray("tpr2s") != null){
+                    tpr2s = arrayObject.getJSONArray("tpr2s");
                 }
 
                 // ACESSOS
@@ -1454,6 +1494,110 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                 }
 
+                // IMAGENS PARADAS
+
+                if(imagensParadas.length() > 0){
+
+                    int total = imagensParadas.length();
+                    List<ImagemParada> lstImagensParadas = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        ImagemParada parada;
+                        JSONObject obj = imagensParadas.getJSONObject(i);
+
+                        parada = (ImagemParada) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), ImagemParada.class, 1);
+                        parada.setEnviado(true);
+                        parada.setImagemEnviada(true);
+
+                        lstImagensParadas.add(parada);
+
+                        if(parada.getImagem() != null && !parada.getImagem().isEmpty()){
+                            File imagem = new File(getContext().getApplicationContext().getFilesDir(), parada.getImagem());
+
+                            if(!imagem.exists() || !imagem.canWrite()){
+                                imageDownload(baseUrl, parada.getImagem());
+                            }
+                        }
+
+                    }
+
+                    add(lstImagensParadas, "imagem_parada");
+
+                }
+
+                // FEEDBACKS ITINERARIOS
+
+                if(feedbacksItinerarios.length() > 0){
+
+                    int total = feedbacksItinerarios.length();
+                    List<FeedbackItinerario> lstFeedbacksItinerarios = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        FeedbackItinerario fi;
+                        JSONObject obj = feedbacksItinerarios.getJSONObject(i);
+
+                        fi = (FeedbackItinerario) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), FeedbackItinerario.class, 1);
+                        fi.setEnviado(true);
+                        fi.setImagemEnviada(true);
+
+                        lstFeedbacksItinerarios.add(fi);
+
+                        if(fi.getImagem() != null && !fi.getImagem().isEmpty()){
+                            File imagem = new File(getContext().getApplicationContext().getFilesDir(), fi.getImagem());
+
+                            if(!imagem.exists() || !imagem.canWrite()){
+                                imageDownload(baseUrl, fi.getImagem());
+                            }
+                        }
+
+                    }
+
+                    add(lstFeedbacksItinerarios, "feedback_itinerario");
+
+                }
+
+                // TPR 1
+
+                if(tprs.length() > 0){
+
+                    int total = tprs.length();
+                    List<Tpr> lstTprs = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        Tpr tpr;
+                        JSONObject obj = tprs.getJSONObject(i);
+
+                        tpr = (Tpr) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Tpr.class, 1);
+                        tpr.setEnviado(true);
+
+                        lstTprs.add(tpr);
+                    }
+
+                    add(lstTprs, "tpr");
+
+                }
+
+                // TPR 2
+
+                if(tpr2s.length() > 0){
+
+                    int total = tpr2s.length();
+                    List<Tpr2> lstTpr2s = new ArrayList<>();
+
+                    for(int i = 0; i < total; i++){
+                        Tpr2 tpr2;
+                        JSONObject obj = tpr2s.getJSONObject(i);
+
+                        tpr2 = (Tpr2) br.com.vostre.circular.utils.JsonUtils.fromJson(obj.toString(), Tpr2.class, 1);
+                        tpr2.setEnviado(true);
+
+                        lstTpr2s.add(tpr2);
+                    }
+
+                    add(lstTpr2s, "tpr2");
+
+                }
+
                 if(!admin){
 
                     AsyncTask.execute(new Runnable() {
@@ -1550,6 +1694,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
         if(BuildConfig.APPLICATION_ID.endsWith("circular")){
             appDatabase.logConsultaDAO().deletarItinerariosEnviados();
             appDatabase.logConsultaDAO().deletarParadasEnviadas();
+            appDatabase.temporariasDAO().deletarInativos();
+            appDatabase.temporariasDAO().deletarInativos2();
         }
 
     }
@@ -1624,6 +1770,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             logsItinerarios = appDatabase.logConsultaDAO().listarTodosItinerariosAEnviar();
             logsParadas = appDatabase.logConsultaDAO().listarTodasParadasAEnviar();
 
+            imagensParadas = appDatabase.imagemParadaDAO().listarTodosAEnviar();
+            feedbacksItinerarios = appDatabase.feedbackItinerarioDAO().listarTodosAEnviar();
+
+            tprs = appDatabase.temporariasDAO().listarTodosTemp1AEnviar();
+            tpr2s = appDatabase.temporariasDAO().listarTodosTemp2AEnviar();
+
             return null;
         }
 
@@ -1668,14 +1820,21 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             String strLogsItinerarios = "\"logs_itinerarios\": "+JsonUtils.toJson((List<EntidadeBase>) logsItinerarios);
             String strLogsParadas = "\"logs_paradas\": "+JsonUtils.toJson((List<EntidadeBase>) logsParadas);
 
+            String strImagensParadas = "\"imagens_paradas\": "+JsonUtils.toJson((List<EntidadeBase>) imagensParadas);
+            String strFeedbacksItinerarios = "\"feedbacks_itinerarios\": "+JsonUtils.toJson((List<EntidadeBase>) feedbacksItinerarios);
+
+            String strTprs = "\"tprs\": "+JsonUtils.toJson((List<EntidadeBase>) tprs);
+            String strTpr2s = "\"tpr2s\": "+JsonUtils.toJson((List<EntidadeBase>) tpr2s);
+
             String json = "{"+strPaises+","+strEmpresas+","+strOnibus+","+strEstados+","+strCidades+","
                     +strBairros+","+strParadas+","+strItinerarios+","+strHorarios+","+strParadasItinerarios+","
                     +strSecoesItinerarios+","+strHorariosItinerarios+","+strMensagens+","+strParametros+","
                     +strPontosInteresse+","+strUsuarios+","+strParadasSugestoes+","+strPreferencias+","+strHistoricos+","
                     +strPontosInteresseSugestoes+","+strServicos+","+strViagens+","+strFeriados+","+strHistoricoSecoes+","
-                    +strLogsItinerarios+","+strLogsParadas+"}";
+                    +strLogsItinerarios+","+strLogsParadas+","+strImagensParadas+","+strFeedbacksItinerarios+","
+                    +strTprs+","+strTpr2s+"}";
 
-             System.out.println("JSON: "+strItinerarios);
+             System.out.println("JSON: "+strImagensParadas);
 
             //System.out.println("POI ENV: "+strPontosInteresse);
             //System.out.println("POIS ENV: "+strPontosInteresseSugestoes);
@@ -1700,7 +1859,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     +bairros.size()+paradas.size()+itinerarios.size()+horarios.size()+paradasItinerario.size()
                     +secoesItinerarios.size()+horariosItinerarios.size()+mensagens.size()+parametros.size()+pontosInteresse.size()
                     +usuarios.size()+paradaSugestoes.size()+preferencias.size()+historicos.size()+pontosInteresseSugestoes.size()
-                    +servicos.size()+viagens.size()+feriados.size()+historicosSecoes.size()+logsItinerarios.size()+logsParadas.size();
+                    +servicos.size()+viagens.size()+feriados.size()+historicosSecoes.size()+logsItinerarios.size()+logsParadas.size()
+                    +imagensParadas.size()+feedbacksItinerarios.size()+tprs.size()+tpr2s.size();
 
             if(registros > 0){
                 chamaAPI(registros, json, 0, baseUrl, token);
@@ -1732,6 +1892,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
         List<ViagemItinerario> viagens;
 
+        List<ImagemParada> imagensParadas;
+        List<FeedbackItinerario> feedbacksItinerarios;
+
         @Override
         protected Void doInBackground(final Void... params) {
 
@@ -1748,6 +1911,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
             servicos = appDatabase.servicoDAO().listarTodosImagemAEnviar();
 
             viagens = appDatabase.viagemItinerarioDAO().listarTodosArquivoAEnviar();
+
+            imagensParadas = appDatabase.imagemParadaDAO().listarTodosImagemAEnviar();
+            feedbacksItinerarios = appDatabase.feedbackItinerarioDAO().listarTodosImagemAEnviar();
 
             return null;
         }
@@ -1801,52 +1967,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     }
                 });
 
-                /*
-
-                RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
-                MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
-                RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
-
-                CircularAPI api = retrofit.create(CircularAPI.class);
-                Call<String> call = api.enviaImagem(body, name, tokenImagem);
-                call.enqueue(new Callback<String>() {
-                    @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
-
-                        if(response.code() == 200){
-                            cidade.setImagemEnviada(true);
-                            CidadesViewModel.edit(cidade, getContext().getApplicationContext());
-                        } else{
-
-                            if(mostraToast){
-                                Log.d("ENVIA_IMAGEM", "Erro "+response.code()+" ("
-                                        +response.message()+") ao enviar imagem de "+cidade.getNome()+" para o servidor");
-//                                Toast.makeText(getContext().getApplicationContext(),
-//                                        "Erro "+response.code()+" ("+response.message()+") ao enviar imagem de "+cidade.getNome()+" para o servidor",
-//                                        Toast.LENGTH_SHORT).show();
-                            }
-
-                            PreferenceUtils.gravaMostraToast(ctx, false);
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onFailure(Call<String> call, Throwable t) {
-
-                        if(mostraToast){
-                            Toast.makeText(getContext().getApplicationContext(),
-                                    "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+cidade.getNome()+" para o servidor",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-
-                        PreferenceUtils.gravaMostraToast(ctx, false);
-
-                    }
-                });
-                */
-
             }
 
             for(final Empresa empresa : empresas){
@@ -1888,49 +2008,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     }
                 });
-
-                /*
-                RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
-                MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
-                RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
-
-                CircularAPI api = retrofit.create(CircularAPI.class);
-                Call<String> call = api.enviaImagem(body, name, tokenImagem);
-                call.enqueue(new Callback<String>() {
-                    @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
-
-                        if(response.code() == 200){
-                            empresa.setImagemEnviada(true);
-                            EmpresasViewModel.editEmpresa(empresa, getContext().getApplicationContext());
-                        } else{
-
-                            if(mostraToast){
-                                Toast.makeText(getContext().getApplicationContext(),
-                                        "Erro ao enviar imagem de "+empresa.getNome()+" para o servidor",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-
-                            PreferenceUtils.gravaMostraToast(ctx, false);
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onFailure(Call<String> call, Throwable t) {
-
-                        if(mostraToast){
-                            Toast.makeText(getContext().getApplicationContext(),
-                                    "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+empresa.getNome()+" para o servidor",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-
-                        PreferenceUtils.gravaMostraToast(ctx, false);
-
-                    }
-                });
-                */
 
             }
 
@@ -1974,45 +2051,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     }
                 });
 
-                /*
-                RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
-                MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
-                RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
-
-                CircularAPI api = retrofit.create(CircularAPI.class);
-                Call<String> call = api.enviaImagem(body, name, tokenImagem);
-                call.enqueue(new Callback<String>() {
-                    @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
-
-                        if(response.code() == 200){
-                            parada.setImagemEnviada(true);
-                            ParadasViewModel.edit(parada, getContext().getApplicationContext());
-                        } else{
-
-                            if(mostraToast){
-                                Toast.makeText(getContext().getApplicationContext(),
-                                        "Erro ao enviar imagem de "+parada.getNome()+" para o servidor",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onFailure(Call<String> call, Throwable t) {
-
-                        if(mostraToast){
-                            Toast.makeText(getContext().getApplicationContext(),
-                                    "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+parada.getNome()+" para o servidor",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-                });
-                */
-
             }
 
             for(final PontoInteresse pontoInteresse : pontosInteresse){
@@ -2052,46 +2090,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     }
                 });
-
-                /*
-
-                RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
-                MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
-                RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
-
-                CircularAPI api = retrofit.create(CircularAPI.class);
-                Call<String> call = api.enviaImagem(body, name, tokenImagem);
-                call.enqueue(new Callback<String>() {
-                    @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
-
-                        if(response.code() == 200){
-                            pontoInteresse.setImagemEnviada(true);
-                            PontosInteresseViewModel.edit(pontoInteresse, getContext().getApplicationContext());
-                        } else{
-
-                            if(mostraToast){
-                                Toast.makeText(getContext().getApplicationContext(),
-                                        "Erro "+response.code()+" ("+response.message()+") ao enviar imagem de "+pontoInteresse.getNome()+" para o servidor",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onFailure(Call<String> call, Throwable t) {
-
-                        if(mostraToast){
-                            Toast.makeText(getContext().getApplicationContext(),
-                                    "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+pontoInteresse.getNome()+" para o servidor",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-                });
-                */
 
             }
 
@@ -2135,45 +2133,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     }
                 });
 
-                /*
-                RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
-                MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
-                RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
-
-                CircularAPI api = retrofit.create(CircularAPI.class);
-                Call<String> call = api.enviaImagem(body, name, tokenImagem);
-                call.enqueue(new Callback<String>() {
-                    @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
-
-                        if(response.code() == 200){
-                            paradaSugestao.setImagemEnviada(true);
-                            ParadasSugeridasViewModel.edit(paradaSugestao, getContext().getApplicationContext());
-                        } else{
-
-                            if(mostraToast){
-                                Toast.makeText(getContext().getApplicationContext(),
-                                        "Erro "+response.code()+" ("+response.message()+") ao enviar imagem de "+paradaSugestao.getNome()+" para o servidor",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onFailure(Call<String> call, Throwable t) {
-
-                        if(mostraToast){
-                            Toast.makeText(getContext().getApplicationContext(),
-                                    "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+paradaSugestao.getNome()+" para o servidor",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-                });
-                */
-
             }
 
             for(final PontoInteresseSugestao pontoInteresseSugestao : pontosInteresseSugestoes){
@@ -2215,46 +2174,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
 
                     }
                 });
-
-                /*
-
-                RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), imagem);
-                MultipartBody.Part body = MultipartBody.Part.createFormData("upload", imagem.getName(), reqFile);
-                RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "upload_test");
-
-                CircularAPI api = retrofit.create(CircularAPI.class);
-                Call<String> call = api.enviaImagem(body, name, tokenImagem);
-                call.enqueue(new Callback<String>() {
-                    @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
-
-                        if(response.code() == 200){
-                            pontoInteresseSugestao.setImagemEnviada(true);
-                            ParadasSugeridasViewModel.editPoi(pontoInteresseSugestao, getContext().getApplicationContext());
-                        } else{
-
-                            if(mostraToast){
-                                Toast.makeText(getContext().getApplicationContext(),
-                                        "Erro "+response.code()+" ("+response.message()+") ao enviar imagem de "+pontoInteresseSugestao.getNome()+" para o servidor",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onFailure(Call<String> call, Throwable t) {
-
-                        if(mostraToast){
-                            Toast.makeText(getContext().getApplicationContext(),
-                                    "Erro "+t.getMessage()+" ("+call.request().headers()+") ao enviar imagem de "+pontoInteresseSugestao.getNome()+" para o servidor",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-                });
-                */
 
             }
 
@@ -2408,6 +2327,90 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                         if(mostraToast){
                             Toast.makeText(getContext().getApplicationContext(),
                                     "Erro "+error.getDescription()+" ("+error.getCode()+") ao enviar arquivo de log de "+viagem.getItinerario()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        PreferenceUtils.gravaMostraToast(ctx, false);
+                        //System.out.println("ERRO ENVIO IMG: "+error.getDescription());
+                    }
+
+                    @Override
+                    public void onReschedule(String requestId, ErrorInfo error) {
+
+                    }
+                });
+
+            }
+
+            for(final ImagemParada parada : imagensParadas){
+
+                File imagem = new File(getContext().getApplicationContext().getFilesDir(),  parada.getImagem());
+
+                imageUpload(imagem.getAbsolutePath(), new UploadCallback() {
+                    @Override
+                    public void onStart(String requestId) {
+                        //System.out.println("INICIANDO ENVIO IMG: "+requestId);
+                    }
+
+                    @Override
+                    public void onProgress(String requestId, long bytes, long totalBytes) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(String requestId, Map resultData) {
+                        parada.setImagemEnviada(true);
+                        ParadasViewModel.editImagemParada(parada, getContext().getApplicationContext());
+                    }
+
+                    @Override
+                    public void onError(String requestId, ErrorInfo error) {
+
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+error.getDescription()+" ("+error.getCode()+") ao enviar imagem de "+parada.getParada()+" para o servidor",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        PreferenceUtils.gravaMostraToast(ctx, false);
+                        //System.out.println("ERRO ENVIO IMG: "+error.getDescription());
+                    }
+
+                    @Override
+                    public void onReschedule(String requestId, ErrorInfo error) {
+
+                    }
+                });
+
+            }
+
+            for(final FeedbackItinerario fi : feedbacksItinerarios){
+
+                File imagem = new File(getContext().getApplicationContext().getFilesDir(),  fi.getImagem());
+
+                imageUpload(imagem.getAbsolutePath(), new UploadCallback() {
+                    @Override
+                    public void onStart(String requestId) {
+                        //System.out.println("INICIANDO ENVIO IMG: "+requestId);
+                    }
+
+                    @Override
+                    public void onProgress(String requestId, long bytes, long totalBytes) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(String requestId, Map resultData) {
+                        fi.setImagemEnviada(true);
+                        DetalhesItinerarioViewModel.editImagemFeedbackItinerario(fi, getContext().getApplicationContext());
+                    }
+
+                    @Override
+                    public void onError(String requestId, ErrorInfo error) {
+
+                        if(mostraToast){
+                            Toast.makeText(getContext().getApplicationContext(),
+                                    "Erro "+error.getDescription()+" ("+error.getCode()+") ao enviar imagem de feedback para o servidor",
                                     Toast.LENGTH_SHORT).show();
                         }
 
@@ -2608,6 +2611,18 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                     break;
                 case "log_parada":
                     db.logConsultaDAO().inserirTodasParadas((List<LogParada>) params[0]);
+                    break;
+                case "imagem_parada":
+                    db.imagemParadaDAO().inserirTodos((List<ImagemParada>) params[0]);
+                    break;
+                case "feedback_itinerario":
+                    db.feedbackItinerarioDAO().inserirTodos((List<FeedbackItinerario>) params[0]);
+                    break;
+                case "tpr":
+                    db.temporariasDAO().inserirTodosTemp1((List<Tpr>) params[0]);
+                    break;
+                case "tpr2":
+                    db.temporariasDAO().inserirTodosTemp2((List<Tpr2>) params[0]);
                     break;
             }
 
@@ -2905,6 +2920,60 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Callback
                 //Toast.makeText(ctx, "Erro ("+t.getMessage()+") ao receber imagem.", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public String consultaTabelaTemp(){
+        return "SELECT t1.sigla, t1.tarifa, t1.distancia, " +
+                "CASE WHEN t1.distanciaMetros IS NULL THEN t1.distancia * 1000 ELSE t1.distanciaMetros END AS distanciaMetros, " +
+                "t1.tempo, t1.id, t1.idBairroPartida, t1.bairroPartida AS 'bairroPartida', t1.cidadePartida AS 'cidadePartida', " +
+                "t2.idBairroDestino, t2.bairroDestino AS 'bairroDestino', t2.cidadeDestino AS 'cidadeDestino'," +
+
+                "CASE WHEN t1.fim = t2.fim THEN t1.distanciaTrecho ELSE (t2.distanciaTrecho + t1.distanciaTrecho) END AS 'distanciaTrecho'," +
+                "CASE WHEN t1.fim = t2.fim THEN t1.distanciaTrechoMetros ELSE (t2.distanciaTrechoMetros + t1.distanciaTrechoMetros) END AS 'distanciaTrechoMetros'," +
+                "CASE WHEN t1.fim = t2.fim THEN t1.tempoTrecho ELSE (t2.tempoTrecho + t1.tempoTrecho) END AS 'tempoTrecho'," +
+                "CASE WHEN t1.fim = t2.fim THEN t1.tarifaTrecho ELSE (t2.tarifaTrecho + t1.tarifaTrecho) END AS 'tarifaTrecho', " +
+                " " +
+                "CASE WHEN (t1.inicio = 1 AND t2.idBairroDestino = (" +
+                " SELECT p3.bairro " +
+                " FROM parada_itinerario pi3 INNER JOIN parada p3 ON p3.id = pi3.parada " +
+                " WHERE pi3.itinerario = t1.id " +
+                " ORDER BY pi3.ordem DESC LIMIT 1 " +
+                "    )) THEN 0 ELSE 1 END AS 'flagTrecho' " +
+                "" +
+                " FROM tpr t1 INNER JOIN tpr t2 ON t1.id = t2.id AND t1.fim <= t2.fim " +
+
+                " ORDER BY t1.id, t1.inicio, t2.inicio";
+    }
+
+    public String consultaTabelaTempSimplificado(){
+        return "SELECT t1.id, 0, " +
+                "                        t1.idBairroPartida, t1.bairroPartida, t1.cidadePartida, " +
+                "                        t2.idBairroDestino, t2.bairroDestino, t2.cidadeDestino," +
+                "                        " +
+                "                        t2.distanciaAcumuladaInicial + t2.distanciaAcumulada - t1.distanciaAcumuladaInicial AS distanciaTrechoMetros," +
+                "                        CASE WHEN (t1.inicio = 1 AND ( " +
+                "                                   t2.idBairroDestino = ( " +
+                "                                                            SELECT p3.bairro " +
+                "                                                              FROM parada_itinerario pi3 " +
+                "                                                                   INNER JOIN " +
+                "                                                                   parada p3 ON p3.id = pi3.parada " +
+                "                                                             WHERE pi3.itinerario = t1.id " +
+                "                                                             ORDER BY pi3.ordem DESC " +
+                "                                                             LIMIT 1 " +
+                "                                                        ) ) " +
+                "                            ) THEN 0 ELSE 1 END AS flag_trecho " +
+                "                   FROM tpr t1 INNER JOIN " +
+                "                        tpr t2 ON t1.id = t2.id AND  " +
+                "                                  t1.fim <= t2.fim " +
+                "                  ORDER BY t1.id, " +
+                "                           t1.inicio, " +
+                "                           t2.inicio";
+    }
+
+    public String consultaDestinoTabelaTemp2Simplificado(String id){
+        return "SELECT id, idBairroPartida, bairroPartida, idBairroDestino, bairroDestino, distanciaTrechoMetros FROM tpr2 " +
+                "WHERE idBairroPartida = '"+id+"'" +
+                "ORDER BY distanciaTrechoMetros";
     }
 
 }

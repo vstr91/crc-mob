@@ -75,13 +75,21 @@ public interface ParadaDAO {
             "WHERE b.id = :bairro AND pi.ativo = 1 AND i.ativo = 1 AND pi.ordem < i.totalParadas AND p.ativo = 1 ORDER BY b.nome, p.nome, p.sentido")
     List<ParadaBairro> listarTodosAtivosComBairroPorBairroComItinerarioSync(String bairro);
 
+    @Query("SELECT DISTINCT p.id, p.nome, p.rua, p.sentido, p.imagem, b.id AS idBairro, b.nome AS nomeBairro " +
+            "FROM parada_itinerario pi INNER JOIN parada p ON pi.parada = p.id " +
+            "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN itinerario i ON i.id = pi.itinerario " +
+            "INNER JOIN horario_itinerario hi ON hi.itinerario = i.id " +
+            "WHERE b.id = :bairro AND pi.ativo = 1 AND i.ativo = 1 AND pi.ordem < i.totalParadas AND p.ativo = 1 " +
+            "ORDER BY b.nome, p.nome, p.sentido")
+    List<ParadaBairro> listarTodosAtivosComBairroPorBairroComItinerarioSimplificadoSync(String bairro);
+
     @Query("SELECT DISTINCT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, " +
             "e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada_itinerario pi INNER JOIN parada p ON pi.parada = p.id " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
-            "estado e ON e.id = c.estado WHERE pi.ordem < " +
+            "estado e ON e.id = c.estado INNER JOIN itinerario i ON i.id = pi.itinerario WHERE pi.ordem < " +
             "(SELECT MAX(pi3.ordem) FROM parada_itinerario pi3 WHERE pi3.itinerario = pi.itinerario AND pi3.ativo = 1) " +
-            "AND pi.ativo = 1 AND p.ativo = 1 ORDER BY b.nome, p.nome")
+            "AND pi.ativo = 1 AND p.ativo = 1 AND i.ativo = 1 ORDER BY b.nome, p.nome")
     LiveData<List<ParadaBairro>> listarTodosAtivosComBairroComItinerario();
 
     @Query("SELECT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
@@ -129,8 +137,8 @@ public interface ParadaDAO {
     @Query("SELECT DISTINCT p.*, b.id AS idBairro, b.nome AS nomeBairro, c.id AS idCidade, c.nome AS nomeCidade, e.id AS idEstado, " +
             "e.nome AS nomeEstado, e.sigla AS siglaEstado FROM parada p INNER JOIN parada_itinerario pi ON pi.parada = p.id " +
             "INNER JOIN bairro b ON b.id = p.bairro INNER JOIN cidade c ON c.id = b.cidade INNER JOIN " +
-            "estado e ON e.id = c.estado WHERE (latitude >= :minLat AND latitude <= :maxLat) " +
-            "AND (longitude >= :minLng AND longitude <= :maxLng)")
+            "estado e ON e.id = c.estado WHERE (p.latitude >= :minLat AND p.latitude <= :maxLat) " +
+            "AND (p.longitude >= :minLng AND p.longitude <= :maxLng)")
     LiveData<List<ParadaBairro>> listarTodosAtivosProximos(double minLat, double maxLat, double minLng, double maxLng);
 
     @Query("SELECT p.* FROM parada p WHERE p.id = :parada")

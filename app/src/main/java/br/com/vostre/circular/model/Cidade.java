@@ -1,5 +1,7 @@
 package br.com.vostre.circular.model;
 
+import androidx.annotation.Nullable;
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.annotation.NonNull;
@@ -15,6 +17,42 @@ public class Cidade extends EntidadeSlug {
 
     @NonNull
     private boolean imagemEnviada = true;
+
+    @Nullable
+    @ColumnInfo(name = "id_clima")
+    private Integer idClima;
+
+    @Nullable
+    private Double latitude;
+
+    @Nullable
+    private Double longitude;
+
+    @Nullable
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(@Nullable Double latitude) {
+        this.latitude = latitude;
+    }
+
+    @Nullable
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(@Nullable Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public Integer getIdClima() {
+        return idClima;
+    }
+
+    public void setIdClima(Integer idClima) {
+        this.idClima = idClima;
+    }
 
     @NonNull
     public boolean isImagemEnviada() {

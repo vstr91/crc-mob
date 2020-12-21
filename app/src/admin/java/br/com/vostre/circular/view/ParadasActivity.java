@@ -65,6 +65,7 @@ import br.com.vostre.circular.utils.DrawableUtils;
 import br.com.vostre.circular.view.adapter.ParadaAdapter;
 import br.com.vostre.circular.view.form.FormParada;
 import br.com.vostre.circular.view.utils.InfoWindow;
+import br.com.vostre.circular.view.viewHolder.ImagemParadaViewHolder;
 import br.com.vostre.circular.viewModel.ParadasViewModel;
 
 public class ParadasActivity extends BaseActivity implements ParadaListener {
@@ -275,15 +276,15 @@ public class ParadasActivity extends BaseActivity implements ParadaListener {
 
     private void configuraMapa() {
 
-        OnlineTileSourceBase MAPBOXSATELLITELABELLED = new MapBoxTileSource("MapBoxSatelliteLabelled", 1, 19, 256, ".png");
-        ((MapBoxTileSource) MAPBOXSATELLITELABELLED).retrieveAccessToken(this);
-        ((MapBoxTileSource) MAPBOXSATELLITELABELLED).retrieveMapBoxMapId(this);
-        TileSourceFactory.addTileSource(MAPBOXSATELLITELABELLED);
+//        OnlineTileSourceBase MAPBOXSATELLITELABELLED = new MapBoxTileSource("MapBoxSatelliteLabelled", 1, 19, 256, ".png");
+//        ((MapBoxTileSource) MAPBOXSATELLITELABELLED).retrieveAccessToken(this);
+//        ((MapBoxTileSource) MAPBOXSATELLITELABELLED).retrieveMapBoxMapId(this);
+//        TileSourceFactory.addTileSource(MAPBOXSATELLITELABELLED);
 
         map = binding.map;
 
-//        map.setTileSource(TileSourceFactory.MAPNIK);
-        map.setTileSource(MAPBOXSATELLITELABELLED);
+        map.setTileSource(TileSourceFactory.MAPNIK);
+//        map.setTileSource(MAPBOXSATELLITELABELLED);
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
 
@@ -336,6 +337,11 @@ public class ParadasActivity extends BaseActivity implements ParadaListener {
         });
 
         Toast.makeText(ctx, "Buscando ruas...", Toast.LENGTH_SHORT).show();
+    }
+
+    public void onBtnFotosClick(View v){
+        Intent i = new Intent(this, ImagensParadasActivity.class);
+        startActivity(i);
     }
 
     public void onFabLocationClick(View v){
@@ -525,10 +531,10 @@ public class ParadasActivity extends BaseActivity implements ParadaListener {
 
                     switch(p.getParada().getSentido()){
                         case 0:
-                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.centro));
+                            m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker_centro));
                             break;
                         case 1:
-                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.bairro));
+                            m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker_bairro));
                             break;
                         default:
                             m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
@@ -539,15 +545,16 @@ public class ParadasActivity extends BaseActivity implements ParadaListener {
 
                     switch(p.getParada().getSentido()){
                         case 0:
-                            m.setIcon(DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
-                                    mergeDrawable(this, R.drawable.marker, R.drawable.centro).mutate()));
+                            m.setIcon(DrawableUtils
+                                    .convertToGrayscale(getApplicationContext().getResources().getDrawable(R.drawable.marker_centro).mutate()));
                             break;
                         case 1:
-                            m.setIcon(DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
-                                    mergeDrawable(this, R.drawable.marker, R.drawable.bairro).mutate()));
+                            m.setIcon(DrawableUtils
+                                    .convertToGrayscale(getApplicationContext().getResources().getDrawable(R.drawable.marker_bairro).mutate()));
                             break;
                         default:
-                            m.setIcon(DrawableUtils.convertToGrayscale(getApplicationContext().getResources().getDrawable(R.drawable.marker).mutate()));
+                            m.setIcon(DrawableUtils
+                                    .convertToGrayscale(getApplicationContext().getResources().getDrawable(R.drawable.marker).mutate()));
                             break;
                     }
 

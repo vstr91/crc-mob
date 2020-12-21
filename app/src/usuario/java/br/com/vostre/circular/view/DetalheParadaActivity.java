@@ -7,12 +7,18 @@ import android.content.Context;
 import android.content.Intent;
 import androidx.databinding.BindingAdapter;
 import androidx.databinding.DataBindingUtil;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
+
+import com.google.android.gms.common.util.CrashUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +35,13 @@ import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crashlytics.CrashlyticsRegistrar;
+import com.jama.carouselview.CarouselView;
+import com.jama.carouselview.CarouselViewListener;
+import com.jama.carouselview.enums.IndicatorAnimationType;
+import com.jama.carouselview.enums.OffsetType;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
@@ -39,6 +53,9 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Polyline;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -50,11 +67,16 @@ import java.util.List;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityDetalheParadaBinding;
+import br.com.vostre.circular.databinding.LinhaCarrosselBinding;
+import br.com.vostre.circular.model.ImagemParada;
 import br.com.vostre.circular.model.PontoInteresse;
+import br.com.vostre.circular.model.log.LogParada;
+import br.com.vostre.circular.model.log.TiposLog;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.DataHoraUtils;
 import br.com.vostre.circular.utils.DestaqueUtils;
+import br.com.vostre.circular.utils.LogConsultaUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SnackbarHelper;
 import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
@@ -85,6 +107,11 @@ public class DetalheParadaActivity extends BaseActivity {
     Bundle bundle;
     boolean exibindoTour = false;
 
+    static int PICK_FILE = 173;
+
+    CarouselView carouselView;
+    LogParada log;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detalhe_parada);
@@ -97,6 +124,8 @@ public class DetalheParadaActivity extends BaseActivity {
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
 
         ctx = this;
+
+        log = LogConsultaUtils.iniciaLogParada(TiposLog.PARADA_DETALHE.name(), ctx);
 
         link = getIntent().getData();
 
@@ -159,6 +188,8 @@ public class DetalheParadaActivity extends BaseActivity {
             }
         });
 
+        log.setParada(idParada);
+
         viewModel.itinerarios.observe(this, itinerariosObserver);
 
         geraModalLoading();
@@ -172,6 +203,7 @@ public class DetalheParadaActivity extends BaseActivity {
 
         viewModel.checaFeriado(Calendar.getInstance());
         viewModel.isFeriado.observe(this, feriadoObserver);
+        viewModel.retorno.observe(this, retornoObserver);
 
     }
 
@@ -219,6 +251,21 @@ public class DetalheParadaActivity extends BaseActivity {
         startActivity(mapIntent);
 
         // STREET VIEW
+    }
+
+    public void onClickBtnFoto(View v){
+        CropImage.activity(null)
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setActivityTitle("Escolher Foto")
+                .setAspectRatio(16,9)
+                .setFixAspectRatio(true)
+                .start(this);
+
+//        Intent intentFile = new Intent();
+//        intentFile.setType("text/*");
+//        intentFile.setAction(Intent.ACTION_GET_CONTENT);
+//        startActivityForResult(Intent.createChooser(intentFile, "Escolha o arquivo de dados"), PICK_FILE);
+
     }
 
     public void onClickBtnMapa(View v){
@@ -282,7 +329,7 @@ public class DetalheParadaActivity extends BaseActivity {
     public static void setTextTaxa(TextView view, Double val){
 
         if(val != null && val > 0.01){
-            view.setText("Taxa de Embarque no valor de "+NumberFormat.getCurrencyInstance().format(val));
+            view.setText("Taxa de Embarque: "+NumberFormat.getCurrencyInstance().format(val));
         } else{
             view.setText("Não há taxa de embarque");
         }
@@ -328,6 +375,32 @@ public class DetalheParadaActivity extends BaseActivity {
     @Override
     public void onGpsChanged(boolean ativo) {
         //Toast.makeText(getApplicationContext(), "GPS Status: "+ativo, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri resultUri = result.getUri();
+
+                Bitmap bmp = BitmapFactory.decodeFile(resultUri.getPath());
+
+                ImagemParada imagemParada = new ImagemParada();
+                imagemParada.setParada(viewModel.parada.getValue().getParada().getId());
+
+                viewModel.salvarFoto(imagemParada, bmp);
+
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+                Toast.makeText(getApplicationContext(), "Houve um problema ao processar a foto. Por favor tente novamente.", Toast.LENGTH_SHORT).show();
+            }
+        }
+
     }
 
     Observer<Boolean> feriadoObserver = new Observer<Boolean>() {
@@ -395,6 +468,8 @@ public class DetalheParadaActivity extends BaseActivity {
             adapter.notifyDataSetChanged();
             ocultaModalLoading();
             binding.listItinerarios.scheduleLayoutAnimation();
+
+            LogConsultaUtils.finalizaLog(ctx, log);
         }
     };
 
@@ -405,16 +480,19 @@ public class DetalheParadaActivity extends BaseActivity {
             if(parada != null){
                 binding.setUmaParada(parada);
 
+                viewModel.getImagensParada(parada.getParada().getId());
+                viewModel.imagensParada.observe(ctx, imagensParadaObserver);
+
                 //log
                 bundle = new Bundle();
                 bundle.putString("parada", parada.getParada().getNome()+" - "+parada.getNomeBairroComCidade());
                 mFirebaseAnalytics.logEvent("consulta_detalhe_parada", bundle);
 
-                if(parada.getParada().getImagem() != null){
-                    binding.imageView9.setImageDrawable(Drawable.createFromPath(getApplicationContext().getFilesDir()+"/"+parada.getParada().getImagem()));
-                } else{
-                    binding.imageView9.setImageDrawable(getResources().getDrawable(R.drawable.imagem_nao_disponivel_16_9));
-                }
+//                if(parada.getParada().getImagem() != null){
+//                    binding.imageView9.setImageDrawable(Drawable.createFromPath(getApplicationContext().getFilesDir()+"/"+parada.getParada().getImagem()));
+//                } else{
+//                    binding.imageView9..getsetImageDrawable(getResources().getDrawable(R.drawable.imagem_nao_disponivel_16_9));
+//                }
 
                 if(parada.getParada().getRua() != null && !parada.getParada().getRua().isEmpty()){
                     binding.textViewRua.setVisibility(View.VISIBLE);
@@ -422,6 +500,26 @@ public class DetalheParadaActivity extends BaseActivity {
                 } else{
                     binding.textViewRua.setVisibility(View.GONE);
                     binding.linearLayout2.invalidate();
+                }
+
+                if(parada.getParada().getSentido() > -1){
+                    binding.textViewSentidoParada.setText(parada.getParada().getSentidoTexto());
+                    binding.textView88.setVisibility(View.VISIBLE);
+                    binding.textViewSentidoParada.setVisibility(View.VISIBLE);
+
+                    switch(parada.getParada().getSentido()){
+                        case 0:
+                            binding.textViewSentidoParada.setTextColor(ctx.getResources().getColor(R.color.azul));
+                            break;
+                        case 1:
+                            binding.textViewSentidoParada.setTextColor(ctx.getResources().getColor(R.color.ciano));
+                            break;
+                    }
+
+                } else{
+                    binding.textViewSentidoParada.setText("");
+                    binding.textView88.setVisibility(View.GONE);
+                    binding.textViewSentidoParada.setVisibility(View.GONE);
                 }
 
                 adapterPois = new PontosInteresseAdapter(viewModel.pois.getValue(), ctx, parada, bsd);
@@ -461,6 +559,91 @@ public class DetalheParadaActivity extends BaseActivity {
 
             adapterPois.pois = pois;
             adapterPois.notifyDataSetChanged();
+        }
+    };
+
+    Observer<List<ImagemParada>> imagensParadaObserver = new Observer<List<ImagemParada>>() {
+        @Override
+        public void onChanged(List<ImagemParada> imagens) {
+
+            if(carouselView == null){
+                int totalImagens = imagens.size();
+
+                if (totalImagens == 0) {
+                    ImagemParada ip = new ImagemParada();
+
+                    ParadaBairro pb = viewModel.parada.getValue();
+
+                    if(pb != null){
+                        ip.setImagem(pb.getParada().getImagem());
+                        ip.setDescricao("-1");
+                    }
+
+                    imagens.add(ip);
+
+                    totalImagens++;
+                }
+
+                carouselView = binding.imageView9;
+
+                carouselView.setSize(totalImagens);
+                carouselView.setResource(R.layout.linha_carrossel);
+                carouselView.setAutoPlay(true);
+                carouselView.setIndicatorAnimationType(IndicatorAnimationType.THIN_WORM);
+                carouselView.setCarouselOffset(OffsetType.CENTER);
+                carouselView.setAutoPlayDelay(5000);
+                carouselView.setIndicatorPadding(60);
+                carouselView.hideIndicator(false);
+                carouselView.setIndicatorRadius(8);
+                carouselView.setCarouselViewListener(new CarouselViewListener() {
+                    @Override
+                    public void onBindView(View view, int position) {
+                        // Example here is setting up a full image carousel
+                        ImageView imageViewFoto = view.findViewById(R.id.imageViewFoto);
+
+                        ImagemParada ip = viewModel.imagensParada.getValue().get(position);
+
+                        if (ip.getImagem() == null || ip.getImagem().isEmpty()) {
+                            imageViewFoto.setImageResource(R.drawable.imagem_nao_disponivel_16_9);
+                        } else {
+                            imageViewFoto.setImageDrawable(Drawable.createFromPath(getApplicationContext().getFilesDir() + "/"
+                                    + ip.getImagem()));
+                        }
+
+                        TextView textViewCredito = view.findViewById(R.id.textViewCredito);
+
+                        if(ip.getDescricao() != null && !ip.getDescricao().isEmpty() && !ip.getDescricao().equals("-1")){
+                            textViewCredito.setText("Foto por "+ip.getDescricao());
+                            textViewCredito.setVisibility(View.VISIBLE);
+                        } else if(ip.getDescricao() != null && ip.getDescricao().equals("-1")){
+                            textViewCredito.setVisibility(View.GONE);
+                        } else{
+                            textViewCredito.setText("Foto por usuário anônimo");
+                            textViewCredito.setVisibility(View.VISIBLE);
+                        }
+
+                    }
+                });
+                // After you finish setting up, show the CarouselView
+                carouselView.show();
+            }
+
+        }
+
+    };
+
+    Observer<Integer> retornoObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer retorno) {
+
+            if(retorno == 1){
+                Toast.makeText(getApplicationContext(), "Sugestão de imagem da Parada cadastrada! Obrigado!", Toast.LENGTH_SHORT).show();
+            } else if(retorno == 0){
+                Toast.makeText(getApplicationContext(),
+                        "Houve um problema ao salvar a imagem. Por favor, tente novamente.",
+                        Toast.LENGTH_SHORT).show();
+            }
+
         }
     };
 
@@ -505,6 +688,8 @@ public class DetalheParadaActivity extends BaseActivity {
                 false, true, 3));
         targets.add(DestaqueUtils.geraTapTarget(binding.imageButton5, "Ver no Street View", "Aqui você pode ver o entorno da parada no Google Street View!",
                 false, true, 4));
+        targets.add(DestaqueUtils.geraTapTarget(binding.imageButton6, "Enviar Foto", "Aqui você pode sugerir novas fotos do ponto de parada!",
+                false, true, 5));
         targets.add(DestaqueUtils.geraTapTarget(binding.listItinerarios.findViewHolderForAdapterPosition(0).itemView.findViewById(R.id.textView23),
                 "Próximas Saídas", "Aqui você verá os próximos itinerários que sairão ou passarão pela parada!", false, true, 5));
 

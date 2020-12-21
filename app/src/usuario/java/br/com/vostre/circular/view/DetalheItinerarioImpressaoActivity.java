@@ -202,13 +202,41 @@ public class DetalheItinerarioImpressaoActivity extends AppCompatActivity {
                     Legenda legenda = new Legenda();
                     legenda.setItinerario(itinerario.getItinerario().getId());
 
-                    if(itinerario.getItinerario().getObservacao() != null && !itinerario.getItinerario().getObservacao().isEmpty()){
-                        legenda.setTexto(itinerario.getNomeBairroPartida()+", "+itinerario.getNomeCidadePartida()+" x "
-                                +itinerario.getNomeBairroDestino()+", "+itinerario.getNomeCidadeDestino()+" ("
-                                +itinerario.getItinerario().getObservacao()+")");
+                    String bairroPartida, cidadePartida, bairroDestino, cidadeDestino, observacao;
+
+                    bairroPartida = itinerario.getNomeBairroPartida();
+                    cidadePartida = itinerario.getNomeCidadePartida();
+                    bairroDestino = itinerario.getNomeBairroDestino();
+                    cidadeDestino = itinerario.getNomeCidadeDestino();
+                    observacao = itinerario.getItinerario().getObservacao();
+
+                    bairroPartida = (itinerario.getItinerario().getAliasBairroPartida() == null ||
+                            itinerario.getItinerario().getAliasBairroPartida().isEmpty()) ?
+                            bairroPartida :
+                            itinerario.getItinerario().getAliasBairroPartida();
+
+                    cidadePartida = (itinerario.getItinerario().getAliasCidadePartida() == null ||
+                            itinerario.getItinerario().getAliasCidadePartida().isEmpty()) ?
+                            cidadePartida :
+                            itinerario.getItinerario().getAliasCidadePartida();
+
+                    bairroDestino = (itinerario.getItinerario().getAliasBairroDestino() == null ||
+                            itinerario.getItinerario().getAliasBairroDestino().isEmpty()) ?
+                            bairroDestino :
+                            itinerario.getItinerario().getAliasBairroDestino();
+
+                    cidadeDestino = (itinerario.getItinerario().getAliasCidadeDestino() == null ||
+                            itinerario.getItinerario().getAliasCidadeDestino().isEmpty()) ?
+                            cidadeDestino :
+                            itinerario.getItinerario().getAliasCidadeDestino();
+
+                    if(observacao != null && !observacao.isEmpty()){
+                        legenda.setTexto(bairroPartida+", "+cidadePartida+" x "
+                                +bairroDestino+", "+cidadeDestino+" ("
+                                +observacao+")");
                     } else{
-                        legenda.setTexto(itinerario.getNomeBairroPartida()+", "+itinerario.getNomeCidadePartida()+" x "
-                                +itinerario.getNomeBairroDestino()+", "+itinerario.getNomeCidadeDestino());
+                        legenda.setTexto(bairroPartida+", "+cidadePartida+" x "
+                                +bairroDestino+", "+cidadeDestino);
                     }
 
                     legenda.setCor(cores[cont]);

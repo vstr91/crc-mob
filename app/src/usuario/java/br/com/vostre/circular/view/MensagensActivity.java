@@ -156,6 +156,12 @@ public class MensagensActivity extends BaseActivity {
         public void onChanged(List<Mensagem> mensagens) {
             adapterRecebidas.mensagens = mensagens;
             adapterRecebidas.notifyDataSetChanged();
+
+            if(mensagens.size() > 0){
+                binding.textViewListaVazia2.setVisibility(View.GONE);
+            } else{
+                binding.textViewListaVazia2.setVisibility(View.VISIBLE);
+            }
         }
     };
 

@@ -16,6 +16,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -36,6 +37,7 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import br.com.vostre.circular.model.Feriado;
+import br.com.vostre.circular.model.ImagemParada;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.ParadaSugestao;
@@ -52,6 +54,7 @@ import br.com.vostre.circular.model.pojo.PontoInteresseSugestaoBairro;
 import br.com.vostre.circular.utils.DataHoraUtils;
 import br.com.vostre.circular.utils.ImageUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
+import br.com.vostre.circular.utils.SessionUtils;
 import br.com.vostre.circular.utils.StringUtils;
 import br.com.vostre.circular.view.listener.FeriadoListener;
 
@@ -85,6 +88,12 @@ public class MapaViewModel extends AndroidViewModel {
     public BairroCidade bairroPoi;
 
     public static MutableLiveData<Boolean> isFeriado;
+
+    public LiveData<List<ImagemParada>> imagensParada;
+
+    public void getImagensParada(String parada){
+        this.imagensParada = appDatabase.imagemParadaDAO().listarTodosAtivosPorParada(parada);
+    }
 
     public ParadaSugestaoBairro getParadaNova() {
         return paradaNova;
@@ -777,5 +786,86 @@ public class MapaViewModel extends AndroidViewModel {
     }
 
     // fim editar poi
+
+    public void salvarFotoParada(ImagemParada imagemParada, Bitmap foto) {
+        FileOutputStream fos = null;
+        File file = new File(getApplication().getFilesDir(),  UUID.randomUUID().toString()+".png");
+
+        try {
+            fos = new FileOutputStream(file);
+            foto = ImageUtils.scaleDown(foto, 600, true);
+            foto.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+
+                    if(imagemParada.getImagem() != null && !imagemParada.getImagem().isEmpty()){
+                        File fotoAntiga = new File(getApplication().getFilesDir(), imagemParada.getImagem());
+
+                        if(fotoAntiga.exists() && fotoAntiga.canWrite() && fotoAntiga.getName() != file.getName()){
+                            fotoAntiga.delete();
+                        }
+                    }
+
+                    imagemParada.setImagem(file.getName());
+                    imagemParada.setImagemEnviada(false);
+
+                    if(SessionUtils.estaLogado(getApplication().getApplicationContext())){
+
+                        imagemParada.setDescricao(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+
+                        imagemParada.setUsuarioCadastro(PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext()));
+                        imagemParada.setUsuarioUltimaAlteracao(PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext()));
+                    }
+
+                    add(imagemParada);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                retorno.setValue(0);
+            }
+        }
+    }
+
+    // adicionar
+
+    public void add(final ImagemParada imagemParada) {
+
+        imagemParada.setDataCadastro(new DateTime());
+        imagemParada.setUltimaAlteracao(new DateTime());
+        imagemParada.setEnviado(false);
+
+        new MapaViewModel.addFotoParadaAsyncTask(appDatabase).execute(imagemParada);
+    }
+
+    private static class addFotoParadaAsyncTask extends AsyncTask<ImagemParada, Void, Void> {
+
+        private AppDatabase db;
+
+        addFotoParadaAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final ImagemParada... params) {
+            db.imagemParadaDAO().inserir((params[0]));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            if(retorno != null){
+                retorno.setValue(3);
+            }
+
+        }
+
+    }
+
+    // fim adicionar
 
 }

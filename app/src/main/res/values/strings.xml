@@ -3,4 +3,5 @@
     <string name="texto_buscando_por_linha">Buscando itinerários disponíveis!\nSó um momento, por favor!</string>
     <string name="texto_buscando_por_destino">Buscando itinerários disponíveis!\nSó um momento, por favor!\n\nAtenção: Em destinos que possuem muitos itinerários, a busca pode demorar um pouco mais!</string>
     <string name="key_google">AIzaSyDdo8cVftdY7wgvpCdWxS1LD0MvjDJaVrY</string>
+    <string name="key_owm">98ee0a31f14480bc02d266774f30b276</string>
 </resources>

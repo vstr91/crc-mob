@@ -122,189 +122,6 @@
                 android:layout_height="match_parent">
 
                 <LinearLayout
-                    android:id="@+id/tab3"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/textView76"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginEnd="8dp"
-                            android:text="Pesquise informando o destino desejado. Todo itinerário cadastrado no sistema que passar pelo bairro escolhido será exibido"
-                            android:textAlignment="center"
-                            android:textSize="10sp"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <androidx.cardview.widget.CardView
-                            android:id="@+id/cardViewListDestinoConsulta"
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:layout_marginStart="16dp"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginEnd="16dp"
-                            android:layout_marginBottom="24dp"
-                            android:visibility="visible"
-                            app:cardCornerRadius="10dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/textView76">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:orientation="vertical"
-                                android:padding="10dp">
-
-                                <TextView
-                                    android:id="@+id/textView94"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:paddingTop="10dp"
-                                    android:paddingBottom="0dp"
-                                    android:text="Para qual cidade você quer ir?"
-                                    android:textAppearance="@style/texto_azul" />
-
-                                <TextView
-                                    android:id="@+id/textView97"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:text="Escolha a cidade para onde você deseja ir, pressionando o brasão ou o nome da cidade abaixo"
-                                    android:textSize="8sp" />
-
-                                <androidx.recyclerview.widget.RecyclerView
-                                    android:id="@+id/listCidadesDestinoConsulta"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:stretchColumns="true"
-                                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                                    app:spanCount="3"
-                                    tools:listitem="@layout/linha_cidades" />
-                            </LinearLayout>
-
-                        </androidx.cardview.widget.CardView>
-
-                        <androidx.cardview.widget.CardView
-                            android:id="@+id/cardViewDestinoConsulta"
-                            android:layout_width="match_parent"
-                            android:layout_height="80dp"
-                            android:layout_marginStart="16dp"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginEnd="16dp"
-                            android:visibility="gone"
-                            app:cardCornerRadius="10dp"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/textView76">
-
-                            <androidx.constraintlayout.widget.ConstraintLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_weight="1">
-
-                                <ImageView
-                                    android:id="@+id/circleViewPartidaConsulta"
-                                    android:layout_width="50dp"
-                                    android:layout_height="50dp"
-                                    android:layout_marginStart="10dp"
-                                    android:layout_marginBottom="8dp"
-                                    android:layout_weight="1"
-                                    android:contentDescription="@{`brasão partida: `+destinoConsulta.nomeCidadeComEstado}"
-                                    app:corArcoMaior="@color/azul"
-                                    app:corArcoMenor="@color/azul"
-                                    app:espessuraArcoMaior="4"
-                                    app:espessuraArcoMenor="4"
-                                    app:imagem="@{destinoConsulta.brasao}"
-                                    app:layout_constraintBottom_toBottomOf="parent"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toBottomOf="@+id/textView96" />
-
-                                <TextView
-                                    android:id="@+id/textView96"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center_vertical|start"
-                                    android:layout_marginTop="8dp"
-                                    android:gravity="center_vertical"
-                                    android:paddingLeft="10dp"
-                                    android:text="Destino"
-                                    android:textAppearance="@style/texto_azul"
-                                    app:layout_constraintBottom_toTopOf="@+id/circleViewPartidaConsulta"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toTopOf="parent" />
-
-                                <TextView
-                                    android:id="@+id/textViewBairroPartidaConsulta"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="8dp"
-                                    android:layout_marginTop="5dp"
-                                    android:layout_weight="1"
-                                    android:text="@={destinoConsulta.bairro.nome}"
-                                    android:textAppearance="@style/texto_azul"
-                                    android:textColor="@color/cinzaEscuro"
-                                    app:layout_constraintStart_toEndOf="@+id/circleViewPartidaConsulta"
-                                    app:layout_constraintTop_toTopOf="@+id/circleViewPartidaConsulta"
-                                    tools:text="Bairro Partida" />
-
-                                <TextView
-                                    android:id="@+id/textViewCidadePartidaConsulta"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@={destinoConsulta.nomeCidade}"
-                                    android:textSize="12sp"
-                                    app:layout_constraintStart_toStartOf="@+id/textViewBairroPartidaConsulta"
-                                    app:layout_constraintTop_toBottomOf="@+id/textViewBairroPartidaConsulta"
-                                    tools:text="Cidade Partida" />
-
-                                <androidx.appcompat.widget.AppCompatImageButton
-                                    android:id="@+id/imageButtonConsulta"
-                                    style="@style/botao_transparente"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="16dp"
-                                    android:layout_marginRight="16dp"
-                                    android:layout_marginBottom="8dp"
-                                    android:contentDescription="Botão editar partida"
-                                    android:onClick="@{view::onClickBtnEditarPartidaConsulta}"
-                                    app:layout_constraintBottom_toBottomOf="parent"
-                                    app:layout_constraintEnd_toEndOf="parent"
-                                    app:layout_constraintTop_toBottomOf="@+id/textView96"
-                                    app:srcCompat="@drawable/ic_edit_blue_24dp" />
-
-                            </androidx.constraintlayout.widget.ConstraintLayout>
-
-                        </androidx.cardview.widget.CardView>
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/listItinerariosDestino"
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:layout_marginStart="16dp"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginEnd="16dp"
-                            android:layout_marginBottom="8dp"
-                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/cardViewDestinoConsulta"
-                            tools:listitem="@layout/linha_itinerarios" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
                     android:id="@+id/tab1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -384,10 +201,8 @@
                             android:layout_width="80dp"
                             android:layout_height="80dp"
                             android:layout_marginStart="8dp"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginTop="16dp"
+                            android:layout_marginTop="8dp"
                             android:layout_marginEnd="8dp"
-                            android:layout_marginRight="8dp"
                             android:background="@color/transparente"
                             android:contentDescription="Botão inverter consulta"
                             android:onClick="@{view::onClickBtnInverter}"
@@ -805,6 +620,189 @@
                         <!--                            app:layout_constraintEnd_toEndOf="parent"-->
                         <!--                            app:layout_constraintStart_toStartOf="parent"-->
                         <!--                            app:layout_constraintTop_toBottomOf="@+id/radioGroupConsulta" />-->
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/tab3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:id="@+id/textView76"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="Pesquise informando o destino desejado. Todo itinerário cadastrado no sistema que passar pelo bairro escolhido será exibido"
+                            android:textAlignment="center"
+                            android:textSize="10sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cardViewListDestinoConsulta"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="16dp"
+                            android:layout_marginBottom="24dp"
+                            android:visibility="visible"
+                            app:cardCornerRadius="10dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/textView76">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:padding="10dp">
+
+                                <TextView
+                                    android:id="@+id/textView94"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:paddingTop="10dp"
+                                    android:paddingBottom="0dp"
+                                    android:text="Para qual cidade você quer ir?"
+                                    android:textAppearance="@style/texto_azul" />
+
+                                <TextView
+                                    android:id="@+id/textView97"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="Escolha a cidade para onde você deseja ir, pressionando o brasão ou o nome da cidade abaixo"
+                                    android:textSize="8sp" />
+
+                                <androidx.recyclerview.widget.RecyclerView
+                                    android:id="@+id/listCidadesDestinoConsulta"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:stretchColumns="true"
+                                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                                    app:spanCount="3"
+                                    tools:listitem="@layout/linha_cidades" />
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cardViewDestinoConsulta"
+                            android:layout_width="match_parent"
+                            android:layout_height="80dp"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="16dp"
+                            android:visibility="gone"
+                            app:cardCornerRadius="10dp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/textView76">
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1">
+
+                                <ImageView
+                                    android:id="@+id/circleViewPartidaConsulta"
+                                    android:layout_width="50dp"
+                                    android:layout_height="50dp"
+                                    android:layout_marginStart="10dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:layout_weight="1"
+                                    android:contentDescription="@{`brasão partida: `+destinoConsulta.nomeCidadeComEstado}"
+                                    app:corArcoMaior="@color/azul"
+                                    app:corArcoMenor="@color/azul"
+                                    app:espessuraArcoMaior="4"
+                                    app:espessuraArcoMenor="4"
+                                    app:imagem="@{destinoConsulta.brasao}"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/textView96" />
+
+                                <TextView
+                                    android:id="@+id/textView96"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical|start"
+                                    android:layout_marginTop="8dp"
+                                    android:gravity="center_vertical"
+                                    android:paddingLeft="10dp"
+                                    android:text="Destino"
+                                    android:textAppearance="@style/texto_azul"
+                                    app:layout_constraintBottom_toTopOf="@+id/circleViewPartidaConsulta"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                                <TextView
+                                    android:id="@+id/textViewBairroPartidaConsulta"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginTop="5dp"
+                                    android:layout_weight="1"
+                                    android:text="@={destinoConsulta.bairro.nome}"
+                                    android:textAppearance="@style/texto_azul"
+                                    android:textColor="@color/cinzaEscuro"
+                                    app:layout_constraintStart_toEndOf="@+id/circleViewPartidaConsulta"
+                                    app:layout_constraintTop_toTopOf="@+id/circleViewPartidaConsulta"
+                                    tools:text="Bairro Partida" />
+
+                                <TextView
+                                    android:id="@+id/textViewCidadePartidaConsulta"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@={destinoConsulta.nomeCidade}"
+                                    android:textSize="12sp"
+                                    app:layout_constraintStart_toStartOf="@+id/textViewBairroPartidaConsulta"
+                                    app:layout_constraintTop_toBottomOf="@+id/textViewBairroPartidaConsulta"
+                                    tools:text="Cidade Partida" />
+
+                                <androidx.appcompat.widget.AppCompatImageButton
+                                    android:id="@+id/imageButtonConsulta"
+                                    style="@style/botao_transparente"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="16dp"
+                                    android:layout_marginRight="16dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:contentDescription="Botão editar partida"
+                                    android:onClick="@{view::onClickBtnEditarPartidaConsulta}"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/textView96"
+                                    app:srcCompat="@drawable/ic_edit_blue_24dp" />
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/listItinerariosDestino"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="16dp"
+                            android:layout_marginBottom="8dp"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/cardViewDestinoConsulta"
+                            tools:listitem="@layout/linha_itinerarios" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 

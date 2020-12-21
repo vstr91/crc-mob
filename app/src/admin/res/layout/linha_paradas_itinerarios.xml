@@ -57,7 +57,7 @@
                     android:paddingTop="0dp"
                     android:paddingRight="10dp"
                     android:paddingBottom="10dp"
-                    android:text="@{parada.bairroComCidade}"
+                    android:text="@{parada.rua+`\n`+parada.bairroComCidade}"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/guideline5"

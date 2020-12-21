@@ -67,7 +67,7 @@
                                 android:layout_weight="5"
                                 android:gravity="center_vertical"
                                 android:paddingLeft="10dp"
-                                android:text="@{itinerario.nomeBairroPartida}" />
+                                android:text="@{(itinerario.itinerario.aliasBairroPartida == null || itinerario.itinerario.aliasBairroPartida.empty)  ? itinerario.nomeBairroPartida : itinerario.itinerario.aliasBairroPartida}" />
 
                             <TextView
                                 android:id="@+id/textViewCidadePartida"
@@ -78,7 +78,7 @@
                                 android:gravity="center_vertical"
                                 android:paddingBottom="10dp"
                                 android:paddingLeft="10dp"
-                                android:text="@{itinerario.nomeCidadePartida}" />
+                                android:text="@{(itinerario.itinerario.aliasCidadePartida == null || itinerario.itinerario.aliasCidadePartida.empty)  ? itinerario.nomeCidadePartida : itinerario.itinerario.aliasCidadePartida}" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -104,7 +104,7 @@
                                 android:layout_weight="5"
                                 android:gravity="center_vertical"
                                 android:paddingLeft="10dp"
-                                android:text="@{itinerario.nomeBairroDestino}" />
+                                android:text="@{(itinerario.itinerario.aliasBairroDestino == null || itinerario.itinerario.aliasBairroDestino.empty)  ? itinerario.nomeBairroDestino : itinerario.itinerario.aliasBairroDestino}" />
 
                             <TextView
                                 android:id="@+id/textViewCidadeDestino"
@@ -115,7 +115,7 @@
                                 android:gravity="center_vertical"
                                 android:paddingBottom="10dp"
                                 android:paddingLeft="10dp"
-                                android:text="@{itinerario.nomeCidadeDestino}" />
+                                android:text="@{(itinerario.itinerario.aliasCidadeDestino == null || itinerario.itinerario.aliasCidadeDestino.empty)  ? itinerario.nomeCidadeDestino : itinerario.itinerario.aliasCidadeDestino}" />
                         </LinearLayout>
 
                     </LinearLayout>
@@ -139,6 +139,15 @@
                         android:text="@{itinerario.totalHorarios+` horário(s) cadastrado(s)`}"
                         android:textAppearance="@style/texto_azul"
                         tools:text="10 horários cadastrados" />
+
+                    <TextView
+                        android:id="@+id/textView58"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center|center_horizontal"
+                        android:textSize="12sp"
+                        app:textUltimaAlteracao="@{itinerario.itinerario.ultimaAlteracao}"
+                        tools:text="Última Alteração: 28/08/2020" />
 
                 </LinearLayout>
 

@@ -129,7 +129,7 @@
                                 android:layout_weight="5"
                                 android:gravity="center_vertical"
                                 android:paddingLeft="10dp"
-                                android:text="@{viewModel.iti.nomeBairroPartida}" />
+                                android:text="@{(viewModel.iti.itinerario.aliasBairroPartida == null || viewModel.iti.itinerario.aliasBairroPartida.isEmpty) ? viewModel.iti.nomeBairroPartida : viewModel.iti.itinerario.aliasBairroPartida}" />
 
                             <TextView
                                 android:id="@+id/textViewCidadePartida"
@@ -140,7 +140,7 @@
                                 android:gravity="center_vertical"
                                 android:paddingLeft="10dp"
                                 android:paddingBottom="5dp"
-                                android:text="@{viewModel.iti.nomeCidadePartida}" />
+                                android:text="@{(viewModel.iti.itinerario.aliasCidadePartida == null || viewModel.iti.itinerario.aliasCidadePartida.isEmpty) ? viewModel.iti.nomeCidadePartida : viewModel.iti.itinerario.aliasCidadePartida}" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -165,7 +165,7 @@
                                 android:layout_weight="5"
                                 android:gravity="center_vertical"
                                 android:paddingLeft="10dp"
-                                android:text="@{viewModel.iti.nomeBairroDestino}" />
+                                android:text="@{(viewModel.iti.itinerario.aliasBairroDestino == null || viewModel.iti.itinerario.aliasBairroDestino.isEmpty) ? viewModel.iti.nomeBairroDestino : viewModel.iti.itinerario.aliasBairroDestino}" />
 
                             <TextView
                                 android:id="@+id/textViewCidadeDestino"
@@ -176,7 +176,7 @@
                                 android:gravity="center_vertical"
                                 android:paddingLeft="10dp"
                                 android:paddingBottom="5dp"
-                                android:text="@{viewModel.iti.nomeCidadeDestino}" />
+                                android:text="@{(viewModel.iti.itinerario.aliasCidadeDestino == null || viewModel.iti.itinerario.aliasCidadeDestino.isEmpty) ? viewModel.iti.nomeCidadeDestino : viewModel.iti.itinerario.aliasCidadeDestino}" />
                         </LinearLayout>
 
                     </LinearLayout>
@@ -352,6 +352,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/btnIniciar"
             app:layout_constraintEnd_toEndOf="parent"
@@ -429,6 +430,30 @@
             app:layout_constraintEnd_toStartOf="@+id/textView5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/textView4" />
+
+        <Button
+            android:id="@+id/btnTrechos"
+            style="@style/botao_transparente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Ver Trechos"
+            android:onClick="onClickBtnVerTrechos"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/listParadas" />
+
+        <Button
+            android:id="@+id/btnAtualizaTrechos"
+            style="@style/botao_transparente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:onClick="onClickBtnAtualizaTrechos"
+            android:text="Atualizar Trechos"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/listParadas" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

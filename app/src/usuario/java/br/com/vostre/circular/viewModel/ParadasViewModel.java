@@ -34,6 +34,7 @@ import java.util.UUID;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.ImagemParada;
 import br.com.vostre.circular.model.Pais;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.dao.AppDatabase;
@@ -227,6 +228,15 @@ public class ParadasViewModel extends AndroidViewModel {
         new editAsyncTask(appDatabase).execute(parada);
     }
 
+    public static void editImagemParada(final ImagemParada parada, Context context) {
+
+        if(appDatabase == null){
+            appDatabase = AppDatabase.getAppDatabase(context.getApplicationContext());
+        }
+
+        new editImagemParadaAsyncTask(appDatabase).execute(parada);
+    }
+
     public void edit(final Parada parada) {
 
         parada.setUltimaAlteracao(new DateTime());
@@ -261,6 +271,22 @@ public class ParadasViewModel extends AndroidViewModel {
 
     }
 
+    private static class editImagemParadaAsyncTask extends AsyncTask<ImagemParada, Void, Void> {
+
+        private AppDatabase db;
+
+        editImagemParadaAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final ImagemParada... params) {
+            db.imagemParadaDAO().editar((params[0]));
+            return null;
+        }
+
+    }
+
     // fim editar
 
     public void carregarBairros(String cidade) {
@@ -281,11 +307,11 @@ public class ParadasViewModel extends AndroidViewModel {
         @Override
         protected Void doInBackground(final Void... params) {
 
-            this.brs = appDatabase.bairroDAO().listarTodosAtivosComCidadePorCidadeSync(cidade);
+            this.brs = appDatabase.bairroDAO().listarTodosAtivosPorCidadeSync(cidade);
             List<BairroCidade> comParadas = new ArrayList<>();
 
             for(BairroCidade b : brs){
-                List<ParadaBairro> paradas = db.paradaDAO().listarTodosAtivosComBairroPorBairroComItinerarioSync(b.getBairro().getId());
+                List<ParadaBairro> paradas = db.paradaDAO().listarTodosAtivosComBairroPorBairroComItinerarioSimplificadoSync(b.getBairro().getId());
 
                 if(paradas != null && paradas.size() > 0){
                     b.setParadas(paradas);

@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/circleview-debug" />
+            <option value="$PROJECT_DIR$/hipster" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

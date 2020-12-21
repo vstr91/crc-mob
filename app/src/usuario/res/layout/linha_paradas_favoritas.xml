@@ -77,11 +77,9 @@
                     android:id="@+id/textViewBairro"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
-                    android:text="@{parada.nomeBairroComCidade}"
+                    android:layout_marginEnd="8dp"
+                    android:text="@{parada.parada.rua+`, `+parada.nomeBairroComCidade}"
                     android:textColor="@color/cinzaMedio"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -90,7 +88,7 @@
                     app:layout_constraintStart_toEndOf="@+id/circleView2"
                     app:layout_constraintTop_toBottomOf="@+id/textViewNome"
                     app:layout_constraintVertical_bias="0.0"
-                    tools:text="aaa" />
+                    tools:text="Rua Teste 10, Bairro - Cidade" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>

@@ -56,6 +56,9 @@ public interface ItinerarioDAO {
             ")")
     LiveData<List<ItinerarioPartidaDestino>> listarTodos();
 
+    @Query("SELECT * FROM itinerario WHERE ativo = 1")
+    List<Itinerario> listarTodosAtivosSimplificadoNovoSync();
+
     @Query("SELECT DISTINCT i.*, " +
             "(SELECT pp.bairro FROM parada pp " +
             "WHERE pp.id = i.paradaInicial) AS 'idBairroPartida', " +
@@ -144,16 +147,16 @@ public interface ItinerarioDAO {
 
             "FROM parada_itinerario pit INNER JOIN itinerario i ON i.id = pit.itinerario " +
             "ORDER BY i.ativo DESC, " +
-            "(SELECT c.nome FROM parada pp " +
+            "(SELECT IFNULL(NULLIF(i.aliasCidadePartida, ''), c.nome) FROM parada pp " +
             "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pp.id = i.paradaInicial" +
             "), " +
-            "(SELECT b.nome FROM parada pp " +
+            "(SELECT IFNULL(NULLIF(i.aliasBairroPartida, ''), b.nome) FROM parada pp " +
             "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pp.id = i.paradaInicial" +
             "), " +
-            "(SELECT c.nome FROM parada pp " +
+            "(SELECT IFNULL(NULLIF(i.aliasCidadeDestino, ''), c.nome) FROM parada pp " +
             "INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pp.id = i.paradaFinal" +
             ")," +
-            "(SELECT b.nome FROM parada pp " +
+            "(SELECT IFNULL(NULLIF(i.aliasBairroDestino, ''), b.nome) FROM parada pp " +
             "            INNER JOIN bairro b ON b.id = pp.bairro INNER JOIN cidade c ON c.id = b.cidade WHERE pp.id = i.paradaFinal)")
     LiveData<List<ItinerarioPartidaDestino>> listarTodosComTotalHorariosSimplificado();
 
@@ -816,6 +819,9 @@ public interface ItinerarioDAO {
 
     @RawQuery()
     ItinerarioPartidaDestino deletaTabelaTemp(SimpleSQLiteQuery query);
+
+    @RawQuery()
+    List<ItinerarioPartidaDestino> executarComando(SimpleSQLiteQuery query);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void inserirTodos(List<Itinerario> itinerarios);

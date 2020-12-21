@@ -39,11 +39,13 @@ import br.com.vostre.circular.model.Cidade;
 import br.com.vostre.circular.model.Empresa;
 import br.com.vostre.circular.model.EntidadeBase;
 import br.com.vostre.circular.model.Estado;
+import br.com.vostre.circular.model.FeedbackItinerario;
 import br.com.vostre.circular.model.Feriado;
 import br.com.vostre.circular.model.HistoricoItinerario;
 import br.com.vostre.circular.model.HistoricoSecao;
 import br.com.vostre.circular.model.Horario;
 import br.com.vostre.circular.model.HorarioItinerario;
+import br.com.vostre.circular.model.ImagemParada;
 import br.com.vostre.circular.model.Itinerario;
 import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.Onibus;
@@ -57,10 +59,14 @@ import br.com.vostre.circular.model.Problema;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Servico;
 import br.com.vostre.circular.model.TipoProblema;
+import br.com.vostre.circular.model.Tpr;
+import br.com.vostre.circular.model.Tpr2;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.model.api.CircularAPI;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.dao.PaisDAO;
+import br.com.vostre.circular.model.log.LogItinerario;
+import br.com.vostre.circular.model.log.LogParada;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.Crypt;
 import br.com.vostre.circular.utils.DBUtils;
@@ -408,6 +414,24 @@ public class BaseViewModel extends AndroidViewModel {
                 case "servico":
                     db.servicoDAO().deletarTodos();
                     db.servicoDAO().inserirTodos((List<Servico>) params[0]);
+                    break;
+                case "log_itinerario":
+                    db.logConsultaDAO().inserirTodosItinerarios((List<LogItinerario>) params[0]);
+                    break;
+                case "log_parada":
+                    db.logConsultaDAO().inserirTodasParadas((List<LogParada>) params[0]);
+                    break;
+                case "imagem_parada":
+                    db.imagemParadaDAO().inserirTodos((List<ImagemParada>) params[0]);
+                    break;
+                case "feedback_itinerario":
+                    db.feedbackItinerarioDAO().inserirTodos((List<FeedbackItinerario>) params[0]);
+                    break;
+                case "tpr":
+                    db.temporariasDAO().inserirTodosTemp1((List<Tpr>) params[0]);
+                    break;
+                case "tpr2":
+                    db.temporariasDAO().inserirTodosTemp2((List<Tpr2>) params[0]);
                     break;
                 case "parametro_interno":
                     db.parametroInternoDAO().inserir((ParametroInterno) params[0].get(0));

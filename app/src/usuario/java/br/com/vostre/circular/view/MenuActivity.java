@@ -31,6 +31,11 @@ import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.work.Constraints;
+import androidx.work.NetworkType;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+
 import br.com.vostre.circular.BuildConfig;
 
 import android.util.Log;
@@ -56,6 +61,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -95,6 +101,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 
 import br.com.vostre.circular.App;
 import br.com.vostre.circular.R;
@@ -103,6 +111,7 @@ import br.com.vostre.circular.model.Mensagem;
 import br.com.vostre.circular.model.Parametro;
 import br.com.vostre.circular.model.ParametroInterno;
 import br.com.vostre.circular.model.api.CircularAPI;
+import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.BadgeDrawerToggle;
 import br.com.vostre.circular.utils.DBUtils;
@@ -111,6 +120,7 @@ import br.com.vostre.circular.utils.JsonUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.ToolbarUtils;
 import br.com.vostre.circular.utils.Unique;
+import br.com.vostre.circular.utils.WorksUtils;
 import br.com.vostre.circular.utils.tasks.PreferenceDownloadAsyncTask;
 import br.com.vostre.circular.view.form.FormNovidades;
 import br.com.vostre.circular.viewModel.BaseViewModel;
@@ -123,32 +133,14 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
+import static br.com.vostre.circular.utils.DBUtils.iniciaTabelasTemporarias;
+
 public class MenuActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     DrawerLayout drawer;
     NavigationView navView;
     ActivityMenuBinding binding;
     BadgeDrawerToggle drawerToggle;
-
-    // Constants
-    // The authority for the sync adapter's content provider
-    public static final String AUTHORITY = "br.com.vostre.circular.datasync.provider";
-    // An account type, in the form of a domain name
-    public static final String ACCOUNT_TYPE = "br.com.vostre.circular.usuario.main";
-    // The account name
-    public static final String ACCOUNT = "dummyaccount";
-    // Instance fields
-    Account mAccount;
-
-    // Sync interval constants
-    public static final long SECONDS_PER_MINUTE = 60L;
-    public static final long SYNC_INTERVAL_IN_MINUTES = 60*5L;
-    public static final long SYNC_INTERVAL =
-            SYNC_INTERVAL_IN_MINUTES *
-                    SECONDS_PER_MINUTE;
-    // Global variables
-    // A content resolver for accessing the provider
-    ContentResolver mResolver;
 
     Location localAnterior;
 
@@ -175,10 +167,36 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         setViewAtual(binding.getRoot());
 
+        // inicia atualizacao periodica
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+
+        WorksUtils.iniciaWorkAtualizacao(getApplicationContext(), 60, "sync", constraints);
+
         carregaImagens();
 
         //v2.3.x - forca atualizacao bd - campos novos no itinerario
-        DBUtils.populaBancoDeDados(this);
+        if(PreferenceUtils.carregarPreferencia(getApplicationContext(),
+                getApplicationContext().getPackageName()+".atualizacao23x").isEmpty()){
+
+            DBUtils.populaBancoDeDados(this);
+
+            PreferenceUtils.salvarPreferencia(getApplicationContext(),
+                    getApplicationContext().getPackageName()+".atualizacao23x", "-1");
+
+        }
+
+        //v2.4.x - forca atualizacao bd - novas tabelas temporarias
+        if(PreferenceUtils.carregarPreferencia(getApplicationContext(),
+                getApplicationContext().getPackageName()+".atualizacao24x").isEmpty()){
+
+            DBUtils.populaBancoDeDados(this);
+
+            PreferenceUtils.salvarPreferencia(getApplicationContext(),
+                    getApplicationContext().getPackageName()+".atualizacao24x", "-1");
+
+        }
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -197,6 +215,9 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
                     String identificadorUnico = Unique.geraIdentificadorUnico();
                     PreferenceUtils.salvarPreferencia(getApplicationContext(), getApplicationContext().getPackageName()+".id_unico", identificadorUnico);
                     OneSignal.sendTag("id_unico", identificadorUnico);
+
+//                    iniciaTabelasTemporarias(AppDatabase.getAppDatabase(getApplicationContext()), true);
+
                 }
             });
 
@@ -251,24 +272,24 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 //                                    geraAvisoMensagens();
 //                                    geraAvisoIncidente();
 
-                                    List<TapTarget> targets = geraAvisos();
-                                    exibeTour(targets, new TapTargetSequence.Listener(){
-
-                                        @Override
-                                        public void onSequenceFinish() {
-                                            //Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
-                                        }
-
-                                        @Override
-                                        public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
-
-                                        }
-
-                                        @Override
-                                        public void onSequenceCanceled(TapTarget lastTarget) {
-//                                            Toast.makeText(getApplicationContext(), "Tour cancelado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
+//                                    List<TapTarget> targets = geraAvisos();
+//                                    exibeTour(targets, new TapTargetSequence.Listener(){
+//
+//                                        @Override
+//                                        public void onSequenceFinish() {
+//                                            //Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+//                                        }
+//
+//                                        @Override
+//                                        public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+//
+//                                        }
+//
+//                                        @Override
+//                                        public void onSequenceCanceled(TapTarget lastTarget) {
+////                                            Toast.makeText(getApplicationContext(), "Tour cancelado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+//                                        }
+//                                    });
 
                                     Toast.makeText(getApplicationContext(), "Acesso ao GPS e Armazenamento são necessários para aproveitar ao máximo as funções do Circular!", Toast.LENGTH_LONG).show();
                                 }
@@ -291,47 +312,25 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 //            geraAvisoAjuda();
 //            geraAvisoMensagens();
 //            geraAvisoIncidente();
-            List<TapTarget> targets = geraAvisos();
-            exibeTour(targets, new TapTargetSequence.Listener(){
-
-                @Override
-                public void onSequenceFinish() {
-                    //Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
-
-                }
-
-                @Override
-                public void onSequenceCanceled(TapTarget lastTarget) {
-//                                            Toast.makeText(getApplicationContext(), "Tour cancelado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
-                }
-            });
+//            List<TapTarget> targets = geraAvisos();
+//            exibeTour(targets, new TapTargetSequence.Listener(){
+//
+//                @Override
+//                public void onSequenceFinish() {
+//                    //Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+//                }
+//
+//                @Override
+//                public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+//
+//                }
+//
+//                @Override
+//                public void onSequenceCanceled(TapTarget lastTarget) {
+////                                            Toast.makeText(getApplicationContext(), "Tour cancelado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+//                }
+//            });
         }
-
-        // Create the dummy account
-        mAccount = CreateSyncAccount(this);
-
-        // Get the content resolver for your app
-        mResolver = getContentResolver();
-
-        if(mAccount == null){
-            mAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
-        }
-
-        ContentResolver.setIsSyncable(mAccount, AUTHORITY, 1);
-        ContentResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
-
-        /*
-         * Turn on periodic syncing
-         */
-        ContentResolver.addPeriodicSync(
-                new Account(ACCOUNT, ACCOUNT_TYPE),
-                AUTHORITY,
-                Bundle.EMPTY,
-                SYNC_INTERVAL);
 
         drawer = binding.container;
         navView = binding.nav;
@@ -461,24 +460,24 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 //            geraAvisoMensagens();
 //            geraAvisoIncidente();
 
-            List<TapTarget> targets = geraAvisos();
-            exibeTour(targets, new TapTargetSequence.Listener(){
-
-                @Override
-                public void onSequenceFinish() {
-                    //Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
-
-                }
-
-                @Override
-                public void onSequenceCanceled(TapTarget lastTarget) {
-//                                            Toast.makeText(getApplicationContext(), "Tour cancelado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
-                }
-            });
+//            List<TapTarget> targets = geraAvisos();
+//            exibeTour(targets, new TapTargetSequence.Listener(){
+//
+//                @Override
+//                public void onSequenceFinish() {
+//                    //Toast.makeText(getApplicationContext(), "Tour finalizado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+//                }
+//
+//                @Override
+//                public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
+//
+//                }
+//
+//                @Override
+//                public void onSequenceCanceled(TapTarget lastTarget) {
+////                                            Toast.makeText(getApplicationContext(), "Tour cancelado. Se quiser visualizar novamente, basta pressionar o botão de ajuda no topo da tela", Toast.LENGTH_SHORT).show();
+//                }
+//            });
         }
 
     }
@@ -698,7 +697,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
         btnLogin.setEnabled(false);
-
     }
 
     public void onClickBtnSair(View v){
@@ -730,17 +728,9 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
     public void onClickBtnAtualizar(View v){
         drawer.closeDrawers();
-        // Pass the settings flags by inserting them in a bundle
-        Bundle settingsBundle = new Bundle();
-        settingsBundle.putBoolean(
-                ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        settingsBundle.putBoolean(
-                ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        /*
-         * Request the sync for the default account, authority, and
-         * manual sync settings
-         */
-        ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
+
+        // inicia atualizacao periodica
+        WorksUtils.iniciaWorkAtualizacaoSingle(getApplicationContext(), "sync-single");
 
         PreferenceUtils.gravaMostraToast(getApplicationContext(),true);
 
@@ -778,9 +768,9 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             binding.textView34.setVisibility(View.VISIBLE);
             binding.btnSair.setVisibility(View.VISIBLE);
 
-            if(menu != null){
-                menu.getItem(1).setVisible(true);
-            }
+//            if(menu != null){
+//                menu.getItem(1).setVisible(true);
+//            }
 
         } else{
             binding.btnLogin.setVisibility(View.VISIBLE);
@@ -789,9 +779,9 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
             binding.textView34.setVisibility(View.GONE);
             binding.btnSair.setVisibility(View.GONE);
 
-            if(menu != null){
-                menu.getItem(1).setVisible(false);
-            }
+//            if(menu != null){
+//                menu.getItem(1).setVisible(false);
+//            }
 
         }
 
@@ -799,6 +789,8 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
     private void signOut() {
         FirebaseAuth.getInstance().signOut();
+        mGoogleSignInClient.signOut();
+
         updateUI(null);
 
         requisitaAtualizacao();
@@ -811,44 +803,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false;
-    }
-
-    /**
-     * Create a new dummy account for the sync adapter
-     *
-     * @param context The application context
-     */
-    public static Account CreateSyncAccount(Context context) {
-        // Create the account type and default account
-        Account newAccount = new Account(
-                ACCOUNT, ACCOUNT_TYPE);
-        // Get an instance of the Android account manager
-        AccountManager accountManager =
-                (AccountManager) context.getSystemService(
-                        ACCOUNT_SERVICE);
-        /*
-         * Add the account and account type, no password or user data
-         * If successful, return the Account object, otherwise report an error.
-         */
-        if (accountManager.addAccountExplicitly(newAccount, null, null)) {
-            //System.out.println("Entrou");
-            /*
-             * If you don't set android:syncable="true" in
-             * in your <provider> element in the manifest,
-             * then call context.setIsSyncable(account, AUTHORITY, 1)
-             * here.
-             */
-            return newAccount;
-        } else {
-            //System.out.println("Entrou erro");
-            /*
-             * The account exists or some other error occurred. Log this, report it,
-             * or handle it internally.
-             */
-        }
-
-        return null;
-
     }
 
     private boolean checarPermissoes(){
@@ -1159,13 +1113,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     private void requisitaAtualizacao(){
-        Bundle settingsBundle = new Bundle();
-        settingsBundle.putBoolean(
-                ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        settingsBundle.putBoolean(
-                ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-
-        ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
+        WorksUtils.iniciaWorkAtualizacaoSingle(getApplicationContext(), "sync-single");
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {

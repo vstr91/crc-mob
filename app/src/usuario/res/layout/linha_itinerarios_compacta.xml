@@ -86,13 +86,12 @@
 
                 <TextView
                     android:id="@+id/textView15"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_marginStart="8dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@{itinerario.nomeCidadePartida}"
                     android:textSize="12sp"
-                    app:layout_constraintStart_toStartOf="@+id/guideline12"
+                    app:layout_constraintStart_toStartOf="@+id/textView12"
                     app:layout_constraintTop_toBottomOf="@+id/textView12"
                     tools:text="Cidade" />
 

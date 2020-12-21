@@ -21,7 +21,6 @@ import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -47,6 +46,7 @@ import java.util.ArrayList;
 import br.com.vostre.circular.BuildConfig;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityLoginBinding;
+import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.utils.Constants;
 import br.com.vostre.circular.utils.DBUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
@@ -54,7 +54,8 @@ import br.com.vostre.circular.utils.Unique;
 import br.com.vostre.circular.utils.tasks.PreferenceDownloadAsyncTask;
 import br.com.vostre.circular.view.form.FormNovidades;
 import br.com.vostre.circular.viewModel.BaseViewModel;
-import io.fabric.sdk.android.Fabric;
+
+import static br.com.vostre.circular.utils.DBUtils.iniciaTabelasTemporarias;
 
 public class LoginActivity extends BaseActivity {
 
@@ -71,13 +72,6 @@ public class LoginActivity extends BaseActivity {
     static int RC_SIGN_IN = 480;
     boolean flag = false;
     private FirebaseAuth mAuth;
-
-//    // The authority for the sync adapter's content provider
-//    public static final String AUTHORITY = "br.com.vostre.circular.datasync.provider";
-//    // An account type, in the form of a domain name
-//    public static final String ACCOUNT_TYPE = "br.com.vostre.circular.usuario";
-//    // The account name
-//    public static final String ACCOUNT = "dummyaccount";
 
     Bundle bundle;
 
@@ -107,20 +101,6 @@ public class LoginActivity extends BaseActivity {
             });
 
         }
-
-
-
-        // Pass the settings flags by inserting them in a bundle
-        Bundle settingsBundle = new Bundle();
-        settingsBundle.putBoolean(
-                ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        settingsBundle.putBoolean(
-                ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        /*
-         * Request the sync for the default account, authority, and
-         * manual sync settings
-         */
-        ContentResolver.requestSync(new Account(Constants.ACCOUNT, Constants.ACCOUNT_TYPE), Constants.AUTHORITY, settingsBundle);
 
         btnLogin = binding.btnLogin;
 
@@ -203,7 +183,9 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if(requestCode == RC_SIGN_IN){
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
 
             try {
@@ -217,7 +199,7 @@ public class LoginActivity extends BaseActivity {
 //            handleSignInResult(task);
             binding.btnLogin.setEnabled(true);
 
-            if(progressBar != null){
+            if (progressBar != null) {
                 progressBar.setVisibility(View.VISIBLE);
             }
 

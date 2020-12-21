@@ -1,5 +1,6 @@
 package br.com.vostre.circular.view;
 
+import androidx.core.net.ConnectivityManagerCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
@@ -12,6 +13,9 @@ import android.location.Location;
 import android.location.LocationManager;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
@@ -52,11 +56,12 @@ import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.Usuario;
 import br.com.vostre.circular.utils.ToolbarUtils;
 import br.com.vostre.circular.view.listener.GpsListener;
+import br.com.vostre.circular.view.listener.RedeListener;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
 import static br.com.vostre.circular.utils.ToolbarUtils.PICK_FILE;
 
-public class BaseActivity extends AppCompatActivity implements View.OnClickListener, GpsListener {
+public class BaseActivity extends AppCompatActivity implements View.OnClickListener, GpsListener, RedeListener {
 
     public Toolbar toolbar;
     Menu menu;
@@ -72,6 +77,9 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
     Location localAnterior;
 
+    ConnectivityManager cm;
+    boolean redeAtiva = false;
+
     private BroadcastReceiver mGpsSwitchStateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -79,6 +87,11 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
             if (LocationManager.PROVIDERS_CHANGED_ACTION.equals(intent.getAction())) {
                 gpsAtivo = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
                 onGpsChanged(gpsAtivo);
+            }
+
+            if(ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())){
+                checaRede();
+                onRedeChanged(redeAtiva);
             }
         }
     };
@@ -135,6 +148,14 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         gpsAtivo = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
+        cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        checaRede();
+
+    }
+
+    private void checaRede() {
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        redeAtiva = networkInfo != null && networkInfo.isConnected();
     }
 
     @Override
@@ -602,6 +623,11 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onGpsChanged(boolean ativo) {
+
+    }
+
+    @Override
+    public void onRedeChanged(boolean ativo) {
 
     }
 

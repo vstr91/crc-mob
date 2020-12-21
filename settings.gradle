@@ -1,1 +1,1 @@
-include ':app', ':circleview-debug'
+include ':app', ':circleview-debug', ':hipster'

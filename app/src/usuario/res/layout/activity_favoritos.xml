@@ -24,6 +24,56 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"></include>
 
+        <TextView
+            android:id="@+id/textViewCarregando"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginLeft="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_marginBottom="8dp"
+            android:elevation="25dp"
+            android:gravity="center"
+            android:text="Carregando dados! Só um momento, por favor!"
+            android:textColor="@color/branco"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Carregando dados! Só um momento, por favor!" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="27dp"
+            android:layout_marginRight="27dp"
+            android:elevation="25dp"
+            app:layout_constraintEnd_toEndOf="@+id/textViewCarregando"
+            app:layout_constraintStart_toStartOf="@+id/textViewCarregando"
+            app:layout_constraintTop_toBottomOf="@+id/textViewCarregando" />
+
+        <LinearLayout
+            android:id="@+id/fundo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/cinzaEscuro80"
+            android:clickable="true"
+            android:elevation="20dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </LinearLayout>
+
         <TabHost
             android:id="@+id/tabs"
             style="@style/TabWidget"
@@ -72,6 +122,34 @@
                             tools:listitem="@layout/linha_itinerarios">
 
                         </androidx.recyclerview.widget.RecyclerView>
+
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/estrela_itinerario"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_gravity="center"
+                            app:lottie_autoPlay="true"
+                            app:lottie_loop="false"
+                            app:lottie_rawRes="@raw/favorito_vazio" />
+
+                        <TextView
+                            android:id="@+id/textViewListaVazia2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginRight="8dp"
+                            android:gravity="center"
+                            android:padding="10dp"
+                            android:text="Nenhum itinerário marcado como favorito até o momento.\nPara marcar como favorito, pressione a estrela na tela do quadro de horários e o itinerário aparecerá aqui!"
+                            android:textColor="@color/branco"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/listMensagens" />
+
                     </LinearLayout>
 
                     <LinearLayout
@@ -91,6 +169,34 @@
                             tools:listitem="@layout/linha_paradas">
 
                         </androidx.recyclerview.widget.RecyclerView>
+
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/estrela_parada"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_gravity="center"
+                            app:lottie_autoPlay="true"
+                            app:lottie_loop="false"
+                            app:lottie_rawRes="@raw/favorito_vazio" />
+
+                        <TextView
+                            android:id="@+id/textViewListaVazia3"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginRight="8dp"
+                            android:gravity="center"
+                            android:padding="10dp"
+                            android:text="Nenhuma parada marcada como favorita até o momento.\nPara marcar como favorita, pressione a estrela na tela de detalhes da parada e ela aparecerá aqui!"
+                            android:textColor="@color/branco"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/listMensagens" />
+
                     </LinearLayout>
 
                 </FrameLayout>

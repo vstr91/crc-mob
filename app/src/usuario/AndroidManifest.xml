@@ -135,12 +135,12 @@
             android:name=".view.ListaPontosInteresseActivity"
             android:noHistory="true"
             android:screenOrientation="portrait" />
+        <activity
+            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat" />
         <meta-data
             android:name="CLOUDINARY_URL"
             android:value="cloudinary://@vostre" />
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="048b5dba17da58b2de2b7470cf50a3def5e51fb3" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="br.com.vostre.circular.fileprovider"

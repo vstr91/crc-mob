@@ -90,6 +90,12 @@ public class HorariosItinerarioActivity extends BaseActivity {
         viewModel.retorno.observe(this, retornoObserver);
     }
 
+    public void onClickBtnPorTexto(View v){
+        Intent i = new Intent(getApplicationContext(), HorariosItinerarioTextoActivity.class);
+        i.putExtra("itinerario", getIntent().getStringExtra("itinerario"));
+        startActivity(i);
+    }
+
     Observer<List<HorarioItinerarioNome>> horariosObserver = new Observer<List<HorarioItinerarioNome>>() {
         @Override
         public void onChanged(List<HorarioItinerarioNome> horarios) {

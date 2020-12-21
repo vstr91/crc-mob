@@ -18,7 +18,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -68,8 +67,6 @@ import br.com.vostre.circular.view.listener.HoraListener;
 import br.com.vostre.circular.view.listener.MensagemListener;
 import br.com.vostre.circular.view.listener.ToolbarListener;
 import br.com.vostre.circular.viewModel.BaseViewModel;
-
-import io.fabric.sdk.android.Fabric;
 
 import static br.com.vostre.circular.utils.ToolbarUtils.PICK_FILE;
 
@@ -123,7 +120,7 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
-        Fabric.with(this, new Crashlytics());
+//        Fabric.with(this, new Crashlytics());
 
         //viewModel = ViewModelProviders.of(this).get(BaseViewModel.class);
 

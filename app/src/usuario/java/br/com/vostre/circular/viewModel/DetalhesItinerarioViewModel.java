@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
@@ -16,6 +17,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
+import org.joda.time.DateTime;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -23,10 +25,19 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Polyline;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import br.com.vostre.circular.model.Feedback;
+import br.com.vostre.circular.model.FeedbackItinerario;
+import br.com.vostre.circular.model.ImagemParada;
+import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.SecaoItinerario;
 import br.com.vostre.circular.model.dao.AppDatabase;
 import br.com.vostre.circular.model.pojo.BairroCidade;
@@ -34,11 +45,12 @@ import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.SecaoItinerarioParada;
+import br.com.vostre.circular.utils.StringUtils;
 import br.com.vostre.circular.view.listener.PartidaEDestinoListener;
 
 public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
-    private AppDatabase appDatabase;
+    private static AppDatabase appDatabase;
 
     public LiveData<ItinerarioPartidaDestino> itinerario;
 
@@ -69,6 +81,19 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
     public String partidaConsulta;
     public String destinoConsulta;
+
+    public FeedbackItinerario feedback;
+    public Bitmap foto;
+
+    String nomeTemp = "";
+
+    public FeedbackItinerario getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(FeedbackItinerario feedback) {
+        this.feedback = feedback;
+    }
 
     public void setItinerario(String itinerario, String paradaPartida, String paradaDestino,
                               String bairroPartida, String bairroDestino) {
@@ -141,10 +166,83 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
         retorno.setValue(-1);
 
         this.ruas = appDatabase.paradaItinerarioDAO().listarRuasPorItinerario("");
+        feedback = new FeedbackItinerario();
+    }
+
+    public void salvarFeedback(FeedbackItinerario feedback){
+        add(feedback);
+        System.out.println("FEEDBACK "+feedback.getItinerario()+" | "+feedback.getDescricao()+" | "+feedback.getImagem());
     }
 
     public void carregarRuas(String itinerario){
         this.ruas = appDatabase.paradaItinerarioDAO().listarRuasPorItinerario(itinerario);
+    }
+
+    public Bitmap preProcessarFoto(Bitmap foto){
+        nomeTemp = UUID.randomUUID().toString()+".temp.png";
+        File file = new File(getApplication().getFilesDir(),  nomeTemp);
+        FileOutputStream fos = null;
+
+        try {
+            fos = new FileOutputStream(file);
+            foto = foto.createScaledBitmap(foto, (int) (foto.getWidth() * 0.1), (int) (foto.getHeight() * 0.1), true);
+            foto.compress(Bitmap.CompressFormat.PNG, 10, fos);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+
+                    return foto;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+
+    }
+
+    public void salvarFoto(FeedbackItinerario feedback, Bitmap foto) {
+        FileOutputStream fos = null;
+        File file = new File(getApplication().getFilesDir(),  UUID.randomUUID().toString()+".png");
+
+        try {
+            fos = new FileOutputStream(file);
+
+            if(foto.getHeight() > 768 || foto.getWidth() > 1024){
+                foto = foto.createScaledBitmap(foto, (int) (foto.getWidth() * 0.3), (int) (foto.getHeight() * 0.3), true);
+            }
+
+            foto.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+
+                    feedback.setImagem(file.getName());
+                    feedback.setImagemEnviada(false);
+
+                    if(nomeTemp != null && !nomeTemp.trim().isEmpty()){
+
+                        File temp = new File(getApplication().getFilesDir(), nomeTemp);
+
+                        if(temp != null && temp.exists() && temp.isFile()){
+                            temp.delete();
+                        }
+
+                    }
+
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                retorno.setValue(0);
+            }
+        }
     }
 
     public void carregarHorariosFiltrados(String itinerario, String itinerarioARemover, String paradaPartida, String paradaDestino, boolean trechoIsolado,
@@ -467,40 +565,73 @@ public class DetalhesItinerarioViewModel extends AndroidViewModel {
 
     }
 
-//    public void carregaPartidaEDestino(String partida, String destino, PartidaEDestinoListener listener){
-//        new carregaPartidaEDestinoAsyncTask(appDatabase, partida, destino, listener);
-//    }
-//
-//    private static class carregaPartidaEDestinoAsyncTask extends AsyncTask<List<SecaoItinerarioParada>, Void, Void> {
-//
-//        private AppDatabase db;
-//        private String partida;
-//        private String destino;
-//        ParadaBairro paradaPartida;
-//        ParadaBairro paradadestino;
-//        PartidaEDestinoListener listener;
-//
-//        carregaPartidaEDestinoAsyncTask(AppDatabase appDatabase, String partida, String destino, PartidaEDestinoListener listener) {
-//            db = appDatabase;
-//            this.partida = partida;
-//            this.destino = destino;
-//            this.listener = listener;
-//        }
-//
-//        @Override
-//        protected Void doInBackground(final List<SecaoItinerarioParada>... params) {
-//
-//            paradaPartida = db.paradaDAO().carregarComBairroSync(partida);
-//            paradadestino = db.paradaDAO().carregarComBairroSync(destino);
-//
-//            return null;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Void aVoid) {
-//            super.onPostExecute(aVoid);
-//            listener.onLoaded(paradaPartida, paradadestino);
-//        }
-//    }
+    // adicionar
+
+    public void add(final FeedbackItinerario feedback) {
+
+        feedback.setDataCadastro(new DateTime());
+        feedback.setUltimaAlteracao(new DateTime());
+        feedback.setEnviado(false);
+
+        feedback.setItinerario(itinerario.getValue().getItinerario().getId());
+
+        if(feedback.getImagem() != null && !feedback.getImagem().isEmpty()){
+            salvarFoto(feedback, foto);
+        }
+
+        new addAsyncTask(appDatabase).execute(feedback);
+    }
+
+    private static class addAsyncTask extends AsyncTask<FeedbackItinerario, Void, Void> {
+
+        private AppDatabase db;
+
+        addAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final FeedbackItinerario... params) {
+            db.feedbackItinerarioDAO().inserir((params[0]));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            if(retorno != null){
+                retorno.setValue(1);
+            }
+
+        }
+
+    }
+
+    // fim adicionar
+
+    public static void editImagemFeedbackItinerario(final FeedbackItinerario fi, Context context) {
+
+        if(appDatabase == null){
+            appDatabase = AppDatabase.getAppDatabase(context.getApplicationContext());
+        }
+
+        new DetalhesItinerarioViewModel.editImagemFeedbackItinerarioAsyncTask(appDatabase).execute(fi);
+    }
+
+    private static class editImagemFeedbackItinerarioAsyncTask extends AsyncTask<FeedbackItinerario, Void, Void> {
+
+        private AppDatabase db;
+
+        editImagemFeedbackItinerarioAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final FeedbackItinerario... params) {
+            db.feedbackItinerarioDAO().editar((params[0]));
+            return null;
+        }
+
+    }
 
 }

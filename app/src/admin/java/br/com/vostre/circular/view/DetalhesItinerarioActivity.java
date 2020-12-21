@@ -10,9 +10,12 @@ import androidx.databinding.BindingAdapter;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.InverseBindingAdapter;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
@@ -22,10 +25,12 @@ import android.os.Bundle;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
@@ -34,17 +39,21 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
+import org.osmdroid.bonuspack.utils.PolylineEncoder;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.vostre.circular.R;
@@ -54,8 +63,11 @@ import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
+import br.com.vostre.circular.model.pojo.TrechoPartidaDestino;
 import br.com.vostre.circular.utils.DrawableUtils;
+import br.com.vostre.circular.utils.WidgetUtils;
 import br.com.vostre.circular.view.adapter.ParadaItinerarioAdapter;
+import br.com.vostre.circular.view.adapter.TrechoAdapter;
 import br.com.vostre.circular.view.form.FormHistorico;
 import br.com.vostre.circular.view.form.FormItinerario;
 import br.com.vostre.circular.view.utils.SortListItemHelper;
@@ -85,6 +97,11 @@ public class DetalhesItinerarioActivity extends BaseActivity {
 
     boolean mapaOculto = false;
     int tamanhoOriginalMapa = 0;
+
+    BottomSheetDialog bsd;
+    RecyclerView listTrechos;
+    TrechoAdapter adapterTrechos;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,8 +150,9 @@ public class DetalhesItinerarioActivity extends BaseActivity {
             viewModel.pits.observe(this, pitsObserver);
             viewModel.paradasItinerario.observe(this, paradasItinerarioObserver);
             viewModel.historicoItinerario.observe(this, historicoItinerarioObserver);
+            viewModel.trechos.observe(this, trechosObserver);
 
-            viewModel.localAtual.observe(this, localObserver);
+//            viewModel.localAtual.observe(this, localObserver);
 
             binding.setViewModel(viewModel);
 
@@ -186,6 +204,25 @@ public class DetalhesItinerarioActivity extends BaseActivity {
             touchHelper.attachToRecyclerView(listParadas);
         }
 
+        bsd = new BottomSheetDialog(ctx);
+        bsd.setCanceledOnTouchOutside(true);
+
+        bsd.setContentView(R.layout.bottom_sheet_trechos);
+
+        listTrechos = bsd.findViewById(R.id.listTrechos);
+
+        adapterTrechos = new TrechoAdapter(viewModel.trechos.getValue(), this);
+
+        listTrechos.setAdapter(adapterTrechos);
+
+        ImageButton btnFechar = bsd.findViewById(R.id.btnFechar);
+        btnFechar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bsd.dismiss();
+            }
+        });
+
     }
 
     private void configuraMapa() {
@@ -204,7 +241,7 @@ public class DetalhesItinerarioActivity extends BaseActivity {
 //        GeoPoint startPoint = new GeoPoint(-22.470804460339885, -43.82463455200195);
 //        mapController.setCenter(startPoint);
 
-        map.setMaxZoomLevel(19d);
+        map.setMaxZoomLevel(25d);
         map.setMinZoomLevel(9d);
 
     }
@@ -328,6 +365,22 @@ public class DetalhesItinerarioActivity extends BaseActivity {
                 List<ParadaItinerarioBairro> paradas = viewModel.pits.getValue();
 
                 viewModel.calculaDistancia(viewModel.itinerario.getValue().getItinerario(), paradas, false);
+
+                viewModel.atualizaTrajetoItinerarios(viewModel.itinerario.getValue().getItinerario().getId());
+
+                viewModel.atualizaDistanciaAcumulada(viewModel.itinerario.getValue().getItinerario().getId());
+            }
+        });
+    }
+
+    public void onClickBtnAtualizaTrechos(View v){
+
+        Toast.makeText(getApplicationContext(), "Atualizando trechos...", Toast.LENGTH_SHORT).show();
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                viewModel.atualizaTemporarias(viewModel.itinerario.getValue().getItinerario().getId());
             }
         });
     }
@@ -360,6 +413,10 @@ public class DetalhesItinerarioActivity extends BaseActivity {
         Intent i = new Intent(ctx, RegistraViagemActivity.class);
         i.putExtra("itinerario", viewModel.getItinerario().getValue().getItinerario().getId());
         ctx.startActivity(i);
+    }
+
+    public void onClickBtnVerTrechos(View v){
+        bsd.show();
     }
 
     @Override
@@ -452,10 +509,10 @@ public class DetalhesItinerarioActivity extends BaseActivity {
 
                     switch(p.getParada().getSentido()){
                         case 0:
-                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.centro));
+                            m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker_centro));
                             break;
                         case 1:
-                            m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.bairro));
+                            m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker_bairro));
                             break;
                         default:
                             m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
@@ -466,15 +523,16 @@ public class DetalhesItinerarioActivity extends BaseActivity {
 
                     switch(p.getParada().getSentido()){
                         case 0:
-                            m.setIcon(DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
-                                    mergeDrawable(this, R.drawable.marker, R.drawable.centro).mutate()));
+                            m.setIcon(DrawableUtils
+                                    .convertToGrayscale(getApplicationContext().getResources().getDrawable(R.drawable.marker_centro).mutate()));
                             break;
                         case 1:
-                            m.setIcon(DrawableUtils.convertToGrayscale(br.com.vostre.circular.utils.DrawableUtils.
-                                    mergeDrawable(this, R.drawable.marker, R.drawable.bairro).mutate()));
+                            m.setIcon(DrawableUtils
+                                    .convertToGrayscale(getApplicationContext().getResources().getDrawable(R.drawable.marker_bairro).mutate()));
                             break;
                         default:
-                            m.setIcon(DrawableUtils.convertToGrayscale(getApplicationContext().getResources().getDrawable(R.drawable.marker).mutate()));
+                            m.setIcon(DrawableUtils
+                                    .convertToGrayscale(getApplicationContext().getResources().getDrawable(R.drawable.marker).mutate()));
                             break;
                     }
 
@@ -589,6 +647,8 @@ public class DetalhesItinerarioActivity extends BaseActivity {
             map.getOverlays().add(overlayEvents);
             atualizarParadasMapa(paradas);
 
+            atualizaTrajetoMapa(viewModel.iti.get());
+
 //            List<Overlay> ov = map.getOverlays().;
 //            System.out.println(ov.size());
         }
@@ -613,6 +673,28 @@ public class DetalhesItinerarioActivity extends BaseActivity {
         @Override
         public void onChanged(final List<ParadaItinerarioBairro> paradas) {
             viewModel.paradasItinerario.postValue(paradas);
+
+            if(map != null){
+
+                List<GeoPoint> geoPoints = new ArrayList<>();
+
+                for(ParadaItinerarioBairro p : paradas){
+                    Location l = new Location(LocationManager.NETWORK_PROVIDER);
+                    l.setLatitude(Double.parseDouble(p.getLatitude()));
+                    l.setLongitude(Double.parseDouble(p.getLongitude()));
+
+                    GeoPoint g = new GeoPoint(l);
+                    geoPoints.add(g);
+                }
+
+
+                map.getController().zoomToSpan(BoundingBox.fromGeoPoints(geoPoints).getLatitudeSpan(),
+                        BoundingBox.fromGeoPoints(geoPoints).getLongitudeSpanWithDateLine());
+
+                viewModel.atualizaPontoMapa();
+
+                viewModel.localAtual.observe(ctx, localObserver);
+            }
         }
     };
 
@@ -624,9 +706,42 @@ public class DetalhesItinerarioActivity extends BaseActivity {
             binding.textViewBairroPartida.setText(viewModel.itinerario.getValue().getNomeBairroPartida());
             viewModel.iti.set(itinerario);
 
+            atualizaTrajetoMapa(itinerario);
+
+            WidgetUtils.desenhaTrajetoMapa(itinerario.getItinerario(), map,
+                                10, R.color.azul);
+
             viewModel.carregaDirections(map, itinerario.getItinerario());
         }
     };
+
+    Observer<List<TrechoPartidaDestino>> trechosObserver = new Observer<List<TrechoPartidaDestino>>() {
+        @Override
+        public void onChanged(final List<TrechoPartidaDestino> trechos) {
+            adapterTrechos.trechos = trechos;
+            adapterTrechos.notifyDataSetChanged();
+
+            if(trechos.size() > 0){
+                binding.btnTrechos.setText("Ver Trechos ("+trechos.size()+")");
+            }
+
+        }
+    };
+
+    private void atualizaTrajetoMapa(ItinerarioPartidaDestino itinerario) {
+        List<GeoPoint> pontos = PolylineEncoder.decode(itinerario.getItinerario().getTrajeto(), 10, false);
+
+        Polyline line = new Polyline();
+        line.setPoints(pontos);
+        line.getOutlinePaint().setStrokeWidth(10);
+        line.getOutlinePaint().setColor(getResources().getColor(R.color.azul));
+
+        line.getOutlinePaint().setStrokeJoin(Paint.Join.ROUND);
+        line.getOutlinePaint().setStrokeCap(Paint.Cap.ROUND);
+
+        map.getOverlays().add(line);
+        map.invalidate();
+    }
 
     Observer<Location> localObserver = new Observer<Location>() {
         @Override

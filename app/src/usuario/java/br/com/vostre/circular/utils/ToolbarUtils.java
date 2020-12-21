@@ -45,13 +45,6 @@ public class ToolbarUtils {
 
     static MenuItem itemMsg;
 
-    // The authority for the sync adapter's content provider
-    public static final String AUTHORITY = "br.com.vostre.circular.datasync.provider";
-    // An account type, in the form of a domain name
-    public static final String ACCOUNT_TYPE = "br.com.vostre.circular.usuario.main";
-    // The account name
-    public static final String ACCOUNT = "dummyaccount";
-
     public static void preparaMenu(Menu menu, Activity activity, View.OnClickListener listener){
 
         activity.getMenuInflater().inflate(R.menu.main, menu);

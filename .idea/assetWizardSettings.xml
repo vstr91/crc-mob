@@ -333,7 +333,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/E:/Downloads/Programas/android-studio-ide-201.6565218-windows/android-studio/plugins/android/lib/android.jar!/images/material/icons/materialicons/accessible/baseline_accessible_24.xml" />
+                                      <entry key="url" value="file:/$PROJECT_DIR$/../../../../android/sdk/icons/material/materialicons/feedback/baseline_feedback_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -343,9 +343,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="assetSourceType" value="FILE" />
-                            <entry key="color" value="dddddd" />
-                            <entry key="outputName" value="ic_instagram_logo" />
+                            <entry key="color" value="ffffff" />
+                            <entry key="outputName" value="ic_baseline_feedback_24_white" />
                             <entry key="sourceFile" value="C:\Users\Almir\Documents\Desenvolvimento\Projetos\Circular\Versão 2.x\Imagens\Material App\Instagram_logo.svg" />
                           </map>
                         </option>

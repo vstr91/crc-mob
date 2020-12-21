@@ -4,6 +4,8 @@ import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
+
+import androidx.constraintlayout.solver.state.State;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import android.content.ContentResolver;
@@ -24,6 +26,12 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.work.Constraints;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
+
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -44,13 +52,16 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityMenuBinding;
 import br.com.vostre.circular.model.ParametroInterno;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.model.works.SyncWorker;
 import br.com.vostre.circular.utils.APIUtils;
 import br.com.vostre.circular.utils.DBUtils;
+import br.com.vostre.circular.utils.WorksUtils;
 import br.com.vostre.circular.viewModel.BaseViewModel;
 
 public class MenuActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -59,26 +70,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     NavigationView navView;
     ActivityMenuBinding binding;
     ActionBarDrawerToggle drawerToggle;
-
-    // Constants
-    // The authority for the sync adapter's content provider
-    public static String AUTHORITY = "br.com.vostre.circular.admin.datasync.provider";
-    // An account type, in the form of a domain name
-    public static final String ACCOUNT_TYPE = "br.com.vostre.circular.admin";
-    // The account name
-    public static final String ACCOUNT = "dummyaccount";
-    // Instance fields
-    Account mAccount;
-
-    // Sync interval constants
-    public static final long SECONDS_PER_MINUTE = 60L;
-    public static final long SYNC_INTERVAL_IN_MINUTES = 60*5L;
-    public static final long SYNC_INTERVAL =
-            SYNC_INTERVAL_IN_MINUTES *
-                    SECONDS_PER_MINUTE;
-    // Global variables
-    // A content resolver for accessing the provider
-    ContentResolver mResolver;
 
     int permissionStorage;
 
@@ -108,26 +99,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
         permissionStorage = ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
-        // Create the dummy account
-        mAccount = CreateSyncAccount(this);
-
-        // Get the content resolver for your app
-        mResolver = getContentResolver();
-
-        mAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
-
-        ContentResolver.setIsSyncable(mAccount, AUTHORITY, 1);
-        ContentResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
-
-        /*
-         * Turn on periodic syncing
-         */
-        ContentResolver.addPeriodicSync(
-                new Account(ACCOUNT, ACCOUNT_TYPE),
-                AUTHORITY,
-                Bundle.EMPTY,
-                SYNC_INTERVAL);
-
         drawer = binding.container;
         navView = binding.nav;
 
@@ -156,37 +127,6 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 
         ctx = this;
 
-//        DestaqueUtils.geraDestaqueUnico(this, binding.button, "Outro", "Teste modular", new TapTargetView.Listener(){
-//            @Override
-//            public void onTargetClick(TapTargetView view) {
-//                super.onTargetClick(view);
-//                onClickBtnPaises(view);
-//            }
-//        });
-
-//        List<TapTarget> targets = new ArrayList<>();
-//
-//        targets.add(DestaqueUtils.geraTapTarget(binding.button2, "Novo teste!", "Pressione esta opção para ter acesso a outros dados!", false));
-//        targets.add(DestaqueUtils.geraTapTarget(binding.button3, "Botao 3", "Botao tres texto", false));
-//        targets.add(DestaqueUtils.geraTapTarget(binding.button4, "Botao 4", "Botao quatro texto", false));
-//
-//        DestaqueUtils.geraSequenciaDestaques(this, targets, new TapTargetSequence.Listener() {
-//            @Override
-//            public void onSequenceFinish() {
-//                Toast.makeText(getApplicationContext(), "Terminou!", Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
-//                Toast.makeText(getApplicationContext(), "Um passo", Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void onSequenceCanceled(TapTarget lastTarget) {
-//                Toast.makeText(getApplicationContext(), "Cancelou...", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-
         viewModel.localAtual.observe(this, localObserver);
         viewModel.iniciarAtualizacoesPosicao();
         localAnterior = new Location(LocationManager.GPS_PROVIDER);
@@ -205,6 +145,13 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 //                        .playOn(findViewById(R.id.imageView2));
 //            }
 //        });
+
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+
+        // inicia atualizacao periodica
+        WorksUtils.iniciaWorkAtualizacao(getApplicationContext(), 60, "sync", constraints);
 
     }
 
@@ -303,56 +250,23 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
 //        Intent i = new Intent(getApplicationContext(), CameraActivity.class);
 //        startActivity(i);
 
-        CropImage.activity(null)
-                .setGuidelines(CropImageView.Guidelines.ON)
-                .start(this);
+        // EM USO
+//        CropImage.activity(null)
+//                .setGuidelines(CropImageView.Guidelines.ON)
+//                .start(this);
 
 //        Intent intentFile = new Intent();
 //        intentFile.setType("text/*");
 //        intentFile.setAction(Intent.ACTION_GET_CONTENT);
 //        startActivityForResult(Intent.createChooser(intentFile, "Escolha o arquivo de dados"), PICK_FILE);
+
+        Intent i = new Intent(getApplicationContext(), MapaActivity.class);
+        startActivity(i);
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false;
-    }
-
-    /**
-     * Create a new dummy account for the sync adapter
-     *
-     * @param context The application context
-     */
-    public static Account CreateSyncAccount(Context context) {
-        // Create the account type and default account
-        Account newAccount = new Account(
-                ACCOUNT, ACCOUNT_TYPE);
-        // Get an instance of the Android account manager
-        AccountManager accountManager =
-                (AccountManager) context.getSystemService(
-                        ACCOUNT_SERVICE);
-        /*
-         * Add the account and account type, no password or user data
-         * If successful, return the Account object, otherwise report an error.
-         */
-        if (accountManager.addAccountExplicitly(newAccount, null, null)) {
-            /*
-             * If you don't set android:syncable="true" in
-             * in your <provider> element in the manifest,
-             * then call context.setIsSyncable(account, AUTHORITY, 1)
-             * here.
-             */
-            System.out.println("AQUI!!!!");
-        } else {
-            /*
-             * The account exists or some other error occurred. Log this, report it,
-             * or handle it internally.
-             */
-            System.out.println("EXISTE!!!!");
-        }
-
-        return null;
-
     }
 
     Observer<List<ParametroInterno>> parametrosInternosObserver = new Observer<List<ParametroInterno>>() {
@@ -442,13 +356,7 @@ public class MenuActivity extends BaseActivity implements NavigationView.OnNavig
     };
 
     private void requisitaAtualizacao(){
-        Bundle settingsBundle = new Bundle();
-        settingsBundle.putBoolean(
-                ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        settingsBundle.putBoolean(
-                ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-
-        ContentResolver.requestSync(new Account(ACCOUNT, ACCOUNT_TYPE), AUTHORITY, settingsBundle);
+        WorksUtils.iniciaWorkAtualizacaoSingle(getApplicationContext(), "sync-single");
     }
 
     @Override

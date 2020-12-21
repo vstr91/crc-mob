@@ -17,6 +17,9 @@ import android.os.Handler;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.InputFilter;
 import android.view.Menu;
@@ -26,6 +29,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -42,6 +46,7 @@ import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.vision.clearcut.LogUtils;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.joda.time.DateTime;
@@ -60,6 +65,8 @@ import java.util.List;
 import br.com.vostre.circleview.CircleView;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityItinerariosBinding;
+import br.com.vostre.circular.listener.ParadaItinerarioListener;
+import br.com.vostre.circular.listener.ParadaListener;
 import br.com.vostre.circular.model.Bairro;
 import br.com.vostre.circular.model.log.LogConsulta;
 import br.com.vostre.circular.model.log.LogItinerario;
@@ -69,6 +76,7 @@ import br.com.vostre.circular.model.pojo.CidadeEstado;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
+import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 import br.com.vostre.circular.utils.DBUtils;
 import br.com.vostre.circular.utils.DataHoraUtils;
 import br.com.vostre.circular.utils.DestaqueUtils;
@@ -77,12 +85,17 @@ import br.com.vostre.circular.utils.WidgetUtils;
 import br.com.vostre.circular.view.adapter.CidadeAdapter;
 import br.com.vostre.circular.view.adapter.ItinerarioAdapter;
 import br.com.vostre.circular.view.adapter.ItinerarioResultadoAdapter;
+import br.com.vostre.circular.view.adapter.ParadaAdapter;
+import br.com.vostre.circular.view.adapter.ParadaBottomSheetAdapter;
 import br.com.vostre.circular.view.form.FormBairro;
 import br.com.vostre.circular.view.listener.FeriadoListener;
 import br.com.vostre.circular.view.listener.HoraListener;
 import br.com.vostre.circular.view.listener.ItemListener;
 import br.com.vostre.circular.view.listener.SelectListener;
 import br.com.vostre.circular.viewModel.ItinerariosViewModel;
+
+import static br.com.vostre.circular.utils.LogConsultaUtils.finalizaLog;
+import static br.com.vostre.circular.utils.LogConsultaUtils.iniciaLogItinerario;
 
 public class ItinerariosActivity extends BaseActivity implements SelectListener, ItemListener, HoraListener {
 
@@ -140,7 +153,12 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     Bairro bairroAtual;
 
-//    LogItinerario log;
+    BottomSheetDialog bsd;
+    RecyclerView listParadas;
+
+    ParadaBottomSheetAdapter adapterParada;
+
+    LogItinerario log;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,6 +197,14 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
         ocultaModalLoading();
 
+        ParadaItinerarioListener listenerParada = new ParadaItinerarioListener() {
+            @Override
+            public void onSelected(String itinerario, String bairro, String itinerarioSeguinte) {
+                viewModel.carregaParadasItinerario(itinerario, bairro, itinerarioSeguinte);
+                viewModel.paradasItinerario.observe(ctx, paradasItinerarioObserver);
+            }
+        };
+
         listCidadesPartida = binding.listCidadesPartida;
         adapter = new CidadeAdapter(viewModel.cidades.getValue(), this);
         adapter.setListener(this);
@@ -192,7 +218,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         listCidadesDestino.setAdapter(adapterDestino);
 
         listResultados = binding.listResultados;
-        adapterResultado = new ItinerarioResultadoAdapter(viewModel.resultadosItinerarios.getValue(), this, "", "");
+        adapterResultado = new ItinerarioResultadoAdapter(viewModel.resultadosItinerarios.getValue(), this, "", "", listenerParada);
         listResultados.setAdapter(adapterResultado);
 
         listItinerariosPorLinha = binding.listItinerarios;
@@ -277,6 +303,28 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         // fim tab por linha
 
         //DBUtils.exportDB(ctx);
+
+        bsd = new BottomSheetDialog(ctx);
+        bsd.setCanceledOnTouchOutside(true);
+
+        adapterParada = new ParadaBottomSheetAdapter(viewModel.paradasItinerario.getValue(), this);
+
+        bsd.setContentView(R.layout.bottom_sheet_paradas_itinerario);
+
+        listParadas = bsd.findViewById(R.id.listParadas);
+        listParadas.setAdapter(adapterParada);
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(listParadas.getContext(),
+                new LinearLayoutManager(ctx).getOrientation());
+        listParadas.addItemDecoration(dividerItemDecoration);
+
+        ImageButton btnFechar = bsd.findViewById(R.id.btnFechar);
+        btnFechar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bsd.dismiss();
+            }
+        });
 
     }
 
@@ -363,17 +411,23 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     public void onClickBtnProcurarPorLinha(View v){
         String linha = binding.editTextLinha.getText().toString().trim().replace(" ", "").replace("-", "").replace("_", "");
-        viewModel.buscarPorLinha(linha);
 
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+        if(!linha.isEmpty()){
+            viewModel.buscarPorLinha(linha);
 
-        viewModel.itinerariosPorLinha.observe(this, itinerarioPorLinhaObserver);
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
-//        log = (LogItinerario) iniciaLog(TiposLog.ITINERARIO_POR_LINHA.name());
-//        log.setLinha(linha);
+            viewModel.itinerariosPorLinha.observe(this, itinerarioPorLinhaObserver);
 
-        geraModalLoading(1);
+            log = (LogItinerario) LogConsultaUtils.iniciaLogItinerario(TiposLog.ITINERARIO_POR_LINHA.name(), ctx);
+            log.setLinha(linha);
+
+            geraModalLoading(1);
+        } else{
+            Toast.makeText(ctx, "Por favor, informe o código da linha.", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     // Fim Tab por linha
@@ -446,8 +500,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 
     public void onClickBtnInverter(View v){
 
-        System.out.println("BAIRRO P>> "+bairroPartida.getBairro().getNome()+" - "+bairroPartida.getNomeCidadeComEstado());
-        System.out.println("BAIRRO D>> "+bairroDestino.getBairro().getNome()+" - "+bairroDestino.getNomeCidadeComEstado());
+//        System.out.println("BAIRRO P>> "+bairroPartida.getBairro().getNome()+" - "+bairroPartida.getNomeCidadeComEstado());
+//        System.out.println("BAIRRO D>> "+bairroDestino.getBairro().getNome()+" - "+bairroDestino.getNomeCidadeComEstado());
 
         inversao = !inversao;
         //viewModel.escolhaAtual = 0;
@@ -455,8 +509,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         bairroPartida = bairroDestino;
         bairroDestino = bairro;
 
-        System.out.println("BAIRRO P-D>> "+bairroPartida.getBairro().getNome()+" - "+bairroPartida.getNomeCidadeComEstado());
-        System.out.println("BAIRRO D-D>> "+bairroDestino.getBairro().getNome()+" - "+bairroDestino.getNomeCidadeComEstado());
+//        System.out.println("BAIRRO P-D>> "+bairroPartida.getBairro().getNome()+" - "+bairroPartida.getNomeCidadeComEstado());
+//        System.out.println("BAIRRO D-D>> "+bairroDestino.getBairro().getNome()+" - "+bairroDestino.getNomeCidadeComEstado());
 
         binding.setPartida(bairroPartida);
         binding.setDestino(bairroDestino);
@@ -466,16 +520,18 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         String diaSeguinte = DataHoraUtils.getDiaSeguinte();
         String diaAnterior = DataHoraUtils.getDiaAnterior();
 
-        System.out.println("MYPartida Antes>> "+viewModel.myPartida.getBairro()+" - "+viewModel.myPartida.getNomeCidadeComEstado());
-        System.out.println("MYDestino Antes>> "+viewModel.myDestino.getBairro()+" - "+viewModel.myDestino.getNomeCidadeComEstado());
+//        System.out.println("MYPartida Antes>> "+viewModel.myPartida.getBairro()+" - "+viewModel.myPartida.getNomeCidadeComEstado());
+//        System.out.println("MYDestino Antes>> "+viewModel.myDestino.getBairro()+" - "+viewModel.myDestino.getNomeCidadeComEstado());
 
         viewModel.myPartida = bairroPartida;
         viewModel.myDestino = bairroDestino;
 
-        System.out.println("MYPartida>> "+viewModel.myPartida.getBairro()+" - "+viewModel.myPartida.getNomeCidadeComEstado());
-        System.out.println("MYDestino>> "+viewModel.myDestino.getBairro()+" - "+viewModel.myDestino.getNomeCidadeComEstado());
+//        System.out.println("MYPartida>> "+viewModel.myPartida.getBairro()+" - "+viewModel.myPartida.getNomeCidadeComEstado());
+//        System.out.println("MYDestino>> "+viewModel.myDestino.getBairro()+" - "+viewModel.myDestino.getNomeCidadeComEstado());
 
-//        log = (LogItinerario) iniciaLog(TiposLog.ITINERARIO_INVERSAO.name());
+        log = (LogItinerario) iniciaLogItinerario(TiposLog.ITINERARIO_INVERSAO.name(), ctx);
+        log.setPartida(bairroPartida.getBairro().getId());
+        log.setDestino(bairroDestino.getBairro().getId());
 
         viewModel.carregaResultadoNovo(DateTimeFormat.forPattern("HH:mm:00").print(dateTime), dia, diaSeguinte, diaAnterior, inversao);
 
@@ -575,8 +631,6 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
                     mFirebaseAnalytics.logEvent("consulta_itinerario", bundle);
                 }
 
-
-
             } else {
                 binding.listResultados.setVisibility(View.GONE);
                 binding.cardViewResultadoVazio.setVisibility(View.VISIBLE);
@@ -606,6 +660,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 //                }
 
             }
+
+            finalizaLog(ctx, log);
 
             adapterResultado.notifyDataSetChanged();
             listResultados.scrollToPosition(0);
@@ -802,24 +858,14 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
                 Toast.makeText(getApplicationContext(), "Nenhum itinerário encontrado...", Toast.LENGTH_SHORT).show();
             }
 
-//            if(log != null){
-//                finalizaLog();
-//            }
+            if(log != null){
+                finalizaLog(ctx, log);
+            }
 
             ocultaModalLoading();
 
         }
     };
-
-//    private LogConsulta iniciaLog(String tipo){
-//        log = (LogItinerario) LogConsultaUtils.iniciaLog(getApplicationContext());
-//        log.setTipo(tipo);
-//        return log;
-//    }
-
-//    private void finalizaLog() {
-//        LogConsultaUtils.finalizaLog(ctx, log, ctx.getLocalClassName());
-//    }
 
     Observer<List<ItinerarioPartidaDestino>> itinerarioPorDestinoObserver = new Observer<List<ItinerarioPartidaDestino>>() {
         @Override
@@ -841,7 +887,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 //                log.setTipo(TiposLog.ITINERARIO_POR_DESTINO.name());
 //            }
 //
-//            finalizaLog();
+            finalizaLog(ctx, log);
 
             ocultaModalLoading();
 
@@ -894,6 +940,20 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
         binding.executePendingBindings();
 
     }
+
+    Observer<List<ParadaBairro>> paradasItinerarioObserver = new Observer<List<ParadaBairro>>() {
+        @Override
+        public void onChanged(List<ParadaBairro> pits) {
+
+            if(pits.size() > 0){
+                adapterParada.paradas = pits;
+                adapterParada.notifyDataSetChanged();
+
+                bsd.show();
+            }
+
+        }
+    };
 
     Observer<HorarioItinerarioNome> itinerarioObserver = new Observer<HorarioItinerarioNome>() {
         @Override
@@ -1010,6 +1070,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
 //                    LogConsultaUtils.finalizaLog(getApplicationContext(), log, ctx.getLocalClassName());
 //                }
 
+                finalizaLog(ctx, log);
+
                 mFirebaseAnalytics.logEvent("consulta_itinerario_data_mod", bundle);
             }
 
@@ -1101,10 +1163,14 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
                     bairroDestino = bairroCidade;
                     viewModel.bairroDestino.observe(this, bairroDestinoObserver);
                     viewModel.destinoEscolhido = true;
+
+                    log = (LogItinerario) LogConsultaUtils.iniciaLogItinerario(TiposLog.ITINERARIO_TRADICIONAL.name(), ctx);
+                    log.setPartida(bairroPartida.getBairro().getId());
+                    log.setDestino(bairroCidade.getBairro().getId());
                 }
 
 //                if(log != null){
-//                    log.setTipo(TiposLog.ITINERARIO_TRADICIONAL.name());
+
 //                }
 
                 break;
@@ -1113,10 +1179,8 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
                 BairroCidade bairroCidadeConsulta = new BairroCidade();
                 bairroCidadeConsulta.getBairro().setId(id);
 
-//                if(log != null){
-//                    log.setDestino(id);
-//                    log.setTipo(TiposLog.ITINERARIO_POR_DESTINO.name());
-//                }
+                log = (LogItinerario) iniciaLogItinerario(TiposLog.ITINERARIO_POR_DESTINO.name(), ctx);
+                log.setDestino(id);
 
                 bairroDestinoConsulta = bairroCidadeConsulta;
                 viewModel.setBairroDestinoConsulta(bairroCidadeConsulta);
@@ -1272,7 +1336,7 @@ public class ItinerariosActivity extends BaseActivity implements SelectListener,
                     DestaqueUtils.geraDestaqueUnico(ctx, binding.listCidades.getChildAt(1).findViewById(R.id.circleView2),
                             "Escolha a cidade de destino", "Depois, escolha a cidade que será o destino da sua viagem!", l3, false, true);
                 }
-            }, 300);
+            }, 600);
 
         }
     };

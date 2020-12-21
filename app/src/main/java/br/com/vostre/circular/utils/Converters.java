@@ -47,4 +47,14 @@ public class Converters {
         return json;
     }
 
+    @TypeConverter
+    public static String fromInteger(Integer valor){
+        return String.valueOf(valor);
+    }
+
+    @TypeConverter
+    public static Integer toInteger(String valor){
+        return Integer.parseInt(valor);
+    }
+
 }

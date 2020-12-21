@@ -22,6 +22,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.DrawableWrapper;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -69,6 +70,8 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -98,6 +101,7 @@ import java.util.List;
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityDetalheItinerarioBinding;
 import br.com.vostre.circular.databinding.ActivityMapaBinding;
+import br.com.vostre.circular.model.ImagemParada;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaSugestao;
 import br.com.vostre.circular.model.PontoInteresse;
@@ -164,6 +168,8 @@ public class MapaActivity extends BaseActivity {
     private FirebaseAuth mAuth;
 
     boolean submenuAberto = false;
+
+    ParadaBairro paradaSelecionada;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -290,7 +296,27 @@ public class MapaActivity extends BaseActivity {
                 }
             }
 
+        } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri resultUri = result.getUri();
+
+                Bitmap bmp = BitmapFactory.decodeFile(resultUri.getPath());
+
+                ImagemParada imagemParada = new ImagemParada();
+                imagemParada.setParada(paradaSelecionada.getParada().getId());
+
+                viewModel.salvarFotoParada(imagemParada, bmp);
+                viewModel.retorno.observe(this, retornoObserver);
+
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+                Toast.makeText(getApplicationContext(), "Houve um problema ao processar a foto. Por favor tente novamente.", Toast.LENGTH_SHORT).show();
+            }
         }
+
+        super.onActivityResult(requestCode, resultCode, data);
 
     }
 
@@ -310,6 +336,21 @@ public class MapaActivity extends BaseActivity {
             }
 
             flag = true;
+
+        }
+    };
+
+    Observer<Integer> retornoObserver = new Observer<Integer>() {
+        @Override
+        public void onChanged(Integer retorno) {
+
+            if(retorno == 3){
+                Toast.makeText(getApplicationContext(), "Sugestão de imagem da Parada cadastrada! Obrigado!", Toast.LENGTH_SHORT).show();
+            } else if(retorno == 0){
+                Toast.makeText(getApplicationContext(),
+                        "Houve um problema ao salvar a imagem. Por favor, tente novamente.",
+                        Toast.LENGTH_SHORT).show();
+            }
 
         }
     };
@@ -405,7 +446,7 @@ public class MapaActivity extends BaseActivity {
 //        GeoPoint startPoint = new GeoPoint(-22.470804460339885, -43.82463455200195);
 //        mapController.setCenter(startPoint);
 
-        map.setMaxZoomLevel(19d);
+        map.setMaxZoomLevel(22d);
         map.setMinZoomLevel(8d);
         map.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -421,6 +462,39 @@ public class MapaActivity extends BaseActivity {
         });
 
         startLocationUpdates();
+    }
+
+    public void onClickBtnStreetView(View v){
+        // STREET VIEW
+
+        // Create a Uri from an intent string. Use the result to create an Intent.
+        Uri gmmIntentUri = Uri.parse("google.streetview:cbll="+paradaSelecionada.getParada().getLatitude()+","
+                +paradaSelecionada.getParada().getLongitude());
+
+        // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        // Make the Intent explicit by setting the Google Maps package
+        mapIntent.setPackage("com.google.android.apps.maps");
+
+        // Attempt to start an activity that can handle the Intent
+        startActivity(mapIntent);
+
+        // STREET VIEW
+    }
+
+    public void onClickBtnFoto(View v){
+        CropImage.activity(null)
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setActivityTitle("Escolher Foto")
+                .setAspectRatio(16,9)
+                .setFixAspectRatio(true)
+                .start(this);
+
+//        Intent intentFile = new Intent();
+//        intentFile.setType("text/*");
+//        intentFile.setAction(Intent.ACTION_GET_CONTENT);
+//        startActivityForResult(Intent.createChooser(intentFile, "Escolha o arquivo de dados"), PICK_FILE);
+
     }
 
     Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {
@@ -502,6 +576,25 @@ public class MapaActivity extends BaseActivity {
         }
     };
 
+    Observer<List<ImagemParada>> imagensParadaObserver = new Observer<List<ImagemParada>>() {
+        @Override
+        public void onChanged(final List<ImagemParada> imagens) {
+
+            int totalImagens = imagens.size();
+
+            if(totalImagens > 0){
+                ImagemParada ip = imagens.get(0);
+
+                paradaSelecionada.getParada().setImagem(ip.getImagem());
+                ImageView imageViewFoto = bsd.findViewById(R.id.imageView3);
+
+                atualizaImagemBSD(imageViewFoto, paradaSelecionada.getParada());
+            }
+
+        }
+
+    };
+
     @BindingAdapter("center")
     public static void setMapCenter(MapView map, GeoPoint geoPoint){
 
@@ -531,22 +624,22 @@ public class MapaActivity extends BaseActivity {
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                 m.setTitle(p.getParada().getNome());
                 m.setDraggable(false);
-                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
+//                m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
 
-//                switch(p.getParada().getSentido()){
-//                    case 0:
-//                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_backspace_black_24dp));
-//                        break;
-//                    case 1:
-//                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_keyboard_forward_black_24dp));
-//                        break;
+                switch(p.getParada().getSentido()){
+                    case 0:
+                        m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker_centro));
+                        break;
+                    case 1:
+                        m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker_bairro));
+                        break;
 //                    case 2:
 //                        m.setIcon(br.com.vostre.circular.utils.DrawableUtils.mergeDrawable(this, R.drawable.marker, R.drawable.ic_swap_horiz_black_24dp));
 //                        break;
-//                    default:
-//                        m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
-//                        break;
-//                }
+                    default:
+                        m.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker));
+                        break;
+                }
 
                 m.setId(p.getParada().getId());
                 m.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
@@ -557,6 +650,11 @@ public class MapaActivity extends BaseActivity {
                             geraModalLoading();
 
                             final ParadaBairro pb = getParadaFromMarker(marker, paradas);
+
+                            paradaSelecionada = pb;
+
+                            viewModel.getImagensParada(pb.getParada().getId());
+                            viewModel.imagensParada.observe(ctx, imagensParadaObserver);
 
                             viewModel.setParada(pb, viewModel.isFeriado.getValue());
                             viewModel.itinerarios.observe(ctx, itinerariosObserver);
@@ -571,6 +669,29 @@ public class MapaActivity extends BaseActivity {
                             TextView textViewReferencia = bsd.findViewById(R.id.textViewReferencia);
                             TextView textViewBairro = bsd.findViewById(R.id.textViewBairro);
                             TextView textViewRua = bsd.findViewById(R.id.textViewRua);
+
+                            TextView textViewSentidoParada = bsd.findViewById(R.id.textViewSentidoParada);
+                            TextView textView88 = bsd.findViewById(R.id.textView88);
+
+                            if(pb.getParada().getSentido() > -1){
+                                textViewSentidoParada.setText(pb.getParada().getSentidoTexto());
+                                textView88.setVisibility(View.VISIBLE);
+                                textViewSentidoParada.setVisibility(View.VISIBLE);
+
+                                switch(pb.getParada().getSentido()){
+                                    case 0:
+                                        textViewSentidoParada.setTextColor(ctx.getResources().getColor(R.color.azul));
+                                        break;
+                                    case 1:
+                                        textViewSentidoParada.setTextColor(ctx.getResources().getColor(R.color.ciano));
+                                        break;
+                                }
+
+                            } else{
+                                textViewSentidoParada.setText("");
+                                textView88.setVisibility(View.GONE);
+                                textViewSentidoParada.setVisibility(View.GONE);
+                            }
 
                             textViewReferencia.setText(pb.getParada().getNome());
 
@@ -621,18 +742,7 @@ public class MapaActivity extends BaseActivity {
 
                             ImageView img = bsd.findViewById(R.id.imageView3);
 
-                            File f = null;
-
-                            if(pb.getParada().getImagem() != null){
-                                f = new File(ctx.getApplicationContext().getFilesDir(),  pb.getParada().getImagem());
-                            }
-
-                            if(pb.getParada().getImagem() != null && f != null && f.exists() && f.canRead()){
-                                img.setImageDrawable(Drawable.createFromPath(getApplicationContext().getFilesDir()
-                                        +"/"+pb.getParada().getImagem()));
-                            } else{
-                                img.setImageDrawable(getResources().getDrawable(R.drawable.imagem_nao_disponivel_16_9));
-                            }
+                            atualizaImagemBSD(img, pb.getParada());
 
                             if(!SessionUtils.estaLogado(getApplicationContext())){
                                 bsd.findViewById(R.id.btnEdicao).setVisibility(View.GONE);
@@ -653,6 +763,24 @@ public class MapaActivity extends BaseActivity {
             }
 
         }
+
+    }
+
+    private void atualizaImagemBSD(ImageView img, Parada parada) {
+        File f = null;
+
+        if (parada.getImagem() != null) {
+            f = new File(ctx.getApplicationContext().getFilesDir(), parada.getImagem());
+        }
+
+        if (parada.getImagem() != null && f != null && f.exists() && f.canRead()) {
+            img.setImageDrawable(Drawable.createFromPath(getApplicationContext().getFilesDir()
+                    + "/" + parada.getImagem()));
+        } else {
+            img.setImageDrawable(getResources().getDrawable(R.drawable.imagem_nao_disponivel_16_9));
+        }
+
+        img.invalidate();
 
     }
 
@@ -814,18 +942,7 @@ public class MapaActivity extends BaseActivity {
 
                             ImageView img = bsd.findViewById(R.id.imageView3);
 
-                            File f = null;
-
-                            if(p.getParada().getImagem() != null){
-                                f = new File(ctx.getApplicationContext().getFilesDir(),  p.getParada().getImagem());
-                            }
-
-                            if(p.getParada().getImagem() != null && f != null && f.exists() && f.canRead()){
-                                img.setImageDrawable(Drawable.createFromPath(getApplicationContext().getFilesDir()
-                                        +"/"+p.getParada().getImagem()));
-                            } else{
-                                img.setImageDrawable(getResources().getDrawable(R.drawable.imagem_nao_disponivel_16_9));
-                            }
+                            atualizaImagemBSD(img, p.getParada());
 
                             Button btnDetalhes = bsd.findViewById(R.id.btnDetalhes);
                             btnDetalhes.setVisibility(View.GONE);
@@ -856,6 +973,7 @@ public class MapaActivity extends BaseActivity {
 
                             mapController.animateTo(marker.getPosition());
                             bsd.show();
+                            ocultaModalLoading();
                         }
 
                         return true;

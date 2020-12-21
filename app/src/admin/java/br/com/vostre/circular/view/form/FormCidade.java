@@ -309,4 +309,12 @@ public class FormCidade extends FormBase {
         }
     };
 
+    public String convertIdClima(Integer val){
+        return String.valueOf(val);
+    }
+
+    public Integer convertIdClima(String val){
+        return Integer.parseInt(val);
+    }
+
 }

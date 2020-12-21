@@ -32,11 +32,11 @@ public interface CircularAPI {
 //    Call<ResponseBody> recebeImagem(@Path("imagem") String imagem);
 
     // API Cloudinary - CDN
-    @GET("vostre/image/upload/v1568376445/circular/{imagem}")
+    @GET("vostre/image/upload/circular/{imagem}")
     Call<ResponseBody> recebeImagem(@Path("imagem") String imagem);
 
     // API Cloudinary - CDN
-    @GET("vostre/raw/upload/v1568376445/circular_viagem/{arquivo}")
+    @GET("vostre/raw/upload/circular_viagem/{arquivo}")
     Call<ResponseBody> recebeArquivo(@Path("arquivo") String arquivo);
 
     @Headers("Content-Type: application/json")
@@ -74,5 +74,13 @@ public interface CircularAPI {
     })
     @POST("api/v1/notifications")
     Call<String> enviaNotificacaoPush(@Body String json);
+
+    @Headers({"Accept: application/json"})
+    @GET("apiTransporte/apresentacao/rest/index.cfm/obterTodasPosicoes")
+    Call<String> recebeDadosGPSRio();
+
+    @Headers("Content-Type: application/json")
+    @POST("api/envia-dados/gps/{onibus}")
+    Call<String> enviaDadosGps(@Body String json, @Path("onibus") String onibus);
 
 }

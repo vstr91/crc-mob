@@ -47,6 +47,13 @@ public interface BairroDAO {
             "ORDER BY b.nome")
     List<BairroCidade> listarTodosAtivosComCidadePorCidadeSync(String cidade);
 
+    @Query("SELECT DISTINCT b.* FROM bairro b " +
+            "INNER JOIN parada p ON p.bairro = b.id INNER JOIN parada_itinerario pi ON pi.parada = p.id " +
+            "INNER JOIN itinerario i ON i.id = pi.itinerario " +
+            "WHERE b.cidade = :cidade AND pi.ativo = 1 AND p.ativo = 1 AND b.ativo = 1 AND i.ativo = 1 " +
+            "ORDER BY b.nome")
+    List<BairroCidade> listarTodosAtivosPorCidadeSync(String cidade);
+
     @Query("SELECT b.*, c.id AS idCidade, c.nome AS nomeCidade, c.brasao AS brasao, e.id AS idEstado, e.nome AS nomeEstado, e.sigla AS siglaEstado FROM bairro b " +
             "INNER JOIN cidade c ON c.id = b.cidade INNER JOIN estado e ON e.id = c.estado WHERE b.cidade = :cidade AND b.id != :bairro")
     LiveData<List<BairroCidade>> listarTodosComCidadePorCidadeFiltro(String cidade, String bairro);

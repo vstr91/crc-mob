@@ -20,6 +20,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
 import org.joda.time.DateTime;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.util.GeoPoint;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.UUID;
 
 import br.com.vostre.circular.R;
+import br.com.vostre.circular.model.ImagemParada;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.Servico;
 import br.com.vostre.circular.model.api.CircularAPI;
@@ -40,6 +42,7 @@ import br.com.vostre.circular.model.pojo.BairroCidade;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.ImageUtils;
 import br.com.vostre.circular.utils.StringUtils;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -322,6 +325,15 @@ public class ParadasViewModel extends AndroidViewModel {
         new editAsyncTask(appDatabase).execute(parada);
     }
 
+    public static void editImagemParada(final ImagemParada parada, Context context) {
+
+        if(appDatabase == null){
+            appDatabase = AppDatabase.getAppDatabase(context.getApplicationContext());
+        }
+
+        new editImagemParadaAsyncTask(appDatabase).execute(parada);
+    }
+
     private static class editAsyncTask extends AsyncTask<Parada, Void, Void> {
 
         private AppDatabase db;
@@ -333,6 +345,31 @@ public class ParadasViewModel extends AndroidViewModel {
         @Override
         protected Void doInBackground(final Parada... params) {
             db.paradaDAO().editar((params[0]));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            if(retorno != null){
+                retorno.setValue(1);
+            }
+
+        }
+
+    }
+
+    private static class editImagemParadaAsyncTask extends AsyncTask<ImagemParada, Void, Void> {
+
+        private AppDatabase db;
+
+        editImagemParadaAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final ImagemParada... params) {
+            db.imagemParadaDAO().editar((params[0]));
             return null;
         }
 
@@ -435,6 +472,29 @@ public class ParadasViewModel extends AndroidViewModel {
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 Toast.makeText(getApplication().getApplicationContext(), "Erro ao buscar rua. "+t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void buscarGPSOnibusRio(){
+        Retrofit retrofit = new Retrofit.Builder()
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .baseUrl("http://dadosabertos.rio.rj.gov.br/")
+                .build();
+
+        CircularAPI api = retrofit.create(CircularAPI.class);
+        Call<String> call = api.recebeDadosGPSRio();
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String res = response.body();
+                System.out.println(res);
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                System.out.println(t.getLocalizedMessage());
             }
         });
     }

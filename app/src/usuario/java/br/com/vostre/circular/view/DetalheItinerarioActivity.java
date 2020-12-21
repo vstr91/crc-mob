@@ -60,8 +60,11 @@ import java.util.concurrent.TimeUnit;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.databinding.ActivityDetalheItinerarioBinding;
+import br.com.vostre.circular.model.FeedbackItinerario;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.SecaoItinerario;
+import br.com.vostre.circular.model.log.LogItinerario;
+import br.com.vostre.circular.model.log.TiposLog;
 import br.com.vostre.circular.model.pojo.HorarioItinerarioNome;
 import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.Legenda;
@@ -69,6 +72,7 @@ import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.utils.CustomLayoutManager;
 import br.com.vostre.circular.utils.DestaqueUtils;
 import br.com.vostre.circular.utils.DrawableUtils;
+import br.com.vostre.circular.utils.LogConsultaUtils;
 import br.com.vostre.circular.utils.PreferenceUtils;
 import br.com.vostre.circular.utils.SnackbarHelper;
 import br.com.vostre.circular.utils.WidgetUtils;
@@ -77,6 +81,8 @@ import br.com.vostre.circular.view.adapter.ItinerarioInfoAdapter;
 import br.com.vostre.circular.view.adapter.LegendaAdapter;
 import br.com.vostre.circular.view.adapter.ParadaRuaAdapter;
 import br.com.vostre.circular.view.adapter.SecaoItinerarioAdapter;
+import br.com.vostre.circular.view.form.FormFeedbackItinerario;
+import br.com.vostre.circular.view.form.FormMapa;
 import br.com.vostre.circular.view.listener.LegendaListener;
 import br.com.vostre.circular.view.listener.PartidaEDestinoListener;
 import br.com.vostre.circular.view.utils.InfoWindow;
@@ -141,6 +147,10 @@ public class DetalheItinerarioActivity extends BaseActivity {
     Long iniPartida;
     Long iniDestino;
 
+    String nomeBairroPartida, nomeBairroDestino;
+
+    LogItinerario log;
+
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,6 +171,8 @@ public class DetalheItinerarioActivity extends BaseActivity {
             mFirebaseAnalytics = FirebaseAnalytics.getInstance(getApplicationContext());
 
             ctx = this;
+
+            log = LogConsultaUtils.iniciaLogItinerario(TiposLog.QUADRO_DE_HORARIOS.name(), ctx);
 
             viewModel = ViewModelProviders.of(this).get(DetalhesItinerarioViewModel.class);
 
@@ -212,6 +224,11 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
             viewModel.partidaConsulta = getIntent().getStringExtra("partidaConsulta");
             viewModel.destinoConsulta = getIntent().getStringExtra("destinoConsulta");
+
+            // log
+            log.setPartida(viewModel.partidaConsulta);
+            log.setDestino(viewModel.destinoConsulta);
+            log.setItinerario(getIntent().getStringExtra("itinerario"));
 
             iniPartida = System.nanoTime();
             iniDestino = System.nanoTime();
@@ -485,6 +502,13 @@ public class DetalheItinerarioActivity extends BaseActivity {
 //        }
     }
 
+    public void onClickBtnFeedback(View v){
+        FormFeedbackItinerario formFI = new FormFeedbackItinerario();
+        formFI.setItinerario(viewModel.itinerario.getValue().getItinerario());
+        formFI.setCtx(ctx.getApplication());
+        formFI.show(ctx.getSupportFragmentManager(), "formFI");
+    }
+
     private Bitmap getScreenViewBitmap(View v) {
         v.setDrawingCacheEnabled(true);
 
@@ -586,13 +610,41 @@ public class DetalheItinerarioActivity extends BaseActivity {
                     Legenda legenda = new Legenda();
                     legenda.setItinerario(itinerario.getItinerario().getId());
 
-                    if(itinerario.getItinerario().getObservacao() != null && !itinerario.getItinerario().getObservacao().isEmpty()){
-                        legenda.setTexto(itinerario.getNomeBairroPartida()+", "+itinerario.getNomeCidadePartida()+" x "
-                                +itinerario.getNomeBairroDestino()+", "+itinerario.getNomeCidadeDestino()+" ("
-                                +itinerario.getItinerario().getObservacao()+")");
+                    String bairroPartida, cidadePartida, bairroDestino, cidadeDestino, observacao;
+
+                    bairroPartida = itinerario.getNomeBairroPartida();
+                    cidadePartida = itinerario.getNomeCidadePartida();
+                    bairroDestino = itinerario.getNomeBairroDestino();
+                    cidadeDestino = itinerario.getNomeCidadeDestino();
+                    observacao = itinerario.getItinerario().getObservacao();
+
+                    bairroPartida = (itinerario.getItinerario().getAliasBairroPartida() == null ||
+                            itinerario.getItinerario().getAliasBairroPartida().isEmpty()) ?
+                            bairroPartida :
+                            itinerario.getItinerario().getAliasBairroPartida();
+
+                    cidadePartida = (itinerario.getItinerario().getAliasCidadePartida() == null ||
+                            itinerario.getItinerario().getAliasCidadePartida().isEmpty()) ?
+                            cidadePartida :
+                            itinerario.getItinerario().getAliasCidadePartida();
+
+                    bairroDestino = (itinerario.getItinerario().getAliasBairroDestino() == null ||
+                            itinerario.getItinerario().getAliasBairroDestino().isEmpty()) ?
+                            bairroDestino :
+                            itinerario.getItinerario().getAliasBairroDestino();
+
+                    cidadeDestino = (itinerario.getItinerario().getAliasCidadeDestino() == null ||
+                            itinerario.getItinerario().getAliasCidadeDestino().isEmpty()) ?
+                            cidadeDestino :
+                            itinerario.getItinerario().getAliasCidadeDestino();
+
+                    if(observacao != null && !observacao.isEmpty()){
+                        legenda.setTexto(bairroPartida+", "+cidadePartida+" x "
+                                +bairroDestino+", "+cidadeDestino+" ("
+                                +observacao+")");
                     } else{
-                        legenda.setTexto(itinerario.getNomeBairroPartida()+", "+itinerario.getNomeCidadePartida()+" x "
-                                +itinerario.getNomeBairroDestino()+", "+itinerario.getNomeCidadeDestino());
+                        legenda.setTexto(bairroPartida+", "+cidadePartida+" x "
+                                +bairroDestino+", "+cidadeDestino);
                     }
 
 
@@ -736,6 +788,8 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 }
             }, 500);
 
+            LogConsultaUtils.finalizaLog(ctx, log);
+
         }
     };
 
@@ -813,10 +867,10 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 if(!viewModel.trechoIsolado){
                     // ALIAS ITINERARIO
 
-                    String partida = binding.textViewNome.getText().toString();
+                    String partida = nomeBairroPartida;
                     String cidadePartida = binding.textViewBairro.getText().toString();
 
-                    String destino = binding.textViewNomeDestino.getText().toString();
+                    String destino = nomeBairroDestino;
                     String cidadeDestino = binding.textViewBairroDestino.getText().toString();
 
                     if(itinerario.getItinerario().getAliasBairroPartida() != null && !itinerario.getItinerario().getAliasBairroPartida().isEmpty()){
@@ -886,13 +940,13 @@ public class DetalheItinerarioActivity extends BaseActivity {
                 //viewModel.carregarItinerarios(parada.getParada().getId());
                 //viewModel.itinerarios.observe(ctx, itinerariosObserver);
 
-                System.out.println("TEMPO ITINERARIO OBSERVER "+contaProcessamento);
+//                System.out.println("TEMPO ITINERARIO OBSERVER "+contaProcessamento);
 
                 contaProcessamento++;
 
                 if(contaProcessamento == 2){
                     ocultaModalLoading();
-                    System.out.println("TEMPO SAIDA ITINERARIO OBSERVER");
+//                    System.out.println("TEMPO SAIDA ITINERARIO OBSERVER");
                 }
 
             }
@@ -933,12 +987,13 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
             if(parada != null){
                 binding.setPartida(parada);
-                System.out.println("PARTIDA>> "+parada.getNomeBairroComCidade());
+                nomeBairroPartida = parada.getNomeBairro();
+//                System.out.println("PARTIDA>> "+parada.getNomeBairroComCidade());
             }
 
             Long partidaFin = System.nanoTime();
 
-            System.out.println("TEMPO TOTAL PARTIDA: "+TimeUnit.SECONDS.convert(partidaFin - iniPartida, TimeUnit.NANOSECONDS));
+//            System.out.println("TEMPO TOTAL PARTIDA: "+TimeUnit.SECONDS.convert(partidaFin - iniPartida, TimeUnit.NANOSECONDS));
 
         }
     };
@@ -949,6 +1004,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
             if(parada != null){
                 binding.setDestino(parada);
+                nomeBairroDestino = parada.getNomeBairro();
 
 //                if(binding.getPartida() != null){
 //                    viewModel.setItinerario(itinerario, );
@@ -956,7 +1012,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
 
                 Long destinoFin = System.nanoTime();
 
-                System.out.println("TEMPO TOTAL DESTINO: "+TimeUnit.SECONDS.convert(destinoFin - iniDestino, TimeUnit.NANOSECONDS));
+//                System.out.println("TEMPO TOTAL DESTINO: "+TimeUnit.SECONDS.convert(destinoFin - iniDestino, TimeUnit.NANOSECONDS));
 
             }
 
@@ -980,7 +1036,7 @@ public class DetalheItinerarioActivity extends BaseActivity {
             Long finRuas = System.nanoTime();
             Long totRuas = finRuas - iniRuas;
 
-            System.out.println("TEMPO TOTAL IRUAS: "+ TimeUnit.SECONDS.convert(totRuas, TimeUnit.NANOSECONDS));
+//            System.out.println("TEMPO TOTAL IRUAS: "+ TimeUnit.SECONDS.convert(totRuas, TimeUnit.NANOSECONDS));
 
             adapterRuas.paradas = ruas;
             adapterRuas.notifyDataSetChanged();

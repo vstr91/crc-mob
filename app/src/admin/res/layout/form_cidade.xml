@@ -44,6 +44,28 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextIdClima"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Id Clima"
+                android:inputType="number"
+                app:textClima="@={viewModel.cidade.cidade.idClima}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
         <Switch
             android:id="@+id/switchProgramado"
             android:checked="@{viewModel.cidade.cidade.programadoPara != null ? true : false}"
@@ -176,7 +198,7 @@
             android:onClick="@{view::onClickBtnBrasao}"
             android:text="Selecionar Brasão"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout8" />
 
         <Button
             android:id="@+id/btnTrocarBrasao"

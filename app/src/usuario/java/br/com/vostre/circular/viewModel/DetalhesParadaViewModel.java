@@ -16,6 +16,8 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.widget.ImageView;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
@@ -42,6 +44,7 @@ import java.util.UUID;
 
 import br.com.vostre.circular.R;
 import br.com.vostre.circular.model.Feriado;
+import br.com.vostre.circular.model.ImagemParada;
 import br.com.vostre.circular.model.Parada;
 import br.com.vostre.circular.model.ParadaItinerario;
 import br.com.vostre.circular.model.PontoInteresse;
@@ -53,6 +56,9 @@ import br.com.vostre.circular.model.pojo.ItinerarioPartidaDestino;
 import br.com.vostre.circular.model.pojo.ParadaBairro;
 import br.com.vostre.circular.model.pojo.ParadaItinerarioBairro;
 import br.com.vostre.circular.utils.DataHoraUtils;
+import br.com.vostre.circular.utils.ImageUtils;
+import br.com.vostre.circular.utils.PreferenceUtils;
+import br.com.vostre.circular.utils.SessionUtils;
 import br.com.vostre.circular.utils.StringUtils;
 import br.com.vostre.circular.view.listener.FeriadoListener;
 
@@ -69,10 +75,13 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
 
     public MutableLiveData<List<ItinerarioPartidaDestino>> itinerarios;
     public LiveData<List<PontoInteresse>> pois;
+    public LiveData<List<ImagemParada>> imagensParada;
 
     public Bitmap foto;
 
     public static MutableLiveData<Boolean> isFeriado;
+
+    public static MutableLiveData<Integer> retorno;
 
     public ParadaBairro getParadaBairro() {
         return paradaBairro;
@@ -96,6 +105,10 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
 
     public void setFoto(Bitmap foto) {
         this.foto = foto;
+    }
+
+    public void getImagensParada(String parada){
+        this.imagensParada = appDatabase.imagemParadaDAO().listarTodosAtivosPorParada(parada);
     }
 
     public void setParada(final String parada, boolean isFeriado) {
@@ -290,6 +303,7 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
 
         isFeriado = new MutableLiveData<>();
         isFeriado.setValue(null);
+        retorno = new MutableLiveData<>();
     }
 
     public void checaFeriado(final Calendar data){
@@ -446,5 +460,88 @@ public class DetalhesParadaViewModel extends AndroidViewModel {
 
         //new buscaAsyncTask(appDatabase, local, this).execute();
     }
+
+    public void salvarFoto(ImagemParada imagemParada, Bitmap foto) {
+        FileOutputStream fos = null;
+        File file = new File(getApplication().getFilesDir(),  UUID.randomUUID().toString()+".png");
+
+        try {
+            fos = new FileOutputStream(file);
+            foto = ImageUtils.scaleDown(foto, 600, true);
+            foto.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+
+                    if(imagemParada.getImagem() != null && !imagemParada.getImagem().isEmpty()){
+                        File fotoAntiga = new File(getApplication().getFilesDir(), imagemParada.getImagem());
+
+                        if(fotoAntiga.exists() && fotoAntiga.canWrite() && fotoAntiga.getName() != file.getName()){
+                            fotoAntiga.delete();
+                        }
+                    }
+
+                    imagemParada.setImagem(file.getName());
+                    imagemParada.setImagemEnviada(false);
+
+                    if(SessionUtils.estaLogado(getApplication().getApplicationContext())){
+
+                        imagemParada.setDescricao(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+
+                        imagemParada.setUsuarioCadastro(PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext()));
+                        imagemParada.setUsuarioUltimaAlteracao(PreferenceUtils.carregarUsuarioLogado(getApplication().getApplicationContext()));
+                    }
+
+                    add(imagemParada);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                retorno.setValue(0);
+            }
+        }
+    }
+
+    // adicionar
+
+    public void add(final ImagemParada imagemParada) {
+
+        imagemParada.setDataCadastro(new DateTime());
+        imagemParada.setUltimaAlteracao(new DateTime());
+        imagemParada.setEnviado(false);
+
+        imagemParada.setParada(parada.getValue().getParada().getId());
+
+        new addAsyncTask(appDatabase).execute(imagemParada);
+    }
+
+    private static class addAsyncTask extends AsyncTask<ImagemParada, Void, Void> {
+
+        private AppDatabase db;
+
+        addAsyncTask(AppDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(final ImagemParada... params) {
+            db.imagemParadaDAO().inserir((params[0]));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            if(retorno != null){
+                retorno.setValue(1);
+            }
+
+        }
+
+    }
+
+    // fim adicionar
 
 }

@@ -560,10 +560,38 @@ public class ItinerarioPartidaDestino {
 
     public String getPartidaEDestinoResumido(){
 
-        if(getNomeCidadePartida() != null && getNomeCidadePartida().equals(getNomeCidadeDestino())){
-            return getNomeBairroPartida()+" x "+getNomeBairroDestino();
+        String bairroPartida, cidadePartida, bairroDestino, cidadeDestino, observacao;
+
+        bairroPartida = this.getNomeBairroPartida();
+        cidadePartida = this.getNomeCidadePartida();
+        bairroDestino = this.getNomeBairroDestino();
+        cidadeDestino = this.getNomeCidadeDestino();
+        observacao = this.getItinerario().getObservacao();
+
+        bairroPartida = (this.getItinerario().getAliasBairroPartida() == null ||
+                this.getItinerario().getAliasBairroPartida().isEmpty()) ?
+                bairroPartida :
+                this.getItinerario().getAliasBairroPartida();
+
+        cidadePartida = (this.getItinerario().getAliasCidadePartida() == null ||
+                this.getItinerario().getAliasCidadePartida().isEmpty()) ?
+                cidadePartida :
+                this.getItinerario().getAliasCidadePartida();
+
+        bairroDestino = (this.getItinerario().getAliasBairroDestino() == null ||
+                this.getItinerario().getAliasBairroDestino().isEmpty()) ?
+                bairroDestino :
+                this.getItinerario().getAliasBairroDestino();
+
+        cidadeDestino = (this.getItinerario().getAliasCidadeDestino() == null ||
+                this.getItinerario().getAliasCidadeDestino().isEmpty()) ?
+                cidadeDestino :
+                this.getItinerario().getAliasCidadeDestino();
+
+        if(cidadePartida != null && cidadePartida.equals(cidadeDestino)){
+            return bairroPartida+" x "+bairroDestino;
         } else{
-            return getNomeCidadePartida()+" x "+getNomeCidadeDestino();
+            return cidadePartida+" x "+cidadeDestino;
         }
 
 

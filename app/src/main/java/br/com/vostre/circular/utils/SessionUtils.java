@@ -2,7 +2,7 @@ package br.com.vostre.circular.utils;
 
 import android.content.Context;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 public class SessionUtils {
 
@@ -13,7 +13,9 @@ public class SessionUtils {
     public static void logUser(String usuarioLogado) {
         // TODO: Use the current user's information
         // You can call any combination of these three methods
-        Crashlytics.setUserIdentifier(usuarioLogado);
+        FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+
+        crashlytics.setUserId(usuarioLogado);
     }
 
 

@@ -11,6 +11,7 @@
 
         <androidx.drawerlayout.widget.DrawerLayout
             android:id="@+id/container"
+            tools:openDrawer="start"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -455,6 +456,29 @@
                         android:visibility="gone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
+
+                    <ImageButton
+                        android:id="@+id/imageButton7"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:alpha="0.5"
+                        android:background="@color/transparente"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/completo"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/textView89"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Em homenagem à nossa eterna\nmascote e companheira, Sofia."
+                        android:textAppearance="@style/texto_azul"
+                        android:textSize="10sp"
+                        app:layout_constraintBottom_toTopOf="@+id/imageButton7"
+                        app:layout_constraintEnd_toEndOf="@+id/imageButton7"
+                        app:layout_constraintStart_toStartOf="@+id/imageButton7" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

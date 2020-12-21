@@ -102,7 +102,7 @@
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/listMensagensRecebidas"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -110,6 +110,25 @@
                             tools:listitem="@layout/linha_mensagens">
 
                         </androidx.recyclerview.widget.RecyclerView>
+
+                        <TextView
+                            android:id="@+id/textViewListaVazia2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginRight="8dp"
+                            android:gravity="center"
+                            android:padding="10dp"
+                            android:text="Nenhuma mensagem recebida até o momento."
+                            android:textColor="@color/branco"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/listMensagensRecebidas" />
+
                     </LinearLayout>
 
                 </FrameLayout>

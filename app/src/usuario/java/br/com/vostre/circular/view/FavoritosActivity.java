@@ -89,6 +89,8 @@ public class FavoritosActivity extends BaseActivity {
         final TabWidget tw = (TabWidget) tabHost.findViewById(android.R.id.tabs);
         tw.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
 
+        geraModalLoading();
+
     }
 
     @Override
@@ -104,14 +106,34 @@ public class FavoritosActivity extends BaseActivity {
         return retorno;
     }
 
+    private void geraModalLoading() {
+        binding.fundo.setVisibility(View.VISIBLE);
+        binding.textViewCarregando.setVisibility(View.VISIBLE);
+        binding.progressBar.setIndeterminate(true);
+        binding.progressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void ocultaModalLoading(){
+        binding.fundo.setVisibility(View.GONE);
+        binding.textViewCarregando.setVisibility(View.GONE);
+        binding.progressBar.setIndeterminate(true);
+        binding.progressBar.setVisibility(View.GONE);
+    }
+
     Observer<List<ParadaBairro>> paradasObserver = new Observer<List<ParadaBairro>>() {
         @Override
         public void onChanged(List<ParadaBairro> paradas) {
 
             if(paradas.size() > 0){
                 adapterParada.paradas = paradas;
+                binding.listItinerarios.setVisibility(View.VISIBLE);
+                binding.textViewListaVazia3.setVisibility(View.GONE);
+                binding.estrelaParada.setVisibility(View.GONE);
             } else{
                 adapterParada.paradas = new ArrayList<>();
+                binding.listParadas.setVisibility(View.GONE);
+                binding.textViewListaVazia3.setVisibility(View.VISIBLE);
+                binding.estrelaParada.setVisibility(View.VISIBLE);
             }
 
             adapterParada.notifyDataSetChanged();
@@ -124,11 +146,19 @@ public class FavoritosActivity extends BaseActivity {
 
             if(itinerarios.size() > 0){
                 adapterItinerarios.itinerarios = itinerarios;
+                binding.listItinerarios.setVisibility(View.VISIBLE);
+                binding.textViewListaVazia2.setVisibility(View.GONE);
+                binding.estrelaItinerario.setVisibility(View.GONE);
             } else{
                 adapterItinerarios.itinerarios = new ArrayList<>();
+                binding.listItinerarios.setVisibility(View.GONE);
+                binding.textViewListaVazia2.setVisibility(View.VISIBLE);
+                binding.estrelaItinerario.setVisibility(View.VISIBLE);
             }
 
             adapterItinerarios.notifyDataSetChanged();
+
+            ocultaModalLoading();
         }
     };
 
